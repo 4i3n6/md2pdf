@@ -1,5 +1,6 @@
 import { marked } from 'marked';
 import DOMPurify from 'dompurify';
+import hljs from 'highlight.js';
 import { calculatePrintDimensions, validateImageForA4 } from './imageProcessor.js';
 
 /**
@@ -68,9 +69,38 @@ const printRenderer = {
     },
 
     code(token) {
-        const sanitized = DOMPurify.sanitize(token.text);
         const lang = token.lang || 'plaintext';
-        return `<pre class="markdown-code-block" data-lang="${lang}"><code class="language-${lang}">${sanitized}</code></pre>\n`;
+        let highlightedCode = token.text;
+
+        // Tentar fazer highlight com highlight.js
+        try {
+            if (lang && hljs.getLanguage(lang)) {
+                const highlighted = hljs.highlight(token.text, { language: lang, ignoreIllegals: true });
+                highlightedCode = highlighted.value;
+            } else if (lang === 'plaintext') {
+                // Plaintext não precisa de highlight
+                highlightedCode = DOMPurify.sanitize(token.text);
+            } else {
+                // Auto-detect
+                try {
+                    const highlighted = hljs.highlightAuto(token.text);
+                    highlightedCode = highlighted.value;
+                } catch {
+                    highlightedCode = DOMPurify.sanitize(token.text);
+                }
+            }
+        } catch (e) {
+            // Fallback para sanitização simples
+            highlightedCode = DOMPurify.sanitize(token.text);
+        }
+
+        // Sanitizar o HTML gerado pelo highlight.js
+        const sanitized = DOMPurify.sanitize(highlightedCode, {
+            ALLOWED_TAGS: ['span', 'br'],
+            ALLOWED_ATTR: ['class']
+        });
+
+        return `<pre class="markdown-code-block hljs" data-lang="${lang}"><code class="language-${lang}">${sanitized}</code></pre>\n`;
     },
 
     blockquote(token) {

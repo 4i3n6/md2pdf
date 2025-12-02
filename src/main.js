@@ -1,6 +1,8 @@
 import { EditorView, basicSetup } from 'codemirror';
 import { markdown } from '@codemirror/lang-markdown';
 import { marked } from 'marked';
+import hljs from 'highlight.js';
+import 'highlight.js/styles/github.css';
 import { processMarkdown, validateMarkdown, estimatePageCount, processImagesInPreview } from './processors/markdownProcessor.js';
 import { printDocument, validatePrintContent, generatePrintReport, togglePrintPreview } from './utils/printUtils.js';
 import { createReporter } from './utils/printReporter.js';
