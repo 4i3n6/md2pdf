@@ -171,9 +171,46 @@ export function printDocument(docName = 'document', logger = console.log) {
 /**
  * Ativa modo de preview de impressão (emula print media no CSS)
  * Permite ao usuário ver como ficará a impressão sem abrir print dialog
+ * Pressione ESC para sair
  */
 export function togglePrintPreview() {
+    const isEntering = !document.body.classList.contains('print-mode');
     document.body.classList.toggle('print-mode');
+    
+    if (isEntering) {
+        // Adicionar listener para ESC quando entrar no modo
+        const escapeHandler = (e) => {
+            if (e.key === 'Escape' && document.body.classList.contains('print-mode')) {
+                document.body.classList.remove('print-mode');
+                document.removeEventListener('keydown', escapeHandler);
+            }
+        };
+        document.addEventListener('keydown', escapeHandler);
+    }
+}
+
+/**
+ * Entra em modo de preview (não toggle)
+ * @returns {boolean} Se entrou ou já estava
+ */
+export function enterPrintPreview() {
+    if (!document.body.classList.contains('print-mode')) {
+        togglePrintPreview();
+        return true;
+    }
+    return false;
+}
+
+/**
+ * Sai do modo de preview
+ * @returns {boolean} Se saiu ou já estava fora
+ */
+export function exitPrintPreview() {
+    if (document.body.classList.contains('print-mode')) {
+        document.body.classList.remove('print-mode');
+        return true;
+    }
+    return false;
 }
 
 /**

@@ -2,7 +2,8 @@ import { EditorView, basicSetup } from 'codemirror';
 import { markdown } from '@codemirror/lang-markdown';
 import { marked } from 'marked';
 import { processMarkdown, validateMarkdown, estimatePageCount, processImagesInPreview } from './processors/markdownProcessor.js';
-import { printDocument, validatePrintContent, generatePrintReport } from './utils/printUtils.js';
+import { printDocument, validatePrintContent, generatePrintReport, togglePrintPreview } from './utils/printUtils.js';
+import { createReporter } from './utils/printReporter.js';
 import './styles.css'; // Importação do CSS para o Vite processar
 import './styles-print.css'; // Estilos otimizados para impressão A4
 
@@ -284,20 +285,41 @@ function setupEvents() {
                 validation.issues.forEach(issue => Logger.log(issue, 'warning'));
             }
 
-            // Gerar relatório
+            // Gerar relatório detalhado com PrintReporter
             const doc = getCurrentDoc();
-            const report = generatePrintReport(doc?.name || 'document', preview.innerHTML);
-            Logger.log(report, 'info');
+            const reporter = createReporter(preview.innerHTML, doc?.name || 'document');
+            const checklist = reporter.generateChecklist();
+            
+            // Mostrar checklist
+            Logger.log('=== PRÉ-IMPRESSÃO ===', 'info');
+            checklist.checks.forEach(check => Logger.log(check, 'success'));
+            checklist.warnings.forEach(warn => Logger.log(warn, 'warning'));
+            
+            // Gerar relatório resumido
+            const stats = reporter.analyze();
+            Logger.log(`📄 ${stats.estimatedPages}pp | 📝 ${stats.words} palavras | ⏱️ ~${stats.readingTime}min`);
 
             // Iniciar impressão com printUtils melhorado
             Logger.log('Abrindo diálogo de impressão...');
             const success = await printDocument(doc?.name || 'document', (msg) => Logger.log(msg));
             
             if (success) {
-                Logger.success('Impressão finalizada');
+                Logger.success('✓ Impressão finalizada com sucesso');
             }
         });
     }
+
+    // Atalhos de teclado globais
+    document.addEventListener('keydown', (e) => {
+        // Ctrl+Shift+P (ou Cmd+Shift+P no Mac) - Preview de impressão
+        if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key === 'P') {
+            e.preventDefault();
+            togglePrintPreview();
+            Logger.success(document.body.classList.contains('print-mode') 
+                ? '📋 Preview de Impressão Ativado (ESC para sair)' 
+                : '✓ Preview Desativado');
+        }
+    });
 
     // Name Input
     const inputName = document.getElementById('doc-name');
