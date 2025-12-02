@@ -73,14 +73,14 @@
         width: 100%;
         height: auto;
         margin: 0;
-        padding: 20mm;
+        padding: 20mm 20mm 20mm 20mm;
         background: white;
-        border: none !important;
+        border: 1px solid #ccc;
         box-shadow: none !important;
         color: black;
         font-family: 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
-        font-size: 10pt;
-        line-height: 1.5;
+        font-size: 9.5pt;
+        line-height: 1.2;
         box-sizing: border-box;
     }
 
@@ -105,43 +105,49 @@
     }
 
     .markdown-body h1 {
-        font-size: 18pt;
-        border-bottom: 2px solid black;
-        padding-bottom: 0.3em;
-        margin-top: 1.2em;
-        margin-bottom: 0.6em;
+        font-size: 14pt;
+        border-bottom: 1px solid #333;
+        padding-bottom: 0.15em;
+        margin-top: 0.4em;
+        margin-bottom: 0.2em;
+        font-weight: bold;
     }
 
     .markdown-body h2 {
-        font-size: 14pt;
-        border-bottom: 1px solid #333;
-        padding-bottom: 0.2em;
-        margin-top: 1em;
-        margin-bottom: 0.5em;
+        font-size: 12pt;
+        border-bottom: none;
+        padding-bottom: 0;
+        margin-top: 0.3em;
+        margin-bottom: 0.15em;
+        font-weight: bold;
     }
 
     .markdown-body h3 {
-        font-size: 12pt;
-        margin-top: 0.8em;
-        margin-bottom: 0.4em;
+        font-size: 11pt;
+        margin-top: 0.25em;
+        margin-bottom: 0.1em;
+        font-weight: bold;
     }
 
     .markdown-body h4 {
-        font-size: 11pt;
-        margin-top: 0.6em;
-        margin-bottom: 0.3em;
+        font-size: 10.5pt;
+        margin-top: 0.2em;
+        margin-bottom: 0.1em;
+        font-weight: bold;
     }
 
     .markdown-body h5 {
-        font-size: 10.5pt;
-        margin-top: 0.5em;
-        margin-bottom: 0.3em;
+        font-size: 10pt;
+        margin-top: 0.15em;
+        margin-bottom: 0.1em;
+        font-weight: bold;
     }
 
     .markdown-body h6 {
         font-size: 10pt;
-        margin-top: 0.4em;
-        margin-bottom: 0.2em;
+        margin-top: 0.1em;
+        margin-bottom: 0.05em;
+        font-weight: bold;
     }
 
     /* ============================================================
@@ -149,11 +155,11 @@
        ============================================================ */
 
     .markdown-body p {
-        margin: 0.5em 0;
+        margin: 0.1em 0;
         text-align: left;
         page-break-inside: avoid;
-        font-size: 10pt;
-        line-height: 1.4;
+        font-size: 9.5pt;
+        line-height: 1.15;
     }
 
     .markdown-body strong,
@@ -205,10 +211,10 @@
     .markdown-body .markdown-code-inline {
         background: #f5f5f5;
         border: 1px solid #ddd;
-        border-radius: 2px;
-        padding: 1px 3px;
+        border-radius: 1px;
+        padding: 0px 2px;
         font-family: 'Courier New', 'Monaco', monospace;
-        font-size: 9pt;
+        font-size: 8pt;
         color: #333;
     }
 
@@ -216,14 +222,14 @@
     .markdown-body .markdown-code-block {
         background: #f8f8f8;
         border: 1px solid #ddd;
-        border-radius: 2px;
-        padding: 8pt;
-        margin: 0.5em 0;
+        border-radius: 1px;
+        padding: 4pt;
+        margin: 0.05em 0;
         overflow-x: auto;
         page-break-inside: avoid;
         font-family: 'Courier New', 'Monaco', monospace;
-        font-size: 9pt;
-        line-height: 1.2;
+        font-size: 7.5pt;
+        line-height: 1.1;
         color: black;
     }
 
@@ -243,17 +249,17 @@
     .markdown-body ol,
     .markdown-body .markdown-list-unordered,
     .markdown-body .markdown-list-ordered {
-        margin: 0.4em 0;
-        padding-left: 1.5em;
+        margin: 0.05em 0;
+        padding-left: 1.2em;
         page-break-inside: avoid;
-        font-size: 10pt;
+        font-size: 9.5pt;
     }
 
     .markdown-body li {
-        margin-bottom: 0.2em;
+        margin-bottom: 0.05em;
         page-break-inside: avoid;
-        font-size: 10pt;
-        line-height: 1.3;
+        font-size: 9.5pt;
+        line-height: 1.1;
     }
 
     .markdown-body ul li::marker,
@@ -268,14 +274,14 @@
     .markdown-body blockquote,
     .markdown-body .markdown-blockquote {
         background: white;
-        border-left: 3px solid #999;
-        margin: 0.4em 0;
-        padding: 0.3em 0 0.3em 0.6em;
+        border-left: 2px solid #999;
+        margin: 0.1em 0;
+        padding: 0.1em 0 0.1em 0.4em;
         page-break-inside: avoid;
         font-style: italic;
         color: #666;
-        font-size: 9.5pt;
-        line-height: 1.3;
+        font-size: 9pt;
+        line-height: 1.1;
     }
 
     /* ============================================================
@@ -286,16 +292,16 @@
     .markdown-body .markdown-table-content {
         width: 100%;
         border-collapse: collapse;
-        margin: 0.5em 0;
+        margin: 0.1em 0;
         page-break-inside: avoid;
         border: 1px solid #ddd;
-        font-size: 9pt;
+        font-size: 8pt;
     }
 
     .markdown-body th,
     .markdown-body td {
         border: 1px solid #ddd;
-        padding: 4pt 6pt;
+        padding: 2pt 3pt;
         text-align: left;
     }
 
@@ -303,7 +309,7 @@
         background: #f0f0f0;
         font-weight: bold;
         color: black;
-        font-size: 9pt;
+        font-size: 8pt;
     }
 
     /* Repetir header de tabela em cada página */
@@ -319,14 +325,14 @@
     .markdown-body .markdown-image,
     .markdown-body .markdown-table {
         page-break-inside: avoid;
-        margin: 0.5em 0;
+        margin: 0.1em 0;
         text-align: center;
     }
 
     .markdown-body img,
     .markdown-body .markdown-img {
         max-width: 100%;
-        max-height: 150mm;
+        max-height: 100mm;
         height: auto;
         border: none;
         display: block;
@@ -335,9 +341,9 @@
 
     .markdown-body figcaption,
     .markdown-body .markdown-figcaption {
-        font-size: 8pt;
+        font-size: 7pt;
         color: #888;
-        margin-top: 0.3em;
+        margin-top: 0.05em;
         font-style: italic;
     }
 
@@ -349,8 +355,8 @@
     .markdown-body .markdown-hr {
         page-break-after: always;
         border: none;
-        border-top: 2px solid black;
-        margin: 2em 0;
+        border-top: 1px solid #333;
+        margin: 0.2em 0;
     }
 
     /* ============================================================
@@ -406,11 +412,11 @@
        ============================================================ */
 
     .markdown-body > :first-child {
-        margin-top: 0;
+        margin-top: 0 !important;
     }
 
     .markdown-body > :last-child {
-        margin-bottom: 0;
+        margin-bottom: 0 !important;
     }
 
     /* ============================================================
