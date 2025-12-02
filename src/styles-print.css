@@ -28,7 +28,6 @@
        HIDE UI ELEMENTS (Sidebar, Top Bar, Editor)
        ============================================================ */
 
-    .app-grid,
     .sidebar,
     .top-bar,
     .pane-header,
@@ -41,6 +40,15 @@
     /* ============================================================
        PREVIEW WRAPPER - PÁGINA PRINCIPAL
        ============================================================ */
+
+    .app-grid {
+        display: block !important;
+        width: 100% !important;
+        height: auto !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        background: white !important;
+    }
 
     .workspace,
     .pane-container.preview-pane,
