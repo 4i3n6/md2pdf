@@ -22,7 +22,7 @@
         background: white;
         color: black;
         font-size: 10pt;
-        font-family: Georgia, 'Times New Roman', serif;
+        font-family: 'Courier New', 'Courier', monospace;
     }
 
     /* ============================================================
@@ -73,13 +73,13 @@
         width: 100%;
         height: auto;
         margin: 0;
-        padding: 20mm 20mm 20mm 20mm;
+        padding: 10mm 12mm 10mm 12mm;
         background: white;
         border: 1px solid #ccc;
         box-shadow: none !important;
         color: black;
-        font-family: Georgia, 'Times New Roman', serif;
-        font-size: 9.5pt;
+        font-family: 'Courier New', 'Courier', monospace;
+        font-size: 9pt;
         line-height: 1.2;
         box-sizing: border-box;
     }
@@ -365,12 +365,12 @@
 
     @page {
         size: A4;
-        margin: 20mm;
+        margin: 10mm 12mm 10mm 12mm;
 
         /* Números de página no rodapé (suportado por Chrome, Firefox) */
         @bottom-center {
             content: "Página " counter(page) " de " counter(pages);
-            font-size: 10pt;
+            font-size: 8pt;
             color: #999;
         }
     }
