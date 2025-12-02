@@ -1,0 +1,442 @@
+/**
+ * ESTILOS PARA IMPRESSÃO EM A4 - MD2PDF
+ * Otimizado para PDF profissional com margens, quebras de página e tipografia
+ */
+
+@media print {
+    /* ============================================================
+       RESET E CONFIGURAÇÕES BASE
+       ============================================================ */
+
+    * {
+        orphans: 3;
+        widows: 3;
+        page-break-inside: avoid;
+    }
+
+    html, body {
+        width: 100%;
+        height: auto;
+        margin: 0;
+        padding: 0;
+        background: white;
+        color: black;
+        font-size: 11pt;
+    }
+
+    /* ============================================================
+       HIDE UI ELEMENTS (Sidebar, Top Bar, Editor)
+       ============================================================ */
+
+    .app-grid,
+    .sidebar,
+    .top-bar,
+    .pane-header,
+    .editor-frame,
+    #console-log,
+    .workspace > .pane-container:first-child {
+        display: none !important;
+    }
+
+    /* ============================================================
+       PREVIEW WRAPPER - PÁGINA PRINCIPAL
+       ============================================================ */
+
+    .workspace,
+    .pane-container.preview-pane,
+    #preview-wrapper {
+        display: block !important;
+        width: 100% !important;
+        height: auto !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        background: white !important;
+        border: none !important;
+        overflow: visible !important;
+    }
+
+    /* ============================================================
+       MARKDOWN BODY - CONTEÚDO PRINCIPAL
+       ============================================================ */
+
+    .markdown-body {
+        max-width: 210mm;
+        width: 100%;
+        margin: 0 auto;
+        padding: 20mm;
+        background: white;
+        border: none !important;
+        box-shadow: none !important;
+        color: black;
+        font-family: 'Georgia', 'Times New Roman', serif;
+        font-size: 11pt;
+        line-height: 1.6;
+    }
+
+    /* ============================================================
+       HEADINGS - H1 a H6
+       ============================================================ */
+
+    .markdown-body h1,
+    .markdown-body h2,
+    .markdown-body h3,
+    .markdown-body h4,
+    .markdown-body h5,
+    .markdown-body h6 {
+        page-break-after: avoid;
+        color: black;
+        border: none;
+        text-transform: none;
+        letter-spacing: normal;
+        margin-top: 1.5em;
+        margin-bottom: 0.75em;
+        font-weight: bold;
+    }
+
+    .markdown-body h1 {
+        font-size: 26pt;
+        border-bottom: 3px solid black;
+        padding-bottom: 0.3em;
+    }
+
+    .markdown-body h2 {
+        font-size: 20pt;
+        border-bottom: 2px solid #333;
+        padding-bottom: 0.25em;
+    }
+
+    .markdown-body h3 {
+        font-size: 16pt;
+        margin-top: 1.25em;
+    }
+
+    .markdown-body h4 {
+        font-size: 14pt;
+    }
+
+    .markdown-body h5 {
+        font-size: 12pt;
+    }
+
+    .markdown-body h6 {
+        font-size: 11pt;
+    }
+
+    /* ============================================================
+       PARÁGRAFOS E TEXTO
+       ============================================================ */
+
+    .markdown-body p {
+        margin: 0.75em 0;
+        text-align: justify;
+        page-break-inside: avoid;
+    }
+
+    .markdown-body strong,
+    .markdown-body b {
+        font-weight: bold;
+    }
+
+    .markdown-body em,
+    .markdown-body i {
+        font-style: italic;
+    }
+
+    .markdown-body u {
+        text-decoration: underline;
+    }
+
+    .markdown-body s,
+    .markdown-body del {
+        text-decoration: line-through;
+    }
+
+    /* ============================================================
+       LINKS - MOSTRAR URL EM PRINT
+       ============================================================ */
+
+    .markdown-body a {
+        color: black;
+        text-decoration: underline;
+        word-break: break-word;
+    }
+
+    .markdown-body a[href]::after {
+        content: " (" attr(href) ")";
+        font-size: 9pt;
+        color: #666;
+        word-break: break-all;
+    }
+
+    /* Não mostrar URLs para links âncora */
+    .markdown-body a[href^="#"]::after {
+        content: '';
+    }
+
+    /* ============================================================
+       CÓDIGO INLINE E BLOCOS
+       ============================================================ */
+
+    .markdown-body code,
+    .markdown-body .markdown-code-inline {
+        background: #f5f5f5;
+        border: 1px solid #ddd;
+        border-radius: 3px;
+        padding: 2px 5px;
+        font-family: 'Courier New', 'Monaco', monospace;
+        font-size: 10pt;
+        color: #c7254e;
+    }
+
+    .markdown-body pre,
+    .markdown-body .markdown-code-block {
+        background: #f8f8f8;
+        border: 1px solid #ddd;
+        border-radius: 3px;
+        padding: 12pt;
+        margin: 1em 0;
+        overflow-x: auto;
+        page-break-inside: avoid;
+        font-family: 'Courier New', 'Monaco', monospace;
+        font-size: 10pt;
+        line-height: 1.4;
+        color: black;
+    }
+
+    .markdown-body pre code,
+    .markdown-body .markdown-code-block code {
+        background: transparent;
+        border: none;
+        padding: 0;
+        color: black;
+    }
+
+    /* ============================================================
+       LISTAS
+       ============================================================ */
+
+    .markdown-body ul,
+    .markdown-body ol,
+    .markdown-body .markdown-list-unordered,
+    .markdown-body .markdown-list-ordered {
+        margin: 1em 0;
+        padding-left: 2em;
+        page-break-inside: avoid;
+    }
+
+    .markdown-body li {
+        margin-bottom: 0.5em;
+        page-break-inside: avoid;
+    }
+
+    .markdown-body ul li::marker,
+    .markdown-body .markdown-list-unordered li::marker {
+        content: '• ';
+    }
+
+    /* ============================================================
+       BLOCKQUOTES (CITAÇÕES)
+       ============================================================ */
+
+    .markdown-body blockquote,
+    .markdown-body .markdown-blockquote {
+        background: white;
+        border-left: 4px solid #333;
+        margin: 1em 0;
+        padding: 0.5em 0 0.5em 1em;
+        page-break-inside: avoid;
+        font-style: italic;
+        color: #555;
+    }
+
+    /* ============================================================
+       TABELAS
+       ============================================================ */
+
+    .markdown-body table,
+    .markdown-body .markdown-table-content {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 1em 0;
+        page-break-inside: avoid;
+        border: 1px solid #ddd;
+        font-size: 10pt;
+    }
+
+    .markdown-body th,
+    .markdown-body td {
+        border: 1px solid #ddd;
+        padding: 8pt;
+        text-align: left;
+    }
+
+    .markdown-body th {
+        background: #f0f0f0;
+        font-weight: bold;
+        color: black;
+    }
+
+    /* Repetir header de tabela em cada página */
+    .markdown-body thead {
+        display: table-header-group;
+    }
+
+    /* ============================================================
+       IMAGENS E FIGURAS
+       ============================================================ */
+
+    .markdown-body figure,
+    .markdown-body .markdown-image,
+    .markdown-body .markdown-table {
+        page-break-inside: avoid;
+        margin: 1em 0;
+        text-align: center;
+    }
+
+    .markdown-body img,
+    .markdown-body .markdown-img {
+        max-width: 100%;
+        height: auto;
+        border: none;
+        display: block;
+        margin: 0 auto;
+    }
+
+    .markdown-body figcaption,
+    .markdown-body .markdown-figcaption {
+        font-size: 9pt;
+        color: #666;
+        margin-top: 0.5em;
+        font-style: italic;
+    }
+
+    /* ============================================================
+       HORIZONTAL RULE
+       ============================================================ */
+
+    .markdown-body hr,
+    .markdown-body .markdown-hr {
+        page-break-after: always;
+        border: none;
+        border-top: 2px solid black;
+        margin: 2em 0;
+    }
+
+    /* ============================================================
+       REGRAS DE PÁGINA (@page)
+       ============================================================ */
+
+    @page {
+        size: A4;
+        margin: 20mm;
+
+        /* Números de página no rodapé (suportado por Chrome, Firefox) */
+        @bottom-center {
+            content: "Página " counter(page) " de " counter(pages);
+            font-size: 10pt;
+            color: #999;
+        }
+    }
+
+    @page :first {
+        /* Primeira página pode ter margem diferente (opcional) */
+    }
+
+    /* ============================================================
+       FALLBACK PARA EDGE (Sem @page completo)
+       ============================================================ */
+
+    @supports not (selector(@page)) {
+        /* Edge antigo não suporta @page - usar margens por CSS */
+        .markdown-body {
+            margin: 20mm;
+            padding: 0;
+        }
+
+        @page {
+            margin: 0;
+        }
+    }
+
+    /* ============================================================
+       UTILITY CLASSES
+       ============================================================ */
+
+    .markdown-body .error {
+        color: #dc2626;
+        background: #fee2e2;
+        padding: 1em;
+        border: 1px solid #dc2626;
+        border-radius: 4px;
+    }
+
+    /* ============================================================
+       ESPAÇAMENTO - Remover espaçamento desnecessário
+       ============================================================ */
+
+    .markdown-body > :first-child {
+        margin-top: 0;
+    }
+
+    .markdown-body > :last-child {
+        margin-bottom: 0;
+    }
+
+    /* ============================================================
+       RESPONSIVIDADE - Garantir legibilidade
+       ============================================================ */
+
+    .markdown-body {
+        min-width: 170mm; /* A4 width - 20mm margins * 2 */
+    }
+
+    /* ============================================================
+       DEBUG (Remover em produção se necessário)
+       ============================================================ */
+
+    /* Uncomment para ver estrutura da página:
+    .markdown-body {
+        border: 1px dashed red;
+    }
+    */
+}
+
+/* ============================================================
+   PREVIEW MODE - Emular impressão na tela (não é @media print)
+   ============================================================ */
+
+body.print-mode {
+    background: #e0e0e0;
+}
+
+body.print-mode .app-grid {
+    display: none;
+}
+
+body.print-mode .workspace {
+    display: block;
+    position: fixed;
+    width: 100vw;
+    height: 100vh;
+    margin: 0;
+    padding: 0;
+}
+
+body.print-mode .pane-container:first-child {
+    display: none;
+}
+
+body.print-mode .pane-container.preview-pane {
+    width: 100vw;
+}
+
+body.print-mode #preview-wrapper {
+    background: #e0e0e0;
+    padding: 20px;
+}
+
+body.print-mode .markdown-body {
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    max-width: 210mm;
+    margin: 0 auto;
+}

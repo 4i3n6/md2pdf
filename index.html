@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MD2PDF__DEV_CONSOLE_V2</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;800&display=swap" rel="stylesheet">
+    <link rel="manifest" href="/manifest.webmanifest">
+    <meta name="theme-color" content="#ffffff">
+</head>
+<body>
+    <div class="app-grid">
+        <!-- Top Bar: Global Status & Controls -->
+        <div class="top-bar">
+            <div class="brand">MD2PDF <span class="version">SYS.V2.0</span></div>
+            <div class="top-metrics">
+                <div class="metric">MEM: <span id="mem-usage">--</span></div>
+                <div class="metric">LATENCY: <span id="render-latency">0ms</span></div>
+                <div class="metric status-ok">SYSTEM: ONLINE</div>
+            </div>
+            <div class="top-controls">
+                <button id="download-btn" class="action-btn">[ EXP_PDF ]</button>
+            </div>
+        </div>
+
+        <!-- Sidebar: Documents & Metrics -->
+        <div class="sidebar">
+            <div class="panel-header">
+                <span>DOC_INDEX</span>
+                <button id="new-doc-btn" class="icon-btn">+</button>
+            </div>
+            <div id="documents-list" class="list-container">
+                <!-- Docs injected here -->
+            </div>
+            
+            <div class="panel-header">SYS_LOGS</div>
+            <div id="console-log" class="console-container">
+                <div class="log-line system">> INIT SEQUENCE STARTED...</div>
+            </div>
+        </div>
+
+        <!-- Main Area: Editor & Preview -->
+        <div class="workspace">
+            <div class="pane-container">
+                <div class="pane-header">
+                    <span>INPUT_STREAM (MD)</span>
+                    <input type="text" id="doc-name" class="bare-input" value="Untitled">
+                </div>
+                <div id="editor" class="editor-frame"></div>
+            </div>
+            
+            <div class="pane-container preview-pane">
+                <div class="pane-header">
+                    <span>RENDER_OUTPUT (A4 Preview)</span>
+                    <span id="status-indicator" class="status-dot"></span>
+                </div>
+                <div id="preview-wrapper">
+                    <div id="preview" class="markdown-body"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script type="module" src="/src/main.js"></script>
+</body>
+</html>
