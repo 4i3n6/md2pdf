@@ -14,7 +14,14 @@ Este documento lista possíveis melhorias e funcionalidades adicionais para o pr
 
 ### Sugestões de Melhoria 🚀
 
-#### 1. Temas do Editor
+#### 1. Themes para Code Blocks ✅ IMPLEMENTADO
+- [x] GitHub Light Theme para syntax highlighting
+- [x] 190+ linguagens suportadas
+- [x] Auto-detect de linguagem
+- [ ] Theme Dark (One Dark)
+- [ ] Seletor de tema na UI
+
+#### 2. Temas do Editor
 ```javascript
 // Adicionar suporte a múltiplos temas
 import { oneDark } from '@codemirror/theme-one-dark';
@@ -28,10 +35,13 @@ import { githubLight } from '@uiw/codemirror-theme-github';
 - Adicionar export para DOCX (via docx.js)
 - Adicionar export para TXT
 
-#### 3. Syntax Highlighting em Blocos de Código
-```bash
-npm install @codemirror/language-data
-```
+#### 3. Syntax Highlighting em Blocos de Código ✅ IMPLEMENTADO
+- [x] highlight.js integrado
+- [x] 190+ linguagens suportadas
+- [x] GitHub Light Theme
+- [x] Sanitização com DOMPurify
+- [ ] Números de linha automáticos
+- [ ] Copy button para blocos
 
 #### 4. Markdown Advanced Features
 - Suporte a diagramas (Mermaid)
