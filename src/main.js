@@ -256,6 +256,35 @@ function updateMetrics() {
     if (el) el.innerText = `${kb}KB`;
 }
 
+function downloadMarkdownFile() {
+    try {
+        const doc = getCurrentDoc();
+        if (!doc) {
+            Logger.error('Nenhum documento carregado');
+            return;
+        }
+
+        // Criar blob com conteúdo MD
+        const blob = new Blob([doc.content], { type: 'text/markdown;charset=utf-8' });
+        const url = URL.createObjectURL(blob);
+        
+        // Criar e disparar download
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = `${doc.name}.md`;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        
+        // Limpar URL temporária
+        URL.revokeObjectURL(url);
+        
+        Logger.success(`✓ Download: ${doc.name}.md (${(blob.size / 1024).toFixed(2)}KB)`);
+    } catch (e) {
+        Logger.error('Erro ao fazer download: ' + e.message);
+    }
+}
+
 function setupEvents() {
     // Create Button
     const btnNew = document.getElementById('new-doc-btn');
@@ -307,6 +336,14 @@ function setupEvents() {
                 Logger.success('✓ Impressão finalizada com sucesso');
             }
         });
+    }
+
+    // Download MD Button
+    const btnDownloadMd = document.getElementById('download-md-btn');
+    if (btnDownloadMd) {
+        btnDownloadMd.addEventListener('click', downloadMarkdownFile);
+    } else {
+        Logger.error('Botão Download MD não encontrado no DOM');
     }
 
     // Atalhos de teclado globais
