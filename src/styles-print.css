@@ -72,15 +72,15 @@
         max-width: 210mm;
         width: 100%;
         height: auto;
-        margin: 0;
-        padding: 10mm 12mm 10mm 12mm;
-        background: white;
-        border: 1px solid #ccc;
+        margin: 0 !important;
+        padding: 10mm 12mm 10mm 12mm !important;
+        background: white !important;
+        border: none !important;
         box-shadow: none !important;
-        color: black;
-        font-family: 'Courier New', 'Courier', monospace;
-        font-size: 9pt;
-        line-height: 1.2;
+        color: black !important;
+        font-family: 'Courier New', 'Courier', monospace !important;
+        font-size: 9pt !important;
+        line-height: 1.2 !important;
         box-sizing: border-box;
     }
 

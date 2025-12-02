@@ -274,7 +274,7 @@ body {
         border: none !important;
         padding: 0 !important;
         color: black !important; 
-        font-family: "Inter", sans-serif !important; /* Serifado/Sans para print fica melhor que mono */
+        font-family: 'Courier New', 'Courier', monospace !important; /* Monoespaçada para print */
         max-width: 100% !important; 
         margin: 0 !important;
     }
