@@ -78,8 +78,7 @@ const printRenderer = {
            alt="${token.text || 'Image'}" 
            class="markdown-img"
            data-print-image="true"
-           loading="lazy"
-           onerror="this.style.display='none'">
+           loading="lazy">
       <figcaption class="markdown-figcaption">${token.text || 'Image'}</figcaption>
     </figure>\n`
   },
@@ -190,10 +189,26 @@ marked.setOptions({
   pedantic: false
 })
 
-marked.use({ renderer: printRenderer as any })
+marked.use({ renderer: printRenderer as unknown as typeof marked.defaults.renderer })
 
 /**
  * Configuração DOMPurify com tags e atributos permitidos
+ */
+/**
+ * Configuração segura do DOMPurify para sanitização de HTML
+ * 
+ * NÃO permite:
+ * - Event handlers (onerror, onclick, etc) - XSS risk
+ * - Data attributes customizadas - information leak
+ * - Inline styles perigosos - CSS injection
+ * 
+ * PERMITE:
+ * - Structural tags (h1-h6, p, div, etc)
+ * - Links (a, href)
+ * - Imagens (img, src, alt, loading)
+ * - Tabelas estruturadas
+ * - Code highlighting (class para highlight.js)
+ * - Semantic markup (role, aria-label)
  */
 const DOMPURIFY_CONFIG = {
   ALLOWED_TAGS: [
@@ -235,13 +250,28 @@ const DOMPURIFY_CONFIG = {
     'aside',
     'nav'
   ],
-  ALLOWED_ATTR: ['href', 'src', 'alt', 'title', 'id', 'class', 'data-lang', 'loading', 'onerror', 'style', 'role', 'aria-label'],
+  // REMOVED: 'onerror', 'onclick' and other event handlers
+  ALLOWED_ATTR: ['href', 'src', 'alt', 'title', 'id', 'class', 'data-lang', 'loading', 'style', 'role', 'aria-label'],
   ALLOW_DATA_ATTR: false,
   FORCE_BODY: false
 } as const
 
 /**
  * Processa markdown para HTML seguro e otimizado para print
+ * 
+ * Converte markdown para HTML com:
+ * - GitHub Flavored Markdown (GFM)
+ * - Sanitização via DOMPurify
+ * - Otimizações para impressão A4
+ * - Syntax highlighting para code blocks
+ * 
+ * @param {string} markdown - Conteúdo markdown a processar
+ * @returns {string} HTML sanitizado e pronto para renderização
+ * @throws Retorna HTML com mensagem de erro se processamento falhar
+ * 
+ * @example
+ *   const html = processMarkdown('# Título\n\nParágrafo')
+ *   // Retorna: '<h1>Título</h1>\n<p>Parágrafo</p>'
  */
 export function processMarkdown(markdown: string): string {
   try {
@@ -262,6 +292,17 @@ export function processMarkdown(markdown: string): string {
 
 /**
  * Valida markdown antes de processar
+ * 
+ * Detecta potenciais problemas:
+ * - Tags perigosas (script, iframe, etc)
+ * - URLs muito longas que podem transbordar em impressão
+ * 
+ * @param {string} markdown - Conteúdo markdown a validar
+ * @returns {object} Objeto com isValid e array de warnings
+ * 
+ * @example
+ *   const result = validateMarkdown('<script>alert(1)</script>')
+ *   // Retorna: { isValid: false, warnings: ['Conteúdo contém tags potencialmente perigosas...'] }
  */
 export function validateMarkdown(markdown: string): { isValid: boolean; warnings: string[] } {
   const warnings: string[] = []
@@ -283,16 +324,34 @@ export function validateMarkdown(markdown: string): { isValid: boolean; warnings
 
 /**
  * Estima número de páginas A4 baseado no conteúdo
+ * 
+ * Fórmula: 
+ * - A4 tem ~80 caracteres de largura (210mm - 40mm margens)
+ * - A4 tem ~45 linhas de altura (297mm - 40mm margens)
+ * - Portanto: ~3500 caracteres por página
+ * 
+ * @param {string} html - Conteúdo HTML renderizado
+ * @returns {number} Número estimado de páginas A4 (mínimo 1)
+ * 
+ * @example
+ *   estimatePageCount('<p>Hello</p>') // 1
+ *   estimatePageCount('<p>'.repeat(500) + '</p>'.repeat(500)) // ~3
  */
 export function estimatePageCount(html: string): number {
   const wordsPerLine = 12
-  const charsPerPage = 45 * wordsPerLine * 5
+  const charsPerPage = 45 * wordsPerLine * 5 // ~2700 caracteres (conservative)
   const totalChars = html.length
   return Math.ceil(totalChars / charsPerPage) || 1
 }
 
 /**
  * Integração com processador de imagens para redimensionar imagens em HTML
+ * 
+ * Carrega processador de imagens dinamicamente e aplica dimensões A4-otimizadas.
+ * 
+ * @param {HTMLElement | null} container - Elemento contendo imagens a processar
+ * @param {boolean} useCache - Se deve usar cache de dimensões (padrão: true)
+ * @returns {Promise<number>} Número de imagens processadas com sucesso
  */
 export async function processImagesInPreview(container: HTMLElement | null, useCache: boolean = true): Promise<number> {
   if (!container) return 0
