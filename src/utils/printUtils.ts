@@ -80,52 +80,22 @@ export function validatePrintContent(htmlContent: string): ValidationResult {
  * Armazena estado original dos elementos antes de modificar para print
  * Chave: seletor CSS, Valor: array com dados do estado original
  */
-const elementStates = new Map<string, Array<{ el: HTMLElement; originalDisplay: string }>>();
+const elementStates = new Map<string, Array<{ el: HTMLElement; originalStyle: string }>>();
 
 /**
  * Otimiza página para impressão (esconde elementos desnecessários)
+ * NOTA: Não modificamos mais o DOM - deixamos o CSS @media print cuidar disso
  * @returns Sucesso da operação
  */
 export function optimizeForPrint(): boolean {
   try {
     // Limpar estados anteriores
     elementStates.clear();
-
-    // Elementos a esconder e seus seletores
-    const elementsToHide = ['.sidebar', '.top-bar', '.pane-header', '.editor-frame', '#console-log', '.app-grid'];
-
-    elementsToHide.forEach((selector) => {
-      const elements: HTMLElement[] = [];
-      
-      document.querySelectorAll(selector).forEach((el) => {
-        const htmlEl = el as HTMLElement;
-        const originalDisplay = window.getComputedStyle(htmlEl).display;
-        
-        // Guardar estado original
-        elements.push(htmlEl);
-        htmlEl.style.display = 'none';
-      });
-      
-      // Armazenar para restauração
-      if (elements.length > 0) {
-        elementStates.set(selector, elements.map((el) => ({
-          el,
-          originalDisplay: window.getComputedStyle(el).getPropertyValue('display') || 'block'
-        })));
-      }
-    });
-
-    // Mostrar apenas preview
-    const workspace = document.querySelector('.workspace') as HTMLElement | null;
-    const previewPane = document.querySelector('.pane-container.preview-pane') as HTMLElement | null;
     
-    if (workspace) {
-      workspace.style.display = 'block';
-    }
-    if (previewPane) {
-      previewPane.style.width = '100%';
-    }
-
+    // Não precisamos mais esconder elementos manualmente
+    // O CSS @media print em styles-print.css já cuida disso
+    // Isso evita problemas de restauração do DOM
+    
     return true;
   } catch (error) {
     console.error('Erro ao otimizar para print:', error);
@@ -135,28 +105,22 @@ export function optimizeForPrint(): boolean {
 
 /**
  * Restaura estado da página após impressão
- * Usa os estados armazenados por optimizeForPrint()
  * @returns Sucesso da operação
  */
 export function restoreAfterPrint(): boolean {
   try {
-    // Restaurar elementos que foram escondidos
-    elementStates.forEach((states) => {
-      states.forEach(({ el, originalDisplay }) => {
-        el.style.display = originalDisplay;
-      });
-    });
-
-    // Restaurar workspace e preview pane
-    const workspace = document.querySelector('.workspace') as HTMLElement | null;
-    const previewPane = document.querySelector('.pane-container.preview-pane') as HTMLElement | null;
+    // Limpar qualquer classe ou estilo residual que possa ter sido adicionado
+    document.body.classList.remove('print-mode');
     
-    if (workspace) {
-      workspace.style.display = '';
-    }
-    if (previewPane) {
-      previewPane.style.width = '';
-    }
+    // Forçar re-render removendo e re-adicionando estilos inline
+    const allElements = document.querySelectorAll('.sidebar, .top-bar, .pane-header, .editor-frame, #console-log, .app-grid, .workspace, .pane-container');
+    allElements.forEach((el) => {
+      const htmlEl = el as HTMLElement;
+      // Limpar qualquer estilo inline que possa ter sido adicionado
+      htmlEl.style.display = '';
+      htmlEl.style.width = '';
+      htmlEl.style.visibility = '';
+    });
 
     // Limpar mapa de estados
     elementStates.clear();
@@ -199,28 +163,38 @@ export function printDocument(
         }
       }
 
-      // Otimizar para print
-      optimizeForPrint();
+      // Flag para evitar múltiplas restaurações
+      let hasRestored = false;
+      
+      const doRestore = (): void => {
+        if (hasRestored) return;
+        hasRestored = true;
+        restoreAfterPrint();
+        resolve(true);
+      };
 
-      // Dar tempo para o render ser atualizado
+      // Aguardar fechamento do diálogo de impressão
+      const afterPrintHandler = (): void => {
+        // Pequeno delay para garantir que o navegador terminou o processo
+        setTimeout(doRestore, 100);
+      };
+
+      // Registrar handler ANTES de chamar print()
+      window.addEventListener('afterprint', afterPrintHandler, { once: true });
+
+      // Abrir diálogo de impressão
+      // O CSS @media print cuida de esconder/mostrar elementos automaticamente
+      window.print();
+
+      // Fallback: se afterprint não disparar em 5 segundos, restaurar mesmo assim
+      // Alguns navegadores (especialmente ao salvar como PDF) podem não disparar afterprint
       setTimeout(() => {
-        // Abrir diálogo de impressão
-        window.print();
+        if (!hasRestored) {
+          console.log('[Print] Fallback: restaurando após timeout');
+          doRestore();
+        }
+      }, 5000);
 
-        // Aguardar fechamento do diálogo
-        const afterPrintHandler = (): void => {
-          restoreAfterPrint();
-          resolve(true);
-        };
-
-        window.addEventListener('afterprint', afterPrintHandler, { once: true });
-
-        // Fallback se afterprint não disparar (alguns navegadores)
-        setTimeout(() => {
-          restoreAfterPrint();
-          resolve(true);
-        }, 2000);
-      }, 100);
     } catch (error) {
       console.error('Erro ao imprimir:', error);
       restoreAfterPrint();
