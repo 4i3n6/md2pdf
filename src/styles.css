@@ -226,6 +226,45 @@ body {
     letter-spacing: 0.5px;
 }
 
+/* Lists - Melhorado para hierarquia visual */
+.markdown-body ul,
+.markdown-body ol {
+    margin: 12px 0;
+    padding-left: 24px;
+}
+
+.markdown-body ul ul,
+.markdown-body ul ol,
+.markdown-body ol ul,
+.markdown-body ol ol {
+    margin: 0;
+    padding-left: 24px;
+}
+
+.markdown-body li {
+    margin-bottom: 6px;
+    line-height: 1.6;
+}
+
+.markdown-body li > ul,
+.markdown-body li > ol {
+    margin-top: 6px;
+    margin-bottom: 0;
+}
+
+/* Bullet style customizado */
+.markdown-body ul > li::marker {
+    color: var(--text-dim);
+}
+
+.markdown-body ul ul > li::marker {
+    content: "◦ ";
+}
+
+.markdown-body ul ul ul > li::marker {
+    content: "▪ ";
+}
+
 .markdown-body code { 
     background: #f3f4f6; 
     border: 1px solid #d1d5db; 

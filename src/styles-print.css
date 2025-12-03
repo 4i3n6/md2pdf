@@ -242,29 +242,54 @@
     }
 
     /* ============================================================
-       LISTAS
-       ============================================================ */
+        LISTAS - Renderiza\u00e7\u00e3o profissional
+        ============================================================ */
 
     .markdown-body ul,
     .markdown-body ol,
     .markdown-body .markdown-list-unordered,
     .markdown-body .markdown-list-ordered {
-        margin: 0.05em 0;
-        padding-left: 1.2em;
+        margin: 0.5em 0;
+        padding-left: 1.8em;
         page-break-inside: avoid;
         font-size: 9.5pt;
+        line-height: 1.4;
+    }
+
+    /* Listas aninhadas - sem margens extras */
+    .markdown-body ul ul,
+    .markdown-body ul ol,
+    .markdown-body ol ul,
+    .markdown-body ol ol,
+    .markdown-body .markdown-list-unordered .markdown-list-unordered,
+    .markdown-body .markdown-list-unordered .markdown-list-ordered,
+    .markdown-body .markdown-list-ordered .markdown-list-unordered,
+    .markdown-body .markdown-list-ordered .markdown-list-ordered {
+        margin: 0.2em 0;
+        padding-left: 1.8em;
     }
 
     .markdown-body li {
-        margin-bottom: 0.05em;
+        margin-bottom: 0.3em;
         page-break-inside: avoid;
         font-size: 9.5pt;
-        line-height: 1.1;
+        line-height: 1.35;
     }
 
     .markdown-body ul li::marker,
     .markdown-body .markdown-list-unordered li::marker {
-        content: '• ';
+        content: '\2022 '; /* Bullet point • */
+    }
+
+    /* Bullets customizados para n\u00edveis */
+    .markdown-body ul ul li::marker,
+    .markdown-body .markdown-list-unordered .markdown-list-unordered li::marker {
+        content: '\25E6 '; /* White bullet ◦ */
+    }
+
+    .markdown-body ul ul ul li::marker,
+    .markdown-body .markdown-list-unordered .markdown-list-unordered .markdown-list-unordered li::marker {
+        content: '\25A0 '; /* Black square ▪ */
     }
 
     /* ============================================================

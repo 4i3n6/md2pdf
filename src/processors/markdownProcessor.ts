@@ -49,7 +49,7 @@ interface LinkToken {
 interface ListToken {
   type: string
   ordered: boolean
-  items: Array<{ text: string }>
+  items: Array<{ text: string; task?: boolean; checked?: boolean }>
 }
 
 // RendererToken type for reference (not directly used in interface implementation)
@@ -160,11 +160,22 @@ const printRenderer = {
   list(token: ListToken): string {
     const tag = token.ordered ? 'ol' : 'ul'
     const className = token.ordered ? 'markdown-list-ordered' : 'markdown-list-unordered'
-    return `<${tag} class="${className}">\n${token.items.map((item) => `<li>${item.text}</li>`).join('\n')}\n</${tag}>\n`
+    const items = token.items
+      .map((item) => {
+        // item.text pode conter tags <ul>, <ol>, <li> para suportar aninhamento
+        return `<li>${item.text}</li>`
+      })
+      .join('')
+    return `<${tag} class="${className}">${items}</${tag}>`
   },
 
-  listitem(token: { text: string }): string {
-    return token.text
+  listitem(token: { text: string; task?: boolean; checked?: boolean }): string {
+    // Suporta listas de tarefas (task lists) do GitHub Flavored Markdown
+    if (token.task) {
+      const checked = token.checked ? 'checked' : ''
+      return `<li><input type="checkbox" ${checked} disabled> ${token.text}</li>`
+    }
+    return `<li>${token.text}</li>`
   },
 
   hr(): string {
@@ -182,14 +193,16 @@ const printRenderer = {
 
 /**
  * Configuração do marked para GitHub Flavored Markdown
+ * Otimizado para renderização profissional e print
  */
 marked.setOptions({
   gfm: true,
   breaks: true,
-  pedantic: false
+  pedantic: false,
+  async: false
 })
 
-marked.use({ renderer: printRenderer as unknown as typeof marked.defaults.renderer })
+marked.use({ renderer: printRenderer as any })
 
 /**
  * Configuração DOMPurify com tags e atributos permitidos
