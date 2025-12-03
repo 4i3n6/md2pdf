@@ -44,26 +44,55 @@ export class UIRenderer {
     // Limpar container
     container.innerHTML = ''
 
-    documents.forEach((doc: Document) => {
+    documents.forEach((doc: Document, index: number) => {
       const item = document.createElement('div')
       item.className = `document-item ${doc.id === activeId ? 'active' : ''}`
+      
+      // WCAG 2.1 AA - Acessibilidade
+      item.setAttribute('data-doc-id', String(doc.id))
+      item.setAttribute('role', 'option')
+      item.setAttribute('aria-selected', doc.id === activeId ? 'true' : 'false')
+      item.setAttribute('tabindex', doc.id === activeId ? '0' : '-1')
+      item.setAttribute('aria-label', `Documento: ${doc.name}`)
+      item.setAttribute('title', `Clique para abrir ${doc.name} (Delete para remover)`)
 
       const name = document.createElement('span')
       name.textContent = doc.name
+      name.className = 'doc-name'
+      name.setAttribute('aria-hidden', 'false')
 
       const deleteBtn = document.createElement('span')
       deleteBtn.textContent = '[x]'
       deleteBtn.style.fontSize = '9px'
       deleteBtn.style.cursor = 'pointer'
+      deleteBtn.setAttribute('role', 'button')
+      deleteBtn.setAttribute('aria-label', `Deletar documento ${doc.name}`)
+      deleteBtn.setAttribute('tabindex', '-1')
+      deleteBtn.setAttribute('title', 'Clique para deletar (ou pressione Delete na seleção)')
       deleteBtn.addEventListener('click', (e: MouseEvent) => {
         e.stopPropagation()
         onDelete(doc.id)
+      })
+      deleteBtn.addEventListener('keydown', (e: KeyboardEvent) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault()
+          e.stopPropagation()
+          onDelete(doc.id)
+        }
       })
 
       item.appendChild(name)
       item.appendChild(deleteBtn)
 
       item.addEventListener('click', () => onSelect(doc.id))
+      item.addEventListener('keydown', (e: KeyboardEvent) => {
+        // Enter ou Space para ativar
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault()
+          onSelect(doc.id)
+        }
+      })
+      
       container.appendChild(item)
     })
   }
