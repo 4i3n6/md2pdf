@@ -39,7 +39,7 @@ class SWUpdateNotifier {
    * Mostra notificação de atualização disponível
    */
   private showUpdateNotification(): void {
-    const logger = (window as any).Logger
+    const logger = window.Logger
 
     if (logger && logger.log) {
       logger.log('Atualizando aplicação...', 'success')
