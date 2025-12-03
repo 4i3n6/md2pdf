@@ -1,7 +1,6 @@
 import { marked } from 'marked'
 import DOMPurify from 'dompurify'
 import hljs from 'highlight.js'
-import { calculatePrintDimensions, validateImageForA4 } from './imageProcessor'
 
 /**
  * Token types for marked renderer
@@ -53,15 +52,7 @@ interface ListToken {
   items: Array<{ text: string }>
 }
 
-type RendererToken =
-  | HeadingToken
-  | ParagraphToken
-  | ImageToken
-  | TableToken
-  | CodeToken
-  | BlockquoteToken
-  | LinkToken
-  | ListToken
+// RendererToken type for reference (not directly used in interface implementation)
 
 /**
  * Renderer customizado otimizado para impressão em A4
@@ -97,8 +88,9 @@ const printRenderer = {
     let rows = ''
     for (let i = 0; i < token.rows.length; i++) {
       const row = token.rows[i]
+      if (!row) continue
       const cells = row
-        .map((cell, j) => {
+        .map((cell) => {
           const tag = i === 0 && token.header ? 'th' : 'td'
           return `<${tag}>${cell}</${tag}>`
         })
@@ -195,9 +187,7 @@ const printRenderer = {
 marked.setOptions({
   gfm: true,
   breaks: true,
-  pedantic: false,
-  mangle: true,
-  smartypants: true
+  pedantic: false
 })
 
 marked.use({ renderer: printRenderer as any })
@@ -259,8 +249,8 @@ export function processMarkdown(markdown: string): string {
       return '<p class="error">Erro: conteúdo inválido</p>'
     }
 
-    const dirty = marked(markdown)
-    const clean = DOMPurify.sanitize(dirty, DOMPURIFY_CONFIG as any)
+    const dirty = marked(markdown) as string
+    const clean = DOMPurify.sanitize(dirty, DOMPURIFY_CONFIG as any) as unknown as string
 
     return clean
   } catch (e) {
@@ -295,7 +285,6 @@ export function validateMarkdown(markdown: string): { isValid: boolean; warnings
  * Estima número de páginas A4 baseado no conteúdo
  */
 export function estimatePageCount(html: string): number {
-  const lines = html.split('\n').length
   const wordsPerLine = 12
   const charsPerPage = 45 * wordsPerLine * 5
   const totalChars = html.length

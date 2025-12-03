@@ -4,8 +4,6 @@
  */
 
 class SWUpdateNotifier {
-  private registration: ServiceWorkerRegistration | null = null
-
   /**
    * Inicializa o notificador de updates
    */

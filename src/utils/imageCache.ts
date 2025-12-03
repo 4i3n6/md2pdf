@@ -162,7 +162,10 @@ class ImageCacheManager {
 
     const toRemove = Math.ceil(entries.length / 2)
     for (let i = 0; i < toRemove; i++) {
-      delete cache[entries[i][0]]
+      const entry = entries[i]
+      if (entry) {
+        delete cache[entry[0]]
+      }
     }
   }
 

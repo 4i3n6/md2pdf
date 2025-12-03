@@ -152,9 +152,9 @@ export async function processImagesForPrint(container: HTMLElement | null, useCa
       img.style.height = printDims.height
       img.style.maxWidth = printDims.maxWidth
 
-      img.dataset.originalWidth = String(dimensions.width)
-      img.dataset.originalHeight = String(dimensions.height)
-      img.dataset.printScale = String(printDims.scale ?? 1)
+      img.dataset['originalWidth'] = String(dimensions.width)
+      img.dataset['originalHeight'] = String(dimensions.height)
+      img.dataset['printScale'] = String(printDims.scale ?? 1)
 
       processed++
     } catch (e) {

@@ -61,8 +61,7 @@
   },
   "include": [
     "src/**/*.ts",
-    "src/**/*.tsx",
-    "vite.config.ts"
+    "src/**/*.tsx"
   ],
   "exclude": [
     "node_modules",

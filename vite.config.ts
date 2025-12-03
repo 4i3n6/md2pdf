@@ -1,7 +1,7 @@
-import { defineConfig } from 'vite';
-import { copyFileSync } from 'fs';
-import { resolve } from 'path';
-import { VitePWA } from 'vite-plugin-pwa';
+import { defineConfig } from 'vite'
+import { copyFileSync } from 'fs'
+import { resolve } from 'path'
+import { VitePWA } from 'vite-plugin-pwa'
 
 export default defineConfig({
   resolve: {
@@ -29,8 +29,8 @@ export default defineConfig({
     rollupOptions: {
       output: {
         manualChunks: {
-          'codemirror': ['codemirror', '@codemirror/lang-markdown'],
-          'marked': ['marked']
+          codemirror: ['codemirror', '@codemirror/lang-markdown'],
+          marked: ['marked']
         }
       }
     },
@@ -135,16 +135,16 @@ export default defineConfig({
     }),
     {
       name: 'copy-cloudflare-files',
-      closeBundle() {
-        // Copiar arquivos de configuração do Cloudflare para dist
+      closeBundle(): void {
         try {
-          copyFileSync(resolve(__dirname, '_headers'), resolve(__dirname, 'dist/_headers'));
-          copyFileSync(resolve(__dirname, '_redirects'), resolve(__dirname, 'dist/_redirects'));
-          console.log('✓ Arquivos Cloudflare copiados');
+          copyFileSync(resolve(__dirname, '_headers'), resolve(__dirname, 'dist/_headers'))
+          copyFileSync(resolve(__dirname, '_redirects'), resolve(__dirname, 'dist/_redirects'))
+          console.log('✓ Arquivos Cloudflare copiados')
         } catch (e) {
-          console.warn('⚠ Erro ao copiar arquivos Cloudflare:', e.message);
+          const errorMsg = e instanceof Error ? e.message : 'Erro desconhecido'
+          console.warn('⚠ Erro ao copiar arquivos Cloudflare:', errorMsg)
         }
       }
     }
   ]
-});
+})
