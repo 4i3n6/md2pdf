@@ -1,89 +1,45 @@
-import { marked } from 'marked'
+import { marked, Renderer } from 'marked'
+import type { Tokens } from 'marked'
 import DOMPurify from 'dompurify'
 import hljs from 'highlight.js'
 
 /**
- * Token types for marked renderer
+ * PrintRenderer - Renderer customizado otimizado para impressão em A4
+ * 
+ * IMPORTANTE: Estende a classe Renderer do marked para ter acesso a this.parser
+ * que é necessário para processar tokens inline (**bold**, *italic*, etc.)
+ * 
+ * Usar objeto literal NÃO funciona porque this.parser seria undefined.
  */
-interface HeadingToken {
-  type: string
-  depth: number
-  text: string
-}
-
-interface ParagraphToken {
-  type: string
-  text: string
-}
-
-interface ImageToken {
-  type: string
-  href: string
-  text: string
-}
-
-interface TableToken {
-  type: string
-  header: boolean
-  rows: string[][]
-}
-
-interface CodeToken {
-  type: string
-  lang: string | null
-  text: string
-}
-
-interface BlockquoteToken {
-  type: string
-  text: string
-}
-
-interface LinkToken {
-  type: string
-  href: string
-  title: string
-  text: string
-}
-
-interface ListToken {
-  type: string
-  ordered: boolean
-  items: Array<{ text: string; task?: boolean; checked?: boolean }>
-}
-
-// RendererToken type for reference (not directly used in interface implementation)
-
-/**
- * Renderer customizado otimizado para impressão em A4
- * Cada função retorna HTML com classes específicas para print styling
- */
-const printRenderer = {
-  heading(token: HeadingToken & { tokens?: any[] }): string {
+class PrintRenderer extends Renderer {
+  /**
+   * Renderiza headings (h1-h6) com ID para navegação e classes para styling
+   */
+  override heading(token: Tokens.Heading): string {
     const level = token.depth
-    // Usar heading.text pois é simples e já contém apenas o texto
     const id = token.text
       .toLowerCase()
       .replace(/\s+/g, '-')
       .replace(/[^\w-]/g, '')
     
-    // Renderizar heading com suporte a inline formatting
-    const content = token.tokens && (this as any).parser?.parseInline
-      ? (this as any).parser.parseInline(token.tokens)
-      : token.text
+    // this.parser.parseInline processa **bold**, *italic*, etc. dentro do heading
+    const content = this.parser.parseInline(token.tokens)
     
     return `<h${level} id="${id}" class="markdown-heading markdown-h${level}">${content}</h${level}>\n`
-  },
+  }
 
-  paragraph(token: ParagraphToken & { tokens?: any[] }): string {
-    // Processar tokens inline para **bold**, *italic*, etc.
-    const content = token.tokens && (this as any).parser?.parseInline
-      ? (this as any).parser.parseInline(token.tokens)
-      : token.text
+  /**
+   * Renderiza parágrafos com suporte a formatação inline
+   */
+  override paragraph(token: Tokens.Paragraph): string {
+    const content = this.parser.parseInline(token.tokens)
     return `<p class="markdown-paragraph">${content}</p>\n`
-  },
+  }
 
-  image(token: ImageToken): string {
+  /**
+   * Renderiza imagens com figure/figcaption para melhor semântica
+   */
+  override image(token: Tokens.Image): string {
     return `<figure class="markdown-image" style="page-break-inside: avoid;">
       <img src="${token.href}" 
            alt="${token.text || 'Image'}" 
@@ -92,43 +48,55 @@ const printRenderer = {
            loading="lazy">
       <figcaption class="markdown-figcaption">${token.text || 'Image'}</figcaption>
     </figure>\n`
-  },
+  }
 
-  table(token: TableToken): string {
-    let rows = ''
-    for (let i = 0; i < token.rows.length; i++) {
-      const row = token.rows[i]
-      if (!row) continue
-      const cells = row
-        .map((cell) => {
-          const tag = i === 0 && token.header ? 'th' : 'td'
-          return `<${tag}>${cell}</${tag}>`
+  /**
+   * Renderiza tabelas com suporte a header e body
+   */
+  override table(token: Tokens.Table): string {
+    // Header row
+    let headerRow = ''
+    if (token.header && token.header.length > 0) {
+      const headerCells = token.header
+        .map((cell: Tokens.TableCell) => `<th>${this.parser.parseInline(cell.tokens)}</th>`)
+        .join('')
+      headerRow = `<thead><tr>${headerCells}</tr></thead>`
+    }
+
+    // Body rows
+    let bodyRows = ''
+    if (token.rows && token.rows.length > 0) {
+      const rows = token.rows
+        .map((row: Tokens.TableCell[]) => {
+          const cells = row
+            .map((cell: Tokens.TableCell) => `<td>${this.parser.parseInline(cell.tokens)}</td>`)
+            .join('')
+          return `<tr>${cells}</tr>`
         })
         .join('')
-      rows += `<tr>${cells}</tr>`
+      bodyRows = `<tbody>${rows}</tbody>`
     }
 
     return `<figure class="markdown-table" style="page-break-inside: avoid;">
       <table class="markdown-table-content">
-        ${rows}
+        ${headerRow}
+        ${bodyRows}
       </table>
     </figure>\n`
-  },
+  }
 
-  tablerow(): string {
-    return ''
-  },
-
-  tablecell(): string {
-    return ''
-  },
-
-  codespan(token: { text: string }): string {
+  /**
+   * Renderiza código inline com sanitização
+   */
+  override codespan(token: Tokens.Codespan): string {
     const sanitized = DOMPurify.sanitize(token.text)
     return `<code class="markdown-code-inline">${sanitized}</code>`
-  },
+  }
 
-  code(token: CodeToken): string {
+  /**
+   * Renderiza blocos de código com syntax highlighting
+   */
+  override code(token: Tokens.Code): string {
     const lang = token.lang || 'plaintext'
     let highlightedCode = token.text
 
@@ -146,7 +114,7 @@ const printRenderer = {
           highlightedCode = DOMPurify.sanitize(token.text)
         }
       }
-    } catch (e) {
+    } catch {
       highlightedCode = DOMPurify.sanitize(token.text)
     }
 
@@ -156,84 +124,107 @@ const printRenderer = {
     })
 
     return `<pre class="markdown-code-block hljs" data-lang="${lang}"><code class="language-${lang}">${sanitized}</code></pre>\n`
-  },
+  }
 
-  blockquote(token: BlockquoteToken & { tokens?: any[] }): string {
-    // Blockquote sempre tem tokens internos
-    const content = (this as any).parser?.parse
-      ? (this as any).parser.parse(token.tokens || [])
-      : token.text
+  /**
+   * Renderiza blockquotes com suporte a conteúdo aninhado
+   */
+  override blockquote(token: Tokens.Blockquote): string {
+    // Blockquote pode conter parágrafos, listas, etc. - usar parse() para blocos
+    const content = this.parser.parse(token.tokens)
     return `<blockquote class="markdown-blockquote" style="page-break-inside: avoid;">
       ${content}
     </blockquote>\n`
-  },
+  }
 
-  link(token: LinkToken & { tokens?: any[] }): string {
-    // Processar inline tokens dentro do link
-    const content = token.tokens && (this as any).parser?.parseInline
-      ? (this as any).parser.parseInline(token.tokens)
-      : token.text
+  /**
+   * Renderiza links com suporte a formatação no texto do link
+   */
+  override link(token: Tokens.Link): string {
+    const content = this.parser.parseInline(token.tokens)
     return `<a href="${token.href}" title="${token.title || ''}" class="markdown-link">${content}</a>`
-  },
+  }
 
-  list(token: ListToken): string {
+  /**
+   * Renderiza listas (ordenadas e não-ordenadas)
+   */
+  override list(token: Tokens.List): string {
     const tag = token.ordered ? 'ol' : 'ul'
     const className = token.ordered ? 'markdown-list-ordered' : 'markdown-list-unordered'
+    
     const items = token.items
-      .map((item: any) => {
-        // Renderizar tokens dentro do list item
-        const itemContent = item.tokens && (this as any).parser?.parse
-          ? (this as any).parser.parse(item.tokens)
-          : item.text
+      .map((item: Tokens.ListItem) => {
+        // List items podem conter parágrafos, sublistas, etc. - usar parse() para blocos
+        const itemContent = this.parser.parse(item.tokens)
+        
+        // Suporte a task lists (checkboxes)
+        if (item.task) {
+          const checked = item.checked ? 'checked' : ''
+          return `<li><input type="checkbox" ${checked} disabled> ${itemContent}</li>`
+        }
+        
         return `<li>${itemContent}</li>`
       })
       .join('')
+    
     return `<${tag} class="${className}">${items}</${tag}>`
-  },
+  }
 
-  listitem(token: { text: string; task?: boolean; checked?: boolean }): string {
-    // Suporta listas de tarefas (task lists) do GitHub Flavored Markdown
-    if (token.task) {
-      const checked = token.checked ? 'checked' : ''
-      return `<input type="checkbox" ${checked} disabled> ${token.text}`
+  /**
+   * Renderiza linha horizontal (quebra de página em print)
+   */
+  override hr(): string {
+    return `<hr class="markdown-hr" style="page-break-after: always;">\n`
+  }
+
+  /**
+   * Renderiza quebra de linha
+   */
+  override br(): string {
+    return '<br>\n'
+  }
+
+  /**
+   * Renderiza texto simples
+   */
+  override text(token: Tokens.Text | Tokens.Escape): string {
+    // Text tokens podem ter tokens internos (raro, mas possível)
+    if ('tokens' in token && token.tokens && token.tokens.length > 0) {
+      return this.parser.parseInline(token.tokens)
     }
     return token.text
-  },
+  }
 
-  hr(): string {
-    return `<hr class="markdown-hr" style="page-break-after: always;">\n`
-  },
-
-  br(): string {
-    return '<br>\n'
-  },
-
-  text(token: { text: string }): string {
-    return token.text
-  },
-
-  strong(token: { text: string; tokens?: any[] }): string {
-    // Processar tokens inline dentro de strong
-    const content = token.tokens && (this as any).parser?.parseInline
-      ? (this as any).parser.parseInline(token.tokens)
-      : token.text
+  /**
+   * Renderiza texto em negrito
+   */
+  override strong(token: Tokens.Strong): string {
+    const content = this.parser.parseInline(token.tokens)
     return `<strong>${content}</strong>`
-  },
+  }
 
-  em(token: { text: string; tokens?: any[] }): string {
-    // Processar tokens inline dentro de em
-    const content = token.tokens && (this as any).parser?.parseInline
-      ? (this as any).parser.parseInline(token.tokens)
-      : token.text
+  /**
+   * Renderiza texto em itálico
+   */
+  override em(token: Tokens.Em): string {
+    const content = this.parser.parseInline(token.tokens)
     return `<em>${content}</em>`
-  },
+  }
 
-  del(token: { text: string; tokens?: any[] }): string {
-    // Strikethrough (GFM)
-    const content = token.tokens && (this as any).parser?.parseInline
-      ? (this as any).parser.parseInline(token.tokens)
-      : token.text
+  /**
+   * Renderiza texto riscado (strikethrough - GFM)
+   */
+  override del(token: Tokens.Del): string {
+    const content = this.parser.parseInline(token.tokens)
     return `<del>${content}</del>`
+  }
+
+  /**
+   * Renderiza HTML inline (passthrough seguro)
+   */
+  override html(token: Tokens.HTML | Tokens.Tag): string {
+    // Sanitizar HTML inline para segurança
+    return DOMPurify.sanitize(token.text)
   }
 }
 
@@ -248,11 +239,9 @@ marked.setOptions({
   async: false
 })
 
-marked.use({ renderer: printRenderer as any })
+// Usar instância da classe PrintRenderer
+marked.use({ renderer: new PrintRenderer() })
 
-/**
- * Configuração DOMPurify com tags e atributos permitidos
- */
 /**
  * Configuração segura do DOMPurify para sanitização de HTML
  * 
@@ -307,10 +296,10 @@ const DOMPURIFY_CONFIG = {
     'section',
     'article',
     'aside',
-    'nav'
+    'nav',
+    'input'
   ],
-  // REMOVED: 'onerror', 'onclick' and other event handlers
-  ALLOWED_ATTR: ['href', 'src', 'alt', 'title', 'id', 'class', 'data-lang', 'loading', 'style', 'role', 'aria-label'],
+  ALLOWED_ATTR: ['href', 'src', 'alt', 'title', 'id', 'class', 'data-lang', 'loading', 'style', 'role', 'aria-label', 'type', 'checked', 'disabled'],
   ALLOW_DATA_ATTR: false,
   FORCE_BODY: false
 } as const

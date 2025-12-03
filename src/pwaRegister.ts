@@ -18,8 +18,7 @@ export function registerServiceWorker(): void {
         : '/sw.js';
 
       const registration = await navigator.serviceWorker.register(scriptPath, {
-        scope: '/',
-        type: 'module'
+        scope: '/'
       });
 
       console.log('Service Worker registrado com sucesso:', registration);
