@@ -1,6 +1,6 @@
 import { EditorView, basicSetup } from 'codemirror'
 import { Decoration } from '@codemirror/view'
-import { RangeSet } from '@codemirror/state'
+import { StateField, StateEffect } from '@codemirror/state'
 import { markdown } from '@codemirror/lang-markdown'
 import 'highlight.js/styles/github.css'
 import { processMarkdown, estimatePageCount } from './processors/markdownProcessor'
@@ -51,6 +51,36 @@ const state: AppState = {
   currentId: null,
   editor: null
 }
+
+// CodeMirror Decorations Setup
+/**
+ * StateEffect para atualizar decorations de validação de Markdown
+ */
+const updateDecorationsEffect = StateEffect.define<any>();
+
+/**
+ * StateField para gerenciar decorations de validação
+ */
+const markdownDecorationsField = StateField.define({
+  create() {
+    return Decoration.none;
+  },
+  
+  update(decorations, tr) {
+    // Se há um efeito de atualização, usar o novo valor
+    for (const effect of tr.effects) {
+      if (effect.is(updateDecorationsEffect)) {
+        return effect.value;
+      }
+    }
+    // Caso contrário, mapear as decorations para as mudanças
+    return decorations.map(tr.changes);
+  },
+  
+  provide(f) {
+    return EditorView.decorations.from(f);
+  }
+});
 
 // Utility Functions
 
@@ -132,9 +162,8 @@ function initSystem(): void {
  * @returns {void}
  */
 function loadDocs(): void {
-  // Inicializar DocumentManager com Logger
-  documentManager.logger = Logger as any
-  documentManager.init()
+   // Inicializar DocumentManager
+   documentManager.init()
 
   // Inscrever para mudanças
   documentManager.subscribe((docs) => {
@@ -181,8 +210,8 @@ function updateEditorDiagnostics(content: string): void {
   // Validar Markdown
   const validation = validateMarkdown(content);
 
-  // Criar decorations para erros e avisos
-  const decorations: Array<{ from: number; to: number; class: string; title: string }> = [];
+  // Construir decorations para erros e avisos
+  const decorationRanges: any[] = [];
   const lines = content.split('\n');
 
   // Processar erros e avisos
@@ -194,14 +223,14 @@ function updateEditorDiagnostics(content: string): void {
     
     if (!line) return;
 
-    // Encontrar posição no documento completo
-    let charIndex = 0;
-    for (let i = 0; i < lineIndex; i++) {
-      charIndex += lines[i].length + 1; // +1 para newline
-    }
+     // Encontrar posição no documento completo
+     let charIndex = 0;
+     for (let i = 0; i < lineIndex; i++) {
+       charIndex += (lines[i]?.length ?? 0) + 1; // +1 para newline
+     }
 
     const from = charIndex + Math.max(0, issue.column - 1);
-    const to = charIndex + line.length;
+    const to = Math.min(charIndex + line.length, content.length);
 
     const cssClass = issue.severity === 'error' 
       ? 'md-error' 
@@ -209,12 +238,15 @@ function updateEditorDiagnostics(content: string): void {
       ? 'md-warning' 
       : 'md-info';
 
-    decorations.push({
-      from,
-      to,
-      class: cssClass,
-      title: issue.message
-    });
+    try {
+      const decoration = Decoration.mark({
+        class: cssClass,
+        title: issue.message
+      });
+      decorationRanges.push(decoration.range(from, to));
+    } catch (e) {
+      // Ignorar erros de decoration para uma range específica
+    }
   });
 
   // Log de erros/avisos para o console do sistema
@@ -229,24 +261,15 @@ function updateEditorDiagnostics(content: string): void {
     Logger.log(`⚠️ ${validation.warnings.length} aviso(s) Markdown`, 'warning');
   }
 
-  // Aplicar decorations ao editor (NOVO - FIX DO BUG)
-  if (state.editor && decorations.length > 0) {
-    try {
-      const ranges = decorations.map(d => 
-        Decoration.mark({ class: d.class, title: d.title }).range(d.from, d.to)
-      );
-      
-      if (ranges.length > 0) {
-        const rangeSet = RangeSet.of(ranges, true);
-        state.editor.dispatch({
-          changes: [],
-          effects: [EditorView.decorations.of(rangeSet) as any]
-        } as any);
-      }
-    } catch (e) {
-      const errorMsg = e instanceof Error ? e.message : String(e);
-      Logger.log(`⚠️ Validação visual desativada: ${errorMsg}`, 'warning');
-    }
+  // Aplicar decorations ao editor via StateEffect
+  try {
+    const decorationSet = Decoration.set(decorationRanges);
+    state.editor.dispatch({
+      effects: [updateDecorationsEffect.of(decorationSet)]
+    });
+  } catch (e) {
+    const errorMsg = e instanceof Error ? e.message : String(e);
+    Logger.log(`⚠️ Validação visual: ${errorMsg}`, 'warning');
   }
 }
 
@@ -276,13 +299,14 @@ function initEditor(): void {
   const debouncedUpdateMetrics = debounce(updateMetrics, 500);
   const debouncedValidate = debounce(updateEditorDiagnostics, 300);
 
-  state.editor = new EditorView({
-    doc: doc ? doc.content : '',
-    extensions: [
-      basicSetup,
-      markdown(),
-      EditorView.lineWrapping,
-      EditorView.theme({
+   state.editor = new EditorView({
+     doc: doc ? doc.content : '',
+     extensions: [
+       basicSetup,
+       markdown(),
+       EditorView.lineWrapping,
+       markdownDecorationsField,
+       EditorView.theme({
         '&': { color: '#111827', backgroundColor: '#ffffff' },
         '.cm-content': { caretColor: '#0052cc' },
         '.cm-gutters': {
