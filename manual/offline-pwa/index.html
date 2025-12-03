@@ -6,7 +6,7 @@
     <meta name="description" content="Uso offline e PWA no MD2PDF. Instale o app e use sem conexão com internet.">
     <meta name="keywords" content="pwa, progressive web app, offline, service worker, instalar app, md2pdf offline, app sem internet">
     <meta name="author" content="MD2PDF">
-    <title>Uso Offline e PWA - Manual MD2PDF</title>
+    <title>Uso Offline e PWA | MD2PDF</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -14,6 +14,7 @@
     <link rel="stylesheet" href="../manual.css">
 </head>
 <body>
+
     <header class="header">
         <div class="header-content">
             <a href="/" class="logo">MD2PDF</a>
@@ -26,6 +27,7 @@
     </header>
 
     <main class="main">
+
         <nav class="breadcrumb" aria-label="Breadcrumb">
             <a href="/">Home</a>
             <span class="breadcrumb-separator">&gt;</span>
@@ -36,76 +38,67 @@
 
         <article class="content">
             <h1>Uso Offline e PWA</h1>
-            
-            <section class="section">
+            <section>
                 <h2>O que é PWA?</h2>
-                <ul class="feature-list">
+                <ul>
                     <li>PWA = Progressive Web App</li>
                     <li>Site que funciona como app nativo</li>
                     <li>Pode ser instalado no dispositivo</li>
                     <li>Funciona sem conexão com internet</li>
                 </ul>
             </section>
-
-            <section class="section">
+            <section>
                 <h2>Como Instalar</h2>
-                
                 <h3>Chrome/Edge (Desktop)</h3>
-                <ul class="feature-list">
+                <ul>
                     <li>Acesse o app em /app</li>
                     <li>Procure ícone de instalação na barra de endereço</li>
                     <li>Clique em "Instalar"</li>
                     <li>App abre em janela própria</li>
                 </ul>
-
                 <h3>Chrome (Android)</h3>
-                <ul class="feature-list">
+                <ul>
                     <li>Acesse o app</li>
                     <li>Toque no menu (3 pontos)</li>
                     <li>"Adicionar à tela inicial"</li>
                 </ul>
-
                 <h3>Safari (iOS)</h3>
-                <ul class="feature-list">
+                <ul>
                     <li>Acesse o app</li>
                     <li>Toque no botão Compartilhar</li>
                     <li>"Adicionar à Tela de Início"</li>
                 </ul>
             </section>
-
-            <section class="section">
+            <section>
                 <h2>Funcionamento Offline</h2>
-                <ul class="feature-list">
+                <ul>
                     <li>Após primeiro acesso, app fica em cache</li>
                     <li>Funciona 100% sem internet</li>
                     <li>Documentos salvos localmente continuam disponíveis</li>
                     <li>Nenhuma funcionalidade é perdida offline</li>
                 </ul>
             </section>
-
-            <section class="section">
+            <section>
                 <h2>Atualizações Automáticas</h2>
-                <ul class="feature-list">
+                <ul>
                     <li>Quando online, app verifica atualizações</li>
                     <li>Atualizações aplicadas automaticamente</li>
                     <li>Você sempre tem a versão mais recente</li>
                     <li>Sem atualização manual necessária</li>
                 </ul>
             </section>
-
-            <section class="section">
+            <section>
                 <h2>Service Worker</h2>
-                <ul class="feature-list">
+                <ul>
                     <li>Tecnologia que permite funcionamento offline</li>
                     <li>Armazena arquivos do app em cache</li>
                     <li>Executa em segundo plano</li>
                     <li>Gerencia cache e atualizações</li>
                 </ul>
             </section>
-
-            <section class="section">
+            <section>
                 <h2>Vantagens do PWA</h2>
-                <ul class="feature-list">
+                <ul>
                     <li>Sem app store necessária</li>
                     <li>Sem permissões de instalação</li>
                     <li>Ocupa pouco espaço (~2MB)</li>
@@ -113,26 +106,30 @@
                     <li>Mesma experiência do site</li>
                 </ul>
             </section>
-
-            <section class="warning-section">
+            <section>
                 <h2>Solução de Problemas</h2>
-                <div class="warning-box">
-                    <ul class="warning-list">
+                <div class="info-box">
+                    <ul>
                         <li><strong>App não atualiza:</strong> limpe cache e recarregue</li>
                         <li><strong>Opção de instalar não aparece:</strong> certifique-se de usar HTTPS</li>
                         <li><strong>Offline não funciona:</strong> acesse o app online primeiro</li>
                     </ul>
                 </div>
             </section>
-
-            <nav class="page-navigation">
-                <a href="/manual/privacy-storage/" class="nav-link nav-prev">
-                    <span class="nav-direction">Anterior</span>
-                    <span class="nav-title">Privacidade</span>
+            <nav class="page-nav">
+                <a href="/manual/privacy-storage/">
+                    <span class="nav-arrow">&larr;</span>
+                    <div class="nav-direction">
+                        <span class="nav-label">Anterior</span>
+                        <span class="nav-title">Privacidade</span>
+                    </div>
                 </a>
-                <a href="/manual/" class="nav-link nav-next">
-                    <span class="nav-direction">Próximo</span>
-                    <span class="nav-title">Voltar ao Índice</span>
+                <a href="/manual/">
+                    <div class="nav-direction">
+                        <span class="nav-label">Próximo</span>
+                        <span class="nav-title">Voltar ao Índice</span>
+                    </div>
+                    <span class="nav-arrow">&rarr;</span>
                 </a>
             </nav>
         </article>
@@ -142,8 +139,8 @@
         <div class="footer-content">
             <div class="footer-links">
                 <a href="/app">Abrir MD2PDF</a>
+                <a href="/manual/">Manual</a>
                 <a href="/">Página Inicial</a>
-                <a href="/manual/">Índice do Manual</a>
             </div>
             <p class="footer-version">MD2PDF v2.0 | Gratuito e sem limites</p>
         </div>

@@ -6,7 +6,7 @@
     <meta name="description" content="Privacidade e armazenamento no MD2PDF. Seus documentos ficam apenas no seu navegador, sem servidores ou rastreamento.">
     <meta name="keywords" content="privacidade, armazenamento local, localStorage, segurança, dados offline, md2pdf privacidade">
     <meta name="author" content="MD2PDF">
-    <title>Privacidade e Armazenamento - Manual do MD2PDF</title>
+    <title>Privacidade e Armazenamento | MD2PDF</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -14,6 +14,7 @@
     <link rel="stylesheet" href="../manual.css">
 </head>
 <body>
+
     <header class="header">
         <div class="header-content">
             <a href="/" class="logo">MD2PDF</a>
@@ -26,6 +27,7 @@
     </header>
 
     <main class="main">
+
         <nav class="breadcrumb" aria-label="Breadcrumb">
             <a href="/">Home</a>
             <span class="breadcrumb-separator">&gt;</span>
@@ -36,14 +38,10 @@
 
         <article class="content">
             <h1>Privacidade e Armazenamento</h1>
-            
-            <div class="info-box info-box-highlight">
-                <p>
-                    <strong>Seus documentos ficam armazenados APENAS no seu navegador.</strong> O MD2PDF não tem acesso aos seus dados. Nada é enviado para servidores.
-                </p>
+            <div class="info-box highlight">
+                <p><strong>Seus documentos ficam armazenados APENAS no seu navegador.</strong> O MD2PDF não tem acesso aos seus dados. Nada é enviado para servidores.</p>
             </div>
-
-            <section class="section">
+            <section>
                 <h2>100% Local</h2>
                 <ul>
                     <li>Todo processamento acontece no seu navegador</li>
@@ -52,8 +50,7 @@
                     <li>Sem contas, sem login</li>
                 </ul>
             </section>
-
-            <section class="section">
+            <section>
                 <h2>Onde Seus Dados Ficam</h2>
                 <ul>
                     <li>Armazenados no localStorage do navegador</li>
@@ -62,8 +59,7 @@
                     <li>Navegadores diferentes = armazenamento diferente</li>
                 </ul>
             </section>
-
-            <section class="section">
+            <section>
                 <h2>Limite de Armazenamento</h2>
                 <ul>
                     <li>localStorage: ~5MB por domínio</li>
@@ -72,8 +68,7 @@
                     <li>Se atingir limite, delete documentos antigos</li>
                 </ul>
             </section>
-
-            <section class="section">
+            <section>
                 <h2>Como Limpar Seus Dados</h2>
                 <ul>
                     <li><strong>Opção 1:</strong> Delete documentos individualmente</li>
@@ -81,8 +76,7 @@
                     <li><strong>Opção 3:</strong> DevTools &gt; Application &gt; localStorage &gt; delete</li>
                 </ul>
             </section>
-
-            <section class="section">
+            <section>
                 <h2>Backup de Documentos</h2>
                 <ul>
                     <li>Use <strong>DOWNLOAD MD</strong> para salvar arquivos</li>
@@ -90,8 +84,7 @@
                     <li>Faça backups regulares de docs importantes</li>
                 </ul>
             </section>
-
-            <section class="section">
+            <section>
                 <h2>Sigilo Garantido</h2>
                 <ul>
                     <li>Sem cookies de rastreamento</li>
@@ -99,32 +92,34 @@
                     <li>Funciona 100% offline</li>
                 </ul>
             </section>
-
-            <div class="info-box info-box-warning">
-                <p>
-                    <strong>Atenção:</strong> Se você limpar dados do navegador, os documentos serão PERDIDOS. Navegadores diferentes não compartilham dados. Modo privado/anônimo pode não salvar dados.
-                </p>
+            <div class="info-box">
+                <p><strong>Atenção:</strong> Se você limpar dados do navegador, os documentos serão PERDIDOS. Navegadores diferentes não compartilham dados. Modo privado/anônimo pode não salvar dados.</p>
             </div>
+            <nav class="page-nav">
+                <a href="/manual/print-export/">
+                    <span class="nav-arrow">&larr;</span>
+                    <div class="nav-direction">
+                        <span class="nav-label">Anterior</span>
+                        <span class="nav-title">Exportar PDF</span>
+                    </div>
+                </a>
+                <a href="/manual/offline-pwa/">
+                    <div class="nav-direction">
+                        <span class="nav-label">Próximo</span>
+                        <span class="nav-title">Uso Offline</span>
+                    </div>
+                    <span class="nav-arrow">&rarr;</span>
+                </a>
+            </nav>
         </article>
-
-        <nav class="page-nav" aria-label="Navegação entre páginas">
-            <a href="/manual/print-export/" class="nav-prev">
-                <span class="nav-direction">Anterior</span>
-                <span class="nav-title">Exportar PDF</span>
-            </a>
-            <a href="/manual/offline-pwa/" class="nav-next">
-                <span class="nav-direction">Próximo</span>
-                <span class="nav-title">Uso Offline</span>
-            </a>
-        </nav>
     </main>
 
     <footer class="footer">
         <div class="footer-content">
             <div class="footer-links">
                 <a href="/app">Abrir MD2PDF</a>
+                <a href="/manual/">Manual</a>
                 <a href="/">Página Inicial</a>
-                <a href="/manual/">Índice do Manual</a>
             </div>
             <p class="footer-version">MD2PDF v2.0 | Gratuito e sem limites</p>
         </div>

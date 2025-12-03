@@ -1,0 +1,491 @@
+{
+  "site": {
+    "title": "MD2PDF",
+    "version": "2.0",
+    "tagline": "Gratuito e sem limites"
+  },
+  "pages": [
+    {
+      "slug": "index",
+      "title": "Manual do MD2PDF",
+      "description": "Manual completo do MD2PDF. Aprenda a converter Markdown para PDF de forma rápida e gratuita.",
+      "keywords": "md2pdf manual, markdown tutorial, pdf converter guide, markdown para pdf, conversor markdown",
+      "isIndex": true,
+      "content": {
+        "intro": [
+          "O <strong>MD2PDF</strong> é um conversor de Markdown para PDF gratuito, sem limites e sem necessidade de cadastro. Escreva em Markdown no editor, visualize em tempo real no formato A4 e exporte diretamente para PDF.",
+          "Neste manual você encontrará tudo o que precisa para dominar a ferramenta: desde os primeiros passos até recursos avançados de exportação e uso offline."
+        ],
+        "toc": [
+          { "number": "01", "slug": "getting-started", "title": "Primeiros Passos", "desc": "O que é Markdown e como começar" },
+          { "number": "02", "slug": "input-stream", "title": "Área de Edição", "desc": "Editor, documentos, botão COPY" },
+          { "number": "03", "slug": "render-output", "title": "Preview e Saída", "desc": "Visualização A4 em tempo real" },
+          { "number": "04", "slug": "keyboard-shortcuts", "title": "Atalhos de Teclado", "desc": "Produtividade com atalhos" },
+          { "number": "05", "slug": "print-export", "title": "Exportar PDF", "desc": "Como gerar seus PDFs" },
+          { "number": "06", "slug": "privacy-storage", "title": "Privacidade e Armazenamento", "desc": "Seus dados são seus" },
+          { "number": "07", "slug": "offline-pwa", "title": "Uso Offline e PWA", "desc": "Instale e use sem internet" }
+        ],
+        "tips": [
+          { "icon": "#", "title": "Títulos com #", "text": "Use # para títulos. Quanto mais #, menor o nível (## subtítulo, ### seção)." },
+          { "icon": "Ctrl", "title": "Ctrl+Shift+E", "text": "Atalho rápido para exportar seu documento para PDF instantaneamente." },
+          { "icon": "---", "title": "Quebra de página", "text": "Use --- (linha horizontal) para forçar uma quebra de página no PDF." },
+          { "icon": "PWA", "title": "Instale o app", "text": "MD2PDF funciona offline. Instale como app no seu dispositivo." }
+        ]
+      }
+    },
+    {
+      "slug": "getting-started",
+      "title": "Primeiros Passos",
+      "pageTitle": "O que é Markdown?",
+      "description": "Aprenda o que é Markdown e como usar o MD2PDF para converter textos de IA em PDFs formatados.",
+      "keywords": "markdown tutorial, o que é markdown, chatgpt para pdf, claude pdf, tutorial markdown",
+      "prev": { "slug": "index", "title": "Índice do Manual" },
+      "next": { "slug": "input-stream", "title": "Área de Edição" },
+      "sections": [
+        {
+          "title": "Por que sua IA escreve assim?",
+          "content": [
+            "Se você já usou ChatGPT, Claude, Gemini ou outras IAs, provavelmente notou que as respostas vêm com símbolos estranhos como <code>**</code>, <code>#</code>, <code>-</code> e <code>`</code>."
+          ],
+          "infoBox": {
+            "title": "Isso não é um bug!",
+            "text": "Esses símbolos são formatação Markdown - uma linguagem simples que transforma texto puro em documentos formatados."
+          },
+          "contentAfter": [
+            "Markdown foi criado para ser legível mesmo sem renderização. Por isso as IAs usam esse formato: é universal, simples e funciona em qualquer lugar."
+          ]
+        },
+        {
+          "title": "Markdown em 2 minutos",
+          "content": ["Veja como os símbolos se transformam em formatação:"],
+          "table": {
+            "headers": ["Você escreve", "Resultado"],
+            "rows": [
+              ["<code># Título</code>", "Título principal (grande)"],
+              ["<code>## Subtítulo</code>", "Subtítulo (médio)"],
+              ["<code>**texto**</code>", "<strong>Texto em negrito</strong>"],
+              ["<code>*texto*</code>", "<em>Texto em itálico</em>"],
+              ["<code>- item</code>", "Lista com marcadores"],
+              ["<code>1. item</code>", "Lista numerada"],
+              ["<code>`código`</code>", "<code>Código inline</code>"],
+              ["<code>[link](url)</code>", "Link clicável"],
+              ["<code>> citação</code>", "Bloco de citação"]
+            ]
+          },
+          "infoBoxHighlight": {
+            "title": "Dica",
+            "text": "Você não precisa memorizar nada! Basta colar o texto no MD2PDF e ver a mágica acontecer."
+          }
+        },
+        {
+          "title": "Como usar o MD2PDF",
+          "steps": [
+            { "title": "Copie o texto da IA", "text": "Selecione toda a resposta do ChatGPT, Claude, Gemini ou qualquer outra IA e copie (Ctrl+C)." },
+            { "title": "Cole na área INPUT_STREAM", "text": "Abra o MD2PDF e cole o texto no editor à esquerda." },
+            { "title": "Veja o preview em tempo real", "text": "O painel direito mostra instantaneamente como seu documento ficará formatado." },
+            { "title": "Exporte para PDF", "text": "Clique no botão <code>[ EXP_PDF ]</code> no topo da página." }
+          ]
+        },
+        {
+          "title": "Dicas para melhores resultados",
+          "list": [
+            "<strong>Copie a resposta completa:</strong> Não copie apenas partes do texto.",
+            "<strong>Use <code>---</code> para quebras de página:</strong> Três hífens em uma linha criam uma nova página no PDF.",
+            "<strong>Revise o preview antes de exportar:</strong> O painel RENDER_OUTPUT mostra exatamente como o PDF ficará.",
+            "<strong>Salve seus documentos:</strong> O MD2PDF salva automaticamente no navegador."
+          ]
+        }
+      ]
+    },
+    {
+      "slug": "input-stream",
+      "title": "Área de Edição",
+      "pageTitle": "Área de Edição (INPUT_STREAM)",
+      "description": "Guia completo da área de edição do MD2PDF. Aprenda sobre o editor Markdown, gerenciamento de documentos e funcionalidades do INPUT_STREAM.",
+      "keywords": "md2pdf editor, markdown editor, input stream, gerenciar documentos, syntax highlighting, editor markdown",
+      "prev": { "slug": "getting-started", "title": "Primeiros Passos" },
+      "next": { "slug": "render-output", "title": "Preview e Saída" },
+      "sections": [
+        {
+          "title": "O Editor de Markdown",
+          "content": ["O painel INPUT_STREAM é onde você escreve e edita seu conteúdo Markdown. O editor oferece recursos avançados para facilitar a escrita:"],
+          "list": [
+            "<strong>Syntax highlighting em tempo real:</strong> O código Markdown é colorido automaticamente, facilitando a identificação de títulos, negrito, itálico, links e outros elementos.",
+            "<strong>Números de linha para referência:</strong> Cada linha do editor é numerada, facilitando a navegação e referência em documentos longos.",
+            "<strong>Indicadores de erro:</strong> Linhas onduladas aparecem sob elementos com problemas de sintaxe, ajudando você a identificar e corrigir erros rapidamente."
+          ]
+        },
+        {
+          "title": "Gerenciando Documentos",
+          "content": ["A sidebar DOC_INDEX à esquerda mostra todos os seus documentos salvos. O gerenciamento é simples e intuitivo:"],
+          "list": [
+            "<strong>DOC_INDEX na sidebar:</strong> Lista todos os documentos disponíveis no navegador.",
+            "<strong>Clique + para criar novo documento:</strong> O botão de adição cria um documento em branco pronto para edição.",
+            "<strong>Clique no nome para abrir:</strong> Selecione qualquer documento da lista para carregá-lo no editor.",
+            "<strong>Clique [x] para deletar:</strong> Remove o documento permanentemente. Uma confirmação é solicitada antes da exclusão.",
+            "<strong>Documentos salvos automaticamente:</strong> Todas as alterações são salvas automaticamente no armazenamento local do navegador."
+          ]
+        },
+        {
+          "title": "Renomeando Documentos",
+          "content": ["Personalizar o nome do documento é importante, pois ele será usado como nome do arquivo PDF exportado:"],
+          "list": [
+            "<strong>Clique no campo de nome:</strong> O campo de nome do documento está localizado acima do editor.",
+            "<strong>Digite o novo nome:</strong> Edite o texto diretamente no campo.",
+            "<strong>Nome salvo automaticamente:</strong> Não é necessário confirmar; o nome é atualizado instantaneamente.",
+            "<strong>Nome usado como nome do arquivo PDF:</strong> Ao exportar, o PDF terá o mesmo nome do documento."
+          ]
+        },
+        {
+          "title": "Botão COPY",
+          "content": ["O botão COPY permite copiar rapidamente todo o conteúdo Markdown do documento atual:"],
+          "list": [
+            "<strong>Localização:</strong> Ao lado do campo de nome do documento.",
+            "<strong>Função:</strong> Copia todo o conteúdo Markdown para a área de transferência.",
+            "<strong>Atalho:</strong> <code>Ctrl+Shift+C</code> para copiar sem usar o mouse.",
+            "<strong>Uso:</strong> Ideal para compartilhar o texto, fazer backup ou continuar a edição em outro editor."
+          ]
+        },
+        {
+          "title": "Indicadores de Erro",
+          "content": ["O editor identifica problemas de sintaxe Markdown e os sinaliza visualmente:"],
+          "list": [
+            "<strong>Linha ondulada vermelha:</strong> Indica um erro de sintaxe que precisa ser corrigido.",
+            "<strong>Linha ondulada amarela:</strong> Indica um aviso sobre algo que pode estar incorreto.",
+            "<strong>Passe o mouse para ver mensagem:</strong> Ao posicionar o cursor sobre o indicador, uma mensagem explica o problema."
+          ]
+        }
+      ]
+    },
+    {
+      "slug": "render-output",
+      "title": "Preview e Saída",
+      "pageTitle": "RENDER_OUTPUT - Preview A4",
+      "description": "Entenda a área de preview A4 do MD2PDF: visualização em tempo real, tratamento de imagens, quebras de página e elementos renderizados.",
+      "keywords": "markdown preview, A4 preview, pdf preview, render output, md2pdf visualização",
+      "prev": { "slug": "input-stream", "title": "Área de Edição" },
+      "next": { "slug": "keyboard-shortcuts", "title": "Atalhos de Teclado" },
+      "intro": "A área de preview do MD2PDF exibe seu documento Markdown renderizado em formato A4, exatamente como ele aparecerá quando exportado para PDF. Acompanhe suas alterações em tempo real enquanto digita.",
+      "sections": [
+        {
+          "title": "Preview em Tempo Real",
+          "content": ["O preview do MD2PDF atualiza automaticamente conforme você digita no editor. Não é necessário salvar ou clicar em nenhum botão para ver as mudanças."],
+          "list": [
+            "<strong>Atualização instantânea:</strong> As alterações aparecem imediatamente enquanto você digita",
+            "<strong>Indicador verde:</strong> O ponto verde no cabeçalho mostra o status de renderização",
+            "<strong>Métrica LATENCY:</strong> Exibe o tempo de renderização em milissegundos na barra superior"
+          ]
+        },
+        {
+          "title": "Formato A4",
+          "content": ["O preview simula uma folha de papel A4, o formato padrão para impressão e documentos."],
+          "list": [
+            "<strong>Dimensões:</strong> O preview simula papel A4 (210x297mm)",
+            "<strong>Margens:</strong> As margens já estão pré-configuradas para impressão",
+            "<strong>WYSIWYG:</strong> O que você vê é muito próximo do que será impresso"
+          ]
+        },
+        {
+          "title": "Como Imagens são Tratadas",
+          "content": ["O MD2PDF processa imagens automaticamente para garantir que elas se ajustem corretamente ao formato A4."],
+          "list": [
+            "<strong>Redimensionamento automático:</strong> Imagens são automaticamente redimensionadas para caber no A4",
+            "<strong>Imagens grandes:</strong> Imagens que excedem a largura da página são reduzidas proporcionalmente",
+            "<strong>Quebras inteligentes:</strong> Imagens evitam quebras de página quando possível"
+          ]
+        },
+        {
+          "title": "Quebras de Página",
+          "content": ["Controle onde as páginas do seu PDF serão divididas usando quebras manuais ou deixe o sistema gerenciar automaticamente."],
+          "list": [
+            "<strong>Quebra manual:</strong> Use <code>---</code> (linha horizontal) para forçar uma quebra de página",
+            "<strong>Blocos de código:</strong> Blocos de código e imagens tentam permanecer em uma única página",
+            "<strong>Listas longas:</strong> Listas extensas podem ser divididas entre páginas automaticamente"
+          ]
+        },
+        {
+          "title": "Elementos Renderizados",
+          "content": ["O preview suporta todos os elementos padrão do Markdown, além de algumas extensões:"],
+          "list": [
+            "<strong>Títulos:</strong> Hierarquia de títulos (h1 a h6) com estilos diferenciados",
+            "<strong>Texto formatado:</strong> Negrito, itálico e tachado",
+            "<strong>Listas:</strong> Listas com marcadores e listas numeradas",
+            "<strong>Blocos de código:</strong> Com syntax highlighting para diversas linguagens",
+            "<strong>Tabelas:</strong> Tabelas com bordas e estilização",
+            "<strong>Citações:</strong> Blockquotes com estilo visual diferenciado",
+            "<strong>Links:</strong> Links clicáveis que funcionam no PDF final"
+          ]
+        }
+      ],
+      "tips": [
+        { "icon": "!", "title": "Aproximação visual", "text": "O preview não é 100% exato - o PDF final pode variar ligeiramente devido a diferenças de renderização do navegador." },
+        { "icon": "PDF", "title": "Teste de impressão", "text": "Para ver o resultado exato, faça um teste de impressão ou exporte para PDF e verifique o arquivo." }
+      ]
+    },
+    {
+      "slug": "keyboard-shortcuts",
+      "title": "Atalhos de Teclado",
+      "pageTitle": "Atalhos de Teclado",
+      "description": "Atalhos de teclado do MD2PDF: aprenda os comandos rápidos para criar, exportar e navegar documentos de forma eficiente.",
+      "keywords": "md2pdf atalhos, keyboard shortcuts, atalhos teclado, markdown shortcuts, pdf shortcuts",
+      "prev": { "slug": "render-output", "title": "Preview e Saída" },
+      "next": { "slug": "print-export", "title": "Exportar PDF" },
+      "intro": "Use atalhos para trabalhar mais rápido.",
+      "sections": [
+        {
+          "title": "Atalhos da Aplicação",
+          "shortcuts": [
+            { "keys": ["Ctrl", "N"], "action": "Criar novo documento" },
+            { "keys": ["Ctrl", "Shift", "E"], "action": "Exportar PDF" },
+            { "keys": ["Ctrl", "Shift", "C"], "action": "Copiar conteúdo Markdown" },
+            { "keys": ["Ctrl", "Shift", "P"], "action": "Preview de impressão (toggle)" },
+            { "keys": ["↑", "↓"], "action": "Navegar entre documentos", "separator": " / " },
+            { "keys": ["Enter"], "action": "Abrir documento selecionado" },
+            { "keys": ["Delete"], "action": "Deletar documento selecionado" },
+            { "keys": ["Escape"], "action": "Sair do preview de impressão" }
+          ]
+        },
+        {
+          "title": "Atalhos do Editor",
+          "shortcuts": [
+            { "keys": ["Ctrl", "Z"], "action": "Desfazer" },
+            { "keys": ["Ctrl", "Shift", "Z"], "action": "Refazer" },
+            { "keys": ["Ctrl", "A"], "action": "Selecionar tudo" }
+          ]
+        },
+        {
+          "title": "Nota para Usuários Mac",
+          "infoBox": {
+            "text": "Substitua <kbd>Ctrl</kbd> por <kbd>Cmd</kbd> (<kbd>⌘</kbd>)"
+          }
+        }
+      ]
+    },
+    {
+      "slug": "print-export",
+      "title": "Exportar PDF",
+      "pageTitle": "Exportar para PDF",
+      "description": "Aprenda a exportar seus documentos Markdown para PDF no MD2PDF. Configurações recomendadas e solução de problemas.",
+      "keywords": "exportar pdf, markdown para pdf, salvar como pdf, imprimir markdown, md2pdf export",
+      "prev": { "slug": "keyboard-shortcuts", "title": "Atalhos de Teclado" },
+      "next": { "slug": "privacy-storage", "title": "Privacidade" },
+      "sections": [
+        {
+          "title": "Botão EXP_PDF",
+          "content": ["O botão <code>[ EXP_PDF ]</code> é a forma principal de exportar seu documento para PDF."],
+          "list": [
+            "<strong>Localização:</strong> Canto superior direito da interface, na barra de controles.",
+            "<strong>Atalho:</strong> <code>Ctrl+Shift+E</code> para acesso rápido sem usar o mouse.",
+            "<strong>Ação:</strong> Abre o diálogo de impressão nativo do navegador."
+          ]
+        },
+        {
+          "title": "Passo a Passo",
+          "content": ["Siga estas etapas para exportar seu documento:"],
+          "steps": [
+            { "title": "Verifique se o preview está como desejado", "text": "Confira o painel RENDER_OUTPUT para garantir que a formatação está correta." },
+            { "title": "Clique em [ EXP_PDF ] ou use Ctrl+Shift+E", "text": "O diálogo de impressão do navegador será aberto automaticamente." },
+            { "title": "Selecione \"Salvar como PDF\"", "text": "Em \"Destino\" ou \"Impressora\", escolha a opção para salvar como arquivo PDF." },
+            { "title": "Nome do arquivo", "text": "O sistema usa automaticamente o nome do seu documento como sugestão." },
+            { "title": "Clique em Salvar", "text": "Escolha o local de destino e confirme para gerar o PDF final." }
+          ]
+        },
+        {
+          "title": "Configurações Recomendadas",
+          "content": ["Para obter os melhores resultados na exportação:"],
+          "list": [
+            "<strong>Destino:</strong> Salvar como PDF (não selecione uma impressora física).",
+            "<strong>Margens:</strong> Padrão ou Mínimas, dependendo da sua preferência.",
+            "<strong>Escala:</strong> 100% para manter o tamanho original.",
+            "<strong>Gráficos de fundo:</strong> Ative se quiser preservar cores de fundo."
+          ]
+        },
+        {
+          "title": "Download MD",
+          "content": ["Além do PDF, você pode baixar o arquivo Markdown original:"],
+          "list": [
+            "<strong>Localização:</strong> Botão na sidebar, na seção ACTIONS.",
+            "<strong>Formato:</strong> Baixa o arquivo em formato <code>.md</code> (Markdown puro).",
+            "<strong>Utilidade:</strong> Ideal para backup ou edição em outros editores."
+          ]
+        },
+        {
+          "title": "Validação Pré-impressão",
+          "content": ["O MD2PDF realiza verificações automáticas antes da exportação:"],
+          "list": [
+            "<strong>Verificação automática:</strong> Analisa o documento em busca de problemas.",
+            "<strong>Avisos no SYS_LOGS:</strong> Problemas detectados aparecem no painel de logs.",
+            "<strong>Exportação opcional:</strong> Você pode continuar mesmo com avisos."
+          ]
+        },
+        {
+          "title": "Solução de Problemas",
+          "infoBoxes": [
+            { "title": "PDF diferente do preview?", "text": "Verifique se o zoom do navegador está em 100%." },
+            { "title": "Conteúdo faltando no PDF?", "text": "Role o preview completamente para verificar se todo o conteúdo está sendo renderizado." },
+            { "title": "Páginas em branco?", "text": "Verifique se há separadores <code>---</code> extras no conteúdo." }
+          ]
+        }
+      ]
+    },
+    {
+      "slug": "privacy-storage",
+      "title": "Privacidade e Armazenamento",
+      "pageTitle": "Privacidade e Armazenamento",
+      "description": "Privacidade e armazenamento no MD2PDF. Seus documentos ficam apenas no seu navegador, sem servidores ou rastreamento.",
+      "keywords": "privacidade, armazenamento local, localStorage, segurança, dados offline, md2pdf privacidade",
+      "prev": { "slug": "print-export", "title": "Exportar PDF" },
+      "next": { "slug": "offline-pwa", "title": "Uso Offline" },
+      "highlightBox": "<strong>Seus documentos ficam armazenados APENAS no seu navegador.</strong> O MD2PDF não tem acesso aos seus dados. Nada é enviado para servidores.",
+      "sections": [
+        {
+          "title": "100% Local",
+          "list": [
+            "Todo processamento acontece no seu navegador",
+            "Nenhum servidor recebe seus dados",
+            "Zero rastreamento ou analytics",
+            "Sem contas, sem login"
+          ]
+        },
+        {
+          "title": "Onde Seus Dados Ficam",
+          "list": [
+            "Armazenados no localStorage do navegador",
+            "Chave: <code>md2pdf-docs-v2</code>",
+            "Dados ficam apenas no seu dispositivo",
+            "Navegadores diferentes = armazenamento diferente"
+          ]
+        },
+        {
+          "title": "Limite de Armazenamento",
+          "list": [
+            "localStorage: ~5MB por domínio",
+            "Monitore uso: métrica <strong>MEM</strong> na barra superior",
+            "Imagens grandes aumentam uso",
+            "Se atingir limite, delete documentos antigos"
+          ]
+        },
+        {
+          "title": "Como Limpar Seus Dados",
+          "list": [
+            "<strong>Opção 1:</strong> Delete documentos individualmente",
+            "<strong>Opção 2:</strong> Limpe dados do navegador para este site",
+            "<strong>Opção 3:</strong> DevTools &gt; Application &gt; localStorage &gt; delete"
+          ]
+        },
+        {
+          "title": "Backup de Documentos",
+          "list": [
+            "Use <strong>DOWNLOAD MD</strong> para salvar arquivos",
+            "Use botão <strong>COPY</strong> para copiar conteúdo",
+            "Faça backups regulares de docs importantes"
+          ]
+        },
+        {
+          "title": "Sigilo Garantido",
+          "list": [
+            "Sem cookies de rastreamento",
+            "Sem scripts de terceiros",
+            "Funciona 100% offline"
+          ]
+        }
+      ],
+      "warningBox": "<strong>Atenção:</strong> Se você limpar dados do navegador, os documentos serão PERDIDOS. Navegadores diferentes não compartilham dados. Modo privado/anônimo pode não salvar dados."
+    },
+    {
+      "slug": "offline-pwa",
+      "title": "Uso Offline e PWA",
+      "pageTitle": "Uso Offline e PWA",
+      "description": "Uso offline e PWA no MD2PDF. Instale o app e use sem conexão com internet.",
+      "keywords": "pwa, progressive web app, offline, service worker, instalar app, md2pdf offline, app sem internet",
+      "prev": { "slug": "privacy-storage", "title": "Privacidade" },
+      "next": { "slug": "index", "title": "Voltar ao Índice" },
+      "sections": [
+        {
+          "title": "O que é PWA?",
+          "list": [
+            "PWA = Progressive Web App",
+            "Site que funciona como app nativo",
+            "Pode ser instalado no dispositivo",
+            "Funciona sem conexão com internet"
+          ]
+        },
+        {
+          "title": "Como Instalar",
+          "subsections": [
+            {
+              "subtitle": "Chrome/Edge (Desktop)",
+              "list": [
+                "Acesse o app em /app",
+                "Procure ícone de instalação na barra de endereço",
+                "Clique em \"Instalar\"",
+                "App abre em janela própria"
+              ]
+            },
+            {
+              "subtitle": "Chrome (Android)",
+              "list": [
+                "Acesse o app",
+                "Toque no menu (3 pontos)",
+                "\"Adicionar à tela inicial\""
+              ]
+            },
+            {
+              "subtitle": "Safari (iOS)",
+              "list": [
+                "Acesse o app",
+                "Toque no botão Compartilhar",
+                "\"Adicionar à Tela de Início\""
+              ]
+            }
+          ]
+        },
+        {
+          "title": "Funcionamento Offline",
+          "list": [
+            "Após primeiro acesso, app fica em cache",
+            "Funciona 100% sem internet",
+            "Documentos salvos localmente continuam disponíveis",
+            "Nenhuma funcionalidade é perdida offline"
+          ]
+        },
+        {
+          "title": "Atualizações Automáticas",
+          "list": [
+            "Quando online, app verifica atualizações",
+            "Atualizações aplicadas automaticamente",
+            "Você sempre tem a versão mais recente",
+            "Sem atualização manual necessária"
+          ]
+        },
+        {
+          "title": "Service Worker",
+          "list": [
+            "Tecnologia que permite funcionamento offline",
+            "Armazena arquivos do app em cache",
+            "Executa em segundo plano",
+            "Gerencia cache e atualizações"
+          ]
+        },
+        {
+          "title": "Vantagens do PWA",
+          "list": [
+            "Sem app store necessária",
+            "Sem permissões de instalação",
+            "Ocupa pouco espaço (~2MB)",
+            "Sempre atualizado",
+            "Mesma experiência do site"
+          ]
+        },
+        {
+          "title": "Solução de Problemas",
+          "warningList": [
+            "<strong>App não atualiza:</strong> limpe cache e recarregue",
+            "<strong>Opção de instalar não aparece:</strong> certifique-se de usar HTTPS",
+            "<strong>Offline não funciona:</strong> acesse o app online primeiro"
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -6,7 +6,7 @@
     <meta name="description" content="Guia completo da área de edição do MD2PDF. Aprenda sobre o editor Markdown, gerenciamento de documentos e funcionalidades do INPUT_STREAM.">
     <meta name="keywords" content="md2pdf editor, markdown editor, input stream, gerenciar documentos, syntax highlighting, editor markdown">
     <meta name="author" content="MD2PDF">
-    <title>Área de Edição (INPUT_STREAM) | MD2PDF Manual</title>
+    <title>Área de Edição | MD2PDF</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -14,6 +14,7 @@
     <link rel="stylesheet" href="../manual.css">
 </head>
 <body>
+
     <header class="header">
         <div class="header-content">
             <a href="/" class="logo">MD2PDF</a>
@@ -26,6 +27,7 @@
     </header>
 
     <main class="main">
+
         <nav class="breadcrumb" aria-label="Breadcrumb">
             <a href="/">Home</a>
             <span class="breadcrumb-separator">&gt;</span>
@@ -36,26 +38,18 @@
 
         <article class="content">
             <h1>Área de Edição (INPUT_STREAM)</h1>
-
             <section>
                 <h2>O Editor de Markdown</h2>
-                <p>
-                    O painel INPUT_STREAM é onde você escreve e edita seu conteúdo Markdown. 
-                    O editor oferece recursos avançados para facilitar a escrita:
-                </p>
+                <p>O painel INPUT_STREAM é onde você escreve e edita seu conteúdo Markdown. O editor oferece recursos avançados para facilitar a escrita:</p>
                 <ul>
                     <li><strong>Syntax highlighting em tempo real:</strong> O código Markdown é colorido automaticamente, facilitando a identificação de títulos, negrito, itálico, links e outros elementos.</li>
                     <li><strong>Números de linha para referência:</strong> Cada linha do editor é numerada, facilitando a navegação e referência em documentos longos.</li>
                     <li><strong>Indicadores de erro:</strong> Linhas onduladas aparecem sob elementos com problemas de sintaxe, ajudando você a identificar e corrigir erros rapidamente.</li>
                 </ul>
             </section>
-
             <section>
                 <h2>Gerenciando Documentos</h2>
-                <p>
-                    A sidebar DOC_INDEX à esquerda mostra todos os seus documentos salvos. 
-                    O gerenciamento é simples e intuitivo:
-                </p>
+                <p>A sidebar DOC_INDEX à esquerda mostra todos os seus documentos salvos. O gerenciamento é simples e intuitivo:</p>
                 <ul>
                     <li><strong>DOC_INDEX na sidebar:</strong> Lista todos os documentos disponíveis no navegador.</li>
                     <li><strong>Clique + para criar novo documento:</strong> O botão de adição cria um documento em branco pronto para edição.</li>
@@ -64,12 +58,9 @@
                     <li><strong>Documentos salvos automaticamente:</strong> Todas as alterações são salvas automaticamente no armazenamento local do navegador.</li>
                 </ul>
             </section>
-
             <section>
                 <h2>Renomeando Documentos</h2>
-                <p>
-                    Personalizar o nome do documento é importante, pois ele será usado como nome do arquivo PDF exportado:
-                </p>
+                <p>Personalizar o nome do documento é importante, pois ele será usado como nome do arquivo PDF exportado:</p>
                 <ul>
                     <li><strong>Clique no campo de nome:</strong> O campo de nome do documento está localizado acima do editor.</li>
                     <li><strong>Digite o novo nome:</strong> Edite o texto diretamente no campo.</li>
@@ -77,12 +68,9 @@
                     <li><strong>Nome usado como nome do arquivo PDF:</strong> Ao exportar, o PDF terá o mesmo nome do documento.</li>
                 </ul>
             </section>
-
             <section>
                 <h2>Botão COPY</h2>
-                <p>
-                    O botão COPY permite copiar rapidamente todo o conteúdo Markdown do documento atual:
-                </p>
+                <p>O botão COPY permite copiar rapidamente todo o conteúdo Markdown do documento atual:</p>
                 <ul>
                     <li><strong>Localização:</strong> Ao lado do campo de nome do documento.</li>
                     <li><strong>Função:</strong> Copia todo o conteúdo Markdown para a área de transferência.</li>
@@ -90,33 +78,29 @@
                     <li><strong>Uso:</strong> Ideal para compartilhar o texto, fazer backup ou continuar a edição em outro editor.</li>
                 </ul>
             </section>
-
             <section>
                 <h2>Indicadores de Erro</h2>
-                <p>
-                    O editor identifica problemas de sintaxe Markdown e os sinaliza visualmente:
-                </p>
+                <p>O editor identifica problemas de sintaxe Markdown e os sinaliza visualmente:</p>
                 <ul>
                     <li><strong>Linha ondulada vermelha:</strong> Indica um erro de sintaxe que precisa ser corrigido.</li>
                     <li><strong>Linha ondulada amarela:</strong> Indica um aviso sobre algo que pode estar incorreto.</li>
                     <li><strong>Passe o mouse para ver mensagem:</strong> Ao posicionar o cursor sobre o indicador, uma mensagem explica o problema.</li>
                 </ul>
             </section>
-
-            <nav class="page-nav" aria-label="Navegação entre páginas">
-                <a href="/manual/getting-started/" class="page-nav-link prev">
-                    <span class="page-nav-arrow">&larr;</span>
-                    <div class="page-nav-content">
-                        <span class="page-nav-label">Anterior</span>
-                        <span class="page-nav-title">Primeiros Passos</span>
+            <nav class="page-nav">
+                <a href="/manual/getting-started/">
+                    <span class="nav-arrow">&larr;</span>
+                    <div class="nav-direction">
+                        <span class="nav-label">Anterior</span>
+                        <span class="nav-title">Primeiros Passos</span>
                     </div>
                 </a>
-                <a href="/manual/render-output/" class="page-nav-link next">
-                    <div class="page-nav-content">
-                        <span class="page-nav-label">Próximo</span>
-                        <span class="page-nav-title">Preview e Saída</span>
+                <a href="/manual/render-output/">
+                    <div class="nav-direction">
+                        <span class="nav-label">Próximo</span>
+                        <span class="nav-title">Preview e Saída</span>
                     </div>
-                    <span class="page-nav-arrow">&rarr;</span>
+                    <span class="nav-arrow">&rarr;</span>
                 </a>
             </nav>
         </article>
@@ -126,6 +110,7 @@
         <div class="footer-content">
             <div class="footer-links">
                 <a href="/app">Abrir MD2PDF</a>
+                <a href="/manual/">Manual</a>
                 <a href="/">Página Inicial</a>
             </div>
             <p class="footer-version">MD2PDF v2.0 | Gratuito e sem limites</p>
