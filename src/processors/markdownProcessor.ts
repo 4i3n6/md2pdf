@@ -59,17 +59,28 @@ interface ListToken {
  * Cada função retorna HTML com classes específicas para print styling
  */
 const printRenderer = {
-  heading(token: HeadingToken): string {
+  heading(token: HeadingToken & { tokens?: any[] }): string {
     const level = token.depth
+    // Usar heading.text pois é simples e já contém apenas o texto
     const id = token.text
       .toLowerCase()
       .replace(/\s+/g, '-')
       .replace(/[^\w-]/g, '')
-    return `<h${level} id="${id}" class="markdown-heading markdown-h${level}">${token.text}</h${level}>\n`
+    
+    // Renderizar heading com suporte a inline formatting
+    const content = token.tokens && (this as any).parser?.parseInline
+      ? (this as any).parser.parseInline(token.tokens)
+      : token.text
+    
+    return `<h${level} id="${id}" class="markdown-heading markdown-h${level}">${content}</h${level}>\n`
   },
 
-  paragraph(token: ParagraphToken): string {
-    return `<p class="markdown-paragraph">${token.text}</p>\n`
+  paragraph(token: ParagraphToken & { tokens?: any[] }): string {
+    // Processar tokens inline para **bold**, *italic*, etc.
+    const content = token.tokens && (this as any).parser?.parseInline
+      ? (this as any).parser.parseInline(token.tokens)
+      : token.text
+    return `<p class="markdown-paragraph">${content}</p>\n`
   },
 
   image(token: ImageToken): string {
@@ -147,23 +158,34 @@ const printRenderer = {
     return `<pre class="markdown-code-block hljs" data-lang="${lang}"><code class="language-${lang}">${sanitized}</code></pre>\n`
   },
 
-  blockquote(token: BlockquoteToken): string {
+  blockquote(token: BlockquoteToken & { tokens?: any[] }): string {
+    // Blockquote sempre tem tokens internos
+    const content = (this as any).parser?.parse
+      ? (this as any).parser.parse(token.tokens || [])
+      : token.text
     return `<blockquote class="markdown-blockquote" style="page-break-inside: avoid;">
-      ${token.text}
+      ${content}
     </blockquote>\n`
   },
 
-  link(token: LinkToken): string {
-    return `<a href="${token.href}" title="${token.title || ''}" class="markdown-link">${token.text}</a>`
+  link(token: LinkToken & { tokens?: any[] }): string {
+    // Processar inline tokens dentro do link
+    const content = token.tokens && (this as any).parser?.parseInline
+      ? (this as any).parser.parseInline(token.tokens)
+      : token.text
+    return `<a href="${token.href}" title="${token.title || ''}" class="markdown-link">${content}</a>`
   },
 
   list(token: ListToken): string {
     const tag = token.ordered ? 'ol' : 'ul'
     const className = token.ordered ? 'markdown-list-ordered' : 'markdown-list-unordered'
     const items = token.items
-      .map((item) => {
-        // item.text pode conter tags <ul>, <ol>, <li> para suportar aninhamento
-        return `<li>${item.text}</li>`
+      .map((item: any) => {
+        // Renderizar tokens dentro do list item
+        const itemContent = item.tokens && (this as any).parser?.parse
+          ? (this as any).parser.parse(item.tokens)
+          : item.text
+        return `<li>${itemContent}</li>`
       })
       .join('')
     return `<${tag} class="${className}">${items}</${tag}>`
@@ -173,9 +195,9 @@ const printRenderer = {
     // Suporta listas de tarefas (task lists) do GitHub Flavored Markdown
     if (token.task) {
       const checked = token.checked ? 'checked' : ''
-      return `<li><input type="checkbox" ${checked} disabled> ${token.text}</li>`
+      return `<input type="checkbox" ${checked} disabled> ${token.text}`
     }
-    return `<li>${token.text}</li>`
+    return token.text
   },
 
   hr(): string {
@@ -188,6 +210,30 @@ const printRenderer = {
 
   text(token: { text: string }): string {
     return token.text
+  },
+
+  strong(token: { text: string; tokens?: any[] }): string {
+    // Processar tokens inline dentro de strong
+    const content = token.tokens && (this as any).parser?.parseInline
+      ? (this as any).parser.parseInline(token.tokens)
+      : token.text
+    return `<strong>${content}</strong>`
+  },
+
+  em(token: { text: string; tokens?: any[] }): string {
+    // Processar tokens inline dentro de em
+    const content = token.tokens && (this as any).parser?.parseInline
+      ? (this as any).parser.parseInline(token.tokens)
+      : token.text
+    return `<em>${content}</em>`
+  },
+
+  del(token: { text: string; tokens?: any[] }): string {
+    // Strikethrough (GFM)
+    const content = token.tokens && (this as any).parser?.parseInline
+      ? (this as any).parser.parseInline(token.tokens)
+      : token.text
+    return `<del>${content}</del>`
   }
 }
 
