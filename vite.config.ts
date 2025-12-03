@@ -17,7 +17,12 @@ export default defineConfig({
     VitePWA({
       strategies: 'generateSW',
       registerType: 'autoUpdate',
-      injectRegister: 'script-defer',
+      // Desabilitar injeção automática - nosso pwaRegister.ts cuida disso
+      injectRegister: false,
+      // Desabilitar SW em desenvolvimento para evitar erros
+      devOptions: {
+        enabled: false
+      },
       workbox: {
         globPatterns: ['**/*.{js,css,html,ico,png,svg,woff,woff2}'],
         cleanupOutdatedCaches: true,
@@ -33,6 +38,7 @@ export default defineConfig({
         display: 'standalone',
         scope: '/',
         start_url: '/',
+        lang: 'pt-BR',
         icons: [
           {
             src: '/icon-192.png',
