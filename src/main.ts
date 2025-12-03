@@ -1,4 +1,6 @@
 import { EditorView, basicSetup } from 'codemirror'
+import { Decoration } from '@codemirror/view'
+import { RangeSet } from '@codemirror/state'
 import { markdown } from '@codemirror/lang-markdown'
 import 'highlight.js/styles/github.css'
 import { processMarkdown, estimatePageCount } from './processors/markdownProcessor'
@@ -226,6 +228,26 @@ function updateEditorDiagnostics(content: string): void {
   if (validation.warnings.length > 0) {
     Logger.log(`⚠️ ${validation.warnings.length} aviso(s) Markdown`, 'warning');
   }
+
+  // Aplicar decorations ao editor (NOVO - FIX DO BUG)
+  if (state.editor && decorations.length > 0) {
+    try {
+      const ranges = decorations.map(d => 
+        Decoration.mark({ class: d.class, title: d.title }).range(d.from, d.to)
+      );
+      
+      if (ranges.length > 0) {
+        const rangeSet = RangeSet.of(ranges, true);
+        state.editor.dispatch({
+          changes: [],
+          effects: [EditorView.decorations.of(rangeSet) as any]
+        } as any);
+      }
+    } catch (e) {
+      const errorMsg = e instanceof Error ? e.message : String(e);
+      Logger.log(`⚠️ Validação visual desativada: ${errorMsg}`, 'warning');
+    }
+  }
 }
 
 /**
@@ -252,6 +274,7 @@ function initEditor(): void {
   // Debounce functions for performance optimization
   const debouncedRender = debounce(renderPreview, 300);
   const debouncedUpdateMetrics = debounce(updateMetrics, 500);
+  const debouncedValidate = debounce(updateEditorDiagnostics, 300);
 
   state.editor = new EditorView({
     doc: doc ? doc.content : '',
@@ -296,8 +319,8 @@ function initEditor(): void {
             saveDocs();
           }
 
-          // Validar sintaxe Markdown em tempo real
-          updateEditorDiagnostics(val);
+           // Validar sintaxe Markdown em tempo real (com debounce para performance)
+           debouncedValidate(val);
 
           // Debounced Render (300ms delay)
           debouncedRender(val);
