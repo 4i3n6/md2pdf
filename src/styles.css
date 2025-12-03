@@ -262,6 +262,46 @@ body {
 .cm-activeLine { background: #eff6ff !important; }
 .cm-activeLineGutter { color: var(--accent) !important; background: #eff6ff !important; }
 
+/* ============================================
+   MARKDOWN SYNTAX VALIDATION STYLES
+   ============================================ */
+
+/* Erro de sintaxe - linha ondulada vermelha */
+.md-error {
+  text-decoration: wavy underline #dc2626;
+  text-decoration-skip-ink: auto;
+  cursor: help;
+}
+
+.md-error:hover {
+  background-color: rgba(220, 38, 38, 0.1);
+  border-radius: 2px;
+}
+
+/* Aviso de sintaxe - linha ondulada amarela */
+.md-warning {
+  text-decoration: wavy underline #f59e0b;
+  text-decoration-skip-ink: auto;
+  cursor: help;
+}
+
+.md-warning:hover {
+  background-color: rgba(245, 158, 11, 0.1);
+  border-radius: 2px;
+}
+
+/* Info de sintaxe - linha ondulada azul */
+.md-info {
+  text-decoration: wavy underline #3b82f6;
+  text-decoration-skip-ink: auto;
+  cursor: help;
+}
+
+.md-info:hover {
+  background-color: rgba(59, 130, 246, 0.1);
+  border-radius: 2px;
+}
+
 /* PRINT OVERRIDE (Absolute Clean) */
 @media print {
     .app-grid, .sidebar, .top-bar, .pane-header, .editor-frame, #console-log { display: none !important; }

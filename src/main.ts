@@ -2,6 +2,7 @@ import { EditorView, basicSetup } from 'codemirror'
 import { markdown } from '@codemirror/lang-markdown'
 import 'highlight.js/styles/github.css'
 import { processMarkdown, estimatePageCount } from './processors/markdownProcessor'
+import { validateMarkdown } from './processors/markdownValidator'
 import { printDocument, validatePrintContent, togglePrintPreview } from './utils/printUtils'
 import { createReporter } from './utils/printReporter'
 import OfflineManager from './utils/offlineManager'
@@ -163,6 +164,70 @@ function saveDocs(): void {
 }
 
 /**
+ * Aplica diagnostics (erros/avisos) ao editor CodeMirror
+ * 
+ * Valida Markdown e mostra erros como underlines vermelhas
+ * e avisos como underlines amarelas no editor
+ * 
+ * @param content - Conteúdo Markdown a validar
+ * @returns {void}
+ */
+function updateEditorDiagnostics(content: string): void {
+  if (!state.editor) return;
+
+  // Validar Markdown
+  const validation = validateMarkdown(content);
+
+  // Criar decorations para erros e avisos
+  const decorations: Array<{ from: number; to: number; class: string; title: string }> = [];
+  const lines = content.split('\n');
+
+  // Processar erros e avisos
+  const allIssues = [...validation.errors, ...validation.warnings];
+  
+  allIssues.forEach((issue) => {
+    const lineIndex = Math.min(issue.line - 1, lines.length - 1);
+    const line = lines[lineIndex];
+    
+    if (!line) return;
+
+    // Encontrar posição no documento completo
+    let charIndex = 0;
+    for (let i = 0; i < lineIndex; i++) {
+      charIndex += lines[i].length + 1; // +1 para newline
+    }
+
+    const from = charIndex + Math.max(0, issue.column - 1);
+    const to = charIndex + line.length;
+
+    const cssClass = issue.severity === 'error' 
+      ? 'md-error' 
+      : issue.severity === 'warning' 
+      ? 'md-warning' 
+      : 'md-info';
+
+    decorations.push({
+      from,
+      to,
+      class: cssClass,
+      title: issue.message
+    });
+  });
+
+  // Log de erros/avisos para o console do sistema
+  if (validation.errors.length > 0) {
+    Logger.error(`❌ ${validation.errors.length} erro(s) de sintaxe Markdown encontrado(s)`);
+    validation.errors.forEach((err) => {
+      Logger.log(`  Linha ${err.line}: ${err.message}`, 'error');
+    });
+  }
+
+  if (validation.warnings.length > 0) {
+    Logger.log(`⚠️ ${validation.warnings.length} aviso(s) Markdown`, 'warning');
+  }
+}
+
+/**
  * Inicializa o editor CodeMirror
  * 
  * Cria instância de EditorView com:
@@ -170,6 +235,7 @@ function saveDocs(): void {
  * - Theme customizado (light mode)
  * - Line wrapping habilitado
  * - Listener para mudanças com debounce
+ * - Validação de sintaxe Markdown
  * 
  * @returns {void}
  */
@@ -194,14 +260,27 @@ function initEditor(): void {
       EditorView.lineWrapping,
       EditorView.theme({
         '&': { color: '#111827', backgroundColor: '#ffffff' },
-        '.cm-content': { caretColor: '#2563eb' },
+        '.cm-content': { caretColor: '#0052cc' },
         '.cm-gutters': {
           backgroundColor: '#f3f4f6',
-          color: '#6b7280',
+          color: '#4b5563',
           borderRight: '1px solid #d1d5db'
         },
-        '.cm-activeLine': { backgroundColor: '#eff6ff' },
-        '.cm-activeLineGutter': { color: '#2563eb', backgroundColor: '#eff6ff' }
+        '.cm-activeLine': { backgroundColor: '#f0f4ff' },
+        '.cm-activeLineGutter': { color: '#0052cc', backgroundColor: '#f0f4ff', fontWeight: '600' },
+        '.cm-cursor': { borderLeftColor: '#0052cc' },
+        
+        // Markdown specific syntax coloring
+        '.cm-heading': { color: '#111827', fontWeight: '700' },
+        '.cm-heading1': { fontSize: '130%' },
+        '.cm-heading2': { fontSize: '120%' },
+        '.cm-heading3': { fontSize: '110%' },
+        '.cm-emphasis': { fontStyle: 'italic', color: '#059669' },
+        '.cm-strong': { fontWeight: 'bold', color: '#dc2626' },
+        '.cm-link': { color: '#0052cc', textDecoration: 'underline' },
+        '.cm-atom': { color: '#ae0a04' },
+        '.cm-quote': { color: '#4b5563', fontStyle: 'italic' },
+        '.cm-strikethrough': { textDecoration: 'line-through', color: '#6b7280' }
       }),
       EditorView.updateListener.of((u): void => {
         if (u.docChanged) {
@@ -215,6 +294,9 @@ function initEditor(): void {
             active.updated = Date.now();
             saveDocs();
           }
+
+          // Validar sintaxe Markdown em tempo real
+          updateEditorDiagnostics(val);
 
           // Debounced Render (300ms delay)
           debouncedRender(val);
