@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Manual MD2PDF - Área de Edição: editor de markdown, gerenciamento de documentos, syntax highlighting">
+    <meta name="keywords" content="markdown editor, document management, copy markdown, syntax highlighting">
+    <title>INPUT_STREAM - Área de Edição | Manual MD2PDF</title>
+    <link rel="stylesheet" href="../manual.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Breadcrumb -->
+        <nav class="breadcrumb" aria-label="Breadcrumb">
+            <a href="/app.html">Home</a>
+            <span class="breadcrumb-separator">&gt;</span>
+            <a href="/manual/">Manual</a>
+            <span class="breadcrumb-separator">&gt;</span>
+            <span class="breadcrumb-current">Área de Edição</span>
+        </nav>
+
+        <!-- Page Header -->
+        <header class="page-header">
+            <h1 class="page-title"><code>INPUT_STREAM</code> - Área de Edição</h1>
+            <p class="page-subtitle">Editor de Markdown com syntax highlighting e gerenciamento de documentos</p>
+        </header>
+
+        <!-- Section: O Editor de Markdown -->
+        <section class="section">
+            <h2 class="section-title">O Editor de Markdown</h2>
+            <div class="section-content">
+                <p>O editor de markdown do MD2PDF oferece uma experiência de escrita profissional com recursos avançados para facilitar a criação de documentos.</p>
+                <ul class="feature-list">
+                    <li>
+                        <strong>Real-time Syntax Highlighting</strong> - O código markdown é colorido automaticamente enquanto você digita, facilitando a identificação de headers, listas, links, código e outros elementos.
+                    </li>
+                    <li>
+                        <strong>Line Numbers</strong> - Números de linha são exibidos na lateral esquerda do editor, facilitando a navegação e referência a trechos específicos do documento.
+                    </li>
+                    <li>
+                        <strong>Error Indicators</strong> - Linhas onduladas (wavy underlines) aparecem automaticamente para indicar problemas de sintaxe no seu markdown.
+                    </li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- Section: Gerenciando Documentos -->
+        <section class="section">
+            <h2 class="section-title">Gerenciando Documentos</h2>
+            <div class="section-content">
+                <p>O painel lateral <code>DOC_INDEX</code> permite gerenciar todos os seus documentos de forma simples e intuitiva.</p>
+                <ul class="feature-list">
+                    <li>
+                        <strong>Visualizar documentos</strong> - O sidebar DOC_INDEX exibe a lista de todos os documentos salvos no navegador.
+                    </li>
+                    <li>
+                        <strong>Criar novo documento</strong> - Clique no botão <code>+</code> para criar um novo documento em branco.
+                    </li>
+                    <li>
+                        <strong>Abrir documento</strong> - Clique no nome do documento na lista para abri-lo no editor.
+                    </li>
+                    <li>
+                        <strong>Excluir documento</strong> - Clique no botão <code>[x]</code> ao lado do documento para excluir. Uma confirmação será solicitada antes da exclusão.
+                    </li>
+                    <li>
+                        <strong>Auto-save</strong> - Os documentos são salvos automaticamente no armazenamento do navegador (localStorage). Não é necessário salvar manualmente.
+                    </li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- Section: Renomeando Documentos -->
+        <section class="section">
+            <h2 class="section-title">Renomeando Documentos</h2>
+            <div class="section-content">
+                <p>O nome do documento pode ser alterado a qualquer momento diretamente na interface.</p>
+                <ul class="feature-list">
+                    <li>
+                        <strong>Editar nome</strong> - Clique no campo de nome do documento no topo do editor.
+                    </li>
+                    <li>
+                        <strong>Digitar novo nome</strong> - Digite o novo nome desejado para o documento.
+                    </li>
+                    <li>
+                        <strong>Salvamento automático</strong> - O nome é salvo automaticamente ao sair do campo ou pressionar Enter.
+                    </li>
+                    <li>
+                        <strong>Nome como arquivo PDF</strong> - O nome do documento será utilizado como nome do arquivo PDF ao exportar.
+                    </li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- Section: Botão COPY -->
+        <section class="section">
+            <h2 class="section-title">Botão COPY</h2>
+            <div class="section-content">
+                <p>O botão COPY permite copiar rapidamente todo o conteúdo markdown do documento atual.</p>
+                <ul class="feature-list">
+                    <li>
+                        <strong>Localização</strong> - O botão está posicionado ao lado do campo de nome do documento, na barra superior do editor.
+                    </li>
+                    <li>
+                        <strong>Função</strong> - Copia todo o conteúdo markdown do documento para a área de transferência.
+                    </li>
+                    <li>
+                        <strong>Atalho de teclado</strong> - Use <kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>C</kbd> para copiar rapidamente.
+                    </li>
+                    <li>
+                        <strong>Casos de uso</strong> - Compartilhar markdown com outras pessoas, fazer backup do conteúdo, ou editar em outro aplicativo.
+                    </li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- Section: Indicadores de Erro -->
+        <section class="section">
+            <h2 class="section-title">Indicadores de Erro</h2>
+            <div class="section-content">
+                <p>O editor identifica automaticamente problemas na sintaxe markdown e os destaca visualmente.</p>
+                
+                <table class="indicator-table">
+                    <thead>
+                        <tr>
+                            <th>Indicador</th>
+                            <th>Significado</th>
+                            <th>Exemplo</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="indicator-red">Linha vermelha ondulada</td>
+                            <td>Erro de sintaxe que pode afetar a renderização</td>
+                            <td><span class="wavy-demo red">texto com erro</span></td>
+                        </tr>
+                        <tr>
+                            <td class="indicator-yellow">Linha amarela ondulada</td>
+                            <td>Aviso sobre possível problema ou sugestão de melhoria</td>
+                            <td><span class="wavy-demo yellow">texto com aviso</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <p style="margin-top: 1rem;"><strong>Dica:</strong> Passe o mouse sobre a linha ondulada para ver a mensagem detalhada do erro ou aviso.</p>
+            </div>
+        </section>
+
+        <!-- Tips Box -->
+        <div class="info-box tip">
+            <div class="info-box-title">
+                <span>Dicas</span>
+            </div>
+            <ul>
+                <li><strong>Use nomes significativos</strong> - Nomeie seus documentos de forma descritiva para facilitar a organização e identificação posterior.</li>
+                <li><strong>Erros não bloqueiam exportação</strong> - Mesmo com erros indicados no editor, você ainda pode exportar o documento para PDF. Os erros são apenas indicativos.</li>
+            </ul>
+        </div>
+
+        <!-- Navigation -->
+        <nav class="navigation" aria-label="Navegação entre páginas">
+            <a href="/manual/getting-started/" class="nav-link">
+                <span>&larr;</span>
+                <div>
+                    <div class="nav-link-label">Anterior</div>
+                    <div class="nav-link-title">Primeiros Passos</div>
+                </div>
+            </a>
+            <a href="/manual/render-output/" class="nav-link">
+                <div>
+                    <div class="nav-link-label">Próximo</div>
+                    <div class="nav-link-title">Visualização</div>
+                </div>
+                <span>&rarr;</span>
+            </a>
+        </nav>
+    </div>
+</body>
+</html>

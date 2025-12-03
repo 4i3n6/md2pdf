@@ -3,10 +3,21 @@
 
 # App
 /app /app.html 200
-/app/* /app.html 200
 
-# Manual pages (served directly)
+# Manual pages
 /manual /manual/index.html 200
 /manual/ /manual/index.html 200
-
-# Fallback for app routes only
+/manual/getting-started /manual/getting-started/index.html 200
+/manual/getting-started/ /manual/getting-started/index.html 200
+/manual/input-stream /manual/input-stream/index.html 200
+/manual/input-stream/ /manual/input-stream/index.html 200
+/manual/render-output /manual/render-output/index.html 200
+/manual/render-output/ /manual/render-output/index.html 200
+/manual/keyboard-shortcuts /manual/keyboard-shortcuts/index.html 200
+/manual/keyboard-shortcuts/ /manual/keyboard-shortcuts/index.html 200
+/manual/print-export /manual/print-export/index.html 200
+/manual/print-export/ /manual/print-export/index.html 200
+/manual/privacy-storage /manual/privacy-storage/index.html 200
+/manual/privacy-storage/ /manual/privacy-storage/index.html 200
+/manual/offline-pwa /manual/offline-pwa/index.html 200
+/manual/offline-pwa/ /manual/offline-pwa/index.html 200

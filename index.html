@@ -5,25 +5,25 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     
     <!-- SEO Meta Tags -->
-    <title>MD2PDF - Transforme Markdown em PDF | Gratis e Privado</title>
-    <meta name="description" content="Converta textos de IA (ChatGPT, Claude, Gemini) para PDF formatado. 100% gratis, sem login, funciona offline. Seus dados nunca saem do navegador.">
-    <meta name="keywords" content="markdown to pdf, convert markdown, chatgpt export, claude export, gemini export, ai text to pdf, conversor markdown, markdown pdf gratis">
+    <title>MD2PDF - Transforme respostas de IA em PDF | Grátis e Privado</title>
+    <meta name="description" content="Transforme as respostas do ChatGPT, Claude e outras IAs em PDFs bonitos e formatados. 100% grátis, sem login, funciona offline. Seus dados nunca saem do navegador.">
+    <meta name="keywords" content="chatgpt para pdf, resposta ia pdf, converter chatgpt, exportar claude, markdown pdf, conversor grátis, pdf offline, ia para documento">
     <meta name="robots" content="index, follow">
     <meta name="author" content="MD2PDF">
     <link rel="canonical" href="https://md2pdf.app/">
     
     <!-- Open Graph Tags -->
     <meta property="og:type" content="website">
-    <meta property="og:title" content="MD2PDF - Transforme Markdown em PDF">
-    <meta property="og:description" content="Converta textos de IA para PDF formatado. Gratis, privado, funciona offline.">
+    <meta property="og:title" content="MD2PDF - Transforme respostas de IA em PDF">
+    <meta property="og:description" content="Converta respostas do ChatGPT, Claude e outras IAs em PDFs formatados. Grátis, privado, funciona offline.">
     <meta property="og:url" content="https://md2pdf.app/">
     <meta property="og:site_name" content="MD2PDF">
     <meta property="og:locale" content="pt_BR">
     
     <!-- Twitter Card -->
     <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="MD2PDF - Transforme Markdown em PDF">
-    <meta name="twitter:description" content="Converta textos de IA para PDF formatado. Gratis, privado, funciona offline.">
+    <meta name="twitter:title" content="MD2PDF - Transforme respostas de IA em PDF">
+    <meta name="twitter:description" content="Converta respostas do ChatGPT, Claude e outras IAs em PDFs formatados. Grátis, privado, funciona offline.">
     
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -43,7 +43,7 @@
         "@context": "https://schema.org",
         "@type": "WebApplication",
         "name": "MD2PDF",
-        "description": "Conversor gratuito de Markdown para PDF. Transforma textos de IA em documentos formatados.",
+        "description": "Transforme respostas de IA em PDFs formatados. Grátis, privado, funciona offline.",
         "url": "https://md2pdf.app/",
         "applicationCategory": "UtilitiesApplication",
         "operatingSystem": "Any",
@@ -53,11 +53,11 @@
             "priceCurrency": "BRL"
         },
         "featureList": [
-            "Conversao de Markdown para PDF",
+            "Converte respostas de IA para PDF",
             "Funciona offline",
-            "100% privado - dados nao saem do navegador",
-            "Sem login necessario",
-            "Gratis para sempre"
+            "100% privado - dados não saem do navegador",
+            "Sem login necessário",
+            "Grátis para sempre"
         ],
         "browserRequirements": "Requires JavaScript. Works on modern browsers."
     }
@@ -69,8 +69,11 @@
             --white: #FFFFFF;
             --black: #0A0A0A;
             --gray: #525252;
+            --gray-light: #737373;
             --orange: #F97316;
             --orange-hover: #EA580C;
+            --bg-alt: #FAFAFA;
+            --border: #E5E5E5;
             --font-mono: 'JetBrains Mono', monospace;
         }
         
@@ -132,7 +135,7 @@
             left: 0;
             right: 0;
             background: var(--white);
-            border-bottom: 1px solid #E5E5E5;
+            border-bottom: 1px solid var(--border);
             z-index: 100;
             padding: 16px 0;
         }
@@ -206,59 +209,54 @@
             font-size: 12px;
         }
         
-        .cta-btn--outline {
-            background: transparent;
-            color: var(--black);
-            border: 1px solid var(--black);
-        }
-        
-        .cta-btn--outline:hover {
-            background: var(--black);
-            color: var(--white);
-        }
-        
         /* Hero Section */
         .hero {
             padding: 140px 0 80px;
             text-align: center;
         }
         
-        .hero-headline {
-            font-size: clamp(24px, 5vw, 36px);
-            font-weight: 700;
-            line-height: 1.3;
+        .hero-badge {
+            display: inline-block;
+            background: var(--bg-alt);
+            border: 1px solid var(--border);
+            padding: 8px 16px;
+            font-size: 12px;
+            color: var(--gray);
             margin-bottom: 32px;
-            max-width: 700px;
+        }
+        
+        .hero-headline {
+            font-size: clamp(26px, 5vw, 40px);
+            font-weight: 700;
+            line-height: 1.2;
+            margin-bottom: 24px;
+            max-width: 750px;
             margin-left: auto;
             margin-right: auto;
         }
         
-        .code-examples {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-            gap: 12px;
-            margin-bottom: 32px;
-        }
-        
-        .code-tag {
-            background: #F5F5F5;
-            border: 1px solid #E5E5E5;
-            padding: 8px 16px;
-            font-size: 13px;
-            color: var(--gray);
+        .hero-headline .highlight {
+            color: var(--orange);
         }
         
         .hero-subheadline {
             font-size: 16px;
             color: var(--gray);
-            max-width: 500px;
+            max-width: 550px;
             margin: 0 auto 40px;
             line-height: 1.7;
         }
         
-        .hero-subheadline strong {
-            color: var(--black);
+        .hero-cta {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 16px;
+        }
+        
+        .hero-note {
+            font-size: 12px;
+            color: var(--gray-light);
         }
         
         /* Section */
@@ -267,141 +265,151 @@
         }
         
         .section--alt {
-            background: #FAFAFA;
-            border-top: 1px solid #E5E5E5;
-            border-bottom: 1px solid #E5E5E5;
+            background: var(--bg-alt);
+            border-top: 1px solid var(--border);
+            border-bottom: 1px solid var(--border);
         }
         
-        .section-title {
-            font-size: 12px;
+        .section-label {
+            font-size: 11px;
             font-weight: 700;
             letter-spacing: 2px;
             text-transform: uppercase;
-            color: var(--gray);
+            color: var(--orange);
             margin-bottom: 16px;
         }
         
-        .section-heading {
-            font-size: clamp(20px, 4vw, 28px);
+        .section-title {
+            font-size: clamp(22px, 4vw, 32px);
             font-weight: 700;
-            margin-bottom: 24px;
+            margin-bottom: 20px;
+            line-height: 1.3;
         }
         
         .section-text {
             color: var(--gray);
             max-width: 600px;
             line-height: 1.7;
+            font-size: 15px;
         }
         
-        /* What is Markdown */
-        .markdown-section {
+        .section-center {
+            text-align: center;
+        }
+        
+        .section-center .section-text {
+            margin: 0 auto;
+        }
+        
+        /* Problem Section */
+        .problem-grid {
             display: grid;
             grid-template-columns: 1fr;
             gap: 48px;
+            margin-top: 48px;
         }
         
         @media (min-width: 768px) {
-            .markdown-section {
+            .problem-grid {
                 grid-template-columns: 1fr 1fr;
                 gap: 64px;
-                align-items: start;
+                align-items: center;
             }
         }
         
-        .markdown-intro p {
-            color: var(--gray);
-            margin-bottom: 16px;
-            line-height: 1.7;
+        .problem-visual {
+            background: var(--white);
+            border: 1px solid var(--border);
+            overflow: hidden;
         }
         
-        .markdown-intro p:last-child {
-            margin-bottom: 0;
+        .problem-header {
+            background: #1a1a1a;
+            color: #888;
+            padding: 12px 16px;
+            font-size: 11px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .problem-header span {
+            color: #fff;
+        }
+        
+        .problem-content {
+            padding: 24px;
+            font-size: 13px;
+            line-height: 1.8;
+            color: var(--gray);
+            background: #fafafa;
+        }
+        
+        .problem-content .symbols {
+            color: #dc2626;
+            font-weight: 600;
+        }
+        
+        /* Solution Visual */
+        .solution-visual {
+            background: var(--white);
+            border: 1px solid var(--border);
+        }
+        
+        .solution-header {
+            background: var(--orange);
+            color: var(--white);
+            padding: 12px 16px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+        
+        .solution-content {
+            padding: 24px;
+            font-size: 13px;
+            line-height: 1.8;
+        }
+        
+        .solution-content h4 {
+            font-size: 18px;
+            margin-bottom: 12px;
+        }
+        
+        .solution-content ul {
+            padding-left: 20px;
+            margin: 12px 0;
+        }
+        
+        .solution-content li {
+            margin-bottom: 6px;
+        }
+        
+        /* AI Badges */
+        .ai-section {
+            margin-top: 48px;
+            padding-top: 48px;
+            border-top: 1px solid var(--border);
+        }
+        
+        .ai-text {
+            font-size: 13px;
+            color: var(--gray);
+            margin-bottom: 20px;
         }
         
         .ai-badges {
             display: flex;
             flex-wrap: wrap;
-            gap: 8px;
-            margin-top: 24px;
+            gap: 10px;
         }
         
         .ai-badge {
             background: var(--white);
-            border: 1px solid #E5E5E5;
-            padding: 6px 12px;
-            font-size: 11px;
+            border: 1px solid var(--border);
+            padding: 8px 14px;
+            font-size: 12px;
             font-weight: 600;
-            color: var(--gray);
-        }
-        
-        /* Comparison Box */
-        .comparison-box {
-            background: var(--white);
-            border: 1px solid #E5E5E5;
-        }
-        
-        .comparison-header {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            border-bottom: 1px solid #E5E5E5;
-        }
-        
-        .comparison-label {
-            padding: 12px 16px;
-            font-size: 10px;
-            font-weight: 700;
-            letter-spacing: 1px;
-            text-transform: uppercase;
-            color: var(--gray);
-        }
-        
-        .comparison-label:first-child {
-            border-right: 1px solid #E5E5E5;
-        }
-        
-        .comparison-content {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-        }
-        
-        .comparison-code,
-        .comparison-result {
-            padding: 20px 16px;
-            font-size: 13px;
-            line-height: 1.8;
-        }
-        
-        .comparison-code {
-            background: #FAFAFA;
-            border-right: 1px solid #E5E5E5;
-            color: var(--gray);
-        }
-        
-        .comparison-result {
-            background: var(--white);
-        }
-        
-        .comparison-result h3 {
-            font-size: 16px;
-            font-weight: 700;
-            margin-bottom: 8px;
-        }
-        
-        .comparison-result strong {
-            font-weight: 700;
-        }
-        
-        .comparison-result em {
-            font-style: italic;
-        }
-        
-        .comparison-result ul {
-            padding-left: 20px;
-            margin: 0;
-        }
-        
-        .comparison-result li {
-            margin-bottom: 4px;
+            color: var(--black);
         }
         
         /* Features Grid */
@@ -420,7 +428,7 @@
         
         .feature-card {
             background: var(--white);
-            border: 1px solid #E5E5E5;
+            border: 1px solid var(--border);
             padding: 32px 24px;
         }
         
@@ -441,7 +449,7 @@
         .feature-text {
             color: var(--gray);
             font-size: 13px;
-            line-height: 1.6;
+            line-height: 1.7;
         }
         
         /* Steps */
@@ -484,6 +492,7 @@
         .step-text {
             color: var(--gray);
             font-size: 13px;
+            line-height: 1.6;
         }
         
         /* Footer */
@@ -492,24 +501,32 @@
             text-align: center;
         }
         
-        .footer-message {
-            font-size: 13px;
-            color: var(--gray);
-            margin-bottom: 32px;
-            padding: 16px 24px;
-            background: #FAFAFA;
-            border: 1px solid #E5E5E5;
-            display: inline-block;
+        .footer-box {
+            background: var(--bg-alt);
+            border: 1px solid var(--border);
+            padding: 32px;
+            margin-bottom: 40px;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
         }
         
-        .footer-message::before {
-            content: ">";
-            margin-right: 8px;
-            color: var(--orange);
+        .footer-box p {
+            font-size: 14px;
+            color: var(--gray);
+            margin-bottom: 24px;
+        }
+        
+        .footer-box p:last-of-type {
+            margin-bottom: 0;
+        }
+        
+        .footer-box strong {
+            color: var(--black);
         }
         
         .footer-cta {
-            margin-bottom: 48px;
+            margin-top: 24px;
         }
         
         .footer-links {
@@ -519,6 +536,7 @@
             gap: 24px;
             font-size: 12px;
             color: var(--gray);
+            margin-top: 40px;
         }
         
         .footer-link {
@@ -535,7 +553,7 @@
         }
         
         .footer-separator {
-            color: #E5E5E5;
+            color: var(--border);
         }
         
         /* Responsive */
@@ -555,34 +573,20 @@
             .section {
                 padding: 60px 0;
             }
-            
-            .code-examples {
-                gap: 8px;
-            }
-            
-            .code-tag {
-                padding: 6px 12px;
-                font-size: 12px;
-            }
-        }
-        
-        /* Focus visible polyfill for older browsers */
-        .js-focus-visible :focus:not(.focus-visible) {
-            outline: none;
         }
     </style>
 </head>
 <body>
     <!-- Skip to main content -->
-    <a href="#main" class="skip-link">Ir para conteudo principal</a>
+    <a href="#main" class="skip-link">Ir para conteúdo principal</a>
     
     <!-- Navigation -->
-    <nav class="nav" role="navigation" aria-label="Navegacao principal">
+    <nav class="nav" role="navigation" aria-label="Navegação principal">
         <div class="container nav-content">
-            <a href="/" class="logo" aria-label="MD2PDF - Pagina inicial">MD2PDF</a>
+            <a href="/" class="logo" aria-label="MD2PDF - Página inicial">MD2PDF</a>
             <div class="nav-links">
-                <a href="/manual" class="nav-link nav-link--desktop">Manual</a>
-                <a href="/app" class="cta-btn cta-btn--small">Comecar <span aria-hidden="true">-></span></a>
+                <a href="/manual/" class="nav-link nav-link--desktop">Manual</a>
+                <a href="/app" class="cta-btn cta-btn--small">Começar <span aria-hidden="true">→</span></a>
             </div>
         </div>
     </nav>
@@ -591,91 +595,87 @@
         <!-- Hero Section -->
         <section class="hero" aria-labelledby="hero-title">
             <div class="container">
+                <div class="hero-badge">Grátis para sempre. Sem login.</div>
+                
                 <h1 id="hero-title" class="hero-headline">
-                    Sabe aquele texto cheio de simbolos que sua IA gera?
+                    Transforme as respostas da sua <span class="highlight">IA em PDF</span>
                 </h1>
                 
-                <div class="code-examples" role="list" aria-label="Exemplos de sintaxe Markdown">
-                    <span class="code-tag" role="listitem"><code>**negrito**</code></span>
-                    <span class="code-tag" role="listitem"><code>_italico_</code></span>
-                    <span class="code-tag" role="listitem"><code># titulos</code></span>
-                    <span class="code-tag" role="listitem"><code>- listas</code></span>
-                </div>
-                
                 <p class="hero-subheadline">
-                    Isso e <strong>Markdown</strong>. E nos transformamos em PDF bonito. <strong>Gratis. Sempre.</strong>
+                    Cole o texto do ChatGPT, Claude ou qualquer IA. Veja formatado instantaneamente. Exporte como PDF profissional.
                 </p>
                 
-                <a href="/app" class="cta-btn">
-                    Comecar Agora <span aria-hidden="true">-></span>
-                </a>
+                <div class="hero-cta">
+                    <a href="/app" class="cta-btn">
+                        Começar Agora <span aria-hidden="true">→</span>
+                    </a>
+                    <p class="hero-note">Funciona 100% no navegador. Seus dados nunca saem do seu dispositivo.</p>
+                </div>
             </div>
         </section>
         
-        <!-- What is Markdown Section -->
-        <section class="section section--alt" aria-labelledby="markdown-title">
+        <!-- Problem Section -->
+        <section class="section section--alt" aria-labelledby="problem-title">
             <div class="container">
-                <div class="markdown-section">
-                    <div class="markdown-intro">
-                        <p class="section-title" id="markdown-title">O que e Markdown?</p>
-                        <h2 class="section-heading">O formato que toda IA usa</h2>
-                        <p>
-                            Quando voce pede algo para o <strong>ChatGPT</strong>, <strong>Claude</strong> ou <strong>Gemini</strong>, 
-                            a resposta vem em Markdown - um formato simples que usa simbolos para formatar texto.
-                        </p>
-                        <p>
-                            O problema? Quando voce copia e cola em outro lugar, esses simbolos ficam visiveis 
-                            em vez de formatar o texto corretamente.
-                        </p>
-                        <p>
-                            <strong>MD2PDF resolve isso.</strong> Cole o texto, veja formatado, exporte como PDF.
-                        </p>
-                        
-                        <div class="ai-badges" aria-label="IAs compativeis">
-                            <span class="ai-badge">ChatGPT</span>
-                            <span class="ai-badge">Claude</span>
-                            <span class="ai-badge">Gemini</span>
-                            <span class="ai-badge">Copilot</span>
-                            <span class="ai-badge">Perplexity</span>
+                <p class="section-label">O problema</p>
+                <h2 class="section-title" id="problem-title">Você já tentou copiar uma resposta de IA?</h2>
+                <p class="section-text">
+                    Quando você copia texto do ChatGPT ou Claude, vem junto uma formatação estranha cheia de símbolos. 
+                    Colar no Word ou Google Docs vira uma bagunça.
+                </p>
+                
+                <div class="problem-grid">
+                    <div class="problem-visual" role="figure" aria-label="Exemplo de texto copiado da IA com símbolos de formatação">
+                        <div class="problem-header">
+                            <span>Texto copiado da IA</span>
+                        </div>
+                        <div class="problem-content">
+                            <span class="symbols">#</span> Guia de Produtividade<br><br>
+                            Aqui estão <span class="symbols">**</span>três dicas<span class="symbols">**</span> para melhorar seu dia:<br><br>
+                            <span class="symbols">-</span> Comece pelas tarefas <span class="symbols">_</span>mais importantes<span class="symbols">_</span><br>
+                            <span class="symbols">-</span> Faça pausas a cada 45 minutos<br>
+                            <span class="symbols">-</span> Elimine distrações do celular
                         </div>
                     </div>
                     
-                    <div class="comparison-box" role="figure" aria-label="Comparacao entre codigo Markdown e resultado formatado">
-                        <div class="comparison-header">
-                            <span class="comparison-label">Markdown</span>
-                            <span class="comparison-label">Resultado</span>
+                    <div class="solution-visual" role="figure" aria-label="Mesmo texto formatado corretamente pelo MD2PDF">
+                        <div class="solution-header">
+                            PDF gerado pelo MD2PDF
                         </div>
-                        <div class="comparison-content">
-                            <div class="comparison-code">
-                                <div># Titulo</div>
-                                <div>**texto em negrito**</div>
-                                <div>_texto em italico_</div>
-                                <div>- item da lista</div>
-                                <div>- outro item</div>
-                            </div>
-                            <div class="comparison-result">
-                                <h3>Titulo</h3>
-                                <div><strong>texto em negrito</strong></div>
-                                <div><em>texto em italico</em></div>
-                                <ul>
-                                    <li>item da lista</li>
-                                    <li>outro item</li>
-                                </ul>
-                            </div>
+                        <div class="solution-content">
+                            <h4>Guia de Produtividade</h4>
+                            <p>Aqui estão <strong>três dicas</strong> para melhorar seu dia:</p>
+                            <ul>
+                                <li>Comece pelas tarefas <em>mais importantes</em></li>
+                                <li>Faça pausas a cada 45 minutos</li>
+                                <li>Elimine distrações do celular</li>
+                            </ul>
                         </div>
+                    </div>
+                </div>
+                
+                <div class="ai-section">
+                    <p class="ai-text">Funciona com qualquer IA que você usa:</p>
+                    <div class="ai-badges" aria-label="IAs compatíveis">
+                        <span class="ai-badge">ChatGPT</span>
+                        <span class="ai-badge">Claude</span>
+                        <span class="ai-badge">Gemini</span>
+                        <span class="ai-badge">Copilot</span>
+                        <span class="ai-badge">Perplexity</span>
+                        <span class="ai-badge">DeepSeek</span>
                     </div>
                 </div>
             </div>
         </section>
         
-        <!-- Why MD2PDF Section -->
+        <!-- Features Section -->
         <section class="section" aria-labelledby="features-title">
             <div class="container">
-                <p class="section-title" id="features-title">Por que MD2PDF?</p>
-                <h2 class="section-heading">Simples, privado, sem pegadinhas</h2>
+                <p class="section-label">Por que MD2PDF?</p>
+                <h2 class="section-title" id="features-title">Simples, privado e sem pegadinhas</h2>
                 <p class="section-text">
-                    Ferramentas online geralmente pedem login, mostram anuncios ou enviam seus dados para servidores. 
-                    MD2PDF nao faz nada disso.
+                    Ferramentas online geralmente pedem login, mostram anúncios ou enviam seus dados para servidores. 
+                    O MD2PDF não faz nada disso.
                 </p>
                 
                 <div class="features-grid">
@@ -683,8 +683,8 @@
                         <p class="feature-icon">[PRIVADO]</p>
                         <h3 class="feature-title">100% no navegador</h3>
                         <p class="feature-text">
-                            Seus dados nunca saem do seu dispositivo. Nenhum servidor recebe suas informacoes. 
-                            Zero rastreamento.
+                            Seus dados nunca saem do seu dispositivo. Nenhum servidor recebe suas informações. 
+                            Zero rastreamento. Sigilo total.
                         </p>
                     </article>
                     
@@ -692,17 +692,17 @@
                         <p class="feature-icon">[OFFLINE]</p>
                         <h3 class="feature-title">Funciona sem internet</h3>
                         <p class="feature-text">
-                            Instale como app e use offline. Perfeito para quando voce esta em um aviao, 
-                            cafe sem wifi ou qualquer lugar.
+                            Instale como app e use offline. Perfeito para quando você está em um avião, 
+                            café sem wifi ou qualquer lugar sem conexão.
                         </p>
                     </article>
                     
                     <article class="feature-card">
-                        <p class="feature-icon">[GRATIS]</p>
+                        <p class="feature-icon">[GRÁTIS]</p>
                         <h3 class="feature-title">Sem limites, para sempre</h3>
                         <p class="feature-text">
-                            Sem login, sem ads, sem limite de conversoes. Gratis hoje, amanha 
-                            e sempre. Sem asteriscos.
+                            Sem login, sem ads, sem limite de conversões. Grátis hoje, amanhã 
+                            e sempre. Sem asteriscos ou letras miúdas.
                         </p>
                     </article>
                 </div>
@@ -710,28 +710,28 @@
         </section>
         
         <!-- How it Works Section -->
-        <section class="section section--alt" aria-labelledby="steps-title">
+        <section class="section section--alt section-center" aria-labelledby="steps-title">
             <div class="container">
-                <p class="section-title" id="steps-title">Como funciona</p>
-                <h2 class="section-heading">Tres passos. Dez segundos.</h2>
+                <p class="section-label">Como funciona</p>
+                <h2 class="section-title" id="steps-title">Três passos. Dez segundos.</h2>
                 
                 <div class="steps-container">
                     <div class="step">
                         <div class="step-number" aria-hidden="true">1</div>
-                        <h3 class="step-title">Cole o texto da IA</h3>
-                        <p class="step-text">Copie a resposta do ChatGPT, Claude ou qualquer IA e cole no editor.</p>
+                        <h3 class="step-title">Cole o texto</h3>
+                        <p class="step-text">Copie a resposta da sua IA favorita e cole no editor do MD2PDF.</p>
                     </div>
                     
                     <div class="step">
                         <div class="step-number" aria-hidden="true">2</div>
-                        <h3 class="step-title">Veja o preview formatado</h3>
-                        <p class="step-text">Instantaneamente veja como seu documento vai ficar, ja formatado.</p>
+                        <h3 class="step-title">Veja formatado</h3>
+                        <p class="step-text">Instantaneamente veja como seu documento vai ficar, já com toda a formatação aplicada.</p>
                     </div>
                     
                     <div class="step">
                         <div class="step-number" aria-hidden="true">3</div>
-                        <h3 class="step-title">Exporte para PDF</h3>
-                        <p class="step-text">Um clique e pronto. PDF profissional pronto para compartilhar.</p>
+                        <h3 class="step-title">Exporte o PDF</h3>
+                        <p class="step-text">Um clique e pronto. PDF profissional pronto para imprimir ou compartilhar.</p>
                     </div>
                 </div>
             </div>
@@ -740,22 +740,27 @@
         <!-- Footer Section -->
         <footer class="footer" role="contentinfo">
             <div class="container">
-                <p class="footer-message">
-                    100% no seu navegador. Seus dados nunca saem do seu dispositivo.
-                </p>
-                
-                <div class="footer-cta">
-                    <a href="/app" class="cta-btn">
-                        Comecar Agora <span aria-hidden="true">-></span>
-                    </a>
+                <div class="footer-box">
+                    <p>
+                        <strong>Seus documentos ficam armazenados apenas no seu navegador.</strong>
+                    </p>
+                    <p>
+                        O MD2PDF não tem acesso aos seus dados. Nada é enviado para servidores. 
+                        Você tem controle total sobre suas informações.
+                    </p>
+                    <div class="footer-cta">
+                        <a href="/app" class="cta-btn">
+                            Começar Agora <span aria-hidden="true">→</span>
+                        </a>
+                    </div>
                 </div>
                 
                 <div class="footer-links">
                     <span>MD2PDF v2.0</span>
                     <span class="footer-separator" aria-hidden="true">|</span>
-                    <a href="/manual" class="footer-link">Manual</a>
+                    <a href="/manual/" class="footer-link">Manual</a>
                     <span class="footer-separator" aria-hidden="true">|</span>
-                    <span>made with care</span>
+                    <span>feito com cuidado</span>
                 </div>
             </div>
         </footer>

@@ -2,10 +2,10 @@
   "buildCommand": "npm run build",
   "outputDirectory": "dist",
   "framework": null,
+  "cleanUrls": true,
+  "trailingSlash": true,
   "rewrites": [
-    { "source": "/app", "destination": "/app.html" },
-    { "source": "/manual", "destination": "/manual/index.html" },
-    { "source": "/manual/", "destination": "/manual/index.html" }
+    { "source": "/app", "destination": "/app.html" }
   ],
   "headers": [
     {
