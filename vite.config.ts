@@ -1,24 +1,67 @@
 import { defineConfig } from 'vite'
-import { copyFileSync } from 'fs'
-import { resolve } from 'path'
 import { VitePWA } from 'vite-plugin-pwa'
+import path from 'path'
 
 export default defineConfig({
+  define: {
+    __VITE_SW_SCOPE__: JSON.stringify('/')
+  },
   resolve: {
     alias: {
-      '@': resolve(__dirname, './src'),
-      '@processors': resolve(__dirname, './src/processors'),
-      '@utils': resolve(__dirname, './src/utils'),
-      '@types': resolve(__dirname, './src/types')
+      '@': path.resolve(__dirname, './src'),
+      '@processors': path.resolve(__dirname, './src/processors'),
+      '@utils': path.resolve(__dirname, './src/utils')
     }
   },
+  plugins: [
+    VitePWA({
+      strategies: 'generateSW',
+      registerType: 'autoUpdate',
+      injectRegister: 'script-defer',
+      workbox: {
+        globPatterns: ['**/*.{js,css,html,ico,png,svg,woff,woff2}'],
+        cleanupOutdatedCaches: true,
+        skipWaiting: true,
+        clientsClaim: true
+      },
+      manifest: {
+        name: 'MD2PDF',
+        short_name: 'MD2PDF',
+        description: 'Conversor Markdown para PDF - Offline First',
+        theme_color: '#ffffff',
+        background_color: '#ffffff',
+        display: 'standalone',
+        scope: '/',
+        start_url: '/',
+        icons: [
+          {
+            src: '/icon-192.png',
+            sizes: '192x192',
+            type: 'image/png'
+          },
+          {
+            src: '/icon-512.png',
+            sizes: '512x512',
+            type: 'image/png'
+          }
+        ]
+      }
+    })
+  ],
   server: {
-    port: 3000,
-    open: true
+    port: 3010,
+    open: true,
+    headers: {
+      'Service-Worker-Allowed': '/',
+      'Cache-Control': 'no-cache'
+    },
+    middlewareMode: false,
+    hmr: {
+      host: 'localhost',
+      port: 3010
+    }
   },
   build: {
-    outDir: 'dist',
-    sourcemap: false,
     minify: 'terser',
     terserOptions: {
       compress: {
@@ -35,116 +78,5 @@ export default defineConfig({
       }
     },
     chunkSizeWarningLimit: 1000
-  },
-  optimizeDeps: {
-    include: ['codemirror', '@codemirror/lang-markdown', 'marked']
-  },
-  plugins: [
-    VitePWA({
-      registerType: 'autoUpdate',
-      includeAssets: ['icon-192.png', 'icon-512.png', 'icon.svg', 'favicon.ico'],
-      manifest: {
-        name: 'MD2PDF - Markdown to PDF Converter',
-        short_name: 'MD2PDF',
-        description: 'Conversor profissional de Markdown para PDF. 100% gratuito, sem limites e funciona offline.',
-        theme_color: '#ffffff',
-        background_color: '#ffffff',
-        display: 'standalone',
-        start_url: '/',
-        scope: '/',
-        orientation: 'portrait-primary',
-        categories: ['productivity'],
-        icons: [
-          {
-            src: '/icon-192.png',
-            sizes: '192x192',
-            type: 'image/png'
-          },
-          {
-            src: '/icon-512.png',
-            sizes: '512x512',
-            type: 'image/png'
-          },
-          {
-            src: '/icon.svg',
-            sizes: '512x512',
-            type: 'image/svg+xml',
-            purpose: 'any maskable'
-          }
-        ]
-      },
-      workbox: {
-        globPatterns: ['**/*.{js,css,html,ico,png,svg,woff2,woff}'],
-        ignoreURLParametersMatching: [/.*/],
-        cleanupOutdatedCaches: true,
-        skipWaiting: true,
-        clientsClaim: true,
-        runtimeCaching: [
-          {
-            urlPattern: /^.*\.(html|js|css)$/,
-            handler: 'StaleWhileRevalidate',
-            options: {
-              cacheName: 'app-shell',
-              expiration: {
-                maxEntries: 50,
-                maxAgeSeconds: 60 * 60 * 24 * 7
-              }
-            }
-          },
-          {
-            urlPattern: /^https:\/\/fonts\.googleapis\.com\/.*/i,
-            handler: 'CacheFirst',
-            options: {
-              cacheName: 'google-fonts-cache',
-              expiration: {
-                maxEntries: 10,
-                maxAgeSeconds: 60 * 60 * 24 * 365
-              },
-              cacheableResponse: {
-                statuses: [0, 200]
-              }
-            }
-          },
-          {
-            urlPattern: /^https:\/\/fonts\.gstatic\.com\/.*/i,
-            handler: 'CacheFirst',
-            options: {
-              cacheName: 'gstatic-fonts-cache',
-              expiration: {
-                maxEntries: 10,
-                maxAgeSeconds: 60 * 60 * 24 * 365
-              },
-              cacheableResponse: {
-                statuses: [0, 200]
-              }
-            }
-          },
-          {
-            urlPattern: /^https:\/\/cdn\..*/i,
-            handler: 'StaleWhileRevalidate',
-            options: {
-              cacheName: 'cdn-resources',
-              expiration: {
-                maxEntries: 20,
-                maxAgeSeconds: 60 * 60 * 24 * 30
-              }
-            }
-          }
-        ]
-      }
-    }),
-    {
-      name: 'copy-cloudflare-files',
-      closeBundle(): void {
-        try {
-          copyFileSync(resolve(__dirname, '_headers'), resolve(__dirname, 'dist/_headers'))
-          copyFileSync(resolve(__dirname, '_redirects'), resolve(__dirname, 'dist/_redirects'))
-          console.log('✓ Arquivos Cloudflare copiados')
-        } catch (e) {
-          const errorMsg = e instanceof Error ? e.message : 'Erro desconhecido'
-          console.warn('⚠ Erro ao copiar arquivos Cloudflare:', errorMsg)
-        }
-      }
-    }
-  ]
+  }
 })

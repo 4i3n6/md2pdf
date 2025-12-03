@@ -117,24 +117,31 @@ export class DocumentManager {
     return this.docs.find((d) => d.id === id)
   }
 
-  /**
-   * Cria um novo documento vazio
-   * 
-   * @param {string} name - Nome do documento (padrão: 'Untitled_XXXX')
-   * @returns {Document} Novo documento criado
-   */
-  create(name?: string): Document {
-    const newDoc: Document = {
-      id: Date.now(),
-      name: name || `UNTITLED_${Math.floor(Math.random() * 1000)}`,
-      content: '',
-      updated: Date.now()
-    }
-    this.docs.unshift(newDoc)
-    this.save()
-    this.logger?.log?.(`Documento criado [ID: ${newDoc.id}]`)
-    return newDoc
-  }
+   /**
+    * Cria um novo documento vazio
+    * 
+    * @param {string} name - Nome do documento (padrão: 'Untitled_XXXX.md')
+    * @returns {Document} Novo documento criado
+    */
+   create(name?: string): Document {
+     let docName = name || `UNTITLED_${Math.floor(Math.random() * 1000)}`
+     
+     // Adicionar extensão .md se não houver
+     if (!docName.endsWith('.md')) {
+       docName += '.md'
+     }
+     
+     const newDoc: Document = {
+       id: Date.now(),
+       name: docName,
+       content: '',
+       updated: Date.now()
+     }
+     this.docs.unshift(newDoc)
+     this.save()
+     this.logger?.log?.(`Documento criado [ID: ${newDoc.id}]`)
+     return newDoc
+   }
 
   /**
    * Atualiza um documento existente

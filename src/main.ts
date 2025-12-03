@@ -9,7 +9,8 @@ import OfflineManager from './utils/offlineManager'
 import SWUpdateNotifier from './utils/swUpdateNotifier'
 import { documentManager } from './services/documentManager'
 import { uiRenderer } from './services/uiRenderer'
-import type { AppState, LoggerInterface } from '@/types/index'
+import type { AppState, LoggerInterface, Document as AppDocument } from '@/types/index'
+import './pwaRegister'
 import './styles.css'
 import './styles-print.css'
 
@@ -329,7 +330,7 @@ function initEditor(): void {
  * 
  * @returns {Document | undefined} Documento ativo ou undefined se nenhum selecionado
  */
-function getCurrentDoc(): Document | undefined {
+function getCurrentDoc(): AppDocument | undefined {
   return state.docs.find((d) => d.id === state.currentId);
 }
 
@@ -515,18 +516,18 @@ function downloadMarkdownFile(): void {
     const blob = new Blob([doc.content], { type: 'text/markdown;charset=utf-8' });
     const url = URL.createObjectURL(blob);
 
-    // Criar e disparar download
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = `${doc.name}.md`;
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+     // Criar e disparar download
+     const link = document.createElement('a');
+     link.href = url;
+     link.download = doc.name; // Já contém .md
+     document.body.appendChild(link);
+     link.click();
+     document.body.removeChild(link);
 
-    // Limpar URL temporária
-    URL.revokeObjectURL(url);
+     // Limpar URL temporária
+     URL.revokeObjectURL(url);
 
-    Logger.success(`✓ Download: ${doc.name}.md (${(blob.size / 1024).toFixed(2)}KB)`);
+     Logger.success(`✓ Download: ${doc.name} (${(blob.size / 1024).toFixed(2)}KB)`);
   } catch (e) {
     const errorMessage = e instanceof Error ? e.message : String(e);
     Logger.error('Erro ao fazer download: ' + errorMessage);
@@ -770,20 +771,8 @@ function setupKeyboardNavigation(): void {
 // Boot
 document.addEventListener('DOMContentLoaded', initSystem);
 
-// PWA
-if ('serviceWorker' in navigator) {
-  window.addEventListener('load', (): void => {
-    navigator.serviceWorker.register('/sw.js').then(
-      (): void => {
-        Logger.success('Service Worker registrado.');
-      },
-      (err: unknown): void => {
-        const errorMessage = err instanceof Error ? err.message : String(err);
-        Logger.error('SW Falhou: ' + errorMessage);
-      }
-    );
-  });
-}
+// PWA - Gerenciado automaticamente pelo Vite PWA
+// O registerSW é injetado automaticamente pelo vite-plugin-pwa
 
 // Exportar Logger globalmente
 export { Logger };
