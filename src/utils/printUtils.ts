@@ -77,25 +77,54 @@ export function validatePrintContent(htmlContent: string): ValidationResult {
 }
 
 /**
+ * Armazena estado original dos elementos antes de modificar para print
+ * Chave: seletor CSS, Valor: array com dados do estado original
+ */
+const elementStates = new Map<string, Array<{ el: HTMLElement; originalDisplay: string }>>();
+
+/**
  * Otimiza página para impressão (esconde elementos desnecessários)
  * @returns Sucesso da operação
  */
 export function optimizeForPrint(): boolean {
   try {
-    // Esconder UI elements
+    // Limpar estados anteriores
+    elementStates.clear();
+
+    // Elementos a esconder e seus seletores
     const elementsToHide = ['.sidebar', '.top-bar', '.pane-header', '.editor-frame', '#console-log', '.app-grid'];
 
     elementsToHide.forEach((selector) => {
+      const elements: HTMLElement[] = [];
+      
       document.querySelectorAll(selector).forEach((el) => {
-        (el as HTMLElement).style.display = 'none';
+        const htmlEl = el as HTMLElement;
+        const originalDisplay = window.getComputedStyle(htmlEl).display;
+        
+        // Guardar estado original
+        elements.push(htmlEl);
+        htmlEl.style.display = 'none';
       });
+      
+      // Armazenar para restauração
+      if (elements.length > 0) {
+        elementStates.set(selector, elements.map((el) => ({
+          el,
+          originalDisplay: window.getComputedStyle(el).getPropertyValue('display') || 'block'
+        })));
+      }
     });
 
     // Mostrar apenas preview
     const workspace = document.querySelector('.workspace') as HTMLElement | null;
     const previewPane = document.querySelector('.pane-container.preview-pane') as HTMLElement | null;
-    if (workspace) workspace.style.display = 'block';
-    if (previewPane) previewPane.style.width = '100%';
+    
+    if (workspace) {
+      workspace.style.display = 'block';
+    }
+    if (previewPane) {
+      previewPane.style.width = '100%';
+    }
 
     return true;
   } catch (error) {
@@ -106,18 +135,31 @@ export function optimizeForPrint(): boolean {
 
 /**
  * Restaura estado da página após impressão
+ * Usa os estados armazenados por optimizeForPrint()
  * @returns Sucesso da operação
  */
 export function restoreAfterPrint(): boolean {
   try {
-    // Remover display none de todos os elementos
-    document.querySelectorAll('[style*="display: none"]').forEach((el) => {
-      (el as HTMLElement).style.display = '';
+    // Restaurar elementos que foram escondidos
+    elementStates.forEach((states) => {
+      states.forEach(({ el, originalDisplay }) => {
+        el.style.display = originalDisplay;
+      });
     });
 
-    // Restaurar workspace
+    // Restaurar workspace e preview pane
+    const workspace = document.querySelector('.workspace') as HTMLElement | null;
     const previewPane = document.querySelector('.pane-container.preview-pane') as HTMLElement | null;
-    if (previewPane) previewPane.style.width = '';
+    
+    if (workspace) {
+      workspace.style.display = '';
+    }
+    if (previewPane) {
+      previewPane.style.width = '';
+    }
+
+    // Limpar mapa de estados
+    elementStates.clear();
 
     return true;
   } catch (error) {
