@@ -2,6 +2,8 @@
  * Tipos globais da aplicação
  */
 
+import type { EditorView } from 'codemirror'
+
 export interface Document {
   id: number
   name: string
@@ -12,7 +14,16 @@ export interface Document {
 export interface AppState {
   docs: Document[]
   currentId: number | null
-  editor: any // CodeMirror EditorView
+  editor: EditorView | null
+}
+
+/**
+ * Declara Logger globalmente em window
+ */
+declare global {
+  interface Window {
+    Logger: LoggerInterface
+  }
 }
 
 export interface LogLine {
