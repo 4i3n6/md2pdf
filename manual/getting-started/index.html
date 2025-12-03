@@ -3,177 +3,144 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Aprenda o que é Markdown e como usar o MD2PDF para converter textos de IA em PDFs formatados. Tutorial básico de Markdown.">
-    <meta name="keywords" content="markdown tutorial, what is markdown, AI text format, markdown basics, chatgpt markdown, o que é markdown, tutorial markdown">
-    <title>Primeiros Passos - O que é Markdown? | MD2PDF Manual</title>
+    <meta name="description" content="Aprenda o que é Markdown e como usar o MD2PDF para converter textos de IA em PDFs formatados.">
+    <meta name="keywords" content="markdown tutorial, o que é markdown, chatgpt para pdf, claude pdf, tutorial markdown">
+    <title>Primeiros Passos | Manual do MD2PDF</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="icon" href="/favicon.ico">
     <link rel="stylesheet" href="../manual.css">
 </head>
 <body>
-    <!-- Header -->
-    <header class="top-bar" role="banner">
-        <a href="/app.html" class="brand">MD2PDF <span class="version">SYS.V2.0</span></a>
-        <div class="top-controls">
-            <a href="/manual/" class="action-btn secondary">[ MANUAL ]</a>
-            <a href="/app.html" class="action-btn">[ ABRIR APP ]</a>
+    <header class="header">
+        <div class="header-content">
+            <a href="/" class="logo">MD2PDF</a>
+            <span class="logo-subtitle">Manual</span>
+            <nav class="header-nav">
+                <a href="/">Home</a>
+                <a href="/app">Abrir App</a>
+            </nav>
         </div>
     </header>
 
-    <!-- Breadcrumb -->
-    <nav class="breadcrumb" aria-label="Navegação estrutural">
-        <a href="/app.html">Home</a>
-        <span>&gt;</span>
-        <a href="/manual/">Manual</a>
-        <span>&gt;</span>
-        Primeiros Passos
-    </nav>
-
-    <!-- Main Content -->
-    <main class="main-content">
-        <h1>O que é Markdown?</h1>
-        <p class="subtitle">Entenda por que sua IA escreve com símbolos estranhos e como transformá-los em documentos bonitos.</p>
-
-        <!-- Section 1 -->
-        <section>
-            <h2>Por que sua IA escreve assim?</h2>
-            <p>
-                Se você já usou ChatGPT, Claude, Gemini ou outras IAs, provavelmente notou que as respostas vêm com símbolos estranhos como <code>**</code>, <code>#</code>, <code>-</code>, <code>`</code> e outros.
-            </p>
-            <div class="info-box">
-                <strong>Isso não é um bug!</strong> Esses símbolos são formatação Markdown - uma linguagem simples que transforma texto puro em documentos formatados.
-            </div>
-            <p>
-                Markdown foi criado para ser legível mesmo sem renderização. Por isso as IAs usam esse formato: é universal, simples e funciona em qualquer lugar.
-            </p>
-        </section>
-
-        <!-- Section 2 -->
-        <section>
-            <h2>Markdown em 2 minutos</h2>
-            <p>Veja como os símbolos se transformam em formatação:</p>
-
-            <table class="md-table">
-                <thead>
-                    <tr>
-                        <th>Você escreve</th>
-                        <th>Resultado</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td><code># Título</code></td>
-                        <td class="result">Título principal (grande)</td>
-                    </tr>
-                    <tr>
-                        <td><code>## Subtítulo</code></td>
-                        <td class="result">Subtítulo (médio)</td>
-                    </tr>
-                    <tr>
-                        <td><code>**texto**</code></td>
-                        <td class="result"><strong>Texto em negrito</strong></td>
-                    </tr>
-                    <tr>
-                        <td><code>*texto*</code></td>
-                        <td class="result"><em>Texto em itálico</em></td>
-                    </tr>
-                    <tr>
-                        <td><code>- item</code></td>
-                        <td class="result">Lista com marcadores</td>
-                    </tr>
-                    <tr>
-                        <td><code>1. item</code></td>
-                        <td class="result">Lista numerada</td>
-                    </tr>
-                    <tr>
-                        <td><code>`código`</code></td>
-                        <td class="result"><code>Código inline</code></td>
-                    </tr>
-                    <tr>
-                        <td><code>[link](url)</code></td>
-                        <td class="result"><a href="#">Link clicável</a></td>
-                    </tr>
-                    <tr>
-                        <td><code>&gt; citação</code></td>
-                        <td class="result">Bloco de citação</td>
-                    </tr>
-                </tbody>
-            </table>
-
-            <div class="info-box highlight">
-                <strong>Dica:</strong> Você não precisa memorizar nada! Basta colar o texto no MD2PDF e ver a mágica acontecer.
-            </div>
-        </section>
-
-        <!-- Section 3 -->
-        <section>
-            <h2>Como usar o MD2PDF</h2>
-            <p>Converter texto de IA para PDF é simples:</p>
-
-            <ol class="steps">
-                <li>
-                    <strong>Copie o texto da IA</strong><br>
-                    Selecione toda a resposta do ChatGPT, Claude, Gemini ou qualquer outra IA e copie (Ctrl+C).
-                </li>
-                <li>
-                    <strong>Cole na área INPUT_STREAM</strong><br>
-                    Abra o MD2PDF e cole o texto no editor à esquerda. O painel se chama "INPUT_STREAM (MD)".
-                </li>
-                <li>
-                    <strong>Veja o preview em tempo real</strong><br>
-                    O painel direito "RENDER_OUTPUT" mostra instantaneamente como seu documento ficará formatado.
-                </li>
-                <li>
-                    <strong>Exporte para PDF</strong><br>
-                    Clique no botão <code>[ EXP_PDF ]</code> no topo da página. Seu documento será gerado em formato A4, pronto para imprimir ou compartilhar.
-                </li>
-            </ol>
-        </section>
-
-        <!-- Section 4 -->
-        <section>
-            <h2>Dicas para melhores resultados</h2>
-
-            <ul class="tips">
-                <li>
-                    <strong>Copie a resposta completa:</strong> Não copie apenas partes do texto. O Markdown funciona melhor quando o contexto completo está presente.
-                </li>
-                <li>
-                    <strong>Use <code>---</code> para quebras de página:</strong> Adicione três hifens em uma linha separada para criar uma nova página no PDF.
-                </li>
-                <li>
-                    <strong>Revise o preview antes de exportar:</strong> O painel RENDER_OUTPUT mostra exatamente como o PDF ficará. Ajuste o texto se necessário.
-                </li>
-                <li>
-                    <strong>Salve seus documentos:</strong> O MD2PDF salva automaticamente no navegador. Crie novos documentos clicando no botão <code>+</code> na sidebar.
-                </li>
-            </ul>
-        </section>
-
-        <!-- Page Navigation -->
-        <nav class="page-nav" aria-label="Navegação entre páginas">
-            <a href="/manual/">
-                <span class="arrow">&larr;</span>
-                <div>
-                    <span class="label">Anterior</span>
-                    <span class="title">Índice do Manual</span>
-                </div>
-            </a>
-            <a href="/manual/input-stream/">
-                <div>
-                    <span class="label">Próximo</span>
-                    <span class="title">Input Stream</span>
-                </div>
-                <span class="arrow">&rarr;</span>
-            </a>
+    <main class="main">
+        <nav class="breadcrumb" aria-label="Breadcrumb">
+            <a href="/">Home</a>
+            <span class="breadcrumb-separator">></span>
+            <a href="/manual/">Manual</a>
+            <span class="breadcrumb-separator">></span>
+            <span class="breadcrumb-current">Primeiros Passos</span>
         </nav>
+
+        <article class="content">
+            <h1>O que é Markdown?</h1>
+            
+            <section>
+                <h2>Por que sua IA escreve assim?</h2>
+                <p>
+                    Se você já usou ChatGPT, Claude, Gemini ou outras IAs, provavelmente notou que as respostas 
+                    vêm com símbolos estranhos como <code>**</code>, <code>#</code>, <code>-</code> e <code>`</code>.
+                </p>
+                <div class="info-box">
+                    <strong>Isso não é um bug!</strong>
+                    <p>Esses símbolos são formatação Markdown - uma linguagem simples que transforma texto puro em documentos formatados.</p>
+                </div>
+                <p>
+                    Markdown foi criado para ser legível mesmo sem renderização. Por isso as IAs usam esse formato: 
+                    é universal, simples e funciona em qualquer lugar.
+                </p>
+            </section>
+
+            <section>
+                <h2>Markdown em 2 minutos</h2>
+                <p>Veja como os símbolos se transformam em formatação:</p>
+                
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Você escreve</th>
+                            <th>Resultado</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr><td><code># Título</code></td><td>Título principal (grande)</td></tr>
+                        <tr><td><code>## Subtítulo</code></td><td>Subtítulo (médio)</td></tr>
+                        <tr><td><code>**texto**</code></td><td><strong>Texto em negrito</strong></td></tr>
+                        <tr><td><code>*texto*</code></td><td><em>Texto em itálico</em></td></tr>
+                        <tr><td><code>- item</code></td><td>Lista com marcadores</td></tr>
+                        <tr><td><code>1. item</code></td><td>Lista numerada</td></tr>
+                        <tr><td><code>`código`</code></td><td><code>Código inline</code></td></tr>
+                        <tr><td><code>[link](url)</code></td><td>Link clicável</td></tr>
+                        <tr><td><code>> citação</code></td><td>Bloco de citação</td></tr>
+                    </tbody>
+                </table>
+                
+                <div class="info-box highlight">
+                    <strong>Dica</strong>
+                    <p>Você não precisa memorizar nada! Basta colar o texto no MD2PDF e ver a mágica acontecer.</p>
+                </div>
+            </section>
+
+            <section>
+                <h2>Como usar o MD2PDF</h2>
+                <ol class="steps">
+                    <li>
+                        <strong>Copie o texto da IA</strong>
+                        Selecione toda a resposta do ChatGPT, Claude, Gemini ou qualquer outra IA e copie (Ctrl+C).
+                    </li>
+                    <li>
+                        <strong>Cole na área INPUT_STREAM</strong>
+                        Abra o MD2PDF e cole o texto no editor à esquerda.
+                    </li>
+                    <li>
+                        <strong>Veja o preview em tempo real</strong>
+                        O painel direito mostra instantaneamente como seu documento ficará formatado.
+                    </li>
+                    <li>
+                        <strong>Exporte para PDF</strong>
+                        Clique no botão <code>[ EXP_PDF ]</code> no topo da página.
+                    </li>
+                </ol>
+            </section>
+
+            <section>
+                <h2>Dicas para melhores resultados</h2>
+                <ul>
+                    <li><strong>Copie a resposta completa:</strong> Não copie apenas partes do texto.</li>
+                    <li><strong>Use <code>---</code> para quebras de página:</strong> Três hífens em uma linha criam uma nova página no PDF.</li>
+                    <li><strong>Revise o preview antes de exportar:</strong> O painel RENDER_OUTPUT mostra exatamente como o PDF ficará.</li>
+                    <li><strong>Salve seus documentos:</strong> O MD2PDF salva automaticamente no navegador.</li>
+                </ul>
+            </section>
+
+            <nav class="page-nav">
+                <a href="/manual/">
+                    <span class="nav-arrow">←</span>
+                    <div class="nav-direction">
+                        <span class="nav-label">Anterior</span>
+                        <span class="nav-title">Índice do Manual</span>
+                    </div>
+                </a>
+                <a href="/manual/input-stream/">
+                    <div class="nav-direction">
+                        <span class="nav-label">Próximo</span>
+                        <span class="nav-title">Área de Edição</span>
+                    </div>
+                    <span class="nav-arrow">→</span>
+                </a>
+            </nav>
+        </article>
     </main>
 
-    <!-- Footer -->
-    <footer>
-        <p>MD2PDF - Conversor Markdown para PDF | <a href="/app.html">Abrir Aplicação</a> | <a href="/manual/">Manual Completo</a></p>
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-links">
+                <a href="/app">Abrir MD2PDF</a>
+                <a href="/manual/">Manual</a>
+            </div>
+            <p class="footer-version">MD2PDF v2.0</p>
+        </div>
     </footer>
 </body>
 </html>

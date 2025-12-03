@@ -3,10 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Como exportar documentos para PDF no MD2PDF. Guia completo de exportação e configurações recomendadas.">
-    <meta name="keywords" content="export pdf, print pdf, save as pdf, download markdown, md2pdf exportar, converter markdown pdf">
-    <meta name="author" content="MD2PDF">
-    <title>Exportar para PDF - Manual do MD2PDF</title>
+    <meta name="description" content="Aprenda a exportar seus documentos Markdown para PDF no MD2PDF. Configurações recomendadas e solução de problemas.">
+    <meta name="keywords" content="exportar pdf, markdown para pdf, salvar como pdf, imprimir markdown, md2pdf export">
+    <title>Exportar para PDF | Manual do MD2PDF</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -28,169 +27,127 @@
     <main class="main">
         <nav class="breadcrumb" aria-label="Breadcrumb">
             <a href="/">Home</a>
-            <span class="breadcrumb-separator">&gt;</span>
+            <span class="breadcrumb-separator">></span>
             <a href="/manual/">Manual</a>
-            <span class="breadcrumb-separator">&gt;</span>
-            <span class="breadcrumb-current">Exportar PDF</span>
+            <span class="breadcrumb-separator">></span>
+            <span class="breadcrumb-current">Exportar para PDF</span>
         </nav>
 
         <article class="content">
             <h1>Exportar para PDF</h1>
-            
-            <section class="section">
+
+            <section>
                 <h2>Botão EXP_PDF</h2>
                 <p>
-                    O botão <strong>[ EXP_PDF ]</strong> está localizado no <strong>canto superior direito</strong> da interface.
+                    O botão <code>[ EXP_PDF ]</code> é a forma principal de exportar seu documento para PDF.
                 </p>
-                <p>
-                    Você também pode usar o atalho de teclado <kbd>Ctrl+Shift+E</kbd> para acionar a exportação rapidamente.
-                </p>
-                <p>
-                    Ao clicar no botão ou usar o atalho, o diálogo de impressão do navegador será aberto automaticamente.
-                </p>
+                <ul>
+                    <li><strong>Localização:</strong> Canto superior direito da interface, na barra de controles.</li>
+                    <li><strong>Atalho:</strong> <code>Ctrl+Shift+E</code> para acesso rápido sem usar o mouse.</li>
+                    <li><strong>Ação:</strong> Abre o diálogo de impressão nativo do navegador.</li>
+                </ul>
             </section>
 
-            <section class="section">
+            <section>
                 <h2>Passo a Passo</h2>
-                <ol class="steps-list">
+                <p>Siga estas etapas para exportar seu documento:</p>
+                <ol class="steps">
                     <li>
-                        <strong>Verifique o preview</strong>
-                        <p>Certifique-se de que a visualização A4 está exatamente como desejado antes de exportar.</p>
+                        <strong>Verifique se o preview está como desejado</strong>
+                        Confira o painel RENDER_OUTPUT para garantir que a formatação está correta.
                     </li>
                     <li>
-                        <strong>Clique em [ EXP_PDF ]</strong>
-                        <p>Ou use o atalho <kbd>Ctrl+Shift+E</kbd> para abrir o diálogo de impressão.</p>
+                        <strong>Clique em [ EXP_PDF ] ou use Ctrl+Shift+E</strong>
+                        O diálogo de impressão do navegador será aberto automaticamente.
                     </li>
                     <li>
                         <strong>Selecione "Salvar como PDF"</strong>
-                        <p>No diálogo de impressão, escolha a opção "Salvar como PDF" como destino.</p>
+                        Em "Destino" ou "Impressora", escolha a opção para salvar como arquivo PDF.
                     </li>
                     <li>
                         <strong>Nome do arquivo</strong>
-                        <p>O nome sugerido para o arquivo será automaticamente o nome do seu documento.</p>
+                        O sistema usa automaticamente o nome do seu documento como sugestão.
                     </li>
                     <li>
                         <strong>Clique em Salvar</strong>
-                        <p>Escolha o local desejado e confirme para gerar o PDF.</p>
+                        Escolha o local de destino e confirme para gerar o PDF final.
                     </li>
                 </ol>
             </section>
 
-            <section class="section">
+            <section>
                 <h2>Configurações Recomendadas</h2>
-                <p>No diálogo de impressão do navegador, recomendamos as seguintes configurações:</p>
-                <table class="config-table">
-                    <thead>
-                        <tr>
-                            <th>Configuração</th>
-                            <th>Valor Recomendado</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td>Destino</td>
-                            <td>Salvar como PDF</td>
-                        </tr>
-                        <tr>
-                            <td>Margens</td>
-                            <td>Padrão ou Mínimas</td>
-                        </tr>
-                        <tr>
-                            <td>Escala</td>
-                            <td>100%</td>
-                        </tr>
-                        <tr>
-                            <td>Gráficos de fundo</td>
-                            <td>Ativado (se quiser preservar cores de fundo)</td>
-                        </tr>
-                    </tbody>
-                </table>
+                <p>Para obter os melhores resultados na exportação:</p>
+                <ul>
+                    <li><strong>Destino:</strong> Salvar como PDF (não selecione uma impressora física).</li>
+                    <li><strong>Margens:</strong> Padrão ou Mínimas, dependendo da sua preferência.</li>
+                    <li><strong>Escala:</strong> 100% para manter o tamanho original.</li>
+                    <li><strong>Gráficos de fundo:</strong> Ative se quiser preservar cores de fundo.</li>
+                </ul>
             </section>
 
-            <section class="section">
+            <section>
                 <h2>Download MD</h2>
-                <p>
-                    Além de exportar para PDF, você pode baixar o arquivo Markdown original.
-                </p>
-                <p>
-                    O botão de download está localizado na <strong>barra lateral</strong>, na seção <strong>ACTIONS</strong>.
-                </p>
-                <p>
-                    Essa função é útil para:
-                </p>
+                <p>Além do PDF, você pode baixar o arquivo Markdown original:</p>
                 <ul>
-                    <li>Fazer backup do seu documento</li>
-                    <li>Editar em outro editor de sua preferência</li>
-                    <li>Compartilhar o código-fonte Markdown</li>
+                    <li><strong>Localização:</strong> Botão na sidebar, na seção ACTIONS.</li>
+                    <li><strong>Formato:</strong> Baixa o arquivo em formato <code>.md</code> (Markdown puro).</li>
+                    <li><strong>Utilidade:</strong> Ideal para backup ou edição em outros editores.</li>
                 </ul>
             </section>
 
-            <section class="section">
+            <section>
                 <h2>Validação Pré-impressão</h2>
-                <p>
-                    Antes de exportar, o sistema verifica automaticamente seu documento em busca de potenciais problemas.
-                </p>
-                <p>
-                    Caso algum problema seja detectado, avisos serão exibidos no <strong>SYS_LOGS</strong> (logs do sistema).
-                </p>
-                <h3>Problemas Comuns Detectados</h3>
+                <p>O MD2PDF realiza verificações automáticas antes da exportação:</p>
                 <ul>
-                    <li><strong>Imagens muito grandes</strong> - podem aumentar significativamente o tamanho do PDF</li>
-                    <li><strong>URLs muito longas</strong> - podem quebrar o layout ou ficar cortadas</li>
-                    <li><strong>Conteúdo excessivo</strong> - documentos muito extensos podem demorar para processar</li>
+                    <li><strong>Verificação automática:</strong> Analisa o documento em busca de problemas.</li>
+                    <li><strong>Avisos no SYS_LOGS:</strong> Problemas detectados aparecem no painel de logs.</li>
+                    <li><strong>Exportação opcional:</strong> Você pode continuar mesmo com avisos.</li>
                 </ul>
-                <p>
-                    <em>Nota:</em> Os avisos são apenas informativos. Você pode prosseguir com a exportação mesmo que existam avisos.
-                </p>
             </section>
 
-            <section class="section">
+            <section>
                 <h2>Solução de Problemas</h2>
-                <table class="config-table">
-                    <thead>
-                        <tr>
-                            <th>Problema</th>
-                            <th>Solução</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td>PDF está diferente do preview</td>
-                            <td>Verifique se o zoom do navegador está em 100%</td>
-                        </tr>
-                        <tr>
-                            <td>Conteúdo faltando</td>
-                            <td>Role o preview para verificar se todo o conteúdo está visível</td>
-                        </tr>
-                        <tr>
-                            <td>Páginas em branco</td>
-                            <td>Verifique se há separadores <code>---</code> extras no conteúdo</td>
-                        </tr>
-                    </tbody>
-                </table>
+                <div class="info-box">
+                    <strong>PDF diferente do preview?</strong>
+                    <p>Verifique se o zoom do navegador está em 100%.</p>
+                </div>
+                <div class="info-box">
+                    <strong>Conteúdo faltando no PDF?</strong>
+                    <p>Role o preview completamente para verificar se todo o conteúdo está sendo renderizado.</p>
+                </div>
+                <div class="info-box">
+                    <strong>Páginas em branco?</strong>
+                    <p>Verifique se há separadores <code>---</code> extras no conteúdo.</p>
+                </div>
             </section>
-        </article>
 
-        <nav class="page-nav" aria-label="Navegação entre páginas">
-            <a href="/manual/keyboard-shortcuts/" class="nav-prev">
-                <span class="nav-direction">Anterior</span>
-                <span class="nav-title">Atalhos de Teclado</span>
-            </a>
-            <a href="/manual/privacy-storage/" class="nav-next">
-                <span class="nav-direction">Próximo</span>
-                <span class="nav-title">Privacidade e Armazenamento</span>
-            </a>
-        </nav>
+            <nav class="page-nav">
+                <a href="/manual/keyboard-shortcuts/">
+                    <span class="nav-arrow">←</span>
+                    <div class="nav-direction">
+                        <span class="nav-label">Anterior</span>
+                        <span class="nav-title">Atalhos de Teclado</span>
+                    </div>
+                </a>
+                <a href="/manual/privacy-storage/">
+                    <div class="nav-direction">
+                        <span class="nav-label">Próximo</span>
+                        <span class="nav-title">Privacidade</span>
+                    </div>
+                    <span class="nav-arrow">→</span>
+                </a>
+            </nav>
+        </article>
     </main>
 
     <footer class="footer">
         <div class="footer-content">
             <div class="footer-links">
                 <a href="/app">Abrir MD2PDF</a>
-                <a href="/">Página Inicial</a>
-                <a href="/manual/">Índice do Manual</a>
+                <a href="/manual/">Manual</a>
             </div>
-            <p class="footer-version">MD2PDF v2.0 | Gratuito e sem limites</p>
+            <p class="footer-version">MD2PDF v2.0</p>
         </div>
     </footer>
 </body>
