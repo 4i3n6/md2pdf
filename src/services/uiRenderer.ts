@@ -116,14 +116,9 @@ export class UIRenderer {
       container.removeChild(container.firstChild)
     }
 
-    // Criar wrapper para inserir HTML sanitizado
-    const wrapper = document.createElement('div')
-    wrapper.innerHTML = html
-
-    // Clonar e inserir (dobra sanitização)
-    for (const child of wrapper.children) {
-      container.appendChild(child.cloneNode(true))
-    }
+    // Inserir HTML diretamente usando insertAdjacentHTML (não sanitiza novamente)
+    // O HTML já foi sanitizado pelo DOMPurify em processMarkdown()
+    container.insertAdjacentHTML('afterbegin', html)
 
     // Processar imagens com cache
     try {
