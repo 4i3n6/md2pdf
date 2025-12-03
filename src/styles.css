@@ -341,7 +341,7 @@ body {
   border-radius: 2px;
 }
 
-/* PRINT OVERRIDE (Absolute Clean) */
+/* PRINT OVERRIDE (Absolute Clean) - Estilos principais estão em styles-print.css */
 @media print {
     .app-grid, .sidebar, .top-bar, .pane-header, .editor-frame, #console-log { display: none !important; }
     body, .workspace, .pane-container, #preview-wrapper { 
@@ -350,6 +350,10 @@ body {
         height: auto !important; 
         overflow: visible !important; 
         display: block !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        border: none !important;
+        box-shadow: none !important;
     }
     #preview-wrapper { padding: 0 !important; margin: 0 !important; background: white !important; }
     .markdown-body { 
@@ -357,13 +361,14 @@ body {
         border: none !important;
         padding: 0 !important;
         color: black !important; 
-        font-family: 'Courier New', 'Courier', monospace !important; /* Monoespaçada para print */
+        font-family: 'Courier New', 'Courier', monospace !important;
         max-width: 100% !important; 
         margin: 0 !important;
     }
-    .markdown-body code { border: 1px solid #ccc !important; color: black !important; background: none !important; }
-    .markdown-body h1, .markdown-body h2 { border-bottom-color: #000 !important; color: #000 !important; }
-    .markdown-body blockquote { border-left-color: black !important; background: none !important; color: black !important; font-style: italic; }
+    .markdown-body code { border: 1px solid #ccc !important; color: black !important; background: #f5f5f5 !important; }
+    .markdown-body h1, .markdown-body h2 { border-bottom: none !important; color: #000 !important; }
+    .markdown-body blockquote { border-left: 2px solid #666 !important; background: none !important; color: black !important; font-style: italic; }
+    .markdown-body hr { visibility: hidden !important; height: 0 !important; border: none !important; page-break-after: always; }
 }
 
 /* Syntax Highlighting Theme - GitHub Light (Clean, Professional) */

@@ -8,21 +8,28 @@
        RESET E CONFIGURAÇÕES BASE
        ============================================================ */
 
+    *, *::before, *::after {
+        box-sizing: border-box;
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+    }
+
     * {
         orphans: 3;
         widows: 3;
-        page-break-inside: avoid;
     }
 
     html, body {
         width: 100%;
         height: auto;
-        margin: 0;
-        padding: 0;
-        background: white;
-        color: black;
+        margin: 0 !important;
+        padding: 0 !important;
+        background: white !important;
+        color: black !important;
         font-size: 10pt;
         font-family: 'Courier New', 'Courier', monospace;
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
     }
 
     /* ============================================================
@@ -34,8 +41,14 @@
     .pane-header,
     .editor-frame,
     #console-log,
+    .console-container,
+    .panel-header,
     .workspace > .pane-container:first-child {
         display: none !important;
+        visibility: hidden !important;
+        height: 0 !important;
+        width: 0 !important;
+        overflow: hidden !important;
     }
 
     /* ============================================================
@@ -49,9 +62,12 @@
         margin: 0 !important;
         padding: 0 !important;
         background: white !important;
+        border: none !important;
+        box-shadow: none !important;
     }
 
     .workspace,
+    .pane-container,
     .pane-container.preview-pane,
     #preview-wrapper {
         display: block !important;
@@ -61,6 +77,7 @@
         padding: 0 !important;
         background: white !important;
         border: none !important;
+        box-shadow: none !important;
         overflow: visible !important;
     }
 
@@ -69,19 +86,19 @@
        ============================================================ */
 
     .markdown-body {
-        max-width: 210mm;
-        width: 100%;
-        height: auto;
+        width: 100% !important;
+        max-width: none !important;
+        height: auto !important;
         margin: 0 !important;
-        padding: 10mm 12mm 10mm 12mm !important;
+        padding: 0 !important;
         background: white !important;
         border: none !important;
         box-shadow: none !important;
         color: black !important;
         font-family: 'Courier New', 'Courier', monospace !important;
         font-size: 9pt !important;
-        line-height: 1.2 !important;
-        box-sizing: border-box;
+        line-height: 1.3 !important;
+        box-sizing: border-box !important;
     }
 
     /* ============================================================
@@ -106,10 +123,10 @@
 
     .markdown-body h1 {
         font-size: 14pt;
-        border-bottom: 1px solid #333;
-        padding-bottom: 0.15em;
-        margin-top: 0.4em;
-        margin-bottom: 0.2em;
+        border-bottom: none;
+        padding-bottom: 0;
+        margin-top: 0.5em;
+        margin-bottom: 0.3em;
         font-weight: bold;
     }
 
@@ -373,15 +390,17 @@
     }
 
     /* ============================================================
-       HORIZONTAL RULE
+       HORIZONTAL RULE - Quebra de página
        ============================================================ */
 
     .markdown-body hr,
     .markdown-body .markdown-hr {
-        page-break-after: always;
+        visibility: hidden;
+        height: 0;
+        margin: 0;
+        padding: 0;
         border: none;
-        border-top: 1px solid #333;
-        margin: 0.2em 0;
+        page-break-after: always;
     }
 
     /* ============================================================
@@ -390,34 +409,7 @@
 
     @page {
         size: A4;
-        margin: 10mm 12mm 10mm 12mm;
-
-        /* Números de página no rodapé (suportado por Chrome, Firefox) */
-        @bottom-center {
-            content: "Página " counter(page) " de " counter(pages);
-            font-size: 8pt;
-            color: #999;
-        }
-    }
-
-    @page :first {
-        /* Primeira página pode ter margem diferente (opcional) */
-    }
-
-    /* ============================================================
-       FALLBACK PARA EDGE (Sem @page completo)
-       ============================================================ */
-
-    @supports not (selector(@page)) {
-        /* Edge antigo não suporta @page - usar margens por CSS */
-        .markdown-body {
-            margin: 20mm;
-            padding: 0;
-        }
-
-        @page {
-            margin: 0;
-        }
+        margin: 15mm 15mm 15mm 15mm;
     }
 
     /* ============================================================
