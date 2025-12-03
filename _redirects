@@ -1,1 +1,12 @@
-/* /index.html 200
+# Landing page
+/ /index.html 200
+
+# App
+/app /app.html 200
+/app/* /app.html 200
+
+# Manual pages (served directly)
+/manual /manual/index.html 200
+/manual/ /manual/index.html 200
+
+# Fallback for app routes only

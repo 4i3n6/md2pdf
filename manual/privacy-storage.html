@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Privacidade e armazenamento local no MD2PDF. Seus documentos ficam apenas no seu navegador, sem envio para servidores.">
+    <meta name="keywords" content="privacy, local storage, data security, offline storage, no tracking, LGPD, GDPR, md2pdf privacidade, armazenamento local">
+    <meta name="author" content="MD2PDF">
+    <title>Privacidade e Armazenamento Local - Manual MD2PDF</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="icon" href="/favicon.ico">
+    <link rel="stylesheet" href="manual.css">
+</head>
+<body>
+    <header class="header">
+        <div class="header-content">
+            <a href="/" class="logo">MD2PDF</a>
+            <span class="logo-subtitle">Manual</span>
+            <nav class="header-nav">
+                <a href="/">Home</a>
+                <a href="/app">Abrir App</a>
+            </nav>
+        </div>
+    </header>
+
+    <main class="main">
+        <nav class="breadcrumb" aria-label="Breadcrumb">
+            <a href="/">Home</a>
+            <span class="breadcrumb-separator">&gt;</span>
+            <a href="index.html">Manual</a>
+            <span class="breadcrumb-separator">&gt;</span>
+            <span class="breadcrumb-current">Privacidade e Armazenamento</span>
+        </nav>
+
+        <article class="content">
+            <h1>Privacidade e Armazenamento Local</h1>
+            
+            <section class="privacy-highlight">
+                <div class="highlight-box">
+                    <p class="highlight-main">Seus documentos ficam armazenados <strong>APENAS</strong> no seu navegador.</p>
+                    <p class="highlight-sub">O MD2PDF nao tem acesso aos seus dados.</p>
+                    <p class="highlight-sub">Nada e enviado para servidores.</p>
+                </div>
+            </section>
+
+            <section class="section">
+                <h2>100% Local</h2>
+                <ul class="feature-list">
+                    <li>Todo o processamento acontece no seu navegador</li>
+                    <li>Nenhum processamento em servidor</li>
+                    <li>Nenhuma transmissao de dados</li>
+                    <li>Sem contas, sem rastreamento, sem analytics</li>
+                </ul>
+            </section>
+
+            <section class="section">
+                <h2>Onde Seus Dados Ficam</h2>
+                <ul class="feature-list">
+                    <li>Armazenados no <code>localStorage</code> do navegador</li>
+                    <li>Chave de armazenamento: <code>md2pdf-docs-v2</code></li>
+                    <li>Os dados permanecem apenas no seu dispositivo</li>
+                    <li>Navegadores diferentes = armazenamento diferente</li>
+                </ul>
+            </section>
+
+            <section class="section">
+                <h2>Limite de Armazenamento</h2>
+                <ul class="feature-list">
+                    <li>Limite do localStorage: aproximadamente <strong>5MB</strong> por dominio</li>
+                    <li>Monitore o uso: metrica <strong>MEM</strong> na barra superior</li>
+                    <li>Imagens grandes aumentam o uso de armazenamento</li>
+                    <li>Se o limite for atingido, delete documentos antigos</li>
+                </ul>
+            </section>
+
+            <section class="section">
+                <h2>Como Limpar Seus Dados</h2>
+                <div class="options-list">
+                    <div class="option-item">
+                        <span class="option-number">1</span>
+                        <div class="option-content">
+                            <strong>Delete documentos individualmente</strong>
+                            <p>Use o botao de exclusao na lista de documentos</p>
+                        </div>
+                    </div>
+                    <div class="option-item">
+                        <span class="option-number">2</span>
+                        <div class="option-content">
+                            <strong>Limpe os dados do navegador para este site</strong>
+                            <p>Nas configuracoes do navegador, limpe dados do site md2pdf</p>
+                        </div>
+                    </div>
+                    <div class="option-item">
+                        <span class="option-number">3</span>
+                        <div class="option-content">
+                            <strong>Use o DevTools</strong>
+                            <p>Abra DevTools &gt; Application &gt; localStorage &gt; delete</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="section">
+                <h2>Backup de Documentos</h2>
+                <ul class="feature-list">
+                    <li>Use <strong>DOWNLOAD MD</strong> para salvar arquivos markdown</li>
+                    <li>Use o botao <strong>COPY</strong> para copiar o conteudo</li>
+                    <li>Considere fazer backups regulares de documentos importantes</li>
+                </ul>
+            </section>
+
+            <section class="section">
+                <h2>Sigilo Garantido</h2>
+                <ul class="feature-list">
+                    <li>Codigo fonte e aberto e auditavel</li>
+                    <li>Sem cookies para rastreamento</li>
+                    <li>Sem scripts de terceiros</li>
+                    <li>Funciona completamente offline</li>
+                </ul>
+            </section>
+
+            <section class="warning-section">
+                <h2>Aviso Importante</h2>
+                <div class="warning-box">
+                    <ul class="warning-list">
+                        <li>Se voce limpar os dados do navegador, os documentos serao <strong>PERDIDOS</strong></li>
+                        <li>Navegadores diferentes nao compartilham dados entre si</li>
+                        <li>O modo Privado/Anonimo pode nao salvar os dados</li>
+                    </ul>
+                </div>
+            </section>
+
+            <nav class="page-navigation">
+                <a href="print-export.html" class="nav-link nav-prev">
+                    <span class="nav-direction">Anterior</span>
+                    <span class="nav-title">Exportar PDF</span>
+                </a>
+                <a href="offline-pwa.html" class="nav-link nav-next">
+                    <span class="nav-direction">Proximo</span>
+                    <span class="nav-title">Uso Offline e PWA</span>
+                </a>
+            </nav>
+        </article>
+    </main>
+
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-links">
+                <a href="/app">Abrir MD2PDF</a>
+                <a href="/">Pagina Inicial</a>
+                <a href="index.html">Indice do Manual</a>
+            </div>
+            <p class="footer-version">MD2PDF v2.0 | Gratuito e sem limites</p>
+        </div>
+    </footer>
+</body>
+</html>

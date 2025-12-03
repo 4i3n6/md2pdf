@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Conversor de Markdown para PDF gratuito, sem limites, sem autenticação. Editor em tempo real com visualização A4.">
+    <title>MD2PDF - Conversor Markdown para PDF</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;800&display=swap" rel="stylesheet">
+    <link rel="manifest" href="/manifest.webmanifest">
+    <meta name="theme-color" content="#ffffff">
+</head>
+<body>
+    <!-- Skip to main content link (WCAG 2.1) -->
+    <a href="#main-editor" class="sr-only skip-link" tabindex="0">Ir para editor principal</a>
+    
+    <div class="app-grid" role="application" aria-label="MD2PDF - Aplicação de Conversão de Markdown para PDF">
+        <!-- Top Bar: Global Status & Controls (Toolbar role) -->
+        <header class="top-bar" role="banner">
+            <h1 class="brand">MD2PDF <span class="version" aria-label="Versão do sistema 2.0">SYS.V2.0</span> <a href="/manual" class="manual-link" title="Abrir manual" aria-label="Abrir manual de uso">[?]</a></h1>
+            <div class="top-metrics" role="status" aria-label="Status do sistema em tempo real" aria-live="polite">
+                <div class="metric">MEM: <span id="mem-usage" aria-label="Uso de memória">--</span></div>
+                <div class="metric">LATENCY: <span id="render-latency" aria-label="Latência de renderização">0ms</span></div>
+                <div class="metric status-ok system-status" aria-label="Sistema online">SYSTEM: ONLINE</div>
+            </div>
+            <div class="top-controls" role="toolbar" aria-label="Controles principais">
+                <button 
+                    id="download-btn" 
+                    class="action-btn" 
+                    aria-label="Exportar documento como PDF"
+                    title="Exportar documento como PDF (Ctrl+Shift+E)">
+                    [ EXP_PDF ]
+                </button>
+            </div>
+        </header>
+
+        <!-- Sidebar: Documents & Metrics (Navigation) -->
+        <aside class="sidebar" role="complementary" aria-label="Painel lateral de documentos e controles">
+            <div class="panel-header" role="heading" aria-level="2">
+                <span>DOC_INDEX</span>
+                <button 
+                    id="new-doc-btn" 
+                    class="icon-btn" 
+                    aria-label="Criar novo documento"
+                    title="Criar novo documento (Ctrl+N)">
+                    +
+                </button>
+            </div>
+            <div 
+                id="documents-list" 
+                class="list-container" 
+                role="listbox"
+                aria-label="Lista de documentos"
+                aria-describedby="doc-index-help">
+                <!-- Docs injected here -->
+            </div>
+            <span id="doc-index-help" class="sr-only">
+                Use setas para cima/baixo para navegar documentos. Enter para abrir, Delete para remover. Ctrl+N para novo.
+            </span>
+            
+            <div class="panel-header" role="heading" aria-level="2">ACTIONS</div>
+            <div class="actions-section" style="padding: 10px;">
+                <button 
+                    id="download-md-btn" 
+                    class="action-btn" 
+                    style="width: 100%; font-size: 12px;" 
+                    aria-label="Baixar documento em formato Markdown"
+                    title="Baixar documento em formato Markdown">
+                    ↓ DOWNLOAD MD
+                </button>
+            </div>
+            
+            <div class="panel-header" role="heading" aria-level="2">SYS_LOGS</div>
+            <div 
+                id="console-log" 
+                class="console-container" 
+                role="log" 
+                aria-label="Log de sistema"
+                aria-live="polite"
+                aria-atomic="false">
+                <div class="log-line system">> INIT SEQUENCE STARTED...</div>
+            </div>
+        </aside>
+
+        <!-- Main Area: Editor & Preview -->
+        <main class="workspace" role="main" id="main-editor" aria-label="Espaço de trabalho - Editor e Visualização">
+            <!-- Editor Pane -->
+            <div class="pane-container editor-pane">
+                <header class="pane-header" id="editor-header">
+                    <h2 style="margin: 0; font-size: 12px; font-weight: 600;">INPUT_STREAM (MD)</h2>
+                    <label for="doc-name" class="sr-only">Nome do documento</label>
+                    <input 
+                        type="text" 
+                        id="doc-name" 
+                        class="bare-input" 
+                        value="Untitled"
+                        aria-label="Nome do documento"
+                        aria-describedby="editor-header"
+                        spellcheck="true">
+                    <button 
+                        id="copy-md-btn" 
+                        class="icon-btn copy-btn" 
+                        aria-label="Copiar conteúdo Markdown"
+                        title="Copiar conteúdo Markdown (Ctrl+Shift+C)">
+                        [ COPY ]
+                    </button>
+                </header>
+                <div id="editor" class="editor-frame" role="textbox" aria-multiline="true" aria-label="Editor de Markdown"></div>
+            </div>
+            
+            <!-- Preview Pane -->
+            <div class="pane-container preview-pane">
+                <header class="pane-header" id="preview-header">
+                    <h2 style="margin: 0; font-size: 12px; font-weight: 600;">RENDER_OUTPUT (A4 Preview)</h2>
+                    <span 
+                        id="status-indicator" 
+                        class="status-dot" 
+                        role="status"
+                        aria-label="Indicador de status de renderização"
+                        aria-live="polite">
+                    </span>
+                </header>
+                <div id="preview-wrapper" role="region" aria-label="Visualização de saída em A4" aria-describedby="preview-header">
+                    <div id="preview" class="markdown-body" role="document"></div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script type="module" src="/src/main.ts"></script>
+</body>
+</html>

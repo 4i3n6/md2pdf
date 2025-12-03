@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Aprenda a instalar o MD2PDF como PWA e usar offline. Guia completo sobre Progressive Web App e funcionamento sem internet.">
+    <meta name="keywords" content="pwa, progressive web app, offline app, install app, service worker, offline pdf, md2pdf offline">
+    <meta name="author" content="MD2PDF">
+    <title>Uso Offline e PWA - Manual do MD2PDF</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="icon" href="/favicon.ico">
+    <link rel="stylesheet" href="manual.css">
+</head>
+<body>
+    <header class="header">
+        <div class="header-content">
+            <a href="/" class="logo">MD2PDF</a>
+            <span class="logo-subtitle">Manual</span>
+            <nav class="header-nav">
+                <a href="/">Home</a>
+                <a href="/app">Abrir App</a>
+            </nav>
+        </div>
+    </header>
+
+    <main class="main">
+        <nav class="breadcrumb" aria-label="Breadcrumb">
+            <a href="/">Home</a>
+            <span class="breadcrumb-separator">&gt;</span>
+            <a href="/manual/">Manual</a>
+            <span class="breadcrumb-separator">&gt;</span>
+            <span class="breadcrumb-current">Uso Offline e PWA</span>
+        </nav>
+
+        <article class="content">
+            <h1>Uso Offline e PWA</h1>
+            
+            <section class="section">
+                <h2>O que e PWA?</h2>
+                <p>
+                    <strong>PWA</strong> significa <em>Progressive Web App</em> (Aplicativo Web Progressivo). 
+                    E uma tecnologia que permite que um site funcione como um aplicativo nativo no seu dispositivo.
+                </p>
+                <ul>
+                    <li>Um site que funciona como um app nativo</li>
+                    <li>Pode ser instalado no seu dispositivo</li>
+                    <li>Funciona sem conexao com a internet</li>
+                    <li>Abre em sua propria janela, sem barra do navegador</li>
+                </ul>
+            </section>
+
+            <section class="section">
+                <h2>Como Instalar</h2>
+                
+                <h3>Chrome/Edge (Desktop)</h3>
+                <ol>
+                    <li>Acesse o app em <a href="/app">/app</a></li>
+                    <li>Procure o icone de instalacao na barra de endereco</li>
+                    <li>Clique em "Instalar" ou "Adicionar a area de trabalho"</li>
+                    <li>O app abre em sua propria janela</li>
+                </ol>
+
+                <h3>Chrome (Android)</h3>
+                <ol>
+                    <li>Acesse o app</li>
+                    <li>Toque no menu (3 pontos)</li>
+                    <li>Selecione "Adicionar a tela inicial"</li>
+                </ol>
+
+                <h3>Safari (iOS)</h3>
+                <ol>
+                    <li>Acesse o app</li>
+                    <li>Toque no botao Compartilhar</li>
+                    <li>Selecione "Adicionar a Tela de Inicio"</li>
+                </ol>
+            </section>
+
+            <section class="section">
+                <h2>Funcionamento Offline</h2>
+                <p>
+                    O MD2PDF foi projetado para funcionar 100% offline apos o primeiro acesso:
+                </p>
+                <ul>
+                    <li>Apos o primeiro acesso, o app e armazenado em cache</li>
+                    <li>Funciona 100% sem internet</li>
+                    <li>Documentos salvos localmente permanecem disponiveis</li>
+                    <li>Nenhum recurso e perdido no modo offline</li>
+                </ul>
+                <p>
+                    Isso significa que voce pode escrever, editar e exportar seus documentos 
+                    mesmo em um aviao ou em qualquer lugar sem conexao.
+                </p>
+            </section>
+
+            <section class="section">
+                <h2>Atualizacoes Automaticas</h2>
+                <p>
+                    Voce nao precisa se preocupar em atualizar o app manualmente:
+                </p>
+                <ul>
+                    <li>Quando online, o app verifica se ha atualizacoes</li>
+                    <li>Atualizacoes sao aplicadas automaticamente</li>
+                    <li>Voce sempre tem a versao mais recente</li>
+                    <li>Nenhuma atualizacao manual necessaria</li>
+                </ul>
+            </section>
+
+            <section class="section">
+                <h2>Service Worker</h2>
+                <p>
+                    Para os mais tecnicos, veja como funciona por baixo dos panos:
+                </p>
+                <ul>
+                    <li><strong>Service Worker (SW)</strong> armazena os arquivos do app em cache</li>
+                    <li>Habilita toda a funcionalidade offline</li>
+                    <li>Executa em segundo plano</li>
+                    <li>Gerencia cache e atualizacoes automaticamente</li>
+                </ul>
+                <p>
+                    O Service Worker e registrado automaticamente quando voce acessa o app. 
+                    Ele intercepta requisicoes de rede e serve arquivos do cache quando offline.
+                </p>
+            </section>
+
+            <section class="section">
+                <h2>Vantagens do PWA</h2>
+                <p>
+                    Por que usar o MD2PDF como PWA em vez de baixar um app tradicional?
+                </p>
+                <ul>
+                    <li><strong>Sem app store</strong> - Instale diretamente do navegador</li>
+                    <li><strong>Sem permissoes</strong> - Nao pede acesso a camera, contatos, etc.</li>
+                    <li><strong>Leve</strong> - Apenas ~2MB de espaco</li>
+                    <li><strong>Sempre atualizado</strong> - Atualizacoes automaticas</li>
+                    <li><strong>Mesma experiencia</strong> - Identico ao site, sem limitacoes</li>
+                </ul>
+            </section>
+
+            <section class="section">
+                <h2>Solucao de Problemas</h2>
+                
+                <h3>App nao esta atualizando</h3>
+                <p>
+                    Limpe o cache do navegador e recarregue a pagina. 
+                    Em casos extremos, desinstale o PWA e instale novamente.
+                </p>
+
+                <h3>Opcao de instalacao nao aparece</h3>
+                <p>
+                    Certifique-se de que esta acessando via HTTPS. 
+                    Tente usar um navegador diferente (Chrome ou Edge funcionam melhor para PWA).
+                </p>
+
+                <h3>Modo offline nao funciona</h3>
+                <p>
+                    E necessario acessar o app pelo menos uma vez enquanto online para que 
+                    os arquivos sejam armazenados em cache. Apos isso, o offline funcionara normalmente.
+                </p>
+            </section>
+
+            <nav class="page-nav">
+                <a href="privacy-storage.html" class="page-nav-link page-nav-prev">
+                    <span class="page-nav-direction">Anterior</span>
+                    <span class="page-nav-title">Privacidade e Armazenamento</span>
+                </a>
+                <a href="/manual/" class="page-nav-link page-nav-next">
+                    <span class="page-nav-direction">Voltar</span>
+                    <span class="page-nav-title">Indice do Manual</span>
+                </a>
+            </nav>
+        </article>
+    </main>
+
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-links">
+                <a href="/app">Abrir MD2PDF</a>
+                <a href="/">Pagina Inicial</a>
+            </div>
+            <p class="footer-version">MD2PDF v2.0 | Gratuito e sem limites</p>
+        </div>
+    </footer>
+</body>
+</html>

@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Atalhos de teclado do MD2PDF. Trabalhe mais rapido com hotkeys para criar documentos, exportar PDF e navegar pela aplicacao.">
+    <meta name="keywords" content="keyboard shortcuts, hotkeys, productivity, md2pdf shortcuts, atalhos de teclado">
+    <meta name="author" content="MD2PDF">
+    <title>Atalhos de Teclado - Manual do MD2PDF</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="icon" href="/favicon.ico">
+    <link rel="stylesheet" href="manual.css">
+</head>
+<body>
+    <header class="header">
+        <div class="header-content">
+            <a href="/" class="logo">MD2PDF</a>
+            <span class="logo-subtitle">Manual</span>
+            <nav class="header-nav">
+                <a href="/">Home</a>
+                <a href="/app">Abrir App</a>
+            </nav>
+        </div>
+    </header>
+
+    <main class="main">
+        <nav class="breadcrumb" aria-label="Breadcrumb">
+            <a href="/">Home</a>
+            <span class="breadcrumb-separator">&gt;</span>
+            <a href="/manual">Manual</a>
+            <span class="breadcrumb-separator">&gt;</span>
+            <span class="breadcrumb-current">Atalhos de Teclado</span>
+        </nav>
+
+        <article class="content">
+            <h1>Atalhos de Teclado</h1>
+            
+            <section class="intro">
+                <p>
+                    Use atalhos de teclado para trabalhar mais rapido. Os atalhos abaixo permitem criar documentos,
+                    exportar PDFs, navegar entre documentos e editar texto sem tirar as maos do teclado.
+                </p>
+            </section>
+
+            <section class="shortcuts-section">
+                <h2>Atalhos da Aplicacao</h2>
+                <p>Atalhos globais do MD2PDF para gerenciamento de documentos e exportacao.</p>
+                
+                <div class="table-responsive">
+                    <table class="shortcuts-table">
+                        <thead>
+                            <tr>
+                                <th>Atalho</th>
+                                <th>Acao</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><kbd>Ctrl</kbd> + <kbd>N</kbd></td>
+                                <td>Criar novo documento</td>
+                            </tr>
+                            <tr>
+                                <td><kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>E</kbd></td>
+                                <td>Exportar PDF (abre dialogo de impressao)</td>
+                            </tr>
+                            <tr>
+                                <td><kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>C</kbd></td>
+                                <td>Copiar conteudo Markdown</td>
+                            </tr>
+                            <tr>
+                                <td><kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>P</kbd></td>
+                                <td>Preview de impressao (toggle)</td>
+                            </tr>
+                            <tr>
+                                <td><kbd class="key-arrow">&#8593;</kbd> / <kbd class="key-arrow">&#8595;</kbd></td>
+                                <td>Navegar entre documentos na lista</td>
+                            </tr>
+                            <tr>
+                                <td><kbd>Enter</kbd></td>
+                                <td>Abrir documento selecionado</td>
+                            </tr>
+                            <tr>
+                                <td><kbd>Delete</kbd></td>
+                                <td>Deletar documento selecionado</td>
+                            </tr>
+                            <tr>
+                                <td><kbd>Escape</kbd></td>
+                                <td>Sair do modo preview de impressao</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <section class="shortcuts-section">
+                <h2>Atalhos do Editor</h2>
+                <p>Atalhos padrao do CodeMirror para edicao de texto.</p>
+                
+                <div class="table-responsive">
+                    <table class="shortcuts-table">
+                        <thead>
+                            <tr>
+                                <th>Atalho</th>
+                                <th>Acao</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><kbd>Ctrl</kbd> + <kbd>Z</kbd></td>
+                                <td>Desfazer</td>
+                            </tr>
+                            <tr>
+                                <td><kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>Z</kbd></td>
+                                <td>Refazer</td>
+                            </tr>
+                            <tr>
+                                <td><kbd>Ctrl</kbd> + <kbd>A</kbd></td>
+                                <td>Selecionar tudo</td>
+                            </tr>
+                            <tr>
+                                <td><kbd>Ctrl</kbd> + <kbd>F</kbd></td>
+                                <td>Buscar (se disponivel)</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <section class="note-section">
+                <h2>Usuarios Mac</h2>
+                <div class="note-box">
+                    <p>
+                        <strong>No Mac, substitua <kbd>Ctrl</kbd> por <kbd>Cmd</kbd> (<kbd class="cmd-key">&#8984;</kbd>).</strong>
+                    </p>
+                    <p>
+                        Por exemplo: <kbd>Cmd</kbd> + <kbd>N</kbd> para criar novo documento, 
+                        <kbd>Cmd</kbd> + <kbd>Shift</kbd> + <kbd>E</kbd> para exportar PDF.
+                    </p>
+                </div>
+            </section>
+
+            <nav class="page-navigation" aria-label="Navegacao entre paginas">
+                <a href="render-output.html" class="nav-link nav-prev">
+                    <span class="nav-direction">Anterior</span>
+                    <span class="nav-title">Preview e Saida</span>
+                </a>
+                <a href="print-export.html" class="nav-link nav-next">
+                    <span class="nav-direction">Proximo</span>
+                    <span class="nav-title">Exportar PDF</span>
+                </a>
+            </nav>
+        </article>
+    </main>
+
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-links">
+                <a href="/app">Abrir MD2PDF</a>
+                <a href="/manual">Voltar ao Manual</a>
+                <a href="/">Pagina Inicial</a>
+            </div>
+            <p class="footer-version">MD2PDF v2.0 | Gratuito e sem limites</p>
+        </div>
+    </footer>
+</body>
+</html>

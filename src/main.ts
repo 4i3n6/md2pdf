@@ -685,6 +685,40 @@ function setupEvents(): void {
       }
     });
   }
+
+  // Copy Markdown Button
+  const btnCopyMd = document.getElementById('copy-md-btn');
+  if (btnCopyMd) {
+    btnCopyMd.addEventListener('click', async (): Promise<void> => {
+      const doc = getCurrentDoc();
+      if (doc?.content) {
+        try {
+          await navigator.clipboard.writeText(doc.content);
+          Logger.success('Conteúdo copiado para área de transferência');
+          // Feedback visual
+          const originalText = btnCopyMd.textContent;
+          btnCopyMd.textContent = '[ OK! ]';
+          btnCopyMd.classList.add('copied');
+          setTimeout(() => {
+            btnCopyMd.textContent = originalText;
+            btnCopyMd.classList.remove('copied');
+          }, 1500);
+        } catch (err) {
+          Logger.error('Falha ao copiar: ' + String(err));
+        }
+      } else {
+        Logger.log('Nenhum conteúdo para copiar', 'warning');
+      }
+    });
+  }
+
+  // Atalho Ctrl+Shift+C para copiar
+  document.addEventListener('keydown', (e: KeyboardEvent): void => {
+    if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key === 'C') {
+      e.preventDefault();
+      btnCopyMd?.click();
+    }
+  });
 }
 
 /**

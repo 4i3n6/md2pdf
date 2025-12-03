@@ -3,7 +3,9 @@
   "outputDirectory": "dist",
   "framework": null,
   "rewrites": [
-    { "source": "/(.*)", "destination": "/index.html" }
+    { "source": "/app", "destination": "/app.html" },
+    { "source": "/manual", "destination": "/manual/index.html" },
+    { "source": "/manual/", "destination": "/manual/index.html" }
   ],
   "headers": [
     {

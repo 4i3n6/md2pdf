@@ -139,7 +139,7 @@ export function restoreAfterPrint(): boolean {
  * @returns Promise que resolve quando usuário fecha diálogo
  */
 export function printDocument(
-  _docName: string = 'document',
+  docName: string = 'document',
   logger: (message: string) => void = console.log
 ): Promise<boolean> {
   return new Promise((resolve) => {
@@ -163,12 +163,20 @@ export function printDocument(
         }
       }
 
+      // Guardar título original e definir nome do documento como título
+      // Navegadores usam o título da página como nome padrão do PDF
+      const originalTitle = document.title;
+      const pdfName = docName.replace(/\.md$/i, ''); // Remove extensão .md
+      document.title = pdfName;
+
       // Flag para evitar múltiplas restaurações
       let hasRestored = false;
       
       const doRestore = (): void => {
         if (hasRestored) return;
         hasRestored = true;
+        // Restaurar título original
+        document.title = originalTitle;
         restoreAfterPrint();
         resolve(true);
       };

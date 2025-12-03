@@ -2,11 +2,29 @@
   command = "npm run build"
   publish = "dist"
 
+# App route
 [[redirects]]
-  from = "/*"
-  to = "/index.html"
+  from = "/app"
+  to = "/app.html"
   status = 200
 
+[[redirects]]
+  from = "/app/*"
+  to = "/app.html"
+  status = 200
+
+# Manual routes
+[[redirects]]
+  from = "/manual"
+  to = "/manual/index.html"
+  status = 200
+
+[[redirects]]
+  from = "/manual/"
+  to = "/manual/index.html"
+  status = 200
+
+# Security headers
 [[headers]]
   for = "/*"
   [headers.values]

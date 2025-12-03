@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Entenda a area de preview A4 do MD2PDF: visualizacao em tempo real, tratamento de imagens, quebras de pagina e elementos renderizados.">
+    <meta name="keywords" content="markdown preview, A4 preview, pdf preview, render output, md2pdf visualizacao">
+    <meta name="author" content="MD2PDF">
+    <title>RENDER_OUTPUT - Preview A4 | Manual MD2PDF</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="icon" href="/favicon.ico">
+    <link rel="stylesheet" href="manual.css">
+</head>
+<body>
+    <header class="header">
+        <div class="header-content">
+            <a href="/" class="logo">MD2PDF</a>
+            <span class="logo-subtitle">Manual</span>
+            <nav class="header-nav">
+                <a href="/">Home</a>
+                <a href="/app">Abrir App</a>
+            </nav>
+        </div>
+    </header>
+
+    <main class="main">
+        <nav class="breadcrumb" aria-label="Breadcrumb">
+            <a href="/">Home</a>
+            <span class="breadcrumb-separator">&gt;</span>
+            <a href="/manual">Manual</a>
+            <span class="breadcrumb-separator">&gt;</span>
+            <span class="breadcrumb-current">Preview e Saida</span>
+        </nav>
+
+        <article class="content">
+            <h1>RENDER_OUTPUT - Preview A4</h1>
+            
+            <section class="intro">
+                <p>
+                    A area de preview do MD2PDF exibe seu documento Markdown renderizado em formato A4, 
+                    exatamente como ele aparecera quando exportado para PDF. Acompanhe suas alteracoes 
+                    em tempo real enquanto digita.
+                </p>
+            </section>
+
+            <section class="section">
+                <h2>Preview em Tempo Real</h2>
+                <p>
+                    O preview do MD2PDF atualiza automaticamente conforme voce digita no editor. 
+                    Nao e necessario salvar ou clicar em nenhum botao para ver as mudancas.
+                </p>
+                <ul>
+                    <li><strong>Atualizacao instantanea:</strong> As alteracoes aparecem imediatamente enquanto voce digita</li>
+                    <li><strong>Indicador verde:</strong> O ponto verde no cabecalho mostra o status de renderizacao</li>
+                    <li><strong>Metrica LATENCY:</strong> Exibe o tempo de renderizacao em milissegundos na barra superior</li>
+                </ul>
+            </section>
+
+            <section class="section">
+                <h2>Formato A4</h2>
+                <p>
+                    O preview simula uma folha de papel A4, o formato padrao para impressao e documentos.
+                </p>
+                <ul>
+                    <li><strong>Dimensoes:</strong> O preview simula papel A4 (210x297mm)</li>
+                    <li><strong>Margens:</strong> As margens ja estao pre-configuradas para impressao</li>
+                    <li><strong>WYSIWYG:</strong> O que voce ve e muito proximo do que sera impresso</li>
+                </ul>
+            </section>
+
+            <section class="section">
+                <h2>Como Imagens sao Tratadas</h2>
+                <p>
+                    O MD2PDF processa imagens automaticamente para garantir que elas se ajustem 
+                    corretamente ao formato A4.
+                </p>
+                <ul>
+                    <li><strong>Redimensionamento automatico:</strong> Imagens sao automaticamente redimensionadas para caber no A4</li>
+                    <li><strong>Imagens grandes:</strong> Imagens que excedem a largura da pagina sao reduzidas proporcionalmente</li>
+                    <li><strong>Quebras inteligentes:</strong> Imagens evitam quebras de pagina quando possivel</li>
+                </ul>
+            </section>
+
+            <section class="section">
+                <h2>Quebras de Pagina</h2>
+                <p>
+                    Controle onde as paginas do seu PDF serao divididas usando quebras manuais 
+                    ou deixe o sistema gerenciar automaticamente.
+                </p>
+                <ul>
+                    <li><strong>Quebra manual:</strong> Use <code>---</code> (linha horizontal) para forcar uma quebra de pagina</li>
+                    <li><strong>Blocos de codigo:</strong> Blocos de codigo e imagens tentam permanecer em uma unica pagina</li>
+                    <li><strong>Listas longas:</strong> Listas extensas podem ser divididas entre paginas automaticamente</li>
+                </ul>
+            </section>
+
+            <section class="section">
+                <h2>Elementos Renderizados</h2>
+                <p>
+                    O preview suporta todos os elementos padrao do Markdown, alem de algumas extensoes:
+                </p>
+                <ul>
+                    <li><strong>Titulos:</strong> Hierarquia de titulos (h1 a h6) com estilos diferenciados</li>
+                    <li><strong>Texto formatado:</strong> Negrito, italico e tachado</li>
+                    <li><strong>Listas:</strong> Listas com marcadores e listas numeradas</li>
+                    <li><strong>Blocos de codigo:</strong> Com syntax highlighting para diversas linguagens</li>
+                    <li><strong>Tabelas:</strong> Tabelas com bordas e estilizacao</li>
+                    <li><strong>Citacoes:</strong> Blockquotes com estilo visual diferenciado</li>
+                    <li><strong>Links:</strong> Links clicaveis que funcionam no PDF final</li>
+                </ul>
+            </section>
+
+            <section class="tips">
+                <h2>Dicas</h2>
+                <div class="tips-grid">
+                    <div class="tip-card">
+                        <span class="tip-icon">!</span>
+                        <div class="tip-content">
+                            <strong>Aproximacao visual</strong>
+                            <p>O preview nao e 100% exato - o PDF final pode variar ligeiramente devido a diferencas de renderizacao do navegador.</p>
+                        </div>
+                    </div>
+                    <div class="tip-card">
+                        <span class="tip-icon">PDF</span>
+                        <div class="tip-content">
+                            <strong>Teste de impressao</strong>
+                            <p>Para ver o resultado exato, faca um teste de impressao ou exporte para PDF e verifique o arquivo.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <nav class="page-nav" aria-label="Navegacao entre paginas">
+                <a href="input-stream.html" class="page-nav-link prev">
+                    <span class="page-nav-direction">Anterior</span>
+                    <span class="page-nav-title">Area de Edicao</span>
+                </a>
+                <a href="keyboard-shortcuts.html" class="page-nav-link next">
+                    <span class="page-nav-direction">Proximo</span>
+                    <span class="page-nav-title">Atalhos de Teclado</span>
+                </a>
+            </nav>
+        </article>
+    </main>
+
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-links">
+                <a href="/app">Abrir MD2PDF</a>
+                <a href="/manual">Voltar ao Manual</a>
+                <a href="/">Pagina Inicial</a>
+            </div>
+            <p class="footer-version">MD2PDF v2.0 | Gratuito e sem limites</p>
+        </div>
+    </footer>
+</body>
+</html>

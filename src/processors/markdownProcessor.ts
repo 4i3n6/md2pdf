@@ -324,7 +324,7 @@ const DOMPURIFY_CONFIG = {
 export function processMarkdown(markdown: string): string {
   try {
     if (!markdown || typeof markdown !== 'string') {
-      return '<p class="error">Erro: conteúdo inválido</p>'
+      return '' // Conteúdo vazio não é erro
     }
 
     const dirty = marked(markdown) as string
