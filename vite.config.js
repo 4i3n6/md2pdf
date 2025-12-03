@@ -34,15 +34,18 @@ export default defineConfig({
   plugins: [
     VitePWA({
       registerType: 'autoUpdate',
-      includeAssets: ['icon-192.png', 'icon-512.png', 'icon.svg'],
+      includeAssets: ['icon-192.png', 'icon-512.png', 'icon.svg', 'favicon.ico'],
       manifest: {
         name: 'MD2PDF - Markdown to PDF Converter',
         short_name: 'MD2PDF',
-        description: 'Conversor profissional de Markdown para PDF. 100% gratuito e sem limites.',
+        description: 'Conversor profissional de Markdown para PDF. 100% gratuito, sem limites e funciona offline.',
         theme_color: '#ffffff',
         background_color: '#ffffff',
         display: 'standalone',
         start_url: '/',
+        scope: '/',
+        orientation: 'portrait-primary',
+        categories: ['productivity'],
         icons: [
           {
             src: '/icon-192.png',
@@ -63,8 +66,23 @@ export default defineConfig({
         ]
       },
       workbox: {
-        globPatterns: ['**/*.{js,css,html,ico,png,svg,woff2}'],
+        globPatterns: ['**/*.{js,css,html,ico,png,svg,woff2,woff}'],
+        ignoreURLParametersMatching: [/.*/],
+        cleanupOutdatedCaches: true,
+        skipWaiting: true,
+        clientsClaim: true,
         runtimeCaching: [
+          {
+            urlPattern: /^.*\.(html|js|css)$/,
+            handler: 'StaleWhileRevalidate',
+            options: {
+              cacheName: 'app-shell',
+              expiration: {
+                maxEntries: 50,
+                maxAgeSeconds: 60 * 60 * 24 * 7
+              }
+            }
+          },
           {
             urlPattern: /^https:\/\/fonts\.googleapis\.com\/.*/i,
             handler: 'CacheFirst',
@@ -72,7 +90,7 @@ export default defineConfig({
               cacheName: 'google-fonts-cache',
               expiration: {
                 maxEntries: 10,
-                maxAgeSeconds: 60 * 60 * 24 * 365 // 1 year
+                maxAgeSeconds: 60 * 60 * 24 * 365
               },
               cacheableResponse: {
                 statuses: [0, 200]
@@ -90,6 +108,17 @@ export default defineConfig({
               },
               cacheableResponse: {
                 statuses: [0, 200]
+              }
+            }
+          },
+          {
+            urlPattern: /^https:\/\/cdn\..*/i,
+            handler: 'StaleWhileRevalidate',
+            options: {
+              cacheName: 'cdn-resources',
+              expiration: {
+                maxEntries: 20,
+                maxAgeSeconds: 60 * 60 * 24 * 30
               }
             }
           }

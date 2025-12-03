@@ -6,6 +6,8 @@ import 'highlight.js/styles/github.css';
 import { processMarkdown, validateMarkdown, estimatePageCount, processImagesInPreview } from './processors/markdownProcessor.js';
 import { printDocument, validatePrintContent, generatePrintReport, togglePrintPreview } from './utils/printUtils.js';
 import { createReporter } from './utils/printReporter.js';
+import OfflineManager from './utils/offlineManager.js';
+import SWUpdateNotifier from './utils/swUpdateNotifier.js';
 import './styles.css'; // Importação do CSS para o Vite processar
 import './styles-print.css'; // Estilos otimizados para impressão A4
 
@@ -48,6 +50,20 @@ function initSystem() {
      Logger.log('Inicializando núcleo...');
      Logger.success('✓ Markdown processor carregado (com sanitização DOMPurify)');
      Logger.success('✓ Estilos de impressão A4 ativos');
+     
+     // Inicializa gerenciamento offline
+     OfflineManager.init();
+     OfflineManager.loadSyncQueue();
+     OfflineManager.onStatusChange((isOnline) => {
+         const msg = isOnline ? '✓ Conexão restaurada - Funcionamento online' : '⚠️ Sem conexão - Modo offline ativo';
+         Logger.log(msg, isOnline ? 'success' : 'warning');
+     });
+     Logger.success('✓ Gerenciador offline ativo');
+     
+     // Inicializa notificador de updates
+     SWUpdateNotifier.init();
+     Logger.success('✓ Monitor de atualizações ativo');
+     
      loadDocs();
      initEditor();
      setupEvents();
