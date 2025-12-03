@@ -1,22 +1,16 @@
-import { EditorView, basicSetup } from 'codemirror';
-import { markdown } from '@codemirror/lang-markdown';
-import 'highlight.js/styles/github.css';
-import {
-  processMarkdown,
-  estimatePageCount,
-  processImagesInPreview
-} from './processors/markdownProcessor';
-import {
-  printDocument,
-  validatePrintContent,
-  togglePrintPreview
-} from './utils/printUtils';
-import { createReporter } from './utils/printReporter';
-import OfflineManager from './utils/offlineManager';
-import SWUpdateNotifier from './utils/swUpdateNotifier';
-import type { Document, AppState, LoggerInterface } from '@/types/index';
-import './styles.css';
-import './styles-print.css';
+import { EditorView, basicSetup } from 'codemirror'
+import { markdown } from '@codemirror/lang-markdown'
+import 'highlight.js/styles/github.css'
+import { processMarkdown, estimatePageCount } from './processors/markdownProcessor'
+import { printDocument, validatePrintContent, togglePrintPreview } from './utils/printUtils'
+import { createReporter } from './utils/printReporter'
+import OfflineManager from './utils/offlineManager'
+import SWUpdateNotifier from './utils/swUpdateNotifier'
+import { documentManager } from './services/documentManager'
+import { uiRenderer } from './services/uiRenderer'
+import type { AppState, LoggerInterface } from '@/types/index'
+import './styles.css'
+import './styles-print.css'
 
 // Logger do Sistema
 const Logger: LoggerInterface = {
@@ -44,25 +38,58 @@ declare global {
 }
 window.Logger = Logger;
 
-// Estado da aplicação
+/**
+ * Estado da aplicação (UI-only)
+ * Documentos são gerenciados pelo DocumentManager
+ */
 const state: AppState = {
   docs: [],
   currentId: null,
   editor: null
-};
+}
 
-// Documento padrão
-const defaultDoc: Document = {
-  id: 1,
-  name: 'README.md',
-  content: '# SISTEMA INICIADO\n\nPainel carregado com sucesso.\n\n- Editor Ativo\n- Renderizador Pronto\n- Memória OK',
-  updated: Date.now()
-};
+// Utility Functions
+
+/**
+ * Cria uma função debounced que atrasa execução até N ms após última chamada
+ * 
+ * @template T Tipo da função
+ * @param {T} fn - Função a debounce
+ * @param {number} delay - Delay em millisegundos
+ * @returns {(...args: Parameters<T>) => void} Função debounced
+ * 
+ * @example
+ *   const debouncedFn = debounce(() => console.log('hello'), 300)
+ *   debouncedFn() // Não executa
+ *   debouncedFn() // Não executa
+ *   // Após 300ms: "hello" é impresso uma vez
+ */
+function debounce<T extends (...args: any[]) => any>(
+  fn: T,
+  delay: number
+): (...args: Parameters<T>) => void {
+  let timeoutId: NodeJS.Timeout | null = null
+  
+  return (...args: Parameters<T>): void => {
+    if (timeoutId !== null) {
+      clearTimeout(timeoutId)
+    }
+    timeoutId = setTimeout(() => {
+      fn(...args)
+      timeoutId = null
+    }, delay)
+  }
+}
 
 // Core Functions
 
 /**
  * Inicializa o sistema completo
+ * 
+ * Carrega configuração offline, notificador de atualizações,
+ * documentos salvos e inicia o editor com event listeners
+ * 
+ * @returns {void}
  */
 function initSystem(): void {
   Logger.log('Inicializando núcleo...');
@@ -92,44 +119,58 @@ function initSystem(): void {
 }
 
 /**
- * Carrega documentos do localStorage
+ * Carrega documentos via DocumentManager
+ * 
+ * Inicializa DocumentManager, carrega docs do localStorage,
+ * e inscreve no observable para atualizações.
+ * 
+ * @returns {void}
  */
 function loadDocs(): void {
-  try {
-    const raw = localStorage.getItem('md2pdf-docs-v2');
-    if (raw) {
-      state.docs = JSON.parse(raw);
-      Logger.log(`Carregado ${state.docs.length} documentos do armazenamento local.`);
-    } else {
-      state.docs = [defaultDoc];
-      Logger.log('Nenhum dado encontrado. Criando documento padrão.');
-    }
+  // Inicializar DocumentManager com Logger
+  documentManager.logger = Logger as any
+  documentManager.init()
 
-    if (state.docs.length > 0 && state.docs[0]) {
-      state.currentId = state.docs[0].id;
-    }
-    renderList();
-  } catch (e) {
-    const errorMessage = e instanceof Error ? e.message : String(e);
-    Logger.error('Falha crítica no armazenamento: ' + errorMessage);
+  // Inscrever para mudanças
+  documentManager.subscribe((docs) => {
+    state.docs = docs
+    renderList()
+  })
+
+  // Carregar docs iniciais
+  state.docs = documentManager.getAll()
+  if (state.docs.length > 0 && state.docs[0]) {
+    state.currentId = state.docs[0].id
   }
+  renderList()
 }
 
 /**
- * Salva documentos no localStorage
+ * Salva documentos via DocumentManager
+ * 
+ * Atualiza conteúdo do documento ativo no DocumentManager.
+ * DocumentManager cuida de persister em localStorage.
+ * 
+ * @returns {void}
  */
 function saveDocs(): void {
-  try {
-    localStorage.setItem('md2pdf-docs-v2', JSON.stringify(state.docs));
-    updateMetrics();
-  } catch (e) {
-    const errorMessage = e instanceof Error ? e.message : String(e);
-    Logger.error('Erro ao salvar: ' + errorMessage);
-  }
+  const doc = getCurrentDoc()
+  if (!doc) return
+
+  documentManager.setContent(doc.id, doc.content)
+  updateMetrics()
 }
 
 /**
  * Inicializa o editor CodeMirror
+ * 
+ * Cria instância de EditorView com:
+ * - Modo markdown com syntax highlighting
+ * - Theme customizado (light mode)
+ * - Line wrapping habilitado
+ * - Listener para mudanças com debounce
+ * 
+ * @returns {void}
  */
 function initEditor(): void {
   const el = document.getElementById('editor');
@@ -139,6 +180,10 @@ function initEditor(): void {
   }
 
   const doc = getCurrentDoc();
+
+  // Debounce functions for performance optimization
+  const debouncedRender = debounce(renderPreview, 300);
+  const debouncedUpdateMetrics = debounce(updateMetrics, 500);
 
   state.editor = new EditorView({
     doc: doc ? doc.content : '',
@@ -162,7 +207,7 @@ function initEditor(): void {
           const start = performance.now();
           const val = u.state.doc.toString();
 
-          // Update State
+          // Update State (always persist immediately)
           const active = getCurrentDoc();
           if (active) {
             active.content = val;
@@ -170,15 +215,21 @@ function initEditor(): void {
             saveDocs();
           }
 
-          // Render
-          renderPreview(val);
+          // Debounced Render (300ms delay)
+          debouncedRender(val);
 
+          // Debounced Metrics Update (500ms delay)
+          debouncedUpdateMetrics();
+
+          // Visual feedback
+          flashStatus();
+
+          // Update latency display
           const end = performance.now();
           const renderLatencyEl = document.getElementById('render-latency');
           if (renderLatencyEl) {
             renderLatencyEl.innerText = (end - start).toFixed(1) + 'ms';
           }
-          flashStatus();
         }
       })
     ],
@@ -192,6 +243,8 @@ function initEditor(): void {
 
 /**
  * Obtém o documento atualmente selecionado
+ * 
+ * @returns {Document | undefined} Documento ativo ou undefined se nenhum selecionado
  */
 function getCurrentDoc(): Document | undefined {
   return state.docs.find((d) => d.id === state.currentId);
@@ -199,66 +252,63 @@ function getCurrentDoc(): Document | undefined {
 
 /**
  * Renderiza o preview do markdown no elemento preview
+ * 
+ * Processa markdown para HTML com sanitização,
+ * delega renderização para UIRenderer que cuida de imagens A4.
+ * 
+ * @param {string} md - Conteúdo markdown a renderizar
+ * @returns {Promise<void>}
  */
 async function renderPreview(md: string): Promise<void> {
-  const preview = document.getElementById('preview');
-  if (!preview) return;
+  const preview = document.getElementById('preview')
+  if (!preview) return
 
-  // Usar processador customizado com sanitização
-  const html = processMarkdown(md);
-  preview.innerHTML = html;
+  // Processar markdown (sanitização ocorre aqui)
+  const html = processMarkdown(md)
 
-  // Processar imagens para redimensionamento A4 (com cache localStorage)
-  const imagesProcessed = await processImagesInPreview(preview, true);
-  if (imagesProcessed > 0) {
-    Logger.log(`✓ ${imagesProcessed} imagem(ns) otimizada(s) para A4`, 'success');
-  }
+  // Renderizar via UIRenderer (que processa imagens)
+  await uiRenderer.renderPreview(preview, html)
 
   // Estimar páginas para log
-  const estimatedPages = estimatePageCount(html);
-  Logger.log(`Renderizado em ~${estimatedPages} página(s) A4`, 'info');
+  const estimatedPages = estimatePageCount(html)
+  Logger.log(`Renderizado em ~${estimatedPages} página(s) A4`, 'info')
 }
 
 /**
  * Renderiza a lista de documentos no sidebar
+ * 
+ * Delega para UIRenderer para renderização sem efeitos colaterais.
+ * Atualiza input de nome do documento ativo.
+ * 
+ * @returns {void}
  */
 function renderList(): void {
-  const list = document.getElementById('documents-list');
-  if (!list) return;
-  list.innerHTML = '';
+  const list = document.getElementById('documents-list')
+  if (!list) return
 
-  state.docs.forEach((doc: Document): void => {
-    const item = document.createElement('div');
-    item.className = `document-item ${doc.id === state.currentId ? 'active' : ''}`;
-
-    const name = document.createElement('span');
-    name.textContent = doc.name;
-
-    const del = document.createElement('span');
-    del.textContent = '[x]';
-    del.style.fontSize = '9px';
-    del.onclick = (e: MouseEvent): void => {
-      e.stopPropagation();
-      deleteDoc(doc.id);
-    };
-
-    item.appendChild(name);
-    item.appendChild(del);
-
-    item.onclick = (): void => switchDoc(doc.id);
-    list.appendChild(item);
-  });
+  uiRenderer.renderDocumentList(
+    list,
+    state.docs,
+    state.currentId,
+    (id) => switchDoc(id),
+    (id) => deleteDoc(id)
+  )
 
   // Update input name
-  const input = document.getElementById('doc-name') as HTMLInputElement | null;
-  const current = getCurrentDoc();
+  const input = document.getElementById('doc-name') as HTMLInputElement | null
+  const current = getCurrentDoc()
   if (input && current) {
-    input.value = current.name;
+    uiRenderer.setDocumentNameInput(input, current.name)
   }
 }
 
 /**
  * Alterna para um documento diferente
+ * 
+ * Carrega documento selecionado no editor, renderiza preview e lista.
+ * 
+ * @param {number} id - ID do documento a selecionar
+ * @returns {void}
  */
 function switchDoc(id: number): void {
   if (id === state.currentId) return;
@@ -277,56 +327,56 @@ function switchDoc(id: number): void {
 
 /**
  * Cria um novo documento
+ * 
+ * Delega para DocumentManager que cuida de criação e persistência.
+ * Atualiza editor e renderiza interface.
+ * 
+ * @returns {void}
  */
 function createDoc(): void {
-  Logger.log('Tentando criar novo documento...');
+  Logger.log('Tentando criar novo documento...')
   try {
-    const newDoc: Document = {
-      id: Date.now(),
-      name: `UNTITLED_${Math.floor(Math.random() * 1000)}`,
-      content: '',
-      updated: Date.now()
-    };
-    state.docs.unshift(newDoc);
-    state.currentId = newDoc.id;
-    saveDocs();
+    const newDoc = documentManager.create()
+    state.currentId = newDoc.id
 
     // Reset editor
     if (state.editor) {
       state.editor.dispatch({
         changes: { from: 0, to: state.editor.state.doc.length, insert: '' }
-      });
+      })
     }
-    renderList();
-    renderPreview('');
-    Logger.success(`Documento criado [ID: ${newDoc.id}]`);
+    renderList()
+    renderPreview('')
+    Logger.success(`Documento criado [ID: ${newDoc.id}]`)
   } catch (e) {
-    const errorMessage = e instanceof Error ? e.message : String(e);
-    Logger.error('Falha ao criar documento: ' + errorMessage);
+    const errorMessage = e instanceof Error ? e.message : String(e)
+    Logger.error('Falha ao criar documento: ' + errorMessage)
   }
 }
 
 /**
  * Deleta um documento
+ * 
+ * Delega para DocumentManager que cuida de lógica de deleção.
+ * Alterna para primeiro documento se deletar o ativo.
+ * 
+ * @param {number} id - ID do documento a deletar
+ * @returns {void}
  */
 function deleteDoc(id: number): void {
-  if (state.docs.length <= 1) {
-    Logger.error('Bloqueado: Mínimo 1 documento requerido.');
-    return;
-  }
-
   if (confirm('Confirmar exclusão?')) {
-    state.docs = state.docs.filter((d) => d.id !== id);
-    if (state.currentId === id) {
-      const firstDoc = state.docs[0];
-      if (firstDoc) {
-        state.currentId = firstDoc.id;
-        switchDoc(state.currentId);
+    const success = documentManager.delete(id)
+    if (success) {
+      if (state.currentId === id) {
+        const docs = documentManager.getAll()
+        if (docs.length > 0 && docs[0]) {
+          state.currentId = docs[0].id
+          switchDoc(state.currentId)
+        }
       }
+      renderList()
+      Logger.log(`Documento ${id} removido.`)
     }
-    saveDocs();
-    renderList();
-    Logger.log(`Documento ${id} removido.`);
   }
 }
 
@@ -334,30 +384,41 @@ function deleteDoc(id: number): void {
 
 /**
  * Pisca o indicador de status
+ * 
+ * Delega para UIRenderer para renderização do flash.
+ * 
+ * @returns {void}
  */
 function flashStatus(): void {
-  const dot = document.getElementById('status-indicator');
+  const dot = document.getElementById('status-indicator')
   if (dot) {
-    dot.classList.add('active');
-    setTimeout(() => dot.classList.remove('active'), 200);
+    uiRenderer.flashIndicator(dot, 200)
   }
 }
 
 /**
  * Atualiza as métricas exibidas
+ * 
+ * Obtém tamanho total do DocumentManager e atualiza
+ * elemento de exibição de memória (mem-usage).
+ * 
+ * @returns {void}
  */
 function updateMetrics(): void {
-  // Simula uso de memória baseado no tamanho do texto
-  const size = JSON.stringify(state.docs).length;
-  const kb = (size / 1024).toFixed(2);
-  const el = document.getElementById('mem-usage');
+  const size = documentManager.getSize()
+  const el = document.getElementById('mem-usage')
   if (el) {
-    el.innerText = `${kb}KB`;
+    uiRenderer.updateMemoryMetric(el, size)
   }
 }
 
 /**
  * Faz o download do arquivo markdown atual
+ * 
+ * Cria blob com conteúdo markdown e inicia download via link temporário.
+ * Limpa URL após conclusão.
+ * 
+ * @returns {void}
  */
 function downloadMarkdownFile(): void {
   try {
@@ -391,6 +452,15 @@ function downloadMarkdownFile(): void {
 
 /**
  * Configura todos os event listeners
+ * 
+ * Registra listeners para:
+ * - Botão novo documento
+ * - Botão download PDF
+ * - Botão download Markdown
+ * - Atalhos de teclado (Ctrl+Shift+P para preview de impressão)
+ * - Input de nome de documento
+ * 
+ * @returns {void}
  */
 function setupEvents(): void {
   // Create Button
