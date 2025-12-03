@@ -15,8 +15,14 @@
     }
 
     * {
-        orphans: 3;
-        widows: 3;
+        /* Permitir quebras de página por padrão */
+        page-break-inside: auto;
+    }
+
+    /* Orphans/Widows - mínimo de linhas antes/depois de quebra */
+    p, li {
+        orphans: 2;
+        widows: 2;
     }
 
     html, body {
@@ -111,7 +117,10 @@
     .markdown-body h4,
     .markdown-body h5,
     .markdown-body h6 {
+        /* Evitar quebra DEPOIS do heading (não deixar título sozinho no fim da página) */
         page-break-after: avoid;
+        /* Permitir quebra antes se necessário */
+        page-break-before: auto;
         color: black;
         border: none;
         text-transform: none;
@@ -174,7 +183,8 @@
     .markdown-body p {
         margin: 0.1em 0;
         text-align: left;
-        page-break-inside: avoid;
+        /* Permitir quebra em parágrafos longos */
+        page-break-inside: auto;
         font-size: 9.5pt;
         line-height: 1.15;
     }
@@ -243,6 +253,7 @@
         padding: 4pt;
         margin: 0.05em 0;
         overflow-x: auto;
+        /* Blocos de código devem evitar quebra (ficam ilegíveis se quebrados) */
         page-break-inside: avoid;
         font-family: 'Courier New', 'Monaco', monospace;
         font-size: 7.5pt;
@@ -268,7 +279,8 @@
     .markdown-body .markdown-list-ordered {
         margin: 0.5em 0;
         padding-left: 1.8em;
-        page-break-inside: avoid;
+        /* Permitir quebra dentro de listas longas */
+        page-break-inside: auto;
         font-size: 9.5pt;
         line-height: 1.4;
     }
@@ -288,7 +300,8 @@
 
     .markdown-body li {
         margin-bottom: 0.3em;
-        page-break-inside: avoid;
+        /* Permitir quebra em itens longos, evitar apenas em itens curtos */
+        page-break-inside: auto;
         font-size: 9.5pt;
         line-height: 1.35;
     }
