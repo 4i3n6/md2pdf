@@ -26,6 +26,12 @@ interface ValidationResult {
 
 /**
  * Obter dimensões de uma imagem de forma assíncrona
+ * 
+ * Carrega imagem e obtém naturalWidth/naturalHeight.
+ * Timeout de 5s se imagem não carregar.
+ * 
+ * @param {string} src - URL da imagem
+ * @returns {Promise<ImageDimensions | null>} Dimensões ou null se falhar
  */
 export function getImageDimensions(src: string): Promise<ImageDimensions | null> {
   return new Promise((resolve) => {
@@ -60,7 +66,18 @@ export function getImageDimensions(src: string): Promise<ImageDimensions | null>
 
 /**
  * Calcular dimensões proporcionais para impressão A4
- * Mantém aspect ratio e garante que cabe em A4
+ * 
+ * Mantém aspect ratio e garante que cabe em A4 (210x297mm).
+ * Margem padrão: 20mm em cada lado.
+ * Conversão: 1 inch = 25.4mm, 96 DPI = 3.779 px/mm
+ * 
+ * @param {number} width - Largura em pixels
+ * @param {number} height - Altura em pixels
+ * @returns {PrintDimensions} Dimensões ajustadas para print com metadados
+ * 
+ * @example
+ *   calculatePrintDimensions(800, 600)
+ *   // Retorna: { width: '211.5px', height: 'auto', maxWidth: '100%', scale: 0.887 }
  */
 export function calculatePrintDimensions(width: number, height: number): PrintDimensions {
   if (!width || !height || width <= 0 || height <= 0) {
@@ -105,6 +122,11 @@ export function calculatePrintDimensions(width: number, height: number): PrintDi
 
 /**
  * Obter dimensões com cache (localStorage)
+ * 
+ * Tenta recuperar de cache primeiro, caso contrário carrega e cacheia.
+ * 
+ * @param {string} src - URL da imagem
+ * @returns {Promise<ImageDimensions | null>} Dimensões ou null
  */
 export async function getCachedImageDimensions(src: string): Promise<ImageDimensions | null> {
   if (!src) return null
@@ -125,41 +147,71 @@ export async function getCachedImageDimensions(src: string): Promise<ImageDimens
 
 /**
  * Processar todas as imagens em um container HTML
- * Aplica dimensões calculadas para print
+ * 
+ * Processa imagens com concorrência limitada (5 por lote) para melhor performance.
+ * Obtém dimensões, aplica estilos de print e armazena metadados em data attributes.
+ * Falhas em imagens individuais não impedem processamento das demais.
+ * 
+ * @param {HTMLElement | null} container - Container com imagens
+ * @param {boolean} useCache - Se deve cachear dimensões (padrão: true)
+ * @param {number} maxConcurrent - Máximo de imagens simultâneas (padrão: 5)
+ * @returns {Promise<number>} Número de imagens processadas com sucesso
  */
-export async function processImagesForPrint(container: HTMLElement | null, useCache: boolean = true): Promise<number> {
+export async function processImagesForPrint(
+  container: HTMLElement | null,
+  useCache: boolean = true,
+  maxConcurrent: number = 5
+): Promise<number> {
   if (!container) return 0
 
-  const images = container.querySelectorAll('img')
+  const images = Array.from(container.querySelectorAll('img'))
+  if (images.length === 0) return 0
+
   let processed = 0
 
-  for (const img of Array.from(images)) {
-    try {
-      const src = img.src
-      if (!src) continue
+  // Criar lotes de imagens para processar em paralelo
+  for (let i = 0; i < images.length; i += maxConcurrent) {
+    const batch = images.slice(i, i + maxConcurrent)
 
-      const dimensions = useCache ? await getCachedImageDimensions(src) : await getImageDimensions(src)
+    // Processar lote com Promise.allSettled (não falha se uma imagem falhar)
+    const results = await Promise.allSettled(
+      batch.map(async (img) => {
+        const src = img.src
+        if (!src) return
 
-      if (!dimensions) {
-        img.style.maxWidth = '100%'
-        img.style.height = 'auto'
+        const dimensions = useCache
+          ? await getCachedImageDimensions(src)
+          : await getImageDimensions(src)
+
+        if (!dimensions) {
+          // Fallback para responsive image
+          img.style.maxWidth = '100%'
+          img.style.height = 'auto'
+          return
+        }
+
+        // Aplicar dimensões de print
+        const printDims = calculatePrintDimensions(dimensions.width, dimensions.height)
+        img.style.width = printDims.width
+        img.style.height = printDims.height
+        img.style.maxWidth = printDims.maxWidth
+
+        // Armazenar metadados para debugging/análise
+        img.dataset.originalWidth = String(dimensions.width)
+        img.dataset.originalHeight = String(dimensions.height)
+        img.dataset.printScale = String(printDims.scale ?? 1)
+      })
+    )
+
+    // Contar apenas sucesso (settled não lança exceção)
+    results.forEach((result) => {
+      if (result.status === 'fulfilled') {
         processed++
-        continue
+      } else {
+        // Log de erro sem quebrar o fluxo
+        console.warn('Falha ao processar imagem:', result.reason)
       }
-
-      const printDims = calculatePrintDimensions(dimensions.width, dimensions.height)
-      img.style.width = printDims.width
-      img.style.height = printDims.height
-      img.style.maxWidth = printDims.maxWidth
-
-      img.dataset['originalWidth'] = String(dimensions.width)
-      img.dataset['originalHeight'] = String(dimensions.height)
-      img.dataset['printScale'] = String(printDims.scale ?? 1)
-
-      processed++
-    } catch (e) {
-      console.error('Erro ao processar imagem:', e)
-    }
+    })
   }
 
   return processed
@@ -167,6 +219,13 @@ export async function processImagesForPrint(container: HTMLElement | null, useCa
 
 /**
  * Validar se uma imagem cabe em A4
+ * 
+ * Verifica se dimensões (em pixels) cabem em A4 com margens.
+ * Retorna true se cabe, false caso contrário.
+ * 
+ * @param {number} width - Largura em pixels
+ * @param {number} height - Altura em pixels
+ * @returns {ValidationResult} Objeto com fits (boolean) e message
  */
 export function validateImageForA4(width: number, height: number): ValidationResult {
   const MAX_WIDTH_MM = 170
