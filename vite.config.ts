@@ -85,6 +85,7 @@ export default defineConfig({
         app: resolve(__dirname, 'app.html'),
         manual: resolve(__dirname, 'manual/index.html'),
         'manual-getting-started': resolve(__dirname, 'manual/getting-started/index.html'),
+        'manual-markdown-syntax': resolve(__dirname, 'manual/markdown-syntax/index.html'),
         'manual-input-stream': resolve(__dirname, 'manual/input-stream/index.html'),
         'manual-render-output': resolve(__dirname, 'manual/render-output/index.html'),
         'manual-keyboard-shortcuts': resolve(__dirname, 'manual/keyboard-shortcuts/index.html'),

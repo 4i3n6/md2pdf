@@ -3,7 +3,7 @@
  * Generates static HTML pages from content.json and a single template
  */
 
-import { readFileSync, writeFileSync, mkdirSync, existsSync, rmSync } from 'fs';
+import { readFileSync, writeFileSync, mkdirSync, existsSync } from 'fs';
 import { join, dirname } from 'path';
 import { fileURLToPath } from 'url';
 
@@ -14,7 +14,7 @@ const CONTENT_FILE = join(MANUAL_DIR, 'content.json');
 
 // Load content
 const content = JSON.parse(readFileSync(CONTENT_FILE, 'utf-8'));
-const { site, pages } = content;
+const { site, navigation, pages } = content;
 
 // Template functions
 function htmlHead(page, isSubpage = false) {
@@ -50,23 +50,57 @@ function htmlHeader() {
     </header>`;
 }
 
+function htmlSidebar(currentSlug) {
+    const items = navigation.map(item => {
+        const href = item.slug === 'index' ? '/manual/' : `/manual/${item.slug}/`;
+        const activeClass = item.slug === currentSlug ? ' active' : '';
+        return `<a href="${href}" class="sidebar-item${activeClass}">
+                    <span class="sidebar-icon">${item.icon}</span>
+                    <span class="sidebar-title">${item.title}</span>
+                </a>`;
+    }).join('\n                ');
+    
+    return `
+        <aside class="sidebar">
+            <nav class="sidebar-nav" aria-label="Navegação do manual">
+                ${items}
+            </nav>
+        </aside>`;
+}
+
+function htmlAnchors(anchors) {
+    if (!anchors || anchors.length === 0) return '';
+    
+    const items = anchors.map(a => 
+        `<a href="#${a.id}" class="anchor-item">${a.title}</a>`
+    ).join('\n                    ');
+    
+    return `
+            <nav class="page-anchors" aria-label="Nesta página">
+                <span class="anchors-title">Nesta página</span>
+                <div class="anchors-list">
+                    ${items}
+                </div>
+            </nav>`;
+}
+
 function htmlBreadcrumb(page) {
     if (page.isIndex) {
         return `
-        <nav class="breadcrumb" aria-label="Breadcrumb">
-            <a href="/">Home</a>
-            <span class="breadcrumb-separator">&gt;</span>
-            <span class="breadcrumb-current">Manual</span>
-        </nav>`;
+            <nav class="breadcrumb" aria-label="Breadcrumb">
+                <a href="/">Home</a>
+                <span class="breadcrumb-separator">&gt;</span>
+                <span class="breadcrumb-current">Manual</span>
+            </nav>`;
     }
     return `
-        <nav class="breadcrumb" aria-label="Breadcrumb">
-            <a href="/">Home</a>
-            <span class="breadcrumb-separator">&gt;</span>
-            <a href="/manual/">Manual</a>
-            <span class="breadcrumb-separator">&gt;</span>
-            <span class="breadcrumb-current">${page.title}</span>
-        </nav>`;
+            <nav class="breadcrumb" aria-label="Breadcrumb">
+                <a href="/">Home</a>
+                <span class="breadcrumb-separator">&gt;</span>
+                <a href="/manual/">Manual</a>
+                <span class="breadcrumb-separator">&gt;</span>
+                <span class="breadcrumb-current">${page.title}</span>
+            </nav>`;
 }
 
 function htmlFooter() {
@@ -118,6 +152,13 @@ function htmlPageNav(page) {
 }
 
 // Content rendering helpers
+function escapeHtml(text) {
+    return text
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;');
+}
+
 function renderList(items) {
     return `
                 <ul>
@@ -180,14 +221,29 @@ function renderInfoBox(box, highlight = false) {
                 </div>`;
 }
 
+function renderCodeExample(example) {
+    const escapedCode = escapeHtml(example.code);
+    return `
+                <div class="code-example">
+                    <pre><code>${escapedCode}</code></pre>
+                    ${example.description ? `<p class="code-description">${example.description}</p>` : ''}
+                </div>`;
+}
+
 function renderSection(section) {
+    const idAttr = section.id ? ` id="${section.id}"` : '';
     let html = `
-            <section>
+            <section${idAttr}>
                 <h2>${section.title}</h2>`;
     
     // Content paragraphs
     if (section.content) {
         html += section.content.map(p => `\n                <p>${p}</p>`).join('');
+    }
+    
+    // Code example
+    if (section.codeExample) {
+        html += renderCodeExample(section.codeExample);
     }
     
     // Info box (before list)
@@ -234,6 +290,9 @@ function renderSection(section) {
     if (section.subsections) {
         for (const sub of section.subsections) {
             html += `\n                <h3>${sub.subtitle}</h3>`;
+            if (sub.codeExample) {
+                html += renderCodeExample(sub.codeExample);
+            }
             if (sub.list) {
                 html += renderList(sub.list);
             }
@@ -259,7 +318,6 @@ function renderIndexPage(page) {
     const c = page.content;
     
     let html = `
-        <article class="content">
             <h1>${page.title}</h1>
             
             <section class="intro">
@@ -290,8 +348,7 @@ function renderIndexPage(page) {
                         </div>
                     </div>`).join('\n                    ')}
                 </div>
-            </section>
-        </article>`;
+            </section>`;
     
     return html;
 }
@@ -301,8 +358,12 @@ function renderRegularPage(page) {
     const title = page.pageTitle || page.title;
     
     let html = `
-        <article class="content">
             <h1>${title}</h1>`;
+    
+    // Anchors navigation (for pages with many sections)
+    if (page.anchors) {
+        html += htmlAnchors(page.anchors);
+    }
     
     // Highlight box at top
     if (page.highlightBox) {
@@ -353,22 +414,28 @@ function renderRegularPage(page) {
     // Page navigation
     html += htmlPageNav(page);
     
-    html += '\n        </article>';
     return html;
 }
 
 // Generate full page HTML
 function generatePage(page, isSubpage = false) {
-    const content = page.isIndex ? renderIndexPage(page) : renderRegularPage(page);
+    const articleContent = page.isIndex ? renderIndexPage(page) : renderRegularPage(page);
     
     return `${htmlHead(page, isSubpage)}
 <body>
 ${htmlHeader()}
 
-    <main class="main">
+    <div class="layout">
+${htmlSidebar(page.slug)}
+
+        <main class="main">
 ${htmlBreadcrumb(page)}
-${content}
-    </main>
+
+            <article class="content">
+${articleContent}
+            </article>
+        </main>
+    </div>
 ${htmlFooter()}
 </body>
 </html>`;
@@ -377,9 +444,6 @@ ${htmlFooter()}
 // Main build function
 function buildManual() {
     console.log('Building manual pages...');
-    
-    // Track generated files for cleanup
-    const generatedDirs = [];
     
     for (const page of pages) {
         const isIndex = page.slug === 'index';
@@ -393,7 +457,6 @@ function buildManual() {
             if (!existsSync(pageDir)) {
                 mkdirSync(pageDir, { recursive: true });
             }
-            generatedDirs.push(pageDir);
             outputPath = join(pageDir, 'index.html');
         }
         

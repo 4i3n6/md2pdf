@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Uso offline e PWA no MD2PDF. Instale o app e use sem conexão com internet.">
-    <meta name="keywords" content="pwa, progressive web app, offline, service worker, instalar app, md2pdf offline, app sem internet">
+    <meta name="description" content="Instale o MD2PDF como app e use sem conexão com internet.">
+    <meta name="keywords" content="pwa, progressive web app, offline, instalar app, md2pdf offline">
     <meta name="author" content="MD2PDF">
     <title>Uso Offline e PWA | MD2PDF</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -26,93 +26,104 @@
         </div>
     </header>
 
-    <main class="main">
+    <div class="layout">
 
-        <nav class="breadcrumb" aria-label="Breadcrumb">
-            <a href="/">Home</a>
-            <span class="breadcrumb-separator">&gt;</span>
-            <a href="/manual/">Manual</a>
-            <span class="breadcrumb-separator">&gt;</span>
-            <span class="breadcrumb-current">Uso Offline e PWA</span>
-        </nav>
+        <aside class="sidebar">
+            <nav class="sidebar-nav" aria-label="Navegação do manual">
+                <a href="/manual/" class="sidebar-item">
+                    <span class="sidebar-icon">≡</span>
+                    <span class="sidebar-title">Índice</span>
+                </a>
+                <a href="/manual/getting-started/" class="sidebar-item">
+                    <span class="sidebar-icon">1</span>
+                    <span class="sidebar-title">Primeiros Passos</span>
+                </a>
+                <a href="/manual/markdown-syntax/" class="sidebar-item">
+                    <span class="sidebar-icon">#</span>
+                    <span class="sidebar-title">Guia Markdown</span>
+                </a>
+                <a href="/manual/input-stream/" class="sidebar-item">
+                    <span class="sidebar-icon">></span>
+                    <span class="sidebar-title">Área de Edição</span>
+                </a>
+                <a href="/manual/render-output/" class="sidebar-item">
+                    <span class="sidebar-icon">A4</span>
+                    <span class="sidebar-title">Preview e Saída</span>
+                </a>
+                <a href="/manual/keyboard-shortcuts/" class="sidebar-item">
+                    <span class="sidebar-icon">⌘</span>
+                    <span class="sidebar-title">Atalhos</span>
+                </a>
+                <a href="/manual/print-export/" class="sidebar-item">
+                    <span class="sidebar-icon">↓</span>
+                    <span class="sidebar-title">Exportar PDF</span>
+                </a>
+                <a href="/manual/privacy-storage/" class="sidebar-item">
+                    <span class="sidebar-icon">◉</span>
+                    <span class="sidebar-title">Privacidade</span>
+                </a>
+                <a href="/manual/offline-pwa/" class="sidebar-item active">
+                    <span class="sidebar-icon">⚡</span>
+                    <span class="sidebar-title">Uso Offline</span>
+                </a>
+            </nav>
+        </aside>
 
-        <article class="content">
+        <main class="main">
+
+            <nav class="breadcrumb" aria-label="Breadcrumb">
+                <a href="/">Home</a>
+                <span class="breadcrumb-separator">&gt;</span>
+                <a href="/manual/">Manual</a>
+                <span class="breadcrumb-separator">&gt;</span>
+                <span class="breadcrumb-current">Uso Offline e PWA</span>
+            </nav>
+
+            <article class="content">
+
             <h1>Uso Offline e PWA</h1>
             <section>
                 <h2>O que é PWA?</h2>
                 <ul>
-                    <li>PWA = Progressive Web App</li>
+                    <li>Progressive Web App</li>
                     <li>Site que funciona como app nativo</li>
-                    <li>Pode ser instalado no dispositivo</li>
-                    <li>Funciona sem conexão com internet</li>
+                    <li>Instalável no dispositivo</li>
+                    <li>Funciona 100% offline</li>
                 </ul>
             </section>
             <section>
                 <h2>Como Instalar</h2>
-                <h3>Chrome/Edge (Desktop)</h3>
+                <h3>Desktop (Chrome/Edge)</h3>
                 <ul>
-                    <li>Acesse o app em /app</li>
-                    <li>Procure ícone de instalação na barra de endereço</li>
-                    <li>Clique em "Instalar"</li>
-                    <li>App abre em janela própria</li>
+                    <li>Acesse /app</li>
+                    <li>Clique no ícone de instalação na barra de endereço</li>
+                    <li>Confirme "Instalar"</li>
                 </ul>
-                <h3>Chrome (Android)</h3>
+                <h3>Android</h3>
                 <ul>
-                    <li>Acesse o app</li>
-                    <li>Toque no menu (3 pontos)</li>
-                    <li>"Adicionar à tela inicial"</li>
+                    <li>Menu (3 pontos) → "Adicionar à tela inicial"</li>
                 </ul>
-                <h3>Safari (iOS)</h3>
+                <h3>iOS</h3>
                 <ul>
-                    <li>Acesse o app</li>
-                    <li>Toque no botão Compartilhar</li>
-                    <li>"Adicionar à Tela de Início"</li>
+                    <li>Compartilhar → "Adicionar à Tela de Início"</li>
                 </ul>
             </section>
             <section>
                 <h2>Funcionamento Offline</h2>
                 <ul>
                     <li>Após primeiro acesso, app fica em cache</li>
-                    <li>Funciona 100% sem internet</li>
-                    <li>Documentos salvos localmente continuam disponíveis</li>
-                    <li>Nenhuma funcionalidade é perdida offline</li>
+                    <li>Todas as funcionalidades disponíveis offline</li>
+                    <li>Documentos salvos continuam acessíveis</li>
+                    <li>Atualizações automáticas quando online</li>
                 </ul>
             </section>
             <section>
-                <h2>Atualizações Automáticas</h2>
-                <ul>
-                    <li>Quando online, app verifica atualizações</li>
-                    <li>Atualizações aplicadas automaticamente</li>
-                    <li>Você sempre tem a versão mais recente</li>
-                    <li>Sem atualização manual necessária</li>
-                </ul>
-            </section>
-            <section>
-                <h2>Service Worker</h2>
-                <ul>
-                    <li>Tecnologia que permite funcionamento offline</li>
-                    <li>Armazena arquivos do app em cache</li>
-                    <li>Executa em segundo plano</li>
-                    <li>Gerencia cache e atualizações</li>
-                </ul>
-            </section>
-            <section>
-                <h2>Vantagens do PWA</h2>
-                <ul>
-                    <li>Sem app store necessária</li>
-                    <li>Sem permissões de instalação</li>
-                    <li>Ocupa pouco espaço (~2MB)</li>
-                    <li>Sempre atualizado</li>
-                    <li>Mesma experiência do site</li>
-                </ul>
-            </section>
-            <section>
-                <h2>Solução de Problemas</h2>
+                <h2>Problemas</h2>
                 <div class="info-box">
                     <ul>
-                        <li><strong>App não atualiza:</strong> limpe cache e recarregue</li>
-                        <li><strong>Opção de instalar não aparece:</strong> certifique-se de usar HTTPS</li>
-                        <li><strong>Offline não funciona:</strong> acesse o app online primeiro</li>
+                        <li><strong>App não atualiza:</strong> Limpe cache e recarregue</li>
+                        <li><strong>Não aparece opção de instalar:</strong> Use HTTPS</li>
+                        <li><strong>Offline não funciona:</strong> Acesse online primeiro</li>
                     </ul>
                 </div>
             </section>
@@ -127,13 +138,14 @@
                 <a href="/manual/">
                     <div class="nav-direction">
                         <span class="nav-label">Próximo</span>
-                        <span class="nav-title">Voltar ao Índice</span>
+                        <span class="nav-title">Índice</span>
                     </div>
                     <span class="nav-arrow">&rarr;</span>
                 </a>
             </nav>
-        </article>
-    </main>
+            </article>
+        </main>
+    </div>
 
     <footer class="footer">
         <div class="footer-content">

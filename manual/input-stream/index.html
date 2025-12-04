@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Guia completo da área de edição do MD2PDF. Aprenda sobre o editor Markdown, gerenciamento de documentos e funcionalidades do INPUT_STREAM.">
-    <meta name="keywords" content="md2pdf editor, markdown editor, input stream, gerenciar documentos, syntax highlighting, editor markdown">
+    <meta name="description" content="Guia completo da área de edição do MD2PDF. Aprenda sobre o editor Markdown, gerenciamento de documentos e funcionalidades.">
+    <meta name="keywords" content="md2pdf editor, markdown editor, input stream, gerenciar documentos, syntax highlighting">
     <meta name="author" content="MD2PDF">
     <title>Área de Edição | MD2PDF</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -26,73 +26,103 @@
         </div>
     </header>
 
-    <main class="main">
+    <div class="layout">
 
-        <nav class="breadcrumb" aria-label="Breadcrumb">
-            <a href="/">Home</a>
-            <span class="breadcrumb-separator">&gt;</span>
-            <a href="/manual/">Manual</a>
-            <span class="breadcrumb-separator">&gt;</span>
-            <span class="breadcrumb-current">Área de Edição</span>
-        </nav>
+        <aside class="sidebar">
+            <nav class="sidebar-nav" aria-label="Navegação do manual">
+                <a href="/manual/" class="sidebar-item">
+                    <span class="sidebar-icon">≡</span>
+                    <span class="sidebar-title">Índice</span>
+                </a>
+                <a href="/manual/getting-started/" class="sidebar-item">
+                    <span class="sidebar-icon">1</span>
+                    <span class="sidebar-title">Primeiros Passos</span>
+                </a>
+                <a href="/manual/markdown-syntax/" class="sidebar-item">
+                    <span class="sidebar-icon">#</span>
+                    <span class="sidebar-title">Guia Markdown</span>
+                </a>
+                <a href="/manual/input-stream/" class="sidebar-item active">
+                    <span class="sidebar-icon">></span>
+                    <span class="sidebar-title">Área de Edição</span>
+                </a>
+                <a href="/manual/render-output/" class="sidebar-item">
+                    <span class="sidebar-icon">A4</span>
+                    <span class="sidebar-title">Preview e Saída</span>
+                </a>
+                <a href="/manual/keyboard-shortcuts/" class="sidebar-item">
+                    <span class="sidebar-icon">⌘</span>
+                    <span class="sidebar-title">Atalhos</span>
+                </a>
+                <a href="/manual/print-export/" class="sidebar-item">
+                    <span class="sidebar-icon">↓</span>
+                    <span class="sidebar-title">Exportar PDF</span>
+                </a>
+                <a href="/manual/privacy-storage/" class="sidebar-item">
+                    <span class="sidebar-icon">◉</span>
+                    <span class="sidebar-title">Privacidade</span>
+                </a>
+                <a href="/manual/offline-pwa/" class="sidebar-item">
+                    <span class="sidebar-icon">⚡</span>
+                    <span class="sidebar-title">Uso Offline</span>
+                </a>
+            </nav>
+        </aside>
 
-        <article class="content">
+        <main class="main">
+
+            <nav class="breadcrumb" aria-label="Breadcrumb">
+                <a href="/">Home</a>
+                <span class="breadcrumb-separator">&gt;</span>
+                <a href="/manual/">Manual</a>
+                <span class="breadcrumb-separator">&gt;</span>
+                <span class="breadcrumb-current">Área de Edição</span>
+            </nav>
+
+            <article class="content">
+
             <h1>Área de Edição (INPUT_STREAM)</h1>
             <section>
                 <h2>O Editor de Markdown</h2>
-                <p>O painel INPUT_STREAM é onde você escreve e edita seu conteúdo Markdown. O editor oferece recursos avançados para facilitar a escrita:</p>
+                <p>O painel INPUT_STREAM é onde você escreve e edita seu conteúdo Markdown.</p>
                 <ul>
-                    <li><strong>Syntax highlighting em tempo real:</strong> O código Markdown é colorido automaticamente, facilitando a identificação de títulos, negrito, itálico, links e outros elementos.</li>
-                    <li><strong>Números de linha para referência:</strong> Cada linha do editor é numerada, facilitando a navegação e referência em documentos longos.</li>
-                    <li><strong>Indicadores de erro:</strong> Linhas onduladas aparecem sob elementos com problemas de sintaxe, ajudando você a identificar e corrigir erros rapidamente.</li>
+                    <li><strong>Syntax highlighting:</strong> Código Markdown colorido automaticamente</li>
+                    <li><strong>Números de linha:</strong> Facilita referência em documentos longos</li>
+                    <li><strong>Indicadores de erro:</strong> Linhas onduladas mostram problemas de sintaxe</li>
                 </ul>
             </section>
             <section>
                 <h2>Gerenciando Documentos</h2>
-                <p>A sidebar DOC_INDEX à esquerda mostra todos os seus documentos salvos. O gerenciamento é simples e intuitivo:</p>
+                <p>A sidebar DOC_INDEX mostra todos os seus documentos salvos.</p>
                 <ul>
-                    <li><strong>DOC_INDEX na sidebar:</strong> Lista todos os documentos disponíveis no navegador.</li>
-                    <li><strong>Clique + para criar novo documento:</strong> O botão de adição cria um documento em branco pronto para edição.</li>
-                    <li><strong>Clique no nome para abrir:</strong> Selecione qualquer documento da lista para carregá-lo no editor.</li>
-                    <li><strong>Clique [x] para deletar:</strong> Remove o documento permanentemente. Uma confirmação é solicitada antes da exclusão.</li>
-                    <li><strong>Documentos salvos automaticamente:</strong> Todas as alterações são salvas automaticamente no armazenamento local do navegador.</li>
+                    <li><strong>Clique + para criar:</strong> Novo documento em branco</li>
+                    <li><strong>Clique no nome:</strong> Abre o documento</li>
+                    <li><strong>Clique [x]:</strong> Deleta (com confirmação)</li>
+                    <li><strong>Salvamento automático:</strong> Alterações salvas instantaneamente</li>
                 </ul>
             </section>
             <section>
                 <h2>Renomeando Documentos</h2>
-                <p>Personalizar o nome do documento é importante, pois ele será usado como nome do arquivo PDF exportado:</p>
                 <ul>
-                    <li><strong>Clique no campo de nome:</strong> O campo de nome do documento está localizado acima do editor.</li>
-                    <li><strong>Digite o novo nome:</strong> Edite o texto diretamente no campo.</li>
-                    <li><strong>Nome salvo automaticamente:</strong> Não é necessário confirmar; o nome é atualizado instantaneamente.</li>
-                    <li><strong>Nome usado como nome do arquivo PDF:</strong> Ao exportar, o PDF terá o mesmo nome do documento.</li>
+                    <li>Clique no campo de nome acima do editor</li>
+                    <li>Digite o novo nome</li>
+                    <li>O nome é usado como nome do PDF exportado</li>
                 </ul>
             </section>
             <section>
                 <h2>Botão COPY</h2>
-                <p>O botão COPY permite copiar rapidamente todo o conteúdo Markdown do documento atual:</p>
                 <ul>
-                    <li><strong>Localização:</strong> Ao lado do campo de nome do documento.</li>
-                    <li><strong>Função:</strong> Copia todo o conteúdo Markdown para a área de transferência.</li>
-                    <li><strong>Atalho:</strong> <code>Ctrl+Shift+C</code> para copiar sem usar o mouse.</li>
-                    <li><strong>Uso:</strong> Ideal para compartilhar o texto, fazer backup ou continuar a edição em outro editor.</li>
-                </ul>
-            </section>
-            <section>
-                <h2>Indicadores de Erro</h2>
-                <p>O editor identifica problemas de sintaxe Markdown e os sinaliza visualmente:</p>
-                <ul>
-                    <li><strong>Linha ondulada vermelha:</strong> Indica um erro de sintaxe que precisa ser corrigido.</li>
-                    <li><strong>Linha ondulada amarela:</strong> Indica um aviso sobre algo que pode estar incorreto.</li>
-                    <li><strong>Passe o mouse para ver mensagem:</strong> Ao posicionar o cursor sobre o indicador, uma mensagem explica o problema.</li>
+                    <li><strong>Localização:</strong> Ao lado do nome do documento</li>
+                    <li><strong>Atalho:</strong> <code>Ctrl+Shift+C</code></li>
+                    <li><strong>Função:</strong> Copia todo o Markdown para a área de transferência</li>
                 </ul>
             </section>
             <nav class="page-nav">
-                <a href="/manual/getting-started/">
+                <a href="/manual/markdown-syntax/">
                     <span class="nav-arrow">&larr;</span>
                     <div class="nav-direction">
                         <span class="nav-label">Anterior</span>
-                        <span class="nav-title">Primeiros Passos</span>
+                        <span class="nav-title">Guia Markdown</span>
                     </div>
                 </a>
                 <a href="/manual/render-output/">
@@ -103,8 +133,9 @@
                     <span class="nav-arrow">&rarr;</span>
                 </a>
             </nav>
-        </article>
-    </main>
+            </article>
+        </main>
+    </div>
 
     <footer class="footer">
         <div class="footer-content">

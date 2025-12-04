@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Privacidade e armazenamento no MD2PDF. Seus documentos ficam apenas no seu navegador, sem servidores ou rastreamento.">
-    <meta name="keywords" content="privacidade, armazenamento local, localStorage, segurança, dados offline, md2pdf privacidade">
+    <meta name="description" content="Seus documentos ficam apenas no seu navegador. Sem servidores, sem rastreamento.">
+    <meta name="keywords" content="privacidade, armazenamento local, localStorage, segurança, md2pdf">
     <meta name="author" content="MD2PDF">
     <title>Privacidade e Armazenamento | MD2PDF</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -26,74 +26,93 @@
         </div>
     </header>
 
-    <main class="main">
+    <div class="layout">
 
-        <nav class="breadcrumb" aria-label="Breadcrumb">
-            <a href="/">Home</a>
-            <span class="breadcrumb-separator">&gt;</span>
-            <a href="/manual/">Manual</a>
-            <span class="breadcrumb-separator">&gt;</span>
-            <span class="breadcrumb-current">Privacidade e Armazenamento</span>
-        </nav>
+        <aside class="sidebar">
+            <nav class="sidebar-nav" aria-label="Navegação do manual">
+                <a href="/manual/" class="sidebar-item">
+                    <span class="sidebar-icon">≡</span>
+                    <span class="sidebar-title">Índice</span>
+                </a>
+                <a href="/manual/getting-started/" class="sidebar-item">
+                    <span class="sidebar-icon">1</span>
+                    <span class="sidebar-title">Primeiros Passos</span>
+                </a>
+                <a href="/manual/markdown-syntax/" class="sidebar-item">
+                    <span class="sidebar-icon">#</span>
+                    <span class="sidebar-title">Guia Markdown</span>
+                </a>
+                <a href="/manual/input-stream/" class="sidebar-item">
+                    <span class="sidebar-icon">></span>
+                    <span class="sidebar-title">Área de Edição</span>
+                </a>
+                <a href="/manual/render-output/" class="sidebar-item">
+                    <span class="sidebar-icon">A4</span>
+                    <span class="sidebar-title">Preview e Saída</span>
+                </a>
+                <a href="/manual/keyboard-shortcuts/" class="sidebar-item">
+                    <span class="sidebar-icon">⌘</span>
+                    <span class="sidebar-title">Atalhos</span>
+                </a>
+                <a href="/manual/print-export/" class="sidebar-item">
+                    <span class="sidebar-icon">↓</span>
+                    <span class="sidebar-title">Exportar PDF</span>
+                </a>
+                <a href="/manual/privacy-storage/" class="sidebar-item active">
+                    <span class="sidebar-icon">◉</span>
+                    <span class="sidebar-title">Privacidade</span>
+                </a>
+                <a href="/manual/offline-pwa/" class="sidebar-item">
+                    <span class="sidebar-icon">⚡</span>
+                    <span class="sidebar-title">Uso Offline</span>
+                </a>
+            </nav>
+        </aside>
 
-        <article class="content">
+        <main class="main">
+
+            <nav class="breadcrumb" aria-label="Breadcrumb">
+                <a href="/">Home</a>
+                <span class="breadcrumb-separator">&gt;</span>
+                <a href="/manual/">Manual</a>
+                <span class="breadcrumb-separator">&gt;</span>
+                <span class="breadcrumb-current">Privacidade e Armazenamento</span>
+            </nav>
+
+            <article class="content">
+
             <h1>Privacidade e Armazenamento</h1>
             <div class="info-box highlight">
-                <p><strong>Seus documentos ficam armazenados APENAS no seu navegador.</strong> O MD2PDF não tem acesso aos seus dados. Nada é enviado para servidores.</p>
+                <p><strong>100% Local.</strong> Seus documentos ficam APENAS no seu navegador. Nada é enviado para servidores.</p>
             </div>
             <section>
-                <h2>100% Local</h2>
+                <h2>Privacidade Total</h2>
                 <ul>
-                    <li>Todo processamento acontece no seu navegador</li>
-                    <li>Nenhum servidor recebe seus dados</li>
+                    <li>Processamento 100% no navegador</li>
                     <li>Zero rastreamento ou analytics</li>
                     <li>Sem contas, sem login</li>
+                    <li>Funciona offline</li>
                 </ul>
             </section>
             <section>
-                <h2>Onde Seus Dados Ficam</h2>
+                <h2>Armazenamento</h2>
                 <ul>
-                    <li>Armazenados no localStorage do navegador</li>
-                    <li>Chave: <code>md2pdf-docs-v2</code></li>
-                    <li>Dados ficam apenas no seu dispositivo</li>
-                    <li>Navegadores diferentes = armazenamento diferente</li>
+                    <li>Dados no localStorage do navegador</li>
+                    <li>Limite: ~5MB por domínio</li>
+                    <li>Métrica <strong>MEM</strong> mostra uso atual</li>
+                    <li>Navegadores diferentes = dados separados</li>
                 </ul>
             </section>
             <section>
-                <h2>Limite de Armazenamento</h2>
-                <ul>
-                    <li>localStorage: ~5MB por domínio</li>
-                    <li>Monitore uso: métrica <strong>MEM</strong> na barra superior</li>
-                    <li>Imagens grandes aumentam uso</li>
-                    <li>Se atingir limite, delete documentos antigos</li>
-                </ul>
-            </section>
-            <section>
-                <h2>Como Limpar Seus Dados</h2>
-                <ul>
-                    <li><strong>Opção 1:</strong> Delete documentos individualmente</li>
-                    <li><strong>Opção 2:</strong> Limpe dados do navegador para este site</li>
-                    <li><strong>Opção 3:</strong> DevTools &gt; Application &gt; localStorage &gt; delete</li>
-                </ul>
-            </section>
-            <section>
-                <h2>Backup de Documentos</h2>
+                <h2>Backup</h2>
                 <ul>
                     <li>Use <strong>DOWNLOAD MD</strong> para salvar arquivos</li>
-                    <li>Use botão <strong>COPY</strong> para copiar conteúdo</li>
-                    <li>Faça backups regulares de docs importantes</li>
-                </ul>
-            </section>
-            <section>
-                <h2>Sigilo Garantido</h2>
-                <ul>
-                    <li>Sem cookies de rastreamento</li>
-                    <li>Sem scripts de terceiros</li>
-                    <li>Funciona 100% offline</li>
+                    <li>Use <strong>COPY</strong> para copiar conteúdo</li>
+                    <li>Faça backups regulares!</li>
                 </ul>
             </section>
             <div class="info-box">
-                <p><strong>Atenção:</strong> Se você limpar dados do navegador, os documentos serão PERDIDOS. Navegadores diferentes não compartilham dados. Modo privado/anônimo pode não salvar dados.</p>
+                <p><strong>Atenção:</strong> Limpar dados do navegador APAGA seus documentos. Modo privado/anônimo pode não salvar.</p>
             </div>
             <nav class="page-nav">
                 <a href="/manual/print-export/">
@@ -111,8 +130,9 @@
                     <span class="nav-arrow">&rarr;</span>
                 </a>
             </nav>
-        </article>
-    </main>
+            </article>
+        </main>
+    </div>
 
     <footer class="footer">
         <div class="footer-content">
