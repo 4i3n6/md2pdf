@@ -297,7 +297,8 @@ const DOMPURIFY_CONFIG = {
     'article',
     'aside',
     'nav',
-    'input'
+    'input',
+    'mark'
   ],
   ALLOWED_ATTR: ['href', 'src', 'alt', 'title', 'id', 'class', 'data-lang', 'loading', 'style', 'role', 'aria-label', 'type', 'checked', 'disabled'],
   ALLOW_DATA_ATTR: false,

@@ -14,6 +14,11 @@ export interface MarkdownError {
   message: string;
   severity: 'error' | 'warning' | 'info';
   code: string;
+  suggestion?: string;
+  suggestionRange?: {
+    from: number;
+    to: number;
+  };
 }
 
 /**
@@ -47,26 +52,35 @@ export function validateMarkdown(markdown: string): ValidationResult {
     const trimmed = line.trim();
 
     // 1. Validar headings (###...)
-    const headingMatch = line.match(/^(#+)\s+(.+)$/);
+    const headingMatch = line.match(/^(#+)(.*)$/);
     if (headingMatch) {
-      const hashes = headingMatch[1].length;
-      if (hashes > 6) {
+      const hashes = headingMatch[1];
+      const hashCount = hashes.length;
+      const rest = headingMatch[2];
+      
+      if (hashCount > 6) {
         errors.push({
           line: lineNum,
           column: 1,
-          message: `Markdown suporta no máximo 6 níveis de heading (encontrado: ${hashes})`,
+          message: `Markdown suporta no máximo 6 níveis de heading (encontrado: ${hashCount})`,
           severity: 'error',
-          code: 'INVALID_HEADING_LEVEL'
+          code: 'INVALID_HEADING_LEVEL',
+          suggestion: '######' + rest,
+          suggestionRange: { from: 1, to: line.length + 1 }
         });
       }
+      
       // Aviso: heading sem espaço após #
-      if (!line.match(/^#+\s/)) {
+      if (rest && !rest.startsWith(' ')) {
+        const fixedLine = hashes + ' ' + rest.trimStart();
         warnings.push({
           line: lineNum,
-          column: hashes,
+          column: hashCount + 1,
           message: 'Heading deve ter espaço após "#"',
           severity: 'warning',
-          code: 'HEADING_MISSING_SPACE'
+          code: 'HEADING_MISSING_SPACE',
+          suggestion: fixedLine,
+          suggestionRange: { from: 1, to: line.length + 1 }
         });
       }
     }
@@ -151,17 +165,22 @@ export function validateMarkdown(markdown: string): ValidationResult {
     }
 
     // 5. Validar bold/italic (** ou *)
-    const boldCount = (line.match(/\*\*/g) || []).length;
-    const italicCount = (line.match(/\*/g) || []).length - boldCount * 2;
+    // Ignorar linhas que são bullet points (começam com * seguido de espaço)
+    const isBulletPoint = /^\s*\*\s/.test(line);
     
-    if (italicCount % 2 !== 0) {
-      warnings.push({
-        line: lineNum,
-        column: 1,
-        message: 'Número ímpar de * (asteriscos) - italic/bold desbalanceado',
-        severity: 'warning',
-        code: 'UNBALANCED_EMPHASIS'
-      });
+    if (!isBulletPoint) {
+      const boldCount = (line.match(/\*\*/g) || []).length;
+      const italicCount = (line.match(/\*/g) || []).length - boldCount * 2;
+      
+      if (italicCount % 2 !== 0) {
+        warnings.push({
+          line: lineNum,
+          column: 1,
+          message: 'Número ímpar de * (asteriscos) - italic/bold desbalanceado',
+          severity: 'warning',
+          code: 'UNBALANCED_EMPHASIS'
+        });
+      }
     }
 
     // 6. Validar listas (-, *, +)
@@ -170,13 +189,16 @@ export function validateMarkdown(markdown: string): ValidationResult {
     }
 
     // 7. Validar blockquotes (>)
-    if (trimmed.startsWith('>') && !trimmed.match(/^>\s+\S/)) {
+    if (trimmed.startsWith('>') && !trimmed.match(/^>\s/)) {
+      const fixedLine = trimmed.replace(/^>([^\s])/, '> $1');
       warnings.push({
         line: lineNum,
         column: 1,
         message: 'Blockquote deveria ter espaço após ">"',
         severity: 'warning',
-        code: 'BLOCKQUOTE_MISSING_SPACE'
+        code: 'BLOCKQUOTE_MISSING_SPACE',
+        suggestion: fixedLine,
+        suggestionRange: { from: 1, to: line.length + 1 }
       });
     }
 
@@ -217,7 +239,9 @@ export function validateMarkdown(markdown: string): ValidationResult {
       column: 1,
       message: 'Bloco de código não fechado - faltam 3 backticks (```)',
       severity: 'error',
-      code: 'UNCLOSED_CODE_BLOCK'
+      code: 'UNCLOSED_CODE_BLOCK',
+      suggestion: '```',
+      suggestionRange: { from: -1, to: -1 }
     });
   }
 

@@ -1,10 +1,10 @@
 import { EditorView, basicSetup } from 'codemirror'
-import { Decoration } from '@codemirror/view'
+import { Decoration, hoverTooltip } from '@codemirror/view'
 import { StateField, StateEffect } from '@codemirror/state'
 import { markdown } from '@codemirror/lang-markdown'
 import 'highlight.js/styles/github.css'
 import { processMarkdown, estimatePageCount } from './processors/markdownProcessor'
-import { validateMarkdown } from './processors/markdownValidator'
+import { validateMarkdown, type MarkdownError } from './processors/markdownValidator'
 import { printDocument, validatePrintContent, togglePrintPreview } from './utils/printUtils'
 import { createReporter } from './utils/printReporter'
 import OfflineManager from './utils/offlineManager'
@@ -82,6 +82,430 @@ const markdownDecorationsField = StateField.define({
   }
 });
 
+// Global issues storage for tooltip and panel
+let currentIssues: MarkdownError[] = [];
+
+/**
+ * Escapa HTML para exibição segura
+ */
+function escapeHtml(text: string): string {
+  const div = document.createElement('div');
+  div.textContent = text;
+  return div.innerHTML;
+}
+
+/**
+ * Encontra issue na posição do cursor
+ */
+function findIssueAtPosition(pos: number, issues: MarkdownError[], content: string): MarkdownError | null {
+  const lines = content.split('\n');
+  let charIndex = 0;
+  
+  for (let i = 0; i < lines.length; i++) {
+    const lineStart = charIndex;
+    const lineEnd = charIndex + (lines[i]?.length ?? 0);
+    
+    if (pos >= lineStart && pos <= lineEnd) {
+      return issues.find(issue => issue.line === i + 1) || null;
+    }
+    charIndex = lineEnd + 1;
+  }
+  return null;
+}
+
+/**
+ * Extension para hover tooltip de erros/avisos Markdown
+ */
+const markdownHoverTooltip = hoverTooltip((view, pos) => {
+  const content = view.state.doc.toString();
+  const issue = findIssueAtPosition(pos, currentIssues, content);
+  
+  if (!issue) return null;
+
+  return {
+    pos,
+    above: true,
+    create() {
+      const dom = document.createElement('div');
+      dom.className = 'md-tooltip';
+      
+      const icon = issue.severity === 'error' ? 'X' : 
+                   issue.severity === 'warning' ? '!' : 'i';
+      const iconClass = `md-tooltip-icon md-tooltip-icon-${issue.severity}`;
+      
+      let html = `
+        <div class="md-tooltip-header">
+          <span class="${iconClass}">${icon}</span>
+          <span class="md-tooltip-message">${escapeHtml(issue.message)}</span>
+        </div>
+      `;
+      
+      if (issue.suggestion) {
+        html += `
+          <div class="md-tooltip-suggestion">
+            <span class="md-tooltip-suggestion-label">Sugestao:</span>
+            <code class="md-tooltip-suggestion-code">${escapeHtml(issue.suggestion)}</code>
+          </div>
+        `;
+      }
+      
+      dom.innerHTML = html;
+      return { dom };
+    }
+  };
+});
+
+/**
+ * Navega para a posição de uma issue no editor
+ */
+function navigateToIssue(issue: MarkdownError): void {
+  if (!state.editor) return;
+  
+  const content = state.editor.state.doc.toString();
+  const lines = content.split('\n');
+  
+  let pos = 0;
+  for (let i = 0; i < issue.line - 1 && i < lines.length; i++) {
+    pos += (lines[i]?.length ?? 0) + 1;
+  }
+  pos += Math.max(0, issue.column - 1);
+  
+  state.editor.dispatch({
+    selection: { anchor: pos },
+    scrollIntoView: true
+  });
+  state.editor.focus();
+  
+  Logger.log(`Navegado para linha ${issue.line}, coluna ${issue.column}`);
+}
+
+/**
+ * Aplica correção automática de uma issue
+ */
+function applyFix(issue: MarkdownError): void {
+  if (!state.editor || !issue.suggestion) return;
+  
+  const content = state.editor.state.doc.toString();
+  const lines = content.split('\n');
+  
+  let lineStart = 0;
+  for (let i = 0; i < issue.line - 1 && i < lines.length; i++) {
+    lineStart += (lines[i]?.length ?? 0) + 1;
+  }
+  
+  const currentLine = lines[issue.line - 1] || '';
+  const lineEnd = lineStart + currentLine.length;
+  
+  let from: number;
+  let to: number;
+  let insert: string;
+  
+  if (issue.suggestionRange?.from === -1) {
+    // Append no final do documento
+    from = content.length;
+    to = content.length;
+    insert = '\n' + issue.suggestion;
+  } else if (issue.suggestionRange) {
+    // Substituir linha inteira
+    from = lineStart;
+    to = lineEnd;
+    insert = issue.suggestion;
+  } else {
+    // Substituir linha inteira (fallback)
+    from = lineStart;
+    to = lineEnd;
+    insert = issue.suggestion;
+  }
+  
+  state.editor.dispatch({
+    changes: { from, to, insert }
+  });
+  
+  Logger.success(`Correcao aplicada na linha ${issue.line}`);
+}
+
+/**
+ * Renderiza o painel de problemas no sidebar
+ */
+function renderProblemsPanel(issues: MarkdownError[]): void {
+  const panel = document.getElementById('problems-panel');
+  const countEl = document.getElementById('problems-count');
+  
+  if (!panel || !countEl) return;
+  
+  const total = issues.length;
+  countEl.textContent = `(${total})`;
+  countEl.className = `problems-badge ${total > 0 ? 'has-problems' : ''}`;
+  
+  panel.innerHTML = '';
+  
+  if (total === 0) {
+    panel.innerHTML = '<div class="problems-empty">Nenhum problema detectado</div>';
+    return;
+  }
+  
+  issues.forEach((issue, index) => {
+    const item = document.createElement('div');
+    item.className = `problem-item problem-${issue.severity}`;
+    item.setAttribute('role', 'listitem');
+    item.setAttribute('tabindex', '0');
+    
+    const icon = issue.severity === 'error' ? 'X' : 
+                 issue.severity === 'warning' ? '!' : 'i';
+    
+    let html = `
+      <span class="problem-icon">${icon}</span>
+      <span class="problem-location">Ln ${issue.line}</span>
+      <span class="problem-message">${escapeHtml(issue.message)}</span>
+    `;
+    
+    if (issue.suggestion) {
+      html += `<button class="problem-fix-btn" data-index="${index}" title="Aplicar correcao">[FIX]</button>`;
+    }
+    
+    item.innerHTML = html;
+    
+    // Click para navegar (exceto no botão FIX)
+    item.addEventListener('click', (e) => {
+      if ((e.target as HTMLElement).classList.contains('problem-fix-btn')) {
+        const idx = parseInt((e.target as HTMLElement).dataset.index || '0');
+        applyFix(issues[idx]);
+        return;
+      }
+      navigateToIssue(issue);
+    });
+    
+    // Keyboard navigation
+    item.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        navigateToIssue(issue);
+      }
+    });
+    
+    panel.appendChild(item);
+  });
+}
+
+/**
+ * Insere uma tag Markdown na posição do cursor ou envolve o texto selecionado
+ * 
+ * @param tag - Tipo de tag a inserir
+ */
+function insertTag(tag: string): void {
+  if (!state.editor) return;
+  
+  const view = state.editor;
+  const { from, to } = view.state.selection.main;
+  const hasSelection = from !== to;
+  const selectedText = hasSelection ? view.state.sliceDoc(from, to) : '';
+  
+  let insert = '';
+  let cursorOffset = 0;
+  
+  switch (tag) {
+    case 'hr':
+      // Quebra de linha / linha horizontal
+      insert = '\n---\n';
+      cursorOffset = insert.length;
+      break;
+      
+    case 'code':
+      // Bloco de codigo
+      if (hasSelection) {
+        insert = '```\n' + selectedText + '\n```';
+        cursorOffset = 4; // Posiciona apos ```\n
+      } else {
+        insert = '```\n\n```';
+        cursorOffset = 4; // Posiciona dentro do bloco
+      }
+      break;
+      
+    case 'quote':
+      // Blockquote
+      if (hasSelection) {
+        // Adicionar > no inicio de cada linha selecionada
+        insert = selectedText.split('\n').map(line => '> ' + line).join('\n');
+        cursorOffset = insert.length;
+      } else {
+        insert = '> ';
+        cursorOffset = 2;
+      }
+      break;
+      
+    case 'heading':
+      // Heading
+      if (hasSelection) {
+        insert = '# ' + selectedText;
+        cursorOffset = insert.length;
+      } else {
+        insert = '# ';
+        cursorOffset = 2;
+      }
+      break;
+      
+    case 'bold':
+      // Negrito
+      if (hasSelection) {
+        insert = '**' + selectedText + '**';
+        cursorOffset = insert.length;
+      } else {
+        insert = '**texto**';
+        cursorOffset = 2; // Posiciona antes de "texto"
+      }
+      break;
+      
+    case 'italic':
+      // Italico
+      if (hasSelection) {
+        insert = '*' + selectedText + '*';
+        cursorOffset = insert.length;
+      } else {
+        insert = '*texto*';
+        cursorOffset = 1; // Posiciona antes de "texto"
+      }
+      break;
+      
+    case 'list':
+      // Lista
+      if (hasSelection) {
+        // Adicionar - no inicio de cada linha selecionada
+        insert = selectedText.split('\n').map(line => '- ' + line).join('\n');
+        cursorOffset = insert.length;
+      } else {
+        insert = '- ';
+        cursorOffset = 2;
+      }
+      break;
+      
+    case 'link':
+      // Link
+      if (hasSelection) {
+        insert = '[' + selectedText + '](url)';
+        cursorOffset = insert.length - 4; // Posiciona em "url"
+      } else {
+        insert = '[texto](url)';
+        cursorOffset = 1; // Posiciona antes de "texto"
+      }
+      break;
+      
+    case 'strike':
+      // Tachado (strikethrough)
+      if (hasSelection) {
+        insert = '~~' + selectedText + '~~';
+        cursorOffset = insert.length;
+      } else {
+        insert = '~~texto~~';
+        cursorOffset = 2;
+      }
+      break;
+      
+    case 'numlist':
+      // Lista numerada
+      if (hasSelection) {
+        insert = selectedText.split('\n').map((line, i) => `${i + 1}. ` + line).join('\n');
+        cursorOffset = insert.length;
+      } else {
+        insert = '1. ';
+        cursorOffset = 3;
+      }
+      break;
+      
+    case 'checkbox':
+      // Checkbox / Tarefa
+      if (hasSelection) {
+        insert = selectedText.split('\n').map(line => '- [ ] ' + line).join('\n');
+        cursorOffset = insert.length;
+      } else {
+        insert = '- [ ] ';
+        cursorOffset = 6;
+      }
+      break;
+      
+    case 'table':
+      // Tabela
+      insert = '\n| Coluna 1 | Coluna 2 | Coluna 3 |\n|----------|----------|----------|\n| dado 1   | dado 2   | dado 3   |\n';
+      cursorOffset = 3; // Posiciona em "Coluna 1"
+      break;
+      
+    case 'mark-yellow':
+      // Destaque amarelo (usando HTML inline que funciona em MD)
+      if (hasSelection) {
+        insert = '<mark style="background:#fef08a">' + selectedText + '</mark>';
+        cursorOffset = insert.length;
+      } else {
+        insert = '<mark style="background:#fef08a">texto</mark>';
+        cursorOffset = 32;
+      }
+      break;
+      
+    case 'mark-green':
+      // Destaque verde
+      if (hasSelection) {
+        insert = '<mark style="background:#bbf7d0">' + selectedText + '</mark>';
+        cursorOffset = insert.length;
+      } else {
+        insert = '<mark style="background:#bbf7d0">texto</mark>';
+        cursorOffset = 32;
+      }
+      break;
+      
+    case 'mark-blue':
+      // Destaque azul
+      if (hasSelection) {
+        insert = '<mark style="background:#bfdbfe">' + selectedText + '</mark>';
+        cursorOffset = insert.length;
+      } else {
+        insert = '<mark style="background:#bfdbfe">texto</mark>';
+        cursorOffset = 32;
+      }
+      break;
+      
+    case 'mark-red':
+      // Destaque vermelho
+      if (hasSelection) {
+        insert = '<mark style="background:#fecaca">' + selectedText + '</mark>';
+        cursorOffset = insert.length;
+      } else {
+        insert = '<mark style="background:#fecaca">texto</mark>';
+        cursorOffset = 32;
+      }
+      break;
+      
+    default:
+      return;
+  }
+  
+  // Aplicar a insercao/substituicao
+  view.dispatch({
+    changes: { from, to, insert },
+    selection: { anchor: from + cursorOffset }
+  });
+  
+  view.focus();
+  Logger.log(`Tag "${tag}" inserida`);
+}
+
+/**
+ * Configura event listeners para os botoes de quick tags
+ */
+function setupQuickTags(): void {
+  const container = document.querySelector('.quick-tags-container');
+  if (!container) return;
+  
+  container.addEventListener('click', (e) => {
+    const target = e.target as HTMLElement;
+    if (target.classList.contains('tag-btn')) {
+      const tag = target.dataset.tag;
+      if (tag) {
+        insertTag(tag);
+      }
+    }
+  });
+  
+  Logger.success('Quick Tags ativadas');
+}
+
 // Utility Functions
 
 /**
@@ -148,6 +572,7 @@ function initSystem(): void {
   loadDocs();
   initEditor();
   setupEvents();
+  setupQuickTags();
   setupKeyboardNavigation();
   updateMetrics();
   Logger.success('Sistema pronto.');
@@ -217,6 +642,9 @@ function updateEditorDiagnostics(content: string): void {
   // Processar erros e avisos
   const allIssues = [...validation.errors, ...validation.warnings];
   
+  // Armazenar globalmente para tooltip e painel
+  currentIssues = allIssues;
+  
   allIssues.forEach((issue) => {
     const lineIndex = Math.min(issue.line - 1, lines.length - 1);
     const line = lines[lineIndex];
@@ -248,17 +676,17 @@ function updateEditorDiagnostics(content: string): void {
       // Ignorar erros de decoration para uma range específica
     }
   });
+  
+  // Renderizar painel de problemas
+  renderProblemsPanel(allIssues);
 
-  // Log de erros/avisos para o console do sistema
+  // Log de erros/avisos para o console do sistema (apenas se houver novos)
   if (validation.errors.length > 0) {
-    Logger.error(`❌ ${validation.errors.length} erro(s) de sintaxe Markdown encontrado(s)`);
-    validation.errors.forEach((err) => {
-      Logger.log(`  Linha ${err.line}: ${err.message}`, 'error');
-    });
+    Logger.error(`${validation.errors.length} erro(s) de sintaxe Markdown`);
   }
 
   if (validation.warnings.length > 0) {
-    Logger.log(`⚠️ ${validation.warnings.length} aviso(s) Markdown`, 'warning');
+    Logger.log(`${validation.warnings.length} aviso(s) Markdown`, 'warning');
   }
 
   // Aplicar decorations ao editor via StateEffect
@@ -306,6 +734,7 @@ function initEditor(): void {
        markdown(),
        EditorView.lineWrapping,
        markdownDecorationsField,
+       markdownHoverTooltip,
        EditorView.theme({
         '&': { color: '#111827', backgroundColor: '#ffffff' },
         '.cm-content': { caretColor: '#0052cc' },
@@ -317,6 +746,11 @@ function initEditor(): void {
         '.cm-activeLine': { backgroundColor: '#f0f4ff' },
         '.cm-activeLineGutter': { color: '#0052cc', backgroundColor: '#f0f4ff', fontWeight: '600' },
         '.cm-cursor': { borderLeftColor: '#0052cc' },
+        
+        // Selection highlighting - cor azul vibrante
+        '.cm-selectionBackground': { backgroundColor: '#3b82f6 !important' },
+        '&.cm-focused .cm-selectionBackground': { backgroundColor: '#3b82f6 !important' },
+        '.cm-selectionMatch': { backgroundColor: '#fef08a' },
         
         // Markdown specific syntax coloring
         '.cm-heading': { color: '#111827', fontWeight: '700' },

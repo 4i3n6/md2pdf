@@ -732,6 +732,122 @@ nav:focus-visible {
 }
 
 /* ============================================
+   QUICK TAGS PANEL
+   ============================================ */
+
+.quick-tags-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    padding: 8px 10px;
+    background: var(--bg-panel);
+    border-bottom: 1px solid var(--border);
+}
+
+.tag-btn {
+    background: var(--bg-core);
+    color: var(--text-main);
+    border: 1px solid var(--border);
+    padding: 4px 8px;
+    border-radius: 3px;
+    font-size: 11px;
+    font-weight: 600;
+    font-family: var(--font-mono);
+    cursor: pointer;
+    transition: all 0.15s;
+    min-width: 32px;
+    text-align: center;
+}
+
+.tag-btn:hover {
+    background: var(--accent);
+    color: white;
+    border-color: var(--accent);
+}
+
+.tag-btn:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 1px;
+}
+
+.tag-btn:active {
+    transform: scale(0.95);
+}
+
+/* Botoes de destaque colorido */
+.tag-btn-yellow {
+    background: #fef08a;
+    color: #854d0e;
+    border-color: #fde047;
+}
+.tag-btn-yellow:hover {
+    background: #fde047;
+    border-color: #facc15;
+    color: #713f12;
+}
+
+.tag-btn-green {
+    background: #bbf7d0;
+    color: #166534;
+    border-color: #86efac;
+}
+.tag-btn-green:hover {
+    background: #86efac;
+    border-color: #4ade80;
+    color: #14532d;
+}
+
+.tag-btn-blue {
+    background: #bfdbfe;
+    color: #1e40af;
+    border-color: #93c5fd;
+}
+.tag-btn-blue:hover {
+    background: #93c5fd;
+    border-color: #60a5fa;
+    color: #1e3a8a;
+}
+
+.tag-btn-red {
+    background: #fecaca;
+    color: #991b1b;
+    border-color: #fca5a5;
+}
+.tag-btn-red:hover {
+    background: #fca5a5;
+    border-color: #f87171;
+    color: #7f1d1d;
+}
+
+/* ============================================
+   EDITOR SELECTION HIGHLIGHT
+   ============================================ */
+
+/* Cor de selecao mais destacada no CodeMirror */
+.cm-editor .cm-selectionBackground {
+    background: #3b82f6 !important;
+}
+
+.cm-editor.cm-focused .cm-selectionBackground {
+    background: #3b82f6 !important;
+}
+
+.cm-editor .cm-selectionMatch {
+    background: #fef08a !important;
+}
+
+/* Texto selecionado com cor clara para contraste */
+.cm-editor .cm-content ::selection {
+    background: #3b82f6;
+    color: white;
+}
+
+.cm-editor .cm-content ::-moz-selection {
+    background: #3b82f6;
+    color: white;
+}
+
+/* ============================================
    PRINT MEDIA - Maintain accessibility
    ============================================ */
 
@@ -740,4 +856,176 @@ nav:focus-visible {
     .sr-only {
         display: none !important;
     }
+}
+
+/* ============================================
+   PROBLEMS PANEL
+   ============================================ */
+
+.problems-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.problems-badge {
+    font-size: 10px;
+    color: var(--text-dim);
+    font-weight: 400;
+}
+
+.problems-badge.has-problems {
+    color: #f59e0b;
+    font-weight: 700;
+}
+
+.problems-container {
+    max-height: 120px;
+    overflow-y: auto;
+    font-size: 11px;
+    border-bottom: 1px solid var(--border);
+    background: var(--bg-panel);
+}
+
+.problems-empty {
+    padding: 10px;
+    color: var(--text-dim);
+    font-style: italic;
+    text-align: center;
+}
+
+.problem-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 10px;
+    cursor: pointer;
+    border-left: 3px solid transparent;
+    transition: background 0.15s;
+}
+
+.problem-item:hover {
+    background: var(--bg-active);
+}
+
+.problem-item:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: -2px;
+}
+
+.problem-item.problem-error {
+    border-left-color: #dc2626;
+}
+
+.problem-item.problem-warning {
+    border-left-color: #f59e0b;
+}
+
+.problem-item.problem-info {
+    border-left-color: #3b82f6;
+}
+
+.problem-icon {
+    flex-shrink: 0;
+    font-size: 10px;
+}
+
+.problem-location {
+    flex-shrink: 0;
+    color: var(--accent);
+    font-weight: 600;
+    min-width: 45px;
+}
+
+.problem-message {
+    flex: 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.problem-fix-btn {
+    flex-shrink: 0;
+    background: #10b981;
+    color: white;
+    border: none;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-size: 9px;
+    font-weight: 700;
+    cursor: pointer;
+    font-family: var(--font-mono);
+}
+
+.problem-fix-btn:hover {
+    background: #059669;
+}
+
+/* ============================================
+   MARKDOWN VALIDATION TOOLTIP
+   ============================================ */
+
+.md-tooltip {
+    background: #1f2937;
+    color: #f9fafb;
+    padding: 10px 14px;
+    border-radius: 6px;
+    font-size: 12px;
+    max-width: 350px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    border: 1px solid #374151;
+    font-family: var(--font-mono);
+    z-index: 1000;
+}
+
+.md-tooltip-header {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+}
+
+.md-tooltip-icon {
+    flex-shrink: 0;
+    font-size: 12px;
+}
+
+.md-tooltip-icon-error {
+    color: #f87171;
+}
+
+.md-tooltip-icon-warning {
+    color: #fbbf24;
+}
+
+.md-tooltip-icon-info {
+    color: #60a5fa;
+}
+
+.md-tooltip-message {
+    flex: 1;
+    line-height: 1.4;
+}
+
+.md-tooltip-suggestion {
+    margin-top: 10px;
+    padding-top: 10px;
+    border-top: 1px solid #374151;
+}
+
+.md-tooltip-suggestion-label {
+    color: #9ca3af;
+    font-size: 10px;
+    display: block;
+    margin-bottom: 4px;
+}
+
+.md-tooltip-suggestion-code {
+    background: #374151;
+    padding: 4px 8px;
+    border-radius: 4px;
+    color: #10b981;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    display: block;
+    word-break: break-all;
 }
