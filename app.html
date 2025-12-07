@@ -7,7 +7,7 @@
     <title>MD2PDF - Conversor Markdown para PDF</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600;800&family=Fira+Code:wght@400;500;600&family=Merriweather:wght@400;700&family=Open+Sans:wght@400;500;600;700&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
     <link rel="manifest" href="/manifest.webmanifest">
     <meta name="theme-color" content="#ffffff">
 </head>
@@ -73,6 +73,8 @@
             
             <div class="panel-header" role="heading" aria-level="2">QUICK_TAGS</div>
             <div class="quick-tags-container" role="toolbar" aria-label="Inserir elementos Markdown">
+                <button class="tag-btn tag-btn-clear" data-tag="clear" title="Remover tags HTML da selecao">CLR</button>
+                <button class="tag-btn" data-tag="br" title="Quebra de linha">&crarr;</button>
                 <button class="tag-btn" data-tag="hr" title="Linha horizontal / Quebra de pagina">---</button>
                 <button class="tag-btn" data-tag="code" title="Bloco de codigo">```</button>
                 <button class="tag-btn" data-tag="quote" title="Citacao (blockquote)">&gt;</button>
@@ -89,6 +91,18 @@
                 <button class="tag-btn tag-btn-green" data-tag="mark-green" title="Destaque verde">■</button>
                 <button class="tag-btn tag-btn-blue" data-tag="mark-blue" title="Destaque azul">■</button>
                 <button class="tag-btn tag-btn-red" data-tag="mark-red" title="Destaque vermelho">■</button>
+                <select class="tag-select" id="tag-font" title="Aplicar fonte na selecao">
+                    <option value="">Aa</option>
+                    <option value="Inter, system-ui, sans-serif">Inter</option>
+                    <option value="'Roboto', sans-serif">Roboto</option>
+                    <option value="'JetBrains Mono', monospace">Mono</option>
+                    <option value="Georgia, serif">Georgia</option>
+                    <option value="Arial, sans-serif">Arial</option>
+                </select>
+                <button class="tag-btn" data-tag="align-left" title="Alinhar esquerda">&lArr;</button>
+                <button class="tag-btn" data-tag="align-center" title="Centralizar">&hArr;</button>
+                <button class="tag-btn" data-tag="align-right" title="Alinhar direita">&rArr;</button>
+                <button class="tag-btn" data-tag="align-justify" title="Justificar">&equiv;</button>
             </div>
             
             <div class="panel-header problems-header" role="heading" aria-level="2">
@@ -143,15 +157,47 @@
             
             <!-- Preview Pane -->
             <div class="pane-container preview-pane">
-                <header class="pane-header" id="preview-header">
-                    <h2 style="margin: 0; font-size: 12px; font-weight: 600;">RENDER_OUTPUT (A4 Preview)</h2>
-                    <span 
-                        id="status-indicator" 
-                        class="status-dot" 
-                        role="status"
-                        aria-label="Indicador de status de renderização"
-                        aria-live="polite">
-                    </span>
+                <header class="pane-header preview-header-extended" id="preview-header">
+                    <div class="preview-header-top">
+                        <h2 style="margin: 0; font-size: 12px; font-weight: 600;">RENDER_OUTPUT</h2>
+                        <span 
+                            id="status-indicator" 
+                            class="status-dot" 
+                            role="status"
+                            aria-label="Indicador de status de renderização"
+                            aria-live="polite">
+                        </span>
+                    </div>
+                    <div class="preview-controls">
+                        <select id="preview-font" class="preview-select" title="Fonte do documento">
+                            <optgroup label="Modernas">
+                                <option value="Inter, system-ui, sans-serif">Inter</option>
+                                <option value="'Roboto', sans-serif">Roboto</option>
+                                <option value="'Open Sans', sans-serif">Open Sans</option>
+                            </optgroup>
+                            <optgroup label="Monospace">
+                                <option value="'JetBrains Mono', monospace" selected>JetBrains Mono</option>
+                                <option value="'Fira Code', monospace">Fira Code</option>
+                                <option value="'Courier New', monospace">Courier New</option>
+                            </optgroup>
+                            <optgroup label="Serif">
+                                <option value="Georgia, serif">Georgia</option>
+                                <option value="'Times New Roman', serif">Times New Roman</option>
+                                <option value="'Merriweather', serif">Merriweather</option>
+                            </optgroup>
+                            <optgroup label="Sans-serif">
+                                <option value="Arial, sans-serif">Arial</option>
+                                <option value="Verdana, sans-serif">Verdana</option>
+                                <option value="Helvetica, sans-serif">Helvetica</option>
+                            </optgroup>
+                        </select>
+                        <div class="align-buttons" role="group" aria-label="Alinhamento do texto">
+                            <button class="align-btn active" data-align="left" title="Alinhar esquerda" aria-pressed="true">&lArr;</button>
+                            <button class="align-btn" data-align="center" title="Centralizar" aria-pressed="false">&hArr;</button>
+                            <button class="align-btn" data-align="right" title="Alinhar direita" aria-pressed="false">&rArr;</button>
+                            <button class="align-btn" data-align="justify" title="Justificar" aria-pressed="false">&equiv;</button>
+                        </div>
+                    </div>
                 </header>
                 <div id="preview-wrapper" role="region" aria-label="Visualização de saída em A4" aria-describedby="preview-header">
                     <div id="preview" class="markdown-body" role="document"></div>

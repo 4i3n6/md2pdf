@@ -85,6 +85,177 @@ const markdownDecorationsField = StateField.define({
 // Global issues storage for tooltip and panel
 let currentIssues: MarkdownError[] = [];
 
+// Document preferences type
+type DocumentPreferences = {
+  font: string;
+  align: string;
+};
+
+const DEFAULT_PREFS: DocumentPreferences = {
+  font: "'JetBrains Mono', monospace",
+  align: 'left'
+};
+
+/**
+ * Obtém preferências de um documento do localStorage
+ */
+function getDocPreferences(docId: number): DocumentPreferences {
+  const key = `md2pdf-doc-prefs-${docId}`;
+  const saved = localStorage.getItem(key);
+  if (saved) {
+    try {
+      return JSON.parse(saved);
+    } catch {
+      return { ...DEFAULT_PREFS };
+    }
+  }
+  return { ...DEFAULT_PREFS };
+}
+
+/**
+ * Salva preferências de um documento no localStorage
+ */
+function saveDocPreferences(docId: number, prefs: DocumentPreferences): void {
+  const key = `md2pdf-doc-prefs-${docId}`;
+  localStorage.setItem(key, JSON.stringify(prefs));
+}
+
+/**
+ * Aplica fonte ao preview do documento
+ */
+function applyPreviewFont(font: string): void {
+  const preview = document.getElementById('preview');
+  if (preview) {
+    preview.style.fontFamily = font;
+  }
+  
+  // Atualizar dropdown visual
+  const fontSelect = document.getElementById('preview-font') as HTMLSelectElement;
+  if (fontSelect) {
+    fontSelect.value = font;
+  }
+  
+  // Salvar preferência do documento atual
+  if (state.currentId) {
+    const prefs = getDocPreferences(state.currentId);
+    prefs.font = font;
+    saveDocPreferences(state.currentId, prefs);
+  }
+}
+
+/**
+ * Aplica alinhamento ao preview do documento
+ */
+function applyPreviewAlign(align: string): void {
+  const preview = document.getElementById('preview');
+  if (preview) {
+    preview.style.textAlign = align;
+  }
+  
+  // Atualizar botões visuais
+  updateAlignButtons(align);
+  
+  // Salvar preferência do documento atual
+  if (state.currentId) {
+    const prefs = getDocPreferences(state.currentId);
+    prefs['align'] = align;
+    saveDocPreferences(state.currentId, prefs);
+  }
+}
+
+/**
+ * Atualiza estado visual dos botões de alinhamento
+ */
+function updateAlignButtons(activeAlign: string): void {
+  const buttons = document.querySelectorAll('.align-btn');
+  buttons.forEach(btn => {
+    const btnAlign = (btn as HTMLElement).dataset['align'];
+    if (btnAlign === activeAlign) {
+      btn.classList.add('active');
+      btn.setAttribute('aria-pressed', 'true');
+    } else {
+      btn.classList.remove('active');
+      btn.setAttribute('aria-pressed', 'false');
+    }
+  });
+}
+
+/**
+ * Carrega preferências de um documento e aplica ao preview
+ */
+function loadDocPreferences(docId: number): void {
+  const prefs = getDocPreferences(docId);
+  applyPreviewFont(prefs.font);
+  applyPreviewAlign(prefs.align);
+}
+
+/**
+ * Configura event listeners dos controles do preview
+ */
+function setupPreviewControls(): void {
+  // Dropdown de fonte
+  const fontSelect = document.getElementById('preview-font') as HTMLSelectElement | null;
+  if (fontSelect) {
+    fontSelect.addEventListener('change', (e) => {
+      const target = e.target as HTMLSelectElement;
+      const font = target.value;
+      if (font) {
+        applyPreviewFont(font);
+        const fontName = font.split(',')[0]?.replace(/'/g, '') || font;
+        Logger.log(`Fonte do documento: ${fontName}`);
+      }
+    });
+  }
+  
+  // Botões de alinhamento
+  document.querySelectorAll('.align-btn').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      const target = e.target as HTMLElement;
+      const align = target.dataset['align'];
+      if (align) {
+        applyPreviewAlign(align);
+        Logger.log(`Alinhamento: ${align}`);
+      }
+    });
+  });
+  
+  // Dropdown de fonte para seleção (QUICK_TAGS)
+  const tagFontSelect = document.getElementById('tag-font') as HTMLSelectElement;
+  tagFontSelect?.addEventListener('change', (e) => {
+    const font = (e.target as HTMLSelectElement).value;
+    if (font) {
+      insertFontTag(font);
+      (e.target as HTMLSelectElement).selectedIndex = 0; // Reset para "Aa"
+    }
+  });
+  
+  Logger.success('Controles do preview ativados');
+}
+
+/**
+ * Insere tag de fonte na seleção do editor
+ */
+function insertFontTag(font: string): void {
+  if (!state.editor) return;
+  
+  const { from, to } = state.editor.state.selection.main;
+  if (from === to) {
+    Logger.log('Selecione um texto para aplicar a fonte', 'warning');
+    return;
+  }
+  
+  const selectedText = state.editor.state.sliceDoc(from, to);
+  const insert = `<span style="font-family: ${font}">${selectedText}</span>`;
+  
+  state.editor.dispatch({
+    changes: { from, to, insert },
+    selection: { anchor: from + insert.length }
+  });
+  
+  state.editor.focus();
+  Logger.log(`Fonte aplicada na selecao`);
+}
+
 /**
  * Escapa HTML para exibição segura
  */
@@ -268,8 +439,11 @@ function renderProblemsPanel(issues: MarkdownError[]): void {
     // Click para navegar (exceto no botão FIX)
     item.addEventListener('click', (e) => {
       if ((e.target as HTMLElement).classList.contains('problem-fix-btn')) {
-        const idx = parseInt((e.target as HTMLElement).dataset.index || '0');
-        applyFix(issues[idx]);
+        const idx = parseInt((e.target as HTMLElement).dataset['index'] || '0');
+        const issueToFix = issues[idx];
+        if (issueToFix) {
+          applyFix(issueToFix);
+        }
         return;
       }
       navigateToIssue(issue);
@@ -304,8 +478,14 @@ function insertTag(tag: string): void {
   let cursorOffset = 0;
   
   switch (tag) {
+    case 'br':
+      // Quebra de linha simples (Markdown: linha vazia)
+      insert = '\n\n';
+      cursorOffset = insert.length;
+      break;
+      
     case 'hr':
-      // Quebra de linha / linha horizontal
+      // Linha horizontal / quebra de pagina
       insert = '\n---\n';
       cursorOffset = insert.length;
       break;
@@ -472,6 +652,33 @@ function insertTag(tag: string): void {
       }
       break;
       
+    case 'clear':
+      // Remover tags HTML da selecao
+      if (hasSelection) {
+        insert = selectedText.replace(/<[^>]*>/g, '');
+        cursorOffset = insert.length;
+        Logger.log('Tags HTML removidas da selecao');
+      } else {
+        Logger.log('Selecione um texto para remover tags', 'warning');
+        return;
+      }
+      break;
+      
+    case 'align-left':
+    case 'align-center':
+    case 'align-right':
+    case 'align-justify':
+      // Alinhamento por selecao
+      if (hasSelection) {
+        const alignValue = tag.replace('align-', '');
+        insert = `<div style="text-align: ${alignValue}">${selectedText}</div>`;
+        cursorOffset = insert.length;
+      } else {
+        Logger.log('Selecione um texto para alinhar', 'warning');
+        return;
+      }
+      break;
+      
     default:
       return;
   }
@@ -496,7 +703,7 @@ function setupQuickTags(): void {
   container.addEventListener('click', (e) => {
     const target = e.target as HTMLElement;
     if (target.classList.contains('tag-btn')) {
-      const tag = target.dataset.tag;
+      const tag = target.dataset['tag'];
       if (tag) {
         insertTag(tag);
       }
@@ -573,6 +780,7 @@ function initSystem(): void {
   initEditor();
   setupEvents();
   setupQuickTags();
+  setupPreviewControls();
   setupKeyboardNavigation();
   updateMetrics();
   Logger.success('Sistema pronto.');
@@ -803,6 +1011,10 @@ function initEditor(): void {
 
   if (doc) {
     renderPreview(doc.content);
+    // Carregar preferências do documento inicial
+    if (state.currentId) {
+      loadDocPreferences(state.currentId);
+    }
   }
 }
 
@@ -886,6 +1098,7 @@ function switchDoc(id: number): void {
     });
     renderPreview(doc.content);
     renderList();
+    loadDocPreferences(id);
     Logger.log(`Alternado para doc ID: ${id}`);
   }
 }

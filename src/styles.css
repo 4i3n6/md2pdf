@@ -256,6 +256,17 @@ body {
     letter-spacing: 0.5px;
 }
 
+/* Paragrafos e quebras de linha */
+.markdown-body p {
+    margin: 0 0 1em 0;
+}
+
+.markdown-body br {
+    display: block;
+    content: "";
+    margin: 0.5em 0;
+}
+
 /* Lists - Melhorado para hierarquia visual */
 .markdown-body ul,
 .markdown-body ol {
@@ -817,6 +828,111 @@ nav:focus-visible {
     background: #fca5a5;
     border-color: #f87171;
     color: #7f1d1d;
+}
+
+/* CLR button - destaque especial */
+.tag-btn-clear {
+    background: #fef2f2;
+    color: #991b1b;
+    border-color: #fecaca;
+    font-weight: 700;
+}
+.tag-btn-clear:hover {
+    background: #dc2626;
+    color: white;
+    border-color: #dc2626;
+}
+
+/* Tag select (dropdown de fonte) */
+.tag-select {
+    background: var(--bg-core);
+    border: 1px solid var(--border);
+    color: var(--text-main);
+    padding: 4px 6px;
+    font-size: 10px;
+    font-family: var(--font-mono);
+    border-radius: 3px;
+    cursor: pointer;
+    min-width: 50px;
+}
+.tag-select:hover {
+    border-color: var(--accent);
+}
+.tag-select:focus {
+    outline: 2px solid var(--accent);
+    outline-offset: 1px;
+}
+
+/* ============================================
+   PREVIEW CONTROLS (Font & Alignment)
+   ============================================ */
+
+.preview-header-extended {
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 6px;
+    padding: 8px 10px !important;
+}
+
+.preview-header-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.preview-controls {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.preview-select {
+    background: var(--bg-core);
+    border: 1px solid var(--border);
+    color: var(--text-main);
+    padding: 3px 6px;
+    font-size: 10px;
+    font-family: var(--font-mono);
+    border-radius: 3px;
+    cursor: pointer;
+    min-width: 120px;
+}
+.preview-select:hover {
+    border-color: var(--accent);
+}
+.preview-select:focus {
+    outline: 2px solid var(--accent);
+    outline-offset: 1px;
+}
+
+.align-buttons {
+    display: flex;
+    gap: 2px;
+}
+
+.align-btn {
+    background: var(--bg-core);
+    border: 1px solid var(--border);
+    color: var(--text-main);
+    padding: 3px 8px;
+    font-size: 12px;
+    cursor: pointer;
+    border-radius: 2px;
+    transition: all 0.15s;
+}
+.align-btn:hover {
+    background: var(--bg-active);
+    border-color: var(--accent);
+}
+.align-btn.active {
+    background: var(--accent);
+    color: white;
+    border-color: var(--accent);
+}
+.align-btn:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 1px;
 }
 
 /* ============================================
