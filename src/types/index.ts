@@ -109,3 +109,64 @@ export interface DocumentAnalysis {
   tables: number
   headings: number
 }
+
+// ============================================
+// STORAGE PROVIDER INTERFACES
+// ============================================
+
+/**
+ * Metadata for a stored document
+ */
+export interface StorageDocumentMeta {
+  id: string
+  name: string
+  size: number
+  updated: number
+  created: number
+}
+
+/**
+ * Result of a storage operation
+ */
+export interface StorageResult<T = void> {
+  success: boolean
+  data?: T
+  error?: string
+}
+
+/**
+ * Interface for storage providers (local, disk, cloud)
+ */
+export interface StorageProvider {
+  /** Provider type identifier */
+  readonly type: StorageType
+  
+  /** Check if provider is available */
+  isAvailable(): boolean
+  
+  /** Save document content */
+  save(doc: Document): Promise<StorageResult<Document>>
+  
+  /** Load document content by ID */
+  load(id: string): Promise<StorageResult<Document>>
+  
+  /** Delete document */
+  delete(id: string): Promise<StorageResult>
+  
+  /** List all documents */
+  list(): Promise<StorageResult<StorageDocumentMeta[]>>
+  
+  /** Check if document exists */
+  exists(id: string): Promise<boolean>
+}
+
+/**
+ * Options for storage migration
+ */
+export interface MigrationOptions {
+  sourceType: StorageType
+  targetType: StorageType
+  documentId: number
+  /** If true, delete from source after successful migration */
+  deleteSource?: boolean
+}

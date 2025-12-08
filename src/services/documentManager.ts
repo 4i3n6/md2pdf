@@ -3,12 +3,13 @@
  * 
  * Gerencia estado de documentos com:
  * - CRUD operations
- * - Persistência em localStorage
+ * - Persistência via StorageManager (local/disk/cloud)
  * - Observer pattern para notificações
  * - Type-safe document management
  */
 
-import type { Document, LoggerInterface } from '@/types/index'
+import type { Document, LoggerInterface, StorageType, MigrationOptions } from '@/types/index'
+import { storageManager } from './storageManager'
 
 /**
  * Tipo para callbacks de mudança de documentos
@@ -334,6 +335,100 @@ export class DocumentManager {
     this.docs = [this.defaultDoc]
     this.save()
     this.logger?.log?.('Todos os documentos foram limpos')
+  }
+
+  // ============================================
+  // STORAGE MANAGER INTEGRATION
+  // ============================================
+
+  /**
+   * Migra um documento para outro tipo de storage
+   * 
+   * @param {number} id - ID do documento
+   * @param {StorageType} targetStorage - Tipo de storage destino
+   * @param {boolean} deleteFromSource - Se true, remove do storage original
+   * @returns {Promise<Document | undefined>} Documento migrado ou undefined
+   */
+  async migrateStorage(
+    id: number,
+    targetStorage: StorageType,
+    deleteFromSource: boolean = false
+  ): Promise<Document | undefined> {
+    const doc = this.getById(id)
+    if (!doc) {
+      this.logger?.error?.(`Documento ${id} não encontrado para migração`)
+      return undefined
+    }
+
+    const options: MigrationOptions = {
+      sourceType: doc.storage,
+      targetType: targetStorage,
+      documentId: id,
+      deleteSource: deleteFromSource
+    }
+
+    const result = await storageManager.migrate(doc, options)
+    
+    if (result.success && result.data) {
+      // Atualizar documento local
+      Object.assign(doc, result.data)
+      this.save()
+      this.logger?.log?.(`Documento ${id} migrado para ${targetStorage}`)
+      return doc
+    }
+
+    this.logger?.error?.(result.error || 'Erro na migração')
+    return undefined
+  }
+
+  /**
+   * Salva documento no storage apropriado (baseado em doc.storage)
+   * 
+   * @param {number} id - ID do documento
+   * @returns {Promise<boolean>} true se salvou com sucesso
+   */
+  async saveToStorage(id: number): Promise<boolean> {
+    const doc = this.getById(id)
+    if (!doc) {
+      this.logger?.error?.(`Documento ${id} não encontrado`)
+      return false
+    }
+
+    const result = await storageManager.save(doc)
+    
+    if (result.success && result.data) {
+      // Atualizar documento local com dados retornados
+      Object.assign(doc, result.data)
+      this.save() // Persistir estado local
+      return true
+    }
+
+    this.logger?.error?.(result.error || 'Erro ao salvar')
+    return false
+  }
+
+  /**
+   * Registra um fileHandle no DiskStorageProvider
+   * 
+   * @param {number} id - ID do documento
+   * @param {FileSystemFileHandle} handle - Handle do arquivo
+   */
+  registerDiskHandle(id: number, handle: FileSystemFileHandle): void {
+    storageManager.disk.registerHandle(String(id), handle)
+  }
+
+  /**
+   * Obtém o storageManager para operações avançadas
+   */
+  getStorageManager() {
+    return storageManager
+  }
+
+  /**
+   * Lista tipos de storage disponíveis
+   */
+  getAvailableStorageTypes(): StorageType[] {
+    return storageManager.getAvailableTypes()
   }
 }
 
