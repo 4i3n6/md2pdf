@@ -235,15 +235,24 @@ function updateSaveStatus(): void {
   
   if (!statusEl) return;
   
-  // Atualizar badge de storage
+  // Atualizar badge de storage com labels claros
   if (storageEl) {
     storageEl.className = `storage-badge storage-${doc.storage}`;
-    storageEl.textContent = doc.storage.toUpperCase();
-    storageEl.title = doc.storage === 'local' 
-      ? 'Armazenado no navegador' 
-      : doc.storage === 'disk' 
-      ? 'Arquivo no disco' 
-      : 'Sincronizado na nuvem';
+    
+    // Labels mais descritivos para cada tipo de storage
+    let label = 'BROWSER';
+    let title = 'Armazenado no navegador (localStorage)';
+    
+    if (doc.storage === 'disk') {
+      label = 'ARQUIVO';
+      title = 'Arquivo salvo no disco local';
+    } else if (doc.storage === 'cloud') {
+      label = 'NUVEM';
+      title = 'Sincronizado na nuvem';
+    }
+    
+    storageEl.textContent = label;
+    storageEl.title = title;
   }
   
   // Determinar status visual

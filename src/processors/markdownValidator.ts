@@ -45,18 +45,35 @@ export function validateMarkdown(markdown: string): ValidationResult {
   }
 
   const lines = markdown.split('\n');
+  
+  // Detectar linhas que estao dentro de blocos de codigo para ignorar validacao
+  const linesInCodeBlock = new Set<number>();
+  let inCodeBlock = false;
+  lines.forEach((line, index) => {
+    if (line.trim().startsWith('```')) {
+      inCodeBlock = !inCodeBlock;
+      linesInCodeBlock.add(index);
+    } else if (inCodeBlock) {
+      linesInCodeBlock.add(index);
+    }
+  });
 
   // Validações por linha
   lines.forEach((line, lineIndex) => {
     const lineNum = lineIndex + 1;
     const trimmed = line.trim();
+    
+    // IMPORTANTE: Ignorar linhas dentro de blocos de codigo
+    if (linesInCodeBlock.has(lineIndex)) {
+      return;
+    }
 
     // 1. Validar headings (###...)
     const headingMatch = line.match(/^(#+)(.*)$/);
     if (headingMatch) {
-      const hashes = headingMatch[1];
+      const hashes = headingMatch[1] || '';
       const hashCount = hashes.length;
-      const rest = headingMatch[2];
+      const rest = headingMatch[2] || '';
       
       if (hashCount > 6) {
         errors.push({

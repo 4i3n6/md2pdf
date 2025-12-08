@@ -340,15 +340,30 @@ body {
     background: #f3f4f6; 
     border: 1px solid #d1d5db; 
     padding: 2px 4px; 
-    color: #be185d; /* Rosa escuro técnico */
+    color: #be185d; /* Rosa escuro tecnico */
     font-weight: 600;
+    font-family: var(--font-mono);
+    font-size: 0.9em;
+    border-radius: 3px;
+}
+
+/* Codigo inline dentro de pre NAO deve ter estilo de inline */
+.markdown-body pre code {
+    background: transparent;
+    border: none;
+    padding: 0;
+    color: inherit;
+    font-weight: normal;
+    border-radius: 0;
 }
 
 .markdown-body pre { 
     background: #f8fafc; 
     border: 1px solid var(--border); 
     padding: 15px; 
-    overflow-x: auto; 
+    overflow-x: auto;
+    border-radius: 4px;
+    margin: 1em 0;
 }
 
 .markdown-body blockquote { 
@@ -498,12 +513,14 @@ body {
 /* Markdown Code Block Styling */
 .markdown-code-block {
     background: #f6f8fa !important;
-    border: 1px solid #e1e4e8;
+    border: 1px solid #e1e4e8 !important;
+    border-left: 4px solid #0052cc !important; /* Barra lateral azul como indicador visual */
     border-radius: 4px;
     margin: 15px 0;
     padding: 12px 15px !important;
     overflow-x: auto;
     page-break-inside: avoid;
+    position: relative;
 }
 
 .markdown-code-block::before {
@@ -515,13 +532,35 @@ body {
     margin-bottom: 8px;
     text-transform: uppercase;
     letter-spacing: 0.5px;
+    background: #e1e4e8;
+    padding: 2px 6px;
+    border-radius: 3px;
+    display: inline-block;
 }
 
-.markdown-code-block.hljs code {
-    font-family: var(--font-mono);
-    font-size: 12px;
-    line-height: 1.5;
-    color: #24292e;
+/* Se nao tiver linguagem, esconder o label */
+.markdown-code-block[data-lang=""]::before,
+.markdown-code-block[data-lang="plaintext"]::before {
+    display: none;
+}
+
+.markdown-code-block code {
+    font-family: var(--font-mono) !important;
+    font-size: 12px !important;
+    line-height: 1.6 !important;
+    color: #24292e !important;
+    background: transparent !important;
+    border: none !important;
+    padding: 0 !important;
+    display: block;
+    white-space: pre;
+    overflow-x: auto;
+}
+
+/* Checkboxes NAO devem aparecer em blocos de codigo */
+.markdown-code-block input[type="checkbox"],
+pre input[type="checkbox"] {
+    display: none !important;
 }
 
 .markdown-code-inline {
@@ -1208,30 +1247,51 @@ nav:focus-visible {
 
 /* Storage Badge */
 .storage-badge {
-    padding: 2px 6px;
-    border-radius: 2px;
+    padding: 3px 8px;
+    border-radius: 3px;
     font-size: 9px;
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.5px;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.storage-badge::before {
+    font-size: 10px;
 }
 
 .storage-local {
-    background: #e5e7eb;
-    color: #4b5563;
+    background: linear-gradient(135deg, #f3f4f6 0%, #e5e7eb 100%);
+    color: #6b7280;
     border: 1px solid #d1d5db;
 }
 
+.storage-local::before {
+    content: "\1F4BE"; /* Floppy disk emoji - representa browser storage */
+}
+
 .storage-disk {
-    background: #dbeafe;
+    background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
     color: #1d4ed8;
-    border: 1px solid #93c5fd;
+    border: 1px solid #60a5fa;
+    box-shadow: 0 1px 3px rgba(29, 78, 216, 0.15);
+}
+
+.storage-disk::before {
+    content: "\1F4C1"; /* Folder emoji - representa arquivo no disco */
 }
 
 .storage-cloud {
-    background: #d1fae5;
+    background: linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%);
     color: #047857;
-    border: 1px solid #6ee7b7;
+    border: 1px solid #34d399;
+    box-shadow: 0 1px 3px rgba(4, 120, 87, 0.15);
+}
+
+.storage-cloud::before {
+    content: "\2601"; /* Cloud emoji */
 }
 
 /* Save Status Indicator */

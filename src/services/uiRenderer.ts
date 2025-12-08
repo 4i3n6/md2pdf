@@ -78,27 +78,34 @@ export class UIRenderer {
       name.setAttribute('aria-hidden', 'false')
       nameContainer.appendChild(name)
 
-      // Storage badge (pequeno)
+      // Storage badge (pequeno) com icone
       const storageBadge = document.createElement('span')
       storageBadge.className = `doc-storage-badge doc-storage-${doc.storage}`
-      const storageLabels: Record<string, string> = {
-        local: 'L',
-        disk: 'D',
-        cloud: 'C'
-      }
-      storageBadge.textContent = storageLabels[doc.storage] || 'L'
-      storageBadge.style.cssText = 'font-size: 8px; padding: 1px 3px; border-radius: 2px; flex-shrink: 0;'
       
-      if (doc.storage === 'local') {
-        storageBadge.style.background = '#e5e7eb'
-        storageBadge.style.color = '#6b7280'
-      } else if (doc.storage === 'disk') {
-        storageBadge.style.background = '#dbeafe'
-        storageBadge.style.color = '#1d4ed8'
-      } else {
-        storageBadge.style.background = '#d1fae5'
-        storageBadge.style.color = '#047857'
+      // Icones e cores mais distintivos
+      let badgeIcon = '\uD83D\uDCBE' // Floppy disk para local
+      let badgeTitle = 'Browser'
+      let badgeBg = '#f3f4f6'
+      let badgeColor = '#6b7280'
+      let badgeBorder = '#d1d5db'
+      
+      if (doc.storage === 'disk') {
+        badgeIcon = '\uD83D\uDCC1' // Folder para disk
+        badgeTitle = 'Arquivo'
+        badgeBg = '#dbeafe'
+        badgeColor = '#1d4ed8'
+        badgeBorder = '#60a5fa'
+      } else if (doc.storage === 'cloud') {
+        badgeIcon = '\u2601' // Cloud
+        badgeTitle = 'Nuvem'
+        badgeBg = '#d1fae5'
+        badgeColor = '#047857'
+        badgeBorder = '#34d399'
       }
+      
+      storageBadge.textContent = badgeIcon
+      storageBadge.title = badgeTitle
+      storageBadge.style.cssText = `font-size: 10px; padding: 2px 4px; border-radius: 2px; flex-shrink: 0; background: ${badgeBg}; color: ${badgeColor}; border: 1px solid ${badgeBorder};`
 
       const deleteBtn = document.createElement('span')
       deleteBtn.textContent = '[x]'
