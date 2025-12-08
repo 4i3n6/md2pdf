@@ -133,24 +133,52 @@
         <main class="workspace" role="main" id="main-editor" aria-label="Espaço de trabalho - Editor e Visualização">
             <!-- Editor Pane -->
             <div class="pane-container editor-pane">
-                <header class="pane-header" id="editor-header">
-                    <h2 style="margin: 0; font-size: 12px; font-weight: 600;">INPUT_STREAM (MD)</h2>
-                    <label for="doc-name" class="sr-only">Nome do documento</label>
-                    <input 
-                        type="text" 
-                        id="doc-name" 
-                        class="bare-input" 
-                        value="Untitled"
-                        aria-label="Nome do documento"
-                        aria-describedby="editor-header"
-                        spellcheck="true">
-                    <button 
-                        id="copy-md-btn" 
-                        class="icon-btn copy-btn" 
-                        aria-label="Copiar conteúdo Markdown"
-                        title="Copiar conteúdo Markdown (Ctrl+Shift+C)">
-                        [ COPY ]
-                    </button>
+                <header class="pane-header editor-header-extended" id="editor-header">
+                    <div class="editor-header-top">
+                        <h2 style="margin: 0; font-size: 12px; font-weight: 600;">INPUT_STREAM</h2>
+                        <label for="doc-name" class="sr-only">Nome do documento</label>
+                        <input 
+                            type="text" 
+                            id="doc-name" 
+                            class="bare-input" 
+                            value="Untitled"
+                            aria-label="Nome do documento"
+                            aria-describedby="editor-header"
+                            spellcheck="true">
+                    </div>
+                    <div class="editor-controls">
+                        <span 
+                            id="storage-badge" 
+                            class="storage-badge storage-local" 
+                            role="status" 
+                            aria-label="Tipo de armazenamento"
+                            title="Armazenado no navegador">
+                            LOCAL
+                        </span>
+                        <span 
+                            id="save-status" 
+                            class="save-status save-status-saved" 
+                            role="status" 
+                            aria-live="polite"
+                            aria-label="Status de salvamento">
+                            <span class="save-dot"></span>
+                            <span class="save-text">Salvo</span>
+                        </span>
+                        <button 
+                            id="force-save-btn" 
+                            class="icon-btn save-btn" 
+                            aria-label="Forcar salvamento"
+                            title="Forcar salvamento (Ctrl+S)">
+                            &#x21bb;
+                        </button>
+                        <button 
+                            id="copy-md-btn" 
+                            class="icon-btn copy-btn" 
+                            aria-label="Copiar conteudo Markdown"
+                            title="Copiar conteudo Markdown (Ctrl+Shift+C)">
+                            COPY
+                        </button>
+                    </div>
                 </header>
                 <div id="editor" class="editor-frame" role="textbox" aria-multiline="true" aria-label="Editor de Markdown"></div>
             </div>

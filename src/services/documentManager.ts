@@ -26,7 +26,10 @@ export class DocumentManager {
     id: 1,
     name: 'README.md',
     content: '# SISTEMA INICIADO\n\nPainel carregado com sucesso.\n\n- Editor Ativo\n- Renderizador Pronto\n- Memória OK',
-    updated: Date.now()
+    updated: Date.now(),
+    storage: 'local',
+    lastSaved: Date.now(),
+    isDirty: false
   }
 
   constructor(private logger?: LoggerInterface) {}
@@ -54,6 +57,9 @@ export class DocumentManager {
         this.docs = JSON.parse(raw)
         if (this.docs.length === 0) {
           this.docs = [this.defaultDoc]
+        } else {
+          // Migrar documentos antigos que não têm os novos campos
+          this.migrateDocuments()
         }
       } else {
         this.docs = [this.defaultDoc]
@@ -63,6 +69,40 @@ export class DocumentManager {
       const errorMessage = e instanceof Error ? e.message : String(e)
       this.logger?.error?.(`Falha ao carregar documentos: ${errorMessage}`)
       this.docs = [this.defaultDoc]
+    }
+  }
+
+  /**
+   * Migra documentos antigos para incluir novos campos
+   * 
+   * @private
+   * @returns {void}
+   */
+  private migrateDocuments(): void {
+    let needsSave = false
+    
+    this.docs = this.docs.map((doc) => {
+      // Verificar se precisa migrar (campo storage não existe)
+      if (doc.storage === undefined) {
+        needsSave = true
+        return {
+          ...doc,
+          storage: 'local' as const,
+          lastSaved: doc.updated || Date.now(),
+          isDirty: false
+        }
+      }
+      return doc
+    })
+    
+    if (needsSave) {
+      this.logger?.log?.('Documentos migrados para novo formato')
+      // Salvar sem notificar observers (ainda não inicializados)
+      try {
+        localStorage.setItem(this.STORAGE_KEY, JSON.stringify(this.docs))
+      } catch (e) {
+        this.logger?.error?.(`Erro ao salvar migração: ${String(e)}`)
+      }
     }
   }
 
@@ -135,7 +175,10 @@ export class DocumentManager {
        id: Date.now(),
        name: docName,
        content: '',
-       updated: Date.now()
+       updated: Date.now(),
+       storage: 'local',
+       lastSaved: Date.now(),
+       isDirty: false
      }
      this.docs.unshift(newDoc)
      this.save()

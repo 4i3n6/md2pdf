@@ -44,7 +44,7 @@ export class UIRenderer {
     // Limpar container
     container.innerHTML = ''
 
-    documents.forEach((doc: Document, index: number) => {
+    documents.forEach((doc: Document) => {
       const item = document.createElement('div')
       item.className = `document-item ${doc.id === activeId ? 'active' : ''}`
       
@@ -56,10 +56,49 @@ export class UIRenderer {
       item.setAttribute('aria-label', `Documento: ${doc.name}`)
       item.setAttribute('title', `Clique para abrir ${doc.name} (Delete para remover)`)
 
+      // Container para nome + indicadores
+      const nameContainer = document.createElement('div')
+      nameContainer.className = 'doc-name-container'
+      nameContainer.style.cssText = 'display: flex; align-items: center; gap: 6px; flex: 1; min-width: 0;'
+
+      // Dirty indicator
+      if (doc.isDirty) {
+        const dirtyDot = document.createElement('span')
+        dirtyDot.className = 'doc-dirty-dot'
+        dirtyDot.style.cssText = 'width: 6px; height: 6px; border-radius: 50%; background: #f59e0b; flex-shrink: 0;'
+        dirtyDot.setAttribute('title', 'Nao salvo')
+        dirtyDot.setAttribute('aria-label', 'Documento modificado')
+        nameContainer.appendChild(dirtyDot)
+      }
+
       const name = document.createElement('span')
       name.textContent = doc.name
       name.className = 'doc-name'
+      name.style.cssText = 'overflow: hidden; text-overflow: ellipsis; white-space: nowrap;'
       name.setAttribute('aria-hidden', 'false')
+      nameContainer.appendChild(name)
+
+      // Storage badge (pequeno)
+      const storageBadge = document.createElement('span')
+      storageBadge.className = `doc-storage-badge doc-storage-${doc.storage}`
+      const storageLabels: Record<string, string> = {
+        local: 'L',
+        disk: 'D',
+        cloud: 'C'
+      }
+      storageBadge.textContent = storageLabels[doc.storage] || 'L'
+      storageBadge.style.cssText = 'font-size: 8px; padding: 1px 3px; border-radius: 2px; flex-shrink: 0;'
+      
+      if (doc.storage === 'local') {
+        storageBadge.style.background = '#e5e7eb'
+        storageBadge.style.color = '#6b7280'
+      } else if (doc.storage === 'disk') {
+        storageBadge.style.background = '#dbeafe'
+        storageBadge.style.color = '#1d4ed8'
+      } else {
+        storageBadge.style.background = '#d1fae5'
+        storageBadge.style.color = '#047857'
+      }
 
       const deleteBtn = document.createElement('span')
       deleteBtn.textContent = '[x]'
@@ -81,7 +120,8 @@ export class UIRenderer {
         }
       })
 
-      item.appendChild(name)
+      item.appendChild(nameContainer)
+      item.appendChild(storageBadge)
       item.appendChild(deleteBtn)
 
       item.addEventListener('click', () => onSelect(doc.id))

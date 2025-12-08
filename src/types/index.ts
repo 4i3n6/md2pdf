@@ -4,11 +4,22 @@
 
 import type { EditorView } from 'codemirror'
 
+export type StorageType = 'local' | 'disk' | 'cloud'
+
+export type SaveStatus = 'saved' | 'modified' | 'saving' | 'error'
+
 export interface Document {
   id: number
   name: string
   content: string
   updated: number
+  storage: StorageType
+  lastSaved: number | null
+  isDirty: boolean
+  /** File handle for disk storage (File System Access API) */
+  fileHandle?: FileSystemFileHandle
+  /** Remote ID for cloud storage */
+  remoteId?: string
 }
 
 export interface AppState {

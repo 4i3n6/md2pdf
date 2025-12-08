@@ -1145,3 +1145,147 @@ nav:focus-visible {
     display: block;
     word-break: break-all;
 }
+
+/* ============================================
+   EDITOR HEADER EXTENDED - Save Status & Storage
+   ============================================ */
+
+.editor-header-extended {
+    flex-direction: column;
+    align-items: stretch;
+    padding: 6px 15px;
+    gap: 6px;
+}
+
+.editor-header-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+}
+
+.editor-header-top .bare-input {
+    flex: 1;
+    max-width: 200px;
+}
+
+.editor-controls {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 10px;
+}
+
+/* Storage Badge */
+.storage-badge {
+    padding: 2px 6px;
+    border-radius: 2px;
+    font-size: 9px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.storage-local {
+    background: #e5e7eb;
+    color: #4b5563;
+    border: 1px solid #d1d5db;
+}
+
+.storage-disk {
+    background: #dbeafe;
+    color: #1d4ed8;
+    border: 1px solid #93c5fd;
+}
+
+.storage-cloud {
+    background: #d1fae5;
+    color: #047857;
+    border: 1px solid #6ee7b7;
+}
+
+/* Save Status Indicator */
+.save-status {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    padding: 2px 8px;
+    border-radius: 2px;
+    font-size: 10px;
+    font-weight: 500;
+}
+
+.save-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+.save-dot.saved {
+    background: var(--success);
+    box-shadow: 0 0 4px var(--success);
+}
+
+.save-dot.modified {
+    background: #f59e0b;
+    box-shadow: 0 0 4px #f59e0b;
+    animation: pulse-modified 1.5s ease-in-out infinite;
+}
+
+.save-dot.saving {
+    background: #3b82f6;
+    animation: pulse-saving 0.8s ease-in-out infinite;
+}
+
+.save-dot.error {
+    background: var(--error);
+    box-shadow: 0 0 4px var(--error);
+}
+
+@keyframes pulse-modified {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+}
+
+@keyframes pulse-saving {
+    0%, 100% { transform: scale(1); opacity: 1; }
+    50% { transform: scale(1.2); opacity: 0.7; }
+}
+
+.save-status-saved {
+    color: var(--success);
+}
+
+.save-status-modified {
+    color: #d97706;
+}
+
+.save-status-saving {
+    color: #2563eb;
+}
+
+.save-status-error {
+    color: var(--error);
+}
+
+.save-text {
+    white-space: nowrap;
+}
+
+/* Save Button */
+.save-btn {
+    font-size: 14px;
+    padding: 0 6px;
+    height: 22px;
+    line-height: 20px;
+    transition: transform 0.2s ease;
+}
+
+.save-btn:hover {
+    transform: rotate(180deg);
+}
+
+.save-btn:active {
+    transform: rotate(360deg);
+}

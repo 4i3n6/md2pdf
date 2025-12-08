@@ -189,6 +189,180 @@ function loadDocPreferences(docId: number): void {
   applyPreviewAlign(prefs.align);
 }
 
+// ============================================
+// SAVE STATUS MANAGEMENT
+// ============================================
+
+let saveStatusInterval: ReturnType<typeof setInterval> | null = null;
+
+/**
+ * Formata tempo relativo desde último salvamento
+ */
+function formatTimeSinceSaved(lastSaved: number | null): string {
+  if (!lastSaved) return 'Nunca salvo';
+  
+  const now = Date.now();
+  const diff = now - lastSaved;
+  
+  const seconds = Math.floor(diff / 1000);
+  const minutes = Math.floor(seconds / 60);
+  const hours = Math.floor(minutes / 60);
+  
+  if (seconds < 5) return 'Salvo agora';
+  if (seconds < 60) return `Salvo ha ${seconds}s`;
+  if (minutes < 60) return `Salvo ha ${minutes}min`;
+  return `Salvo ha ${hours}h`;
+}
+
+/**
+ * Atualiza o indicador de status de salvamento na UI
+ */
+function updateSaveStatus(): void {
+  const doc = getCurrentDoc();
+  if (!doc) return;
+  
+  const statusEl = document.getElementById('save-status');
+  const storageEl = document.getElementById('storage-badge');
+  
+  if (!statusEl) return;
+  
+  // Atualizar badge de storage
+  if (storageEl) {
+    storageEl.className = `storage-badge storage-${doc.storage}`;
+    storageEl.textContent = doc.storage.toUpperCase();
+    storageEl.title = doc.storage === 'local' 
+      ? 'Armazenado no navegador' 
+      : doc.storage === 'disk' 
+      ? 'Arquivo no disco' 
+      : 'Sincronizado na nuvem';
+  }
+  
+  // Determinar status visual
+  let statusClass: string;
+  let dotHtml: string;
+  let statusText: string;
+  
+  if (doc.isDirty) {
+    statusClass = 'save-status-modified';
+    dotHtml = '<span class="save-dot modified"></span>';
+    statusText = 'Nao salvo';
+  } else {
+    statusClass = 'save-status-saved';
+    dotHtml = '<span class="save-dot saved"></span>';
+    statusText = formatTimeSinceSaved(doc.lastSaved);
+  }
+  
+  statusEl.className = `save-status ${statusClass}`;
+  statusEl.innerHTML = `${dotHtml}<span class="save-text">${statusText}</span>`;
+}
+
+/**
+ * Define documento como modificado (dirty)
+ */
+function markDocumentDirty(): void {
+  const doc = getCurrentDoc();
+  if (!doc) return;
+  
+  doc.isDirty = true;
+  updateSaveStatus();
+}
+
+/**
+ * Define documento como salvo
+ */
+function markDocumentSaved(): void {
+  const doc = getCurrentDoc();
+  if (!doc) return;
+  
+  doc.isDirty = false;
+  doc.lastSaved = Date.now();
+  updateSaveStatus();
+}
+
+/**
+ * Mostra status de "salvando..."
+ */
+function showSavingStatus(): void {
+  const statusEl = document.getElementById('save-status');
+  if (!statusEl) return;
+  
+  statusEl.className = 'save-status save-status-saving';
+  statusEl.innerHTML = '<span class="save-dot saving"></span><span class="save-text">Salvando...</span>';
+}
+
+/**
+ * Mostra status de erro ao salvar
+ */
+function showSaveError(): void {
+  const statusEl = document.getElementById('save-status');
+  if (!statusEl) return;
+  
+  statusEl.className = 'save-status save-status-error';
+  statusEl.innerHTML = '<span class="save-dot error"></span><span class="save-text">Erro ao salvar</span>';
+}
+
+/**
+ * Força salvamento manual do documento atual
+ */
+async function forceSave(): Promise<void> {
+  const doc = getCurrentDoc();
+  if (!doc) {
+    Logger.log('Nenhum documento para salvar', 'warning');
+    return;
+  }
+  
+  showSavingStatus();
+  
+  try {
+    // Para localStorage, é síncrono
+    documentManager.setContent(doc.id, doc.content);
+    markDocumentSaved();
+    Logger.success('Documento salvo');
+  } catch (e) {
+    showSaveError();
+    const errorMsg = e instanceof Error ? e.message : String(e);
+    Logger.error('Erro ao salvar: ' + errorMsg);
+  }
+}
+
+/**
+ * Inicia intervalo para atualizar tempo relativo de salvamento
+ */
+function startSaveStatusUpdater(): void {
+  // Atualizar a cada 10 segundos
+  if (saveStatusInterval) {
+    clearInterval(saveStatusInterval);
+  }
+  saveStatusInterval = setInterval(() => {
+    const doc = getCurrentDoc();
+    if (doc && !doc.isDirty) {
+      updateSaveStatus();
+    }
+  }, 10000);
+}
+
+/**
+ * Configura event listeners para controles de salvamento
+ */
+function setupSaveControls(): void {
+  const forceSaveBtn = document.getElementById('force-save-btn');
+  
+  if (forceSaveBtn) {
+    forceSaveBtn.addEventListener('click', forceSave);
+  }
+  
+  // Atalho Ctrl+S para salvar
+  document.addEventListener('keydown', (e: KeyboardEvent): void => {
+    if ((e.ctrlKey || e.metaKey) && e.key === 's') {
+      e.preventDefault();
+      forceSave();
+    }
+  });
+  
+  startSaveStatusUpdater();
+  Logger.success('Controles de salvamento ativos');
+}
+
 /**
  * Configura event listeners dos controles do preview
  */
@@ -781,8 +955,10 @@ function initSystem(): void {
   setupEvents();
   setupQuickTags();
   setupPreviewControls();
+  setupSaveControls();
   setupKeyboardNavigation();
   updateMetrics();
+  updateSaveStatus();
   Logger.success('Sistema pronto.');
 }
 
@@ -977,12 +1153,17 @@ function initEditor(): void {
           const start = performance.now();
           const val = u.state.doc.toString();
 
+          // Marcar como modificado (dirty) imediatamente
+          markDocumentDirty();
+
           // Update State (always persist immediately)
           const active = getCurrentDoc();
           if (active) {
             active.content = val;
             active.updated = Date.now();
             saveDocs();
+            // Marcar como salvo após persistir
+            markDocumentSaved();
           }
 
            // Validar sintaxe Markdown em tempo real (com debounce para performance)
@@ -1099,6 +1280,7 @@ function switchDoc(id: number): void {
     renderPreview(doc.content);
     renderList();
     loadDocPreferences(id);
+    updateSaveStatus();
     Logger.log(`Alternado para doc ID: ${id}`);
   }
 }
