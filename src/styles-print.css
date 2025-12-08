@@ -104,7 +104,7 @@
         box-shadow: none !important;
         color: black !important;
         /* font-family NÃO é definido aqui para respeitar a fonte escolhida pelo usuário via inline style */
-        font-size: 10pt !important;
+        font-size: 9pt !important;
         line-height: 1.6 !important;
         box-sizing: border-box !important;
     }
@@ -180,7 +180,7 @@
         text-align: left;
         /* Permitir quebra em parágrafos longos */
         page-break-inside: auto;
-        font-size: 10pt;
+        font-size: 9pt;
         line-height: 1.6;
     }
 
@@ -305,7 +305,7 @@
         padding-left: 24px;
         /* Permitir quebra dentro de listas longas */
         page-break-inside: auto;
-        font-size: 10pt;
+        font-size: 9pt;
         line-height: 1.6;
     }
 
@@ -326,7 +326,7 @@
         margin-bottom: 6px;
         /* Permitir quebra em itens longos, evitar apenas em itens curtos */
         page-break-inside: auto;
-        font-size: 10pt;
+        font-size: 9pt;
         line-height: 1.6;
     }
 
@@ -359,7 +359,7 @@
         page-break-inside: avoid;
         font-style: italic;
         color: black;
-        font-size: 10pt;
+        font-size: 9pt;
         line-height: 1.6;
         -webkit-print-color-adjust: exact !important;
         print-color-adjust: exact !important;
