@@ -1,0 +1,193 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:xhtml="http://www.w3.org/1999/xhtml">
+  
+  <!-- Landing Pages -->
+  <url>
+    <loc>https://md2pdf.xyz/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://md2pdf.xyz/"/>
+    <xhtml:link rel="alternate" hreflang="pt" href="https://md2pdf.xyz/pt/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://md2pdf.xyz/"/>
+    <changefreq>weekly</changefreq>
+    <priority>1.0</priority>
+  </url>
+  <url>
+    <loc>https://md2pdf.xyz/pt/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://md2pdf.xyz/"/>
+    <xhtml:link rel="alternate" hreflang="pt" href="https://md2pdf.xyz/pt/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://md2pdf.xyz/"/>
+    <changefreq>weekly</changefreq>
+    <priority>1.0</priority>
+  </url>
+  
+  <!-- App Pages -->
+  <url>
+    <loc>https://md2pdf.xyz/app</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://md2pdf.xyz/app"/>
+    <xhtml:link rel="alternate" hreflang="pt" href="https://md2pdf.xyz/pt/app"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://md2pdf.xyz/app"/>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://md2pdf.xyz/pt/app</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://md2pdf.xyz/app"/>
+    <xhtml:link rel="alternate" hreflang="pt" href="https://md2pdf.xyz/pt/app"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://md2pdf.xyz/app"/>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  
+  <!-- Manual EN - Index -->
+  <url>
+    <loc>https://md2pdf.xyz/manual/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://md2pdf.xyz/manual/"/>
+    <xhtml:link rel="alternate" hreflang="pt" href="https://md2pdf.xyz/pt/manual/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://md2pdf.xyz/manual/"/>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  
+  <!-- Manual EN - Pages -->
+  <url>
+    <loc>https://md2pdf.xyz/manual/getting-started/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://md2pdf.xyz/manual/getting-started/"/>
+    <xhtml:link rel="alternate" hreflang="pt" href="https://md2pdf.xyz/pt/manual/primeiros-passos/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://md2pdf.xyz/manual/getting-started/"/>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://md2pdf.xyz/manual/markdown-syntax/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://md2pdf.xyz/manual/markdown-syntax/"/>
+    <xhtml:link rel="alternate" hreflang="pt" href="https://md2pdf.xyz/pt/manual/sintaxe-markdown/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://md2pdf.xyz/manual/markdown-syntax/"/>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://md2pdf.xyz/manual/input-stream/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://md2pdf.xyz/manual/input-stream/"/>
+    <xhtml:link rel="alternate" hreflang="pt" href="https://md2pdf.xyz/pt/manual/area-edicao/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://md2pdf.xyz/manual/input-stream/"/>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://md2pdf.xyz/manual/render-output/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://md2pdf.xyz/manual/render-output/"/>
+    <xhtml:link rel="alternate" hreflang="pt" href="https://md2pdf.xyz/pt/manual/preview-saida/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://md2pdf.xyz/manual/render-output/"/>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://md2pdf.xyz/manual/keyboard-shortcuts/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://md2pdf.xyz/manual/keyboard-shortcuts/"/>
+    <xhtml:link rel="alternate" hreflang="pt" href="https://md2pdf.xyz/pt/manual/atalhos-teclado/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://md2pdf.xyz/manual/keyboard-shortcuts/"/>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://md2pdf.xyz/manual/print-export/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://md2pdf.xyz/manual/print-export/"/>
+    <xhtml:link rel="alternate" hreflang="pt" href="https://md2pdf.xyz/pt/manual/exportar-pdf/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://md2pdf.xyz/manual/print-export/"/>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://md2pdf.xyz/manual/privacy-storage/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://md2pdf.xyz/manual/privacy-storage/"/>
+    <xhtml:link rel="alternate" hreflang="pt" href="https://md2pdf.xyz/pt/manual/privacidade/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://md2pdf.xyz/manual/privacy-storage/"/>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://md2pdf.xyz/manual/offline-pwa/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://md2pdf.xyz/manual/offline-pwa/"/>
+    <xhtml:link rel="alternate" hreflang="pt" href="https://md2pdf.xyz/pt/manual/uso-offline/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://md2pdf.xyz/manual/offline-pwa/"/>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  
+  <!-- Manual PT - Index -->
+  <url>
+    <loc>https://md2pdf.xyz/pt/manual/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://md2pdf.xyz/manual/"/>
+    <xhtml:link rel="alternate" hreflang="pt" href="https://md2pdf.xyz/pt/manual/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://md2pdf.xyz/manual/"/>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  
+  <!-- Manual PT - Pages -->
+  <url>
+    <loc>https://md2pdf.xyz/pt/manual/primeiros-passos/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://md2pdf.xyz/manual/getting-started/"/>
+    <xhtml:link rel="alternate" hreflang="pt" href="https://md2pdf.xyz/pt/manual/primeiros-passos/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://md2pdf.xyz/manual/getting-started/"/>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://md2pdf.xyz/pt/manual/sintaxe-markdown/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://md2pdf.xyz/manual/markdown-syntax/"/>
+    <xhtml:link rel="alternate" hreflang="pt" href="https://md2pdf.xyz/pt/manual/sintaxe-markdown/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://md2pdf.xyz/manual/markdown-syntax/"/>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://md2pdf.xyz/pt/manual/area-edicao/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://md2pdf.xyz/manual/input-stream/"/>
+    <xhtml:link rel="alternate" hreflang="pt" href="https://md2pdf.xyz/pt/manual/area-edicao/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://md2pdf.xyz/manual/input-stream/"/>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://md2pdf.xyz/pt/manual/preview-saida/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://md2pdf.xyz/manual/render-output/"/>
+    <xhtml:link rel="alternate" hreflang="pt" href="https://md2pdf.xyz/pt/manual/preview-saida/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://md2pdf.xyz/manual/render-output/"/>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://md2pdf.xyz/pt/manual/atalhos-teclado/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://md2pdf.xyz/manual/keyboard-shortcuts/"/>
+    <xhtml:link rel="alternate" hreflang="pt" href="https://md2pdf.xyz/pt/manual/atalhos-teclado/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://md2pdf.xyz/manual/keyboard-shortcuts/"/>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://md2pdf.xyz/pt/manual/exportar-pdf/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://md2pdf.xyz/manual/print-export/"/>
+    <xhtml:link rel="alternate" hreflang="pt" href="https://md2pdf.xyz/pt/manual/exportar-pdf/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://md2pdf.xyz/manual/print-export/"/>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://md2pdf.xyz/pt/manual/privacidade/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://md2pdf.xyz/manual/privacy-storage/"/>
+    <xhtml:link rel="alternate" hreflang="pt" href="https://md2pdf.xyz/pt/manual/privacidade/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://md2pdf.xyz/manual/privacy-storage/"/>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://md2pdf.xyz/pt/manual/uso-offline/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://md2pdf.xyz/manual/offline-pwa/"/>
+    <xhtml:link rel="alternate" hreflang="pt" href="https://md2pdf.xyz/pt/manual/uso-offline/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://md2pdf.xyz/manual/offline-pwa/"/>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  
+</urlset>

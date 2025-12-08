@@ -1,16 +1,16 @@
 <!DOCTYPE html>
-<html lang="en-US">
+<html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Guia completo da área de edição do MD2PDF. Aprenda sobre o editor Markdown, gerenciamento de documentos e funcionalidades.">
-    <meta name="keywords" content="md2pdf editor, markdown editor, input stream, gerenciar documentos, syntax highlighting">
+    <meta name="description" content="Guia completo da área de edição do MD2PDF. Editor Markdown com syntax highlighting.">
+    <meta name="keywords" content="md2pdf editor, markdown editor, input stream, gerenciar documentos">
     <meta name="author" content="MD2PDF">
     <title>Área de Edição | MD2PDF</title>
-    <link rel="canonical" href="https://md2pdf.xyz/manual/input-stream/">
-    <link rel="alternate" hreflang="en" href="https://md2pdf.xyz/manual/input-stream/">
-    <link rel="alternate" hreflang="pt" href="https://md2pdf.xyz/pt/manual/input-stream/">
-    <link rel="alternate" hreflang="x-default" href="https://md2pdf.xyz/manual/input-stream/">
+    <link rel="canonical" href="https://md2pdf.xyz/pt/manual/area-edicao/">
+    <link rel="alternate" hreflang="pt" href="https://md2pdf.xyz/pt/manual/area-edicao/">
+    <link rel="alternate" hreflang="en" href="https://md2pdf.xyz/manual/area-edicao/">
+    <link rel="alternate" hreflang="x-default" href="https://md2pdf.xyz/manual/area-edicao/">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -21,11 +21,11 @@
 
     <header class="header">
         <div class="header-content">
-            <a href="/" class="logo">MD2PDF</a>
+            <a href="/pt/" class="logo">MD2PDF</a>
             <span class="logo-subtitle">Manual</span>
             <nav class="header-nav">
-                <a href="/">Home</a>
-                <a href="/app">Open App</a>
+                <a href="/pt/">Início</a>
+                <a href="/pt/app">Abrir App</a>
             </nav>
         </div>
     </header>
@@ -34,39 +34,39 @@
 
         <aside class="sidebar">
             <nav class="sidebar-nav" aria-label="Manual">
-                <a href="/manual/" class="sidebar-item">
+                <a href="/pt/manual/" class="sidebar-item">
                     <span class="sidebar-icon">≡</span>
                     <span class="sidebar-title">Índice</span>
                 </a>
-                <a href="/manual/getting-started/" class="sidebar-item">
+                <a href="/pt/manual/primeiros-passos/" class="sidebar-item">
                     <span class="sidebar-icon">1</span>
                     <span class="sidebar-title">Primeiros Passos</span>
                 </a>
-                <a href="/manual/markdown-syntax/" class="sidebar-item">
+                <a href="/pt/manual/sintaxe-markdown/" class="sidebar-item">
                     <span class="sidebar-icon">#</span>
                     <span class="sidebar-title">Guia Markdown</span>
                 </a>
-                <a href="/manual/input-stream/" class="sidebar-item active">
+                <a href="/pt/manual/area-edicao/" class="sidebar-item active">
                     <span class="sidebar-icon">></span>
                     <span class="sidebar-title">Área de Edição</span>
                 </a>
-                <a href="/manual/render-output/" class="sidebar-item">
+                <a href="/pt/manual/preview-saida/" class="sidebar-item">
                     <span class="sidebar-icon">A4</span>
                     <span class="sidebar-title">Preview e Saída</span>
                 </a>
-                <a href="/manual/keyboard-shortcuts/" class="sidebar-item">
+                <a href="/pt/manual/atalhos-teclado/" class="sidebar-item">
                     <span class="sidebar-icon">⌘</span>
                     <span class="sidebar-title">Atalhos</span>
                 </a>
-                <a href="/manual/print-export/" class="sidebar-item">
+                <a href="/pt/manual/exportar-pdf/" class="sidebar-item">
                     <span class="sidebar-icon">↓</span>
                     <span class="sidebar-title">Exportar PDF</span>
                 </a>
-                <a href="/manual/privacy-storage/" class="sidebar-item">
+                <a href="/pt/manual/privacidade/" class="sidebar-item">
                     <span class="sidebar-icon">◉</span>
                     <span class="sidebar-title">Privacidade</span>
                 </a>
-                <a href="/manual/offline-pwa/" class="sidebar-item">
+                <a href="/pt/manual/uso-offline/" class="sidebar-item">
                     <span class="sidebar-icon">⚡</span>
                     <span class="sidebar-title">Uso Offline</span>
                 </a>
@@ -76,9 +76,9 @@
         <main class="main">
 
             <nav class="breadcrumb" aria-label="Breadcrumb">
-                <a href="/">Home</a>
+                <a href="/pt/">Início</a>
                 <span class="breadcrumb-separator">&gt;</span>
-                <a href="/manual/">Manual</a>
+                <a href="/pt/manual/">Manual</a>
                 <span class="breadcrumb-separator">&gt;</span>
                 <span class="breadcrumb-current">Área de Edição</span>
             </nav>
@@ -97,7 +97,6 @@
             </section>
             <section>
                 <h2>Gerenciando Documentos</h2>
-                <p>A sidebar DOC_INDEX mostra todos os seus documentos salvos.</p>
                 <ul>
                     <li><strong>Clique + para criar:</strong> Novo documento em branco</li>
                     <li><strong>Clique no nome:</strong> Abre o documento</li>
@@ -106,32 +105,23 @@
                 </ul>
             </section>
             <section>
-                <h2>Renomeando Documentos</h2>
-                <ul>
-                    <li>Clique no campo de nome acima do editor</li>
-                    <li>Digite o novo nome</li>
-                    <li>O nome é usado como nome do PDF exportado</li>
-                </ul>
-            </section>
-            <section>
                 <h2>Botão COPY</h2>
                 <ul>
-                    <li><strong>Localização:</strong> Ao lado do nome do documento</li>
                     <li><strong>Atalho:</strong> <code>Ctrl+Shift+C</code></li>
                     <li><strong>Função:</strong> Copia todo o Markdown para a área de transferência</li>
                 </ul>
             </section>
             <nav class="page-nav">
-                <a href="/manual/markdown-syntax/">
+                <a href="/pt/manual/sintaxe-markdown/">
                     <span class="nav-arrow">&larr;</span>
                     <div class="nav-direction">
-                        <span class="nav-label">Previous</span>
+                        <span class="nav-label">Anterior</span>
                         <span class="nav-title">Guia Markdown</span>
                     </div>
                 </a>
-                <a href="/manual/render-output/">
+                <a href="/pt/manual/preview-saida/">
                     <div class="nav-direction">
-                        <span class="nav-label">Next</span>
+                        <span class="nav-label">Próximo</span>
                         <span class="nav-title">Preview e Saída</span>
                     </div>
                     <span class="nav-arrow">&rarr;</span>
@@ -144,9 +134,9 @@
     <footer class="footer">
         <div class="footer-content">
             <div class="footer-links">
-                <a href="/app">Open App</a>
-                <a href="/manual/">Manual</a>
-                <a href="/">Home</a>
+                <a href="/pt/app">Abrir App</a>
+                <a href="/pt/manual/">Manual</a>
+                <a href="/pt/">Início</a>
             </div>
             <p class="footer-version">MD2PDF v2.0 | Gratuito e sem limites</p>
         </div>

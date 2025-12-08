@@ -31,7 +31,7 @@ export default defineConfig({
         clientsClaim: true,
         // Incluir páginas do manual no cache
         navigateFallback: '/app.html',
-        navigateFallbackDenylist: [/^\/manual/, /^\/$/]
+        navigateFallbackDenylist: [/^\/manual/, /^\/pt\/manual/, /^\/$/]
       },
       manifest: {
         name: 'MD2PDF',
@@ -96,6 +96,15 @@ export default defineConfig({
         // PT-BR
         'pt-index': resolve(__dirname, 'pt/index.html'),
         'pt-app': resolve(__dirname, 'pt/app.html'),
+        'pt-manual': resolve(__dirname, 'pt/manual/index.html'),
+        'pt-manual-primeiros-passos': resolve(__dirname, 'pt/manual/primeiros-passos/index.html'),
+        'pt-manual-sintaxe-markdown': resolve(__dirname, 'pt/manual/sintaxe-markdown/index.html'),
+        'pt-manual-area-edicao': resolve(__dirname, 'pt/manual/area-edicao/index.html'),
+        'pt-manual-preview-saida': resolve(__dirname, 'pt/manual/preview-saida/index.html'),
+        'pt-manual-atalhos-teclado': resolve(__dirname, 'pt/manual/atalhos-teclado/index.html'),
+        'pt-manual-exportar-pdf': resolve(__dirname, 'pt/manual/exportar-pdf/index.html'),
+        'pt-manual-privacidade': resolve(__dirname, 'pt/manual/privacidade/index.html'),
+        'pt-manual-uso-offline': resolve(__dirname, 'pt/manual/uso-offline/index.html'),
       },
       output: {
         manualChunks: {

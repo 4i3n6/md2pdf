@@ -1,0 +1,14 @@
+# MD2PDF - Robots.txt
+# https://md2pdf.xyz
+
+User-agent: *
+Allow: /
+
+# Sitemap
+Sitemap: https://md2pdf.xyz/sitemap.xml
+
+# Disallow build artifacts and internal paths
+Disallow: /assets/
+Disallow: /sw.js
+Disallow: /workbox-*.js
+Disallow: /manifest.webmanifest

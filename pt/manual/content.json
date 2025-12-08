@@ -1,0 +1,487 @@
+{
+  "site": {
+    "title": "MD2PDF",
+    "version": "2.0",
+    "tagline": "Gratuito e sem limites"
+  },
+  "navigation": [
+    { "slug": "index", "title": "Índice", "icon": "≡" },
+    { "slug": "primeiros-passos", "title": "Primeiros Passos", "icon": "1" },
+    { "slug": "sintaxe-markdown", "title": "Guia Markdown", "icon": "#" },
+    { "slug": "area-edicao", "title": "Área de Edição", "icon": ">" },
+    { "slug": "preview-saida", "title": "Preview e Saída", "icon": "A4" },
+    { "slug": "atalhos-teclado", "title": "Atalhos", "icon": "⌘" },
+    { "slug": "exportar-pdf", "title": "Exportar PDF", "icon": "↓" },
+    { "slug": "privacidade", "title": "Privacidade", "icon": "◉" },
+    { "slug": "uso-offline", "title": "Uso Offline", "icon": "⚡" }
+  ],
+  "pages": [
+    {
+      "slug": "index",
+      "title": "Manual do MD2PDF",
+      "description": "Manual completo do MD2PDF. Aprenda a converter Markdown para PDF de forma rápida e gratuita.",
+      "keywords": "md2pdf manual, markdown tutorial, pdf converter guide, markdown para pdf, conversor markdown",
+      "isIndex": true,
+      "content": {
+        "intro": [
+          "O <strong>MD2PDF</strong> é um conversor de Markdown para PDF gratuito, sem limites e sem necessidade de cadastro. Escreva em Markdown no editor, visualize em tempo real no formato A4 e exporte diretamente para PDF.",
+          "Neste manual você encontrará tudo o que precisa para dominar a ferramenta: desde os primeiros passos até recursos avançados de exportação e uso offline."
+        ],
+        "toc": [
+          { "number": "01", "slug": "primeiros-passos", "title": "Primeiros Passos", "desc": "O que é Markdown e como começar" },
+          { "number": "02", "slug": "sintaxe-markdown", "title": "Guia Markdown", "desc": "Sintaxe completa com exemplos" },
+          { "number": "03", "slug": "area-edicao", "title": "Área de Edição", "desc": "Editor, documentos, botão COPY" },
+          { "number": "04", "slug": "preview-saida", "title": "Preview e Saída", "desc": "Visualização A4 em tempo real" },
+          { "number": "05", "slug": "atalhos-teclado", "title": "Atalhos de Teclado", "desc": "Produtividade com atalhos" },
+          { "number": "06", "slug": "exportar-pdf", "title": "Exportar PDF", "desc": "Como gerar seus PDFs" },
+          { "number": "07", "slug": "privacidade", "title": "Privacidade e Armazenamento", "desc": "Seus dados são seus" },
+          { "number": "08", "slug": "uso-offline", "title": "Uso Offline e PWA", "desc": "Instale e use sem internet" }
+        ],
+        "tips": [
+          { "icon": "#", "title": "Títulos com #", "text": "Use # para títulos. Quanto mais #, menor o nível (## subtítulo, ### seção)." },
+          { "icon": "Ctrl", "title": "Ctrl+Shift+E", "text": "Atalho rápido para exportar seu documento para PDF instantaneamente." },
+          { "icon": "---", "title": "Quebra de página", "text": "Use --- (linha horizontal) para forçar uma quebra de página no PDF." },
+          { "icon": "PWA", "title": "Instale o app", "text": "MD2PDF funciona offline. Instale como app no seu dispositivo." }
+        ]
+      }
+    },
+    {
+      "slug": "primeiros-passos",
+      "title": "Primeiros Passos",
+      "pageTitle": "O que é Markdown?",
+      "description": "Aprenda o que é Markdown e como usar o MD2PDF para converter textos de IA em PDFs formatados.",
+      "keywords": "markdown tutorial, o que é markdown, chatgpt para pdf, claude pdf, tutorial markdown",
+      "prev": { "slug": "index", "title": "Índice do Manual" },
+      "next": { "slug": "sintaxe-markdown", "title": "Guia Markdown" },
+      "sections": [
+        {
+          "title": "Por que sua IA escreve assim?",
+          "content": [
+            "Se você já usou ChatGPT, Claude, Gemini ou outras IAs, provavelmente notou que as respostas vêm com símbolos estranhos como <code>**</code>, <code>#</code>, <code>-</code> e <code>`</code>."
+          ],
+          "infoBox": {
+            "title": "Isso não é um bug!",
+            "text": "Esses símbolos são formatação Markdown - uma linguagem simples que transforma texto puro em documentos formatados."
+          },
+          "contentAfter": [
+            "Markdown foi criado para ser legível mesmo sem renderização. Por isso as IAs usam esse formato: é universal, simples e funciona em qualquer lugar."
+          ]
+        },
+        {
+          "title": "Como usar o MD2PDF",
+          "steps": [
+            { "title": "Copie o texto da IA", "text": "Selecione toda a resposta do ChatGPT, Claude, Gemini ou qualquer outra IA e copie (Ctrl+C)." },
+            { "title": "Cole na área INPUT_STREAM", "text": "Abra o MD2PDF e cole o texto no editor à esquerda." },
+            { "title": "Veja o preview em tempo real", "text": "O painel direito mostra instantaneamente como seu documento ficará formatado." },
+            { "title": "Exporte para PDF", "text": "Clique no botão <code>[ EXP_PDF ]</code> ou use <code>Ctrl+Shift+E</code>." }
+          ]
+        },
+        {
+          "title": "Próximo passo",
+          "content": [
+            "Agora que você entende o básico, veja o <a href=\"/pt/manual/sintaxe-markdown/\">Guia Markdown</a> para aprender toda a sintaxe com exemplos práticos."
+          ]
+        }
+      ]
+    },
+    {
+      "slug": "sintaxe-markdown",
+      "title": "Guia Markdown",
+      "pageTitle": "Guia Completo de Markdown",
+      "description": "Referência completa de sintaxe Markdown: títulos, formatação, listas, links, imagens, tabelas, código e muito mais.",
+      "keywords": "markdown sintaxe, markdown guia, markdown referência, como escrever markdown, markdown cheatsheet",
+      "prev": { "slug": "primeiros-passos", "title": "Primeiros Passos" },
+      "next": { "slug": "area-edicao", "title": "Área de Edição" },
+      "intro": "Esta página é sua referência completa de Markdown. Consulte sempre que precisar lembrar como formatar algo.",
+      "anchors": [
+        { "id": "titulos", "title": "Títulos" },
+        { "id": "texto", "title": "Formatação de Texto" },
+        { "id": "quebras", "title": "Quebras de Linha" },
+        { "id": "listas", "title": "Listas" },
+        { "id": "links", "title": "Links e Imagens" },
+        { "id": "codigo", "title": "Código" },
+        { "id": "citacoes", "title": "Citações" },
+        { "id": "tabelas", "title": "Tabelas" },
+        { "id": "especiais", "title": "Caracteres Especiais" },
+        { "id": "dicas", "title": "Dicas Avançadas" }
+      ],
+      "sections": [
+        {
+          "id": "titulos",
+          "title": "Títulos",
+          "content": ["Use <code>#</code> para criar títulos. Quanto mais <code>#</code>, menor o nível do título."],
+          "codeExample": {
+            "code": "# Título Principal (H1)\n## Subtítulo (H2)\n### Seção (H3)\n#### Subseção (H4)\n##### Menor (H5)\n###### Mínimo (H6)",
+            "description": "Os títulos H1 e H2 são os mais usados. H3 e H4 servem para subdivisões."
+          },
+          "infoBox": {
+            "title": "Dica",
+            "text": "Sempre deixe um espaço entre o <code>#</code> e o texto. <code>#Título</code> não funciona, use <code># Título</code>."
+          }
+        },
+        {
+          "id": "texto",
+          "title": "Formatação de Texto",
+          "content": ["Formate palavras ou frases com símbolos ao redor do texto."],
+          "table": {
+            "headers": ["Você escreve", "Resultado", "Uso"],
+            "rows": [
+              ["<code>**texto**</code>", "<strong>texto</strong>", "Destaque importante"],
+              ["<code>*texto*</code>", "<em>texto</em>", "Ênfase sutil"],
+              ["<code>***texto***</code>", "<strong><em>texto</em></strong>", "Máximo destaque"],
+              ["<code>~~texto~~</code>", "<del>texto</del>", "Texto removido/errado"],
+              ["<code>`texto`</code>", "<code>texto</code>", "Código ou comando"],
+              ["<code>==texto==</code>", "<mark>texto</mark>", "Marcação (highlight)"]
+            ]
+          }
+        },
+        {
+          "id": "quebras",
+          "title": "Quebras de Linha e Parágrafos",
+          "content": ["Markdown trata quebras de linha de forma especial."],
+          "table": {
+            "headers": ["O que você quer", "Como fazer"],
+            "rows": [
+              ["Nova linha (mesmo parágrafo)", "Dois espaços no final + Enter"],
+              ["Nova linha (alternativa)", "<code>&lt;br&gt;</code> no final"],
+              ["Novo parágrafo", "Linha em branco entre os textos"],
+              ["Quebra de página (PDF)", "<code>---</code> em linha separada"]
+            ]
+          }
+        },
+        {
+          "id": "listas",
+          "title": "Listas",
+          "content": ["Crie listas com marcadores ou números."],
+          "subsections": [
+            {
+              "subtitle": "Lista com marcadores",
+              "codeExample": {
+                "code": "- Item um\n- Item dois\n  - Subitem (2 espaços antes)\n- Item três",
+                "description": "Use <code>-</code>, <code>*</code> ou <code>+</code> para marcadores."
+              }
+            },
+            {
+              "subtitle": "Lista numerada",
+              "codeExample": {
+                "code": "1. Primeiro item\n2. Segundo item\n3. Terceiro item",
+                "description": "A numeração é automática."
+              }
+            },
+            {
+              "subtitle": "Lista de tarefas",
+              "codeExample": {
+                "code": "- [ ] Tarefa pendente\n- [x] Tarefa concluída",
+                "description": "Use <code>[ ]</code> para pendente e <code>[x]</code> para concluído."
+              }
+            }
+          ]
+        },
+        {
+          "id": "links",
+          "title": "Links e Imagens",
+          "content": ["Adicione links clicáveis e imagens ao seu documento."],
+          "table": {
+            "headers": ["Tipo", "Sintaxe", "Exemplo"],
+            "rows": [
+              ["Link", "<code>[texto](url)</code>", "<code>[Google](https://google.com)</code>"],
+              ["Imagem", "<code>![alt](url)</code>", "<code>![Logo](imagem.png)</code>"]
+            ]
+          }
+        },
+        {
+          "id": "codigo",
+          "title": "Código",
+          "content": ["Mostre código com formatação especial."],
+          "subsections": [
+            {
+              "subtitle": "Código inline",
+              "codeExample": {
+                "code": "Use `console.log()` para debug.",
+                "description": "Envolva com crases simples."
+              }
+            },
+            {
+              "subtitle": "Bloco de código",
+              "codeExample": {
+                "code": "```javascript\nfunction hello() {\n  console.log(\"Hello!\");\n}\n```",
+                "description": "Use três crases e o nome da linguagem."
+              }
+            }
+          ]
+        },
+        {
+          "id": "citacoes",
+          "title": "Citações (Blockquotes)",
+          "content": ["Use <code>&gt;</code> para criar blocos de citação."],
+          "codeExample": {
+            "code": "> Esta é uma citação.\n> Pode ter múltiplas linhas.",
+            "description": "Citações são úteis para destacar informações."
+          }
+        },
+        {
+          "id": "tabelas",
+          "title": "Tabelas",
+          "content": ["Crie tabelas usando <code>|</code> e <code>-</code>."],
+          "codeExample": {
+            "code": "| Coluna 1 | Coluna 2 |\n|----------|----------|\n| Dado 1   | Dado 2   |",
+            "description": "Use <code>:</code> para alinhar colunas."
+          }
+        },
+        {
+          "id": "especiais",
+          "title": "Caracteres Especiais",
+          "content": ["Para usar caracteres especiais literalmente, escape com <code>\\</code>."],
+          "table": {
+            "headers": ["Caractere", "Escape"],
+            "rows": [
+              ["<code>*</code>", "<code>\\*</code>"],
+              ["<code>#</code>", "<code>\\#</code>"],
+              ["<code>`</code>", "<code>\\`</code>"]
+            ]
+          }
+        },
+        {
+          "id": "dicas",
+          "title": "Dicas Avançadas",
+          "list": [
+            "<strong>Linha horizontal:</strong> Use <code>---</code> para separadores.",
+            "<strong>Comentários:</strong> Use <code>&lt;!-- comentário --&gt;</code>.",
+            "<strong>HTML inline:</strong> Tags como <code>&lt;br&gt;</code>, <code>&lt;kbd&gt;</code> funcionam."
+          ]
+        }
+      ]
+    },
+    {
+      "slug": "area-edicao",
+      "title": "Área de Edição",
+      "pageTitle": "Área de Edição (INPUT_STREAM)",
+      "description": "Guia completo da área de edição do MD2PDF. Editor Markdown com syntax highlighting.",
+      "keywords": "md2pdf editor, markdown editor, input stream, gerenciar documentos",
+      "prev": { "slug": "sintaxe-markdown", "title": "Guia Markdown" },
+      "next": { "slug": "preview-saida", "title": "Preview e Saída" },
+      "sections": [
+        {
+          "title": "O Editor de Markdown",
+          "content": ["O painel INPUT_STREAM é onde você escreve e edita seu conteúdo Markdown."],
+          "list": [
+            "<strong>Syntax highlighting:</strong> Código Markdown colorido automaticamente",
+            "<strong>Números de linha:</strong> Facilita referência em documentos longos",
+            "<strong>Indicadores de erro:</strong> Linhas onduladas mostram problemas de sintaxe"
+          ]
+        },
+        {
+          "title": "Gerenciando Documentos",
+          "list": [
+            "<strong>Clique + para criar:</strong> Novo documento em branco",
+            "<strong>Clique no nome:</strong> Abre o documento",
+            "<strong>Clique [x]:</strong> Deleta (com confirmação)",
+            "<strong>Salvamento automático:</strong> Alterações salvas instantaneamente"
+          ]
+        },
+        {
+          "title": "Botão COPY",
+          "list": [
+            "<strong>Atalho:</strong> <code>Ctrl+Shift+C</code>",
+            "<strong>Função:</strong> Copia todo o Markdown para a área de transferência"
+          ]
+        }
+      ]
+    },
+    {
+      "slug": "preview-saida",
+      "title": "Preview e Saída",
+      "pageTitle": "RENDER_OUTPUT - Preview A4",
+      "description": "Visualização A4 em tempo real. Veja exatamente como seu PDF ficará.",
+      "keywords": "markdown preview, A4 preview, pdf preview, md2pdf visualização",
+      "prev": { "slug": "area-edicao", "title": "Área de Edição" },
+      "next": { "slug": "atalhos-teclado", "title": "Atalhos" },
+      "intro": "O preview mostra seu documento em formato A4, exatamente como aparecerá no PDF.",
+      "sections": [
+        {
+          "title": "Preview em Tempo Real",
+          "list": [
+            "<strong>Atualização instantânea:</strong> Muda enquanto você digita",
+            "<strong>Indicador verde:</strong> Status de renderização no cabeçalho",
+            "<strong>Métrica LATENCY:</strong> Tempo de renderização em ms"
+          ]
+        },
+        {
+          "title": "Formato A4",
+          "list": [
+            "<strong>Dimensões:</strong> Simula papel A4 (210x297mm)",
+            "<strong>Margens:</strong> Pré-configuradas para impressão",
+            "<strong>WYSIWYG:</strong> Muito próximo do resultado final"
+          ]
+        },
+        {
+          "title": "Quebras de Página",
+          "list": [
+            "<strong>Manual:</strong> Use <code>---</code> para forçar quebra",
+            "<strong>Automática:</strong> Blocos de código tentam ficar inteiros"
+          ]
+        }
+      ]
+    },
+    {
+      "slug": "atalhos-teclado",
+      "title": "Atalhos de Teclado",
+      "pageTitle": "Atalhos de Teclado",
+      "description": "Atalhos de teclado do MD2PDF para criar, exportar e navegar documentos rapidamente.",
+      "keywords": "md2pdf atalhos, keyboard shortcuts, atalhos teclado",
+      "prev": { "slug": "preview-saida", "title": "Preview e Saída" },
+      "next": { "slug": "exportar-pdf", "title": "Exportar PDF" },
+      "intro": "Use atalhos para trabalhar mais rápido.",
+      "sections": [
+        {
+          "title": "Atalhos da Aplicação",
+          "shortcuts": [
+            { "keys": ["Ctrl", "N"], "action": "Criar novo documento" },
+            { "keys": ["Ctrl", "Shift", "E"], "action": "Exportar PDF" },
+            { "keys": ["Ctrl", "Shift", "C"], "action": "Copiar conteúdo Markdown" },
+            { "keys": ["Ctrl", "Shift", "P"], "action": "Preview de impressão" },
+            { "keys": ["↑", "↓"], "action": "Navegar entre documentos", "separator": " / " },
+            { "keys": ["Enter"], "action": "Abrir documento selecionado" },
+            { "keys": ["Delete"], "action": "Deletar documento" },
+            { "keys": ["Escape"], "action": "Sair do preview" }
+          ]
+        },
+        {
+          "title": "Atalhos do Editor",
+          "shortcuts": [
+            { "keys": ["Ctrl", "Z"], "action": "Desfazer" },
+            { "keys": ["Ctrl", "Shift", "Z"], "action": "Refazer" },
+            { "keys": ["Ctrl", "A"], "action": "Selecionar tudo" }
+          ]
+        },
+        {
+          "title": "Usuários Mac",
+          "infoBox": {
+            "text": "Substitua <kbd>Ctrl</kbd> por <kbd>Cmd</kbd> (<kbd>⌘</kbd>)"
+          }
+        }
+      ]
+    },
+    {
+      "slug": "exportar-pdf",
+      "title": "Exportar PDF",
+      "pageTitle": "Exportar para PDF",
+      "description": "Aprenda a exportar documentos Markdown para PDF no MD2PDF.",
+      "keywords": "exportar pdf, markdown para pdf, salvar como pdf",
+      "prev": { "slug": "atalhos-teclado", "title": "Atalhos" },
+      "next": { "slug": "privacidade", "title": "Privacidade" },
+      "sections": [
+        {
+          "title": "Como Exportar",
+          "steps": [
+            { "title": "Verifique o preview", "text": "Confira se a formatação está correta no painel direito." },
+            { "title": "Clique EXP_PDF ou Ctrl+Shift+E", "text": "Abre o diálogo de impressão do navegador." },
+            { "title": "Selecione \"Salvar como PDF\"", "text": "Em Destino/Impressora, escolha salvar como PDF." },
+            { "title": "Clique Salvar", "text": "O nome do documento é usado como nome do arquivo." }
+          ]
+        },
+        {
+          "title": "Configurações Recomendadas",
+          "list": [
+            "<strong>Destino:</strong> Salvar como PDF",
+            "<strong>Margens:</strong> Padrão ou Mínimas",
+            "<strong>Escala:</strong> 100%",
+            "<strong>Gráficos de fundo:</strong> Ativar se quiser cores"
+          ]
+        }
+      ]
+    },
+    {
+      "slug": "privacidade",
+      "title": "Privacidade e Armazenamento",
+      "pageTitle": "Privacidade e Armazenamento",
+      "description": "Seus documentos ficam apenas no seu navegador. Sem servidores, sem rastreamento.",
+      "keywords": "privacidade, armazenamento local, localStorage, segurança",
+      "prev": { "slug": "exportar-pdf", "title": "Exportar PDF" },
+      "next": { "slug": "uso-offline", "title": "Uso Offline" },
+      "highlightBox": "<strong>100% Local.</strong> Seus documentos ficam APENAS no seu navegador. Nada é enviado para servidores.",
+      "sections": [
+        {
+          "title": "Privacidade Total",
+          "list": [
+            "Processamento 100% no navegador",
+            "Zero rastreamento ou analytics",
+            "Sem contas, sem login",
+            "Funciona offline"
+          ]
+        },
+        {
+          "title": "Armazenamento",
+          "list": [
+            "Dados no localStorage do navegador",
+            "Limite: ~5MB por domínio",
+            "Métrica <strong>MEM</strong> mostra uso atual"
+          ]
+        },
+        {
+          "title": "Backup",
+          "list": [
+            "Use <strong>EXPORT MD</strong> para salvar arquivos",
+            "Use <strong>COPY</strong> para copiar conteúdo",
+            "Faça backups regulares!"
+          ]
+        }
+      ],
+      "warningBox": "<strong>Atenção:</strong> Limpar dados do navegador APAGA seus documentos."
+    },
+    {
+      "slug": "uso-offline",
+      "title": "Uso Offline e PWA",
+      "pageTitle": "Uso Offline e PWA",
+      "description": "Instale o MD2PDF como app e use sem conexão com internet.",
+      "keywords": "pwa, progressive web app, offline, instalar app",
+      "prev": { "slug": "privacidade", "title": "Privacidade" },
+      "next": { "slug": "index", "title": "Índice" },
+      "sections": [
+        {
+          "title": "O que é PWA?",
+          "list": [
+            "Progressive Web App",
+            "Site que funciona como app nativo",
+            "Instalável no dispositivo",
+            "Funciona 100% offline"
+          ]
+        },
+        {
+          "title": "Como Instalar",
+          "subsections": [
+            {
+              "subtitle": "Desktop (Chrome/Edge)",
+              "list": [
+                "Acesse /pt/app",
+                "Clique no ícone de instalação na barra de endereço",
+                "Confirme \"Instalar\""
+              ]
+            },
+            {
+              "subtitle": "Android",
+              "list": [
+                "Menu (3 pontos) → \"Adicionar à tela inicial\""
+              ]
+            },
+            {
+              "subtitle": "iOS",
+              "list": [
+                "Compartilhar → \"Adicionar à Tela de Início\""
+              ]
+            }
+          ]
+        },
+        {
+          "title": "Funcionamento Offline",
+          "list": [
+            "Após primeiro acesso, app fica em cache",
+            "Todas as funcionalidades disponíveis offline",
+            "Documentos salvos continuam acessíveis",
+            "Atualizações automáticas quando online"
+          ]
+        }
+      ]
+    }
+  ]
+}
