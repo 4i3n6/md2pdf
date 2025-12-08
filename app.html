@@ -62,28 +62,20 @@
             <div class="panel-header" role="heading" aria-level="2">ACTIONS</div>
             <div class="actions-section" style="padding: 10px; display: flex; flex-direction: column; gap: 6px;">
                 <button 
-                    id="open-file-btn" 
+                    id="import-md-btn" 
                     class="action-btn action-btn-secondary" 
                     style="width: 100%; font-size: 11px;" 
-                    aria-label="Abrir arquivo do disco"
-                    title="Abrir arquivo Markdown do disco (Ctrl+O)">
-                    OPEN FILE
-                </button>
-                <button 
-                    id="save-disk-btn" 
-                    class="action-btn action-btn-secondary" 
-                    style="width: 100%; font-size: 11px;" 
-                    aria-label="Salvar arquivo no disco"
-                    title="Salvar arquivo no disco (Ctrl+Shift+S)">
-                    SAVE TO DISK
+                    aria-label="Importar arquivo Markdown"
+                    title="Importar arquivo .md do computador">
+                    IMPORT MD
                 </button>
                 <button 
                     id="download-md-btn" 
                     class="action-btn action-btn-tertiary" 
                     style="width: 100%; font-size: 11px;" 
-                    aria-label="Baixar documento em formato Markdown"
-                    title="Baixar documento em formato Markdown">
-                    DOWNLOAD MD
+                    aria-label="Exportar documento em formato Markdown"
+                    title="Exportar documento como arquivo .md">
+                    EXPORT MD
                 </button>
             </div>
             
@@ -163,14 +155,6 @@
                             spellcheck="true">
                     </div>
                     <div class="editor-controls">
-                        <span 
-                            id="storage-badge" 
-                            class="storage-badge storage-local" 
-                            role="status" 
-                            aria-label="Tipo de armazenamento"
-                            title="Armazenado no navegador">
-                            LOCAL
-                        </span>
                         <span 
                             id="save-status" 
                             class="save-status save-status-saved" 

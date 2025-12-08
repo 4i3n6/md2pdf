@@ -1,25 +1,25 @@
 /**
  * UI RENDERER SERVICE
  * 
- * Responsável por renderização de UI sem efeitos colaterais.
- * Separa lógica de renderização da lógica de negócio.
+ * Responsavel por renderizacao de UI sem efeitos colaterais.
+ * Separa logica de renderizacao da logica de negocio.
  */
 
 import type { Document, LoggerInterface } from '@/types/index'
 import { processImagesInPreview } from '@/processors/markdownProcessor'
 
 /**
- * Callback para evento de seleção de documento
+ * Callback para evento de selecao de documento
  */
 type DocumentSelectCallback = (id: number) => void
 
 /**
- * Callback para evento de deleção de documento
+ * Callback para evento de delecao de documento
  */
 type DocumentDeleteCallback = (id: number) => void
 
 /**
- * Serviço de renderização de UI
+ * Servico de renderizacao de UI
  */
 export class UIRenderer {
   constructor(private logger?: LoggerInterface) {}
@@ -30,8 +30,8 @@ export class UIRenderer {
    * @param {HTMLElement} container - Container onde renderizar
    * @param {Document[]} documents - Lista de documentos
    * @param {number} activeId - ID do documento ativo
-   * @param {DocumentSelectCallback} onSelect - Callback de seleção
-   * @param {DocumentDeleteCallback} onDelete - Callback de deleção
+   * @param {DocumentSelectCallback} onSelect - Callback de selecao
+   * @param {DocumentDeleteCallback} onDelete - Callback de delecao
    * @returns {void}
    */
   renderDocumentList(
@@ -56,20 +56,10 @@ export class UIRenderer {
       item.setAttribute('aria-label', `Documento: ${doc.name}`)
       item.setAttribute('title', `Clique para abrir ${doc.name} (Delete para remover)`)
 
-      // Container para nome + indicadores
+      // Container para nome
       const nameContainer = document.createElement('div')
       nameContainer.className = 'doc-name-container'
       nameContainer.style.cssText = 'display: flex; align-items: center; gap: 6px; flex: 1; min-width: 0;'
-
-      // Dirty indicator
-      if (doc.isDirty) {
-        const dirtyDot = document.createElement('span')
-        dirtyDot.className = 'doc-dirty-dot'
-        dirtyDot.style.cssText = 'width: 6px; height: 6px; border-radius: 50%; background: #f59e0b; flex-shrink: 0;'
-        dirtyDot.setAttribute('title', 'Nao salvo')
-        dirtyDot.setAttribute('aria-label', 'Documento modificado')
-        nameContainer.appendChild(dirtyDot)
-      }
 
       const name = document.createElement('span')
       name.textContent = doc.name
@@ -78,43 +68,14 @@ export class UIRenderer {
       name.setAttribute('aria-hidden', 'false')
       nameContainer.appendChild(name)
 
-      // Storage badge (pequeno) - apenas letra
-      const storageBadge = document.createElement('span')
-      storageBadge.className = `doc-storage-badge doc-storage-${doc.storage}`
-      
-      // Labels simples e cores distintivas
-      let badgeText = 'B' // Browser
-      let badgeTitle = 'Browser'
-      let badgeBg = '#f3f4f6'
-      let badgeColor = '#6b7280'
-      let badgeBorder = '#d1d5db'
-      
-      if (doc.storage === 'disk') {
-        badgeText = 'D' // Disk
-        badgeTitle = 'Arquivo no disco'
-        badgeBg = '#dbeafe'
-        badgeColor = '#1d4ed8'
-        badgeBorder = '#3b82f6'
-      } else if (doc.storage === 'cloud') {
-        badgeText = 'C' // Cloud
-        badgeTitle = 'Nuvem'
-        badgeBg = '#d1fae5'
-        badgeColor = '#047857'
-        badgeBorder = '#10b981'
-      }
-      
-      storageBadge.textContent = badgeText
-      storageBadge.title = badgeTitle
-      storageBadge.style.cssText = `font-size: 8px; font-weight: 700; padding: 1px 4px; border-radius: 2px; flex-shrink: 0; background: ${badgeBg}; color: ${badgeColor}; border: 1px solid ${badgeBorder};`
-
       const deleteBtn = document.createElement('span')
       deleteBtn.textContent = '[x]'
-      deleteBtn.style.fontSize = '9px'
-      deleteBtn.style.cursor = 'pointer'
+      deleteBtn.className = 'doc-delete-btn'
+      deleteBtn.style.cssText = 'font-size: 9px; cursor: pointer; opacity: 0.6; padding: 2px 4px;'
       deleteBtn.setAttribute('role', 'button')
       deleteBtn.setAttribute('aria-label', `Deletar documento ${doc.name}`)
       deleteBtn.setAttribute('tabindex', '-1')
-      deleteBtn.setAttribute('title', 'Clique para deletar (ou pressione Delete na seleção)')
+      deleteBtn.setAttribute('title', 'Clique para deletar (ou pressione Delete na selecao)')
       deleteBtn.addEventListener('click', (e: MouseEvent) => {
         e.stopPropagation()
         onDelete(doc.id)
@@ -126,9 +87,14 @@ export class UIRenderer {
           onDelete(doc.id)
         }
       })
+      deleteBtn.addEventListener('mouseenter', () => {
+        deleteBtn.style.opacity = '1'
+      })
+      deleteBtn.addEventListener('mouseleave', () => {
+        deleteBtn.style.opacity = '0.6'
+      })
 
       item.appendChild(nameContainer)
-      item.appendChild(storageBadge)
       item.appendChild(deleteBtn)
 
       item.addEventListener('click', () => onSelect(doc.id))
@@ -149,10 +115,10 @@ export class UIRenderer {
    * 
    * Processa HTML sanitizado com:
    * - Imagens redimensionadas para A4
-   * - Estimativa de páginas
+   * - Estimativa de paginas
    * 
    * @param {HTMLElement} container - Container para renderizar
-   * @param {string} html - HTML sanitizado já processado
+   * @param {string} html - HTML sanitizado ja processado
    * @returns {Promise<void>}
    */
   async renderPreview(container: HTMLElement, html: string): Promise<void> {
@@ -163,15 +129,15 @@ export class UIRenderer {
       container.removeChild(container.firstChild)
     }
 
-    // Inserir HTML diretamente usando insertAdjacentHTML (não sanitiza novamente)
-    // O HTML já foi sanitizado pelo DOMPurify em processMarkdown()
+    // Inserir HTML diretamente usando insertAdjacentHTML (nao sanitiza novamente)
+    // O HTML ja foi sanitizado pelo DOMPurify em processMarkdown()
     container.insertAdjacentHTML('afterbegin', html)
 
     // Processar imagens com cache
     try {
       const imagesProcessed = await processImagesInPreview(container, true)
       if (imagesProcessed > 0) {
-        this.logger?.log?.(`✓ ${imagesProcessed} imagem(ns) otimizada(s) para A4`, 'success')
+        this.logger?.log?.(`${imagesProcessed} imagem(ns) otimizada(s) para A4`, 'success')
       }
     } catch (e) {
       this.logger?.error?.(`Erro ao processar imagens: ${String(e)}`)
@@ -192,7 +158,7 @@ export class UIRenderer {
   }
 
   /**
-   * Atualiza métrica de memória
+   * Atualiza metrica de memoria
    * 
    * @param {HTMLElement} container - Container do metric
    * @param {number} bytes - Tamanho em bytes
@@ -207,7 +173,7 @@ export class UIRenderer {
    * Flash visual indicator
    * 
    * @param {HTMLElement} indicator - Elemento indicator
-   * @param {number} duration - Duração do flash em ms
+   * @param {number} duration - Duracao do flash em ms
    * @returns {void}
    */
   flashIndicator(indicator: HTMLElement, duration: number = 200): void {
@@ -247,6 +213,6 @@ export class UIRenderer {
 }
 
 /**
- * Instância singleton do UIRenderer
+ * Instancia singleton do UIRenderer
  */
 export const uiRenderer = new UIRenderer()

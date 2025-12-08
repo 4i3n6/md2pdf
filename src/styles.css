@@ -1245,34 +1245,6 @@ nav:focus-visible {
     font-size: 10px;
 }
 
-/* Storage Badge */
-.storage-badge {
-    padding: 3px 8px;
-    border-radius: 3px;
-    font-size: 9px;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-}
-
-.storage-local {
-    background: #f3f4f6;
-    color: #6b7280;
-    border: 1px solid #d1d5db;
-}
-
-.storage-disk {
-    background: #dbeafe;
-    color: #1d4ed8;
-    border: 1px solid #3b82f6;
-}
-
-.storage-cloud {
-    background: #d1fae5;
-    color: #047857;
-    border: 1px solid #10b981;
-}
-
 /* Save Status Indicator */
 .save-status {
     display: flex;

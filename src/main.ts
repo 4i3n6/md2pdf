@@ -11,13 +11,6 @@ import OfflineManager from './utils/offlineManager'
 import SWUpdateNotifier from './utils/swUpdateNotifier'
 import { documentManager } from './services/documentManager'
 import { uiRenderer } from './services/uiRenderer'
-import {
-  isFileSystemAccessSupported,
-  openFileFromDisk,
-  saveFileToDisk,
-  openFileFallback,
-  downloadFileFallback
-} from './services/fileSystemService'
 import type { AppState, LoggerInterface, Document as AppDocument } from '@/types/index'
 import './pwaRegister'
 import './styles.css'
@@ -41,7 +34,7 @@ const Logger: LoggerInterface = {
   success: (msg: string): void => Logger.log(msg, 'success')
 };
 
-// Expor Logger globalmente para uso em outros módulos
+// Expor Logger globalmente para uso em outros modulos
 declare global {
   interface Window {
     Logger: LoggerInterface;
@@ -50,8 +43,8 @@ declare global {
 window.Logger = Logger;
 
 /**
- * Estado da aplicação (UI-only)
- * Documentos são gerenciados pelo DocumentManager
+ * Estado da aplicacao (UI-only)
+ * Documentos sao gerenciados pelo DocumentManager
  */
 const state: AppState = {
   docs: [],
@@ -60,27 +53,19 @@ const state: AppState = {
 }
 
 // CodeMirror Decorations Setup
-/**
- * StateEffect para atualizar decorations de validação de Markdown
- */
 const updateDecorationsEffect = StateEffect.define<any>();
 
-/**
- * StateField para gerenciar decorations de validação
- */
 const markdownDecorationsField = StateField.define({
   create() {
     return Decoration.none;
   },
   
   update(decorations, tr) {
-    // Se há um efeito de atualização, usar o novo valor
     for (const effect of tr.effects) {
       if (effect.is(updateDecorationsEffect)) {
         return effect.value;
       }
     }
-    // Caso contrário, mapear as decorations para as mudanças
     return decorations.map(tr.changes);
   },
   
@@ -103,9 +88,6 @@ const DEFAULT_PREFS: DocumentPreferences = {
   align: 'left'
 };
 
-/**
- * Obtém preferências de um documento do localStorage
- */
 function getDocPreferences(docId: number): DocumentPreferences {
   const key = `md2pdf-doc-prefs-${docId}`;
   const saved = localStorage.getItem(key);
@@ -119,30 +101,22 @@ function getDocPreferences(docId: number): DocumentPreferences {
   return { ...DEFAULT_PREFS };
 }
 
-/**
- * Salva preferências de um documento no localStorage
- */
 function saveDocPreferences(docId: number, prefs: DocumentPreferences): void {
   const key = `md2pdf-doc-prefs-${docId}`;
   localStorage.setItem(key, JSON.stringify(prefs));
 }
 
-/**
- * Aplica fonte ao preview do documento
- */
 function applyPreviewFont(font: string): void {
   const preview = document.getElementById('preview');
   if (preview) {
     preview.style.fontFamily = font;
   }
   
-  // Atualizar dropdown visual
   const fontSelect = document.getElementById('preview-font') as HTMLSelectElement;
   if (fontSelect) {
     fontSelect.value = font;
   }
   
-  // Salvar preferência do documento atual
   if (state.currentId) {
     const prefs = getDocPreferences(state.currentId);
     prefs.font = font;
@@ -150,19 +124,14 @@ function applyPreviewFont(font: string): void {
   }
 }
 
-/**
- * Aplica alinhamento ao preview do documento
- */
 function applyPreviewAlign(align: string): void {
   const preview = document.getElementById('preview');
   if (preview) {
     preview.style.textAlign = align;
   }
   
-  // Atualizar botões visuais
   updateAlignButtons(align);
   
-  // Salvar preferência do documento atual
   if (state.currentId) {
     const prefs = getDocPreferences(state.currentId);
     prefs['align'] = align;
@@ -170,9 +139,6 @@ function applyPreviewAlign(align: string): void {
   }
 }
 
-/**
- * Atualiza estado visual dos botões de alinhamento
- */
 function updateAlignButtons(activeAlign: string): void {
   const buttons = document.querySelectorAll('.align-btn');
   buttons.forEach(btn => {
@@ -187,9 +153,6 @@ function updateAlignButtons(activeAlign: string): void {
   });
 }
 
-/**
- * Carrega preferências de um documento e aplica ao preview
- */
 function loadDocPreferences(docId: number): void {
   const prefs = getDocPreferences(docId);
   applyPreviewFont(prefs.font);
@@ -201,12 +164,7 @@ function loadDocPreferences(docId: number): void {
 // ============================================
 
 let saveStatusInterval: ReturnType<typeof setInterval> | null = null;
-let diskAutoSaveTimeout: ReturnType<typeof setTimeout> | null = null;
-const DISK_AUTO_SAVE_DELAY = 2000; // 2 segundos de debounce para auto-save no disco
 
-/**
- * Formata tempo relativo desde último salvamento
- */
 function formatTimeSinceSaved(lastSaved: number | null): string {
   if (!lastSaved) return 'Nunca salvo';
   
@@ -223,186 +181,39 @@ function formatTimeSinceSaved(lastSaved: number | null): string {
   return `Salvo ha ${hours}h`;
 }
 
-/**
- * Atualiza o indicador de status de salvamento na UI
- */
 function updateSaveStatus(): void {
   const doc = getCurrentDoc();
   if (!doc) return;
   
   const statusEl = document.getElementById('save-status');
-  const storageEl = document.getElementById('storage-badge');
-  
   if (!statusEl) return;
   
-  // Atualizar badge de storage com labels claros
-  if (storageEl) {
-    storageEl.className = `storage-badge storage-${doc.storage}`;
-    
-    // Labels mais descritivos para cada tipo de storage
-    let label = 'BROWSER';
-    let title = 'Armazenado no navegador (localStorage)';
-    
-    if (doc.storage === 'disk') {
-      label = 'ARQUIVO';
-      title = 'Arquivo salvo no disco local';
-    } else if (doc.storage === 'cloud') {
-      label = 'NUVEM';
-      title = 'Sincronizado na nuvem';
-    }
-    
-    storageEl.textContent = label;
-    storageEl.title = title;
-  }
-  
-  // Determinar status visual
-  let statusClass: string;
-  let dotHtml: string;
-  let statusText: string;
-  
-  if (doc.isDirty) {
-    statusClass = 'save-status-modified';
-    dotHtml = '<span class="save-dot modified"></span>';
-    statusText = 'Nao salvo';
-  } else {
-    statusClass = 'save-status-saved';
-    dotHtml = '<span class="save-dot saved"></span>';
-    statusText = formatTimeSinceSaved(doc.lastSaved);
-  }
-  
-  statusEl.className = `save-status ${statusClass}`;
-  statusEl.innerHTML = `${dotHtml}<span class="save-text">${statusText}</span>`;
+  const statusText = formatTimeSinceSaved(doc.lastSaved);
+  statusEl.className = 'save-status save-status-saved';
+  statusEl.innerHTML = `<span class="save-dot saved"></span><span class="save-text">${statusText}</span>`;
 }
 
-/**
- * Define documento como modificado (dirty)
- */
-function markDocumentDirty(): void {
-  const doc = getCurrentDoc();
-  if (!doc) return;
-  
-  doc.isDirty = true;
-  updateSaveStatus();
-  
-  // Para arquivos do disco, agendar auto-save debounced
-  if (doc.storage === 'disk' && doc.fileHandle && isFileSystemAccessSupported()) {
-    scheduleDiskAutoSave();
-  }
-}
-
-/**
- * Agenda auto-save para arquivo do disco com debounce
- */
-function scheduleDiskAutoSave(): void {
-  // Cancelar timeout anterior se existir
-  if (diskAutoSaveTimeout) {
-    clearTimeout(diskAutoSaveTimeout);
-  }
-  
-  diskAutoSaveTimeout = setTimeout(async () => {
-    const doc = getCurrentDoc();
-    if (!doc || !doc.isDirty || doc.storage !== 'disk' || !doc.fileHandle) {
-      return;
-    }
-    
-    try {
-      await saveFileToDisk(doc.content, { handle: doc.fileHandle });
-      markDocumentSaved();
-      // Nao logar para nao poluir - auto-save silencioso
-    } catch (e) {
-      // Falha silenciosa no auto-save - usuario pode salvar manualmente
-      const errorMsg = e instanceof Error ? e.message : String(e);
-      Logger.log(`Auto-save falhou: ${errorMsg}`, 'warning');
-    }
-  }, DISK_AUTO_SAVE_DELAY);
-}
-
-/**
- * Define documento como salvo
- */
-function markDocumentSaved(): void {
-  const doc = getCurrentDoc();
-  if (!doc) return;
-  
-  doc.isDirty = false;
-  doc.lastSaved = Date.now();
-  updateSaveStatus();
-}
-
-/**
- * Mostra status de "salvando..."
- */
-function showSavingStatus(): void {
-  const statusEl = document.getElementById('save-status');
-  if (!statusEl) return;
-  
-  statusEl.className = 'save-status save-status-saving';
-  statusEl.innerHTML = '<span class="save-dot saving"></span><span class="save-text">Salvando...</span>';
-}
-
-/**
- * Mostra status de erro ao salvar
- */
-function showSaveError(): void {
-  const statusEl = document.getElementById('save-status');
-  if (!statusEl) return;
-  
-  statusEl.className = 'save-status save-status-error';
-  statusEl.innerHTML = '<span class="save-dot error"></span><span class="save-text">Erro ao salvar</span>';
-}
-
-/**
- * Força salvamento manual do documento atual
- * Para documentos do disco, salva diretamente no arquivo
- */
-async function forceSave(): Promise<void> {
+function forceSave(): void {
   const doc = getCurrentDoc();
   if (!doc) {
     Logger.log('Nenhum documento para salvar', 'warning');
     return;
   }
   
-  showSavingStatus();
-  
-  try {
-    // Sempre salvar no localStorage primeiro (backup)
-    documentManager.setContent(doc.id, doc.content);
-    
-    // Se for arquivo do disco com handle, salvar no disco também
-    if (doc.storage === 'disk' && doc.fileHandle && isFileSystemAccessSupported()) {
-      await saveFileToDisk(doc.content, { handle: doc.fileHandle });
-      Logger.success(`Salvo no disco: ${doc.name}`);
-    } else {
-      Logger.success('Documento salvo');
-    }
-    
-    markDocumentSaved();
-  } catch (e) {
-    showSaveError();
-    const errorMsg = e instanceof Error ? e.message : String(e);
-    Logger.error('Erro ao salvar: ' + errorMsg);
-  }
+  documentManager.setContent(doc.id, doc.content);
+  updateSaveStatus();
+  Logger.success('Documento salvo');
 }
 
-/**
- * Inicia intervalo para atualizar tempo relativo de salvamento
- */
 function startSaveStatusUpdater(): void {
-  // Atualizar a cada 10 segundos
   if (saveStatusInterval) {
     clearInterval(saveStatusInterval);
   }
   saveStatusInterval = setInterval(() => {
-    const doc = getCurrentDoc();
-    if (doc && !doc.isDirty) {
-      updateSaveStatus();
-    }
+    updateSaveStatus();
   }, 10000);
 }
 
-/**
- * Configura event listeners para controles de salvamento
- */
 function setupSaveControls(): void {
   const forceSaveBtn = document.getElementById('force-save-btn');
   
@@ -410,7 +221,6 @@ function setupSaveControls(): void {
     forceSaveBtn.addEventListener('click', forceSave);
   }
   
-  // Atalho Ctrl+S para salvar
   document.addEventListener('keydown', (e: KeyboardEvent): void => {
     if ((e.ctrlKey || e.metaKey) && e.key === 's') {
       e.preventDefault();
@@ -423,166 +233,87 @@ function setupSaveControls(): void {
 }
 
 // ============================================
-// FILE SYSTEM ACCESS API INTEGRATION
+// IMPORT/EXPORT FUNCTIONS
 // ============================================
 
 /**
- * Abre um arquivo do disco e cria um novo documento
+ * Importa um arquivo .md do computador
  */
-async function handleOpenFile(): Promise<void> {
-  try {
-    if (isFileSystemAccessSupported()) {
-      const result = await openFileFromDisk();
-      
-      // Criar documento a partir do arquivo
-      const newDoc = documentManager.createFromFile(
-        result.name,
-        result.content,
-        result.handle
-      );
-      
-      // Alternar para o novo documento
-      state.currentId = newDoc.id;
-      
-      if (state.editor) {
-        state.editor.dispatch({
-          changes: { from: 0, to: state.editor.state.doc.length, insert: newDoc.content }
-        });
-      }
-      
-      renderList();
-      renderPreview(newDoc.content);
-      updateSaveStatus();
-      
-      Logger.success(`Arquivo aberto: ${result.name}`);
-    } else {
-      // Fallback para browsers sem suporte
-      const result = await openFileFallback();
-      
-      // Criar documento sem handle (será salvo como local)
-      const newDoc = documentManager.create(result.name);
-      documentManager.setContent(newDoc.id, result.content);
+function importMarkdownFile(): void {
+  const input = document.createElement('input');
+  input.type = 'file';
+  input.accept = '.md,.markdown,.txt';
+  
+  input.onchange = async (e: Event): Promise<void> => {
+    const target = e.target as HTMLInputElement;
+    const file = target.files?.[0];
+    
+    if (!file) {
+      Logger.log('Nenhum arquivo selecionado', 'info');
+      return;
+    }
+    
+    try {
+      const content = await file.text();
+      const newDoc = documentManager.createFromImport(file.name, content);
       
       state.currentId = newDoc.id;
       
       if (state.editor) {
         state.editor.dispatch({
-          changes: { from: 0, to: state.editor.state.doc.length, insert: result.content }
+          changes: { from: 0, to: state.editor.state.doc.length, insert: content }
         });
       }
       
       renderList();
-      renderPreview(result.content);
+      renderPreview(content);
       updateSaveStatus();
       
-      Logger.success(`Arquivo importado: ${result.name} (modo local)`);
-      Logger.log('File System Access API nao suportada - salvo localmente', 'warning');
+      Logger.success(`Arquivo importado: ${file.name}`);
+    } catch (error) {
+      const errorMsg = error instanceof Error ? error.message : String(error);
+      Logger.error(`Erro ao importar arquivo: ${errorMsg}`);
     }
-  } catch (error) {
-    if (error instanceof Error) {
-      if (error.message === 'File selection cancelled') {
-        Logger.log('Selecao de arquivo cancelada', 'info');
-      } else {
-        Logger.error(`Erro ao abrir arquivo: ${error.message}`);
-      }
-    }
-  }
+  };
+  
+  input.click();
 }
 
 /**
- * Salva o documento atual no disco
+ * Exporta o documento atual como arquivo .md
  */
-async function handleSaveToDisk(): Promise<void> {
-  const doc = getCurrentDoc();
-  if (!doc) {
-    Logger.log('Nenhum documento para salvar', 'warning');
-    return;
-  }
-  
+function downloadMarkdownFile(): void {
   try {
-    showSavingStatus();
-    
-    if (isFileSystemAccessSupported()) {
-      const handle = await saveFileToDisk(doc.content, {
-        suggestedName: doc.name,
-        handle: doc.fileHandle
-      });
-      
-      // Atualizar documento com novo handle (caso seja Save As)
-      documentManager.setFileHandle(doc.id, handle);
-      
-      // Atualizar nome se mudou (Save As)
-      if (handle.name !== doc.name) {
-        documentManager.rename(doc.id, handle.name);
-        renderList();
-      }
-      
-      markDocumentSaved();
-      Logger.success(`Salvo no disco: ${handle.name}`);
-    } else {
-      // Fallback: download tradicional
-      downloadFileFallback(doc.content, doc.name);
-      markDocumentSaved();
-      Logger.success(`Download iniciado: ${doc.name}`);
+    const doc = getCurrentDoc();
+    if (!doc) {
+      Logger.error('Nenhum documento carregado');
+      return;
     }
-  } catch (error) {
-    showSaveError();
-    if (error instanceof Error) {
-      if (error.message === 'Save cancelled') {
-        Logger.log('Salvamento cancelado', 'info');
-        updateSaveStatus(); // Restaurar status anterior
-      } else {
-        Logger.error(`Erro ao salvar: ${error.message}`);
-      }
-    }
+
+    const blob = new Blob([doc.content], { type: 'text/markdown;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = doc.name;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+
+    URL.revokeObjectURL(url);
+
+    Logger.success(`Download: ${doc.name} (${(blob.size / 1024).toFixed(2)}KB)`);
+  } catch (e) {
+    const errorMessage = e instanceof Error ? e.message : String(e);
+    Logger.error('Erro ao fazer download: ' + errorMessage);
   }
 }
 
-/**
- * Configura event listeners para operacoes de arquivo
- */
-function setupFileSystemControls(): void {
-  const openBtn = document.getElementById('open-file-btn');
-  const saveDiskBtn = document.getElementById('save-disk-btn');
-  
-  if (openBtn) {
-    openBtn.addEventListener('click', handleOpenFile);
-  }
-  
-  if (saveDiskBtn) {
-    saveDiskBtn.addEventListener('click', handleSaveToDisk);
-  }
-  
-  // Atalhos de teclado
-  document.addEventListener('keydown', (e: KeyboardEvent): void => {
-    // Ctrl+O para abrir arquivo
-    if ((e.ctrlKey || e.metaKey) && e.key === 'o') {
-      e.preventDefault();
-      handleOpenFile();
-    }
-    
-    // Ctrl+Shift+S para salvar no disco (Save As)
-    if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key === 'S') {
-      e.preventDefault();
-      handleSaveToDisk();
-    }
-  });
-  
-  // Mostrar/esconder botoes baseado no suporte
-  if (!isFileSystemAccessSupported()) {
-    if (saveDiskBtn) {
-      saveDiskBtn.title = 'Download arquivo (File System Access API nao suportada)';
-    }
-  }
-  
-  Logger.success('Controles de arquivo ativos');
-}
+// ============================================
+// PREVIEW CONTROLS
+// ============================================
 
-/**
- * Configura event listeners dos controles do preview
- */
 function setupPreviewControls(): void {
-  // Dropdown de fonte
   const fontSelect = document.getElementById('preview-font') as HTMLSelectElement | null;
   if (fontSelect) {
     fontSelect.addEventListener('change', (e) => {
@@ -596,7 +327,6 @@ function setupPreviewControls(): void {
     });
   }
   
-  // Botões de alinhamento
   document.querySelectorAll('.align-btn').forEach(btn => {
     btn.addEventListener('click', (e) => {
       const target = e.target as HTMLElement;
@@ -608,22 +338,18 @@ function setupPreviewControls(): void {
     });
   });
   
-  // Dropdown de fonte para seleção (QUICK_TAGS)
   const tagFontSelect = document.getElementById('tag-font') as HTMLSelectElement;
   tagFontSelect?.addEventListener('change', (e) => {
     const font = (e.target as HTMLSelectElement).value;
     if (font) {
       insertFontTag(font);
-      (e.target as HTMLSelectElement).selectedIndex = 0; // Reset para "Aa"
+      (e.target as HTMLSelectElement).selectedIndex = 0;
     }
   });
   
   Logger.success('Controles do preview ativados');
 }
 
-/**
- * Insere tag de fonte na seleção do editor
- */
 function insertFontTag(font: string): void {
   if (!state.editor) return;
   
@@ -645,18 +371,16 @@ function insertFontTag(font: string): void {
   Logger.log(`Fonte aplicada na selecao`);
 }
 
-/**
- * Escapa HTML para exibição segura
- */
+// ============================================
+// MARKDOWN VALIDATION
+// ============================================
+
 function escapeHtml(text: string): string {
   const div = document.createElement('div');
   div.textContent = text;
   return div.innerHTML;
 }
 
-/**
- * Encontra issue na posição do cursor
- */
 function findIssueAtPosition(pos: number, issues: MarkdownError[], content: string): MarkdownError | null {
   const lines = content.split('\n');
   let charIndex = 0;
@@ -673,9 +397,6 @@ function findIssueAtPosition(pos: number, issues: MarkdownError[], content: stri
   return null;
 }
 
-/**
- * Extension para hover tooltip de erros/avisos Markdown
- */
 const markdownHoverTooltip = hoverTooltip((view, pos) => {
   const content = view.state.doc.toString();
   const issue = findIssueAtPosition(pos, currentIssues, content);
@@ -715,9 +436,6 @@ const markdownHoverTooltip = hoverTooltip((view, pos) => {
   };
 });
 
-/**
- * Navega para a posição de uma issue no editor
- */
 function navigateToIssue(issue: MarkdownError): void {
   if (!state.editor) return;
   
@@ -739,9 +457,6 @@ function navigateToIssue(issue: MarkdownError): void {
   Logger.log(`Navegado para linha ${issue.line}, coluna ${issue.column}`);
 }
 
-/**
- * Aplica correção automática de uma issue
- */
 function applyFix(issue: MarkdownError): void {
   if (!state.editor || !issue.suggestion) return;
   
@@ -761,17 +476,14 @@ function applyFix(issue: MarkdownError): void {
   let insert: string;
   
   if (issue.suggestionRange?.from === -1) {
-    // Append no final do documento
     from = content.length;
     to = content.length;
     insert = '\n' + issue.suggestion;
   } else if (issue.suggestionRange) {
-    // Substituir linha inteira
     from = lineStart;
     to = lineEnd;
     insert = issue.suggestion;
   } else {
-    // Substituir linha inteira (fallback)
     from = lineStart;
     to = lineEnd;
     insert = issue.suggestion;
@@ -784,9 +496,6 @@ function applyFix(issue: MarkdownError): void {
   Logger.success(`Correcao aplicada na linha ${issue.line}`);
 }
 
-/**
- * Renderiza o painel de problemas no sidebar
- */
 function renderProblemsPanel(issues: MarkdownError[]): void {
   const panel = document.getElementById('problems-panel');
   const countEl = document.getElementById('problems-count');
@@ -825,7 +534,6 @@ function renderProblemsPanel(issues: MarkdownError[]): void {
     
     item.innerHTML = html;
     
-    // Click para navegar (exceto no botão FIX)
     item.addEventListener('click', (e) => {
       if ((e.target as HTMLElement).classList.contains('problem-fix-btn')) {
         const idx = parseInt((e.target as HTMLElement).dataset['index'] || '0');
@@ -838,7 +546,6 @@ function renderProblemsPanel(issues: MarkdownError[]): void {
       navigateToIssue(issue);
     });
     
-    // Keyboard navigation
     item.addEventListener('keydown', (e) => {
       if (e.key === 'Enter' || e.key === ' ') {
         e.preventDefault();
@@ -850,11 +557,10 @@ function renderProblemsPanel(issues: MarkdownError[]): void {
   });
 }
 
-/**
- * Insere uma tag Markdown na posição do cursor ou envolve o texto selecionado
- * 
- * @param tag - Tipo de tag a inserir
- */
+// ============================================
+// QUICK TAGS
+// ============================================
+
 function insertTag(tag: string): void {
   if (!state.editor) return;
   
@@ -868,32 +574,27 @@ function insertTag(tag: string): void {
   
   switch (tag) {
     case 'br':
-      // Quebra de linha simples (Markdown: linha vazia)
       insert = '\n\n';
       cursorOffset = insert.length;
       break;
       
     case 'hr':
-      // Linha horizontal / quebra de pagina
       insert = '\n---\n';
       cursorOffset = insert.length;
       break;
       
     case 'code':
-      // Bloco de codigo
       if (hasSelection) {
         insert = '```\n' + selectedText + '\n```';
-        cursorOffset = 4; // Posiciona apos ```\n
+        cursorOffset = 4;
       } else {
         insert = '```\n\n```';
-        cursorOffset = 4; // Posiciona dentro do bloco
+        cursorOffset = 4;
       }
       break;
       
     case 'quote':
-      // Blockquote
       if (hasSelection) {
-        // Adicionar > no inicio de cada linha selecionada
         insert = selectedText.split('\n').map(line => '> ' + line).join('\n');
         cursorOffset = insert.length;
       } else {
@@ -903,7 +604,6 @@ function insertTag(tag: string): void {
       break;
       
     case 'heading':
-      // Heading
       if (hasSelection) {
         insert = '# ' + selectedText;
         cursorOffset = insert.length;
@@ -914,31 +614,27 @@ function insertTag(tag: string): void {
       break;
       
     case 'bold':
-      // Negrito
       if (hasSelection) {
         insert = '**' + selectedText + '**';
         cursorOffset = insert.length;
       } else {
         insert = '**texto**';
-        cursorOffset = 2; // Posiciona antes de "texto"
+        cursorOffset = 2;
       }
       break;
       
     case 'italic':
-      // Italico
       if (hasSelection) {
         insert = '*' + selectedText + '*';
         cursorOffset = insert.length;
       } else {
         insert = '*texto*';
-        cursorOffset = 1; // Posiciona antes de "texto"
+        cursorOffset = 1;
       }
       break;
       
     case 'list':
-      // Lista
       if (hasSelection) {
-        // Adicionar - no inicio de cada linha selecionada
         insert = selectedText.split('\n').map(line => '- ' + line).join('\n');
         cursorOffset = insert.length;
       } else {
@@ -948,18 +644,16 @@ function insertTag(tag: string): void {
       break;
       
     case 'link':
-      // Link
       if (hasSelection) {
         insert = '[' + selectedText + '](url)';
-        cursorOffset = insert.length - 4; // Posiciona em "url"
+        cursorOffset = insert.length - 4;
       } else {
         insert = '[texto](url)';
-        cursorOffset = 1; // Posiciona antes de "texto"
+        cursorOffset = 1;
       }
       break;
       
     case 'strike':
-      // Tachado (strikethrough)
       if (hasSelection) {
         insert = '~~' + selectedText + '~~';
         cursorOffset = insert.length;
@@ -970,7 +664,6 @@ function insertTag(tag: string): void {
       break;
       
     case 'numlist':
-      // Lista numerada
       if (hasSelection) {
         insert = selectedText.split('\n').map((line, i) => `${i + 1}. ` + line).join('\n');
         cursorOffset = insert.length;
@@ -981,7 +674,6 @@ function insertTag(tag: string): void {
       break;
       
     case 'checkbox':
-      // Checkbox / Tarefa
       if (hasSelection) {
         insert = selectedText.split('\n').map(line => '- [ ] ' + line).join('\n');
         cursorOffset = insert.length;
@@ -992,13 +684,11 @@ function insertTag(tag: string): void {
       break;
       
     case 'table':
-      // Tabela
       insert = '\n| Coluna 1 | Coluna 2 | Coluna 3 |\n|----------|----------|----------|\n| dado 1   | dado 2   | dado 3   |\n';
-      cursorOffset = 3; // Posiciona em "Coluna 1"
+      cursorOffset = 3;
       break;
       
     case 'mark-yellow':
-      // Destaque amarelo (usando HTML inline que funciona em MD)
       if (hasSelection) {
         insert = '<mark style="background:#fef08a">' + selectedText + '</mark>';
         cursorOffset = insert.length;
@@ -1009,7 +699,6 @@ function insertTag(tag: string): void {
       break;
       
     case 'mark-green':
-      // Destaque verde
       if (hasSelection) {
         insert = '<mark style="background:#bbf7d0">' + selectedText + '</mark>';
         cursorOffset = insert.length;
@@ -1020,7 +709,6 @@ function insertTag(tag: string): void {
       break;
       
     case 'mark-blue':
-      // Destaque azul
       if (hasSelection) {
         insert = '<mark style="background:#bfdbfe">' + selectedText + '</mark>';
         cursorOffset = insert.length;
@@ -1031,7 +719,6 @@ function insertTag(tag: string): void {
       break;
       
     case 'mark-red':
-      // Destaque vermelho
       if (hasSelection) {
         insert = '<mark style="background:#fecaca">' + selectedText + '</mark>';
         cursorOffset = insert.length;
@@ -1042,7 +729,6 @@ function insertTag(tag: string): void {
       break;
       
     case 'clear':
-      // Remover tags HTML da selecao
       if (hasSelection) {
         insert = selectedText.replace(/<[^>]*>/g, '');
         cursorOffset = insert.length;
@@ -1057,7 +743,6 @@ function insertTag(tag: string): void {
     case 'align-center':
     case 'align-right':
     case 'align-justify':
-      // Alinhamento por selecao
       if (hasSelection) {
         const alignValue = tag.replace('align-', '');
         insert = `<div style="text-align: ${alignValue}">${selectedText}</div>`;
@@ -1072,7 +757,6 @@ function insertTag(tag: string): void {
       return;
   }
   
-  // Aplicar a insercao/substituicao
   view.dispatch({
     changes: { from, to, insert },
     selection: { anchor: from + cursorOffset }
@@ -1082,9 +766,6 @@ function insertTag(tag: string): void {
   Logger.log(`Tag "${tag}" inserida`);
 }
 
-/**
- * Configura event listeners para os botoes de quick tags
- */
 function setupQuickTags(): void {
   const container = document.querySelector('.quick-tags-container');
   if (!container) return;
@@ -1102,22 +783,10 @@ function setupQuickTags(): void {
   Logger.success('Quick Tags ativadas');
 }
 
-// Utility Functions
+// ============================================
+// UTILITY FUNCTIONS
+// ============================================
 
-/**
- * Cria uma função debounced que atrasa execução até N ms após última chamada
- * 
- * @template T Tipo da função
- * @param {T} fn - Função a debounce
- * @param {number} delay - Delay em millisegundos
- * @returns {(...args: Parameters<T>) => void} Função debounced
- * 
- * @example
- *   const debouncedFn = debounce(() => console.log('hello'), 300)
- *   debouncedFn() // Não executa
- *   debouncedFn() // Não executa
- *   // Após 300ms: "hello" é impresso uma vez
- */
 function debounce<T extends (...args: any[]) => any>(
   fn: T,
   delay: number
@@ -1135,35 +804,27 @@ function debounce<T extends (...args: any[]) => any>(
   }
 }
 
-// Core Functions
+// ============================================
+// CORE FUNCTIONS
+// ============================================
 
-/**
- * Inicializa o sistema completo
- * 
- * Carrega configuração offline, notificador de atualizações,
- * documentos salvos e inicia o editor com event listeners
- * 
- * @returns {void}
- */
 function initSystem(): void {
-  Logger.log('Inicializando núcleo...');
-  Logger.success('✓ Markdown processor carregado (com sanitização DOMPurify)');
-  Logger.success('✓ Estilos de impressão A4 ativos');
+  Logger.log('Inicializando nucleo...');
+  Logger.success('Markdown processor carregado');
+  Logger.success('Estilos de impressao A4 ativos');
 
-  // Inicializa gerenciamento offline
   OfflineManager.init();
   OfflineManager.loadSyncQueue();
   OfflineManager.onStatusChange((isOnline: boolean): void => {
     const msg = isOnline
-      ? '✓ Conexão restaurada - Funcionamento online'
-      : '⚠️ Sem conexão - Modo offline ativo';
+      ? 'Conexao restaurada'
+      : 'Sem conexao - Modo offline ativo';
     Logger.log(msg, isOnline ? 'success' : 'warning');
   });
-  Logger.success('✓ Gerenciador offline ativo');
+  Logger.success('Gerenciador offline ativo');
 
-  // Inicializa notificador de updates
   SWUpdateNotifier.init();
-  Logger.success('✓ Monitor de atualizações ativo');
+  Logger.success('Monitor de atualizacoes ativo');
 
   loadDocs();
   initEditor();
@@ -1171,32 +832,20 @@ function initSystem(): void {
   setupQuickTags();
   setupPreviewControls();
   setupSaveControls();
-  setupFileSystemControls();
   setupKeyboardNavigation();
   updateMetrics();
   updateSaveStatus();
   Logger.success('Sistema pronto.');
 }
 
-/**
- * Carrega documentos via DocumentManager
- * 
- * Inicializa DocumentManager, carrega docs do localStorage,
- * e inscreve no observable para atualizações.
- * 
- * @returns {void}
- */
 function loadDocs(): void {
-   // Inicializar DocumentManager
-   documentManager.init()
+  documentManager.init()
 
-  // Inscrever para mudanças
   documentManager.subscribe((docs) => {
     state.docs = docs
     renderList()
   })
 
-  // Carregar docs iniciais
   state.docs = documentManager.getAll()
   if (state.docs.length > 0 && state.docs[0]) {
     state.currentId = state.docs[0].id
@@ -1204,14 +853,6 @@ function loadDocs(): void {
   renderList()
 }
 
-/**
- * Salva documentos via DocumentManager
- * 
- * Atualiza conteúdo do documento ativo no DocumentManager.
- * DocumentManager cuida de persister em localStorage.
- * 
- * @returns {void}
- */
 function saveDocs(): void {
   const doc = getCurrentDoc()
   if (!doc) return
@@ -1220,29 +861,14 @@ function saveDocs(): void {
   updateMetrics()
 }
 
-/**
- * Aplica diagnostics (erros/avisos) ao editor CodeMirror
- * 
- * Valida Markdown e mostra erros como underlines vermelhas
- * e avisos como underlines amarelas no editor
- * 
- * @param content - Conteúdo Markdown a validar
- * @returns {void}
- */
 function updateEditorDiagnostics(content: string): void {
   if (!state.editor) return;
 
-  // Validar Markdown
   const validation = validateMarkdown(content);
-
-  // Construir decorations para erros e avisos
   const decorationRanges: any[] = [];
   const lines = content.split('\n');
 
-  // Processar erros e avisos
   const allIssues = [...validation.errors, ...validation.warnings];
-  
-  // Armazenar globalmente para tooltip e painel
   currentIssues = allIssues;
   
   allIssues.forEach((issue) => {
@@ -1251,11 +877,10 @@ function updateEditorDiagnostics(content: string): void {
     
     if (!line) return;
 
-     // Encontrar posição no documento completo
-     let charIndex = 0;
-     for (let i = 0; i < lineIndex; i++) {
-       charIndex += (lines[i]?.length ?? 0) + 1; // +1 para newline
-     }
+    let charIndex = 0;
+    for (let i = 0; i < lineIndex; i++) {
+      charIndex += (lines[i]?.length ?? 0) + 1;
+    }
 
     const from = charIndex + Math.max(0, issue.column - 1);
     const to = Math.min(charIndex + line.length, content.length);
@@ -1272,15 +897,13 @@ function updateEditorDiagnostics(content: string): void {
         title: issue.message
       });
       decorationRanges.push(decoration.range(from, to));
-    } catch (e) {
-      // Ignorar erros de decoration para uma range específica
+    } catch {
+      // Ignorar erros de decoration
     }
   });
   
-  // Renderizar painel de problemas
   renderProblemsPanel(allIssues);
 
-  // Log de erros/avisos para o console do sistema (apenas se houver novos)
   if (validation.errors.length > 0) {
     Logger.error(`${validation.errors.length} erro(s) de sintaxe Markdown`);
   }
@@ -1289,7 +912,6 @@ function updateEditorDiagnostics(content: string): void {
     Logger.log(`${validation.warnings.length} aviso(s) Markdown`, 'warning');
   }
 
-  // Aplicar decorations ao editor via StateEffect
   try {
     const decorationSet = Decoration.set(decorationRanges);
     state.editor.dispatch({
@@ -1297,45 +919,32 @@ function updateEditorDiagnostics(content: string): void {
     });
   } catch (e) {
     const errorMsg = e instanceof Error ? e.message : String(e);
-    Logger.log(`⚠️ Validação visual: ${errorMsg}`, 'warning');
+    Logger.log(`Validacao visual: ${errorMsg}`, 'warning');
   }
 }
 
-/**
- * Inicializa o editor CodeMirror
- * 
- * Cria instância de EditorView com:
- * - Modo markdown com syntax highlighting
- * - Theme customizado (light mode)
- * - Line wrapping habilitado
- * - Listener para mudanças com debounce
- * - Validação de sintaxe Markdown
- * 
- * @returns {void}
- */
 function initEditor(): void {
   const el = document.getElementById('editor');
   if (!el) {
-    Logger.error('Elemento editor não encontrado!');
+    Logger.error('Elemento editor nao encontrado!');
     return;
   }
 
   const doc = getCurrentDoc();
 
-  // Debounce functions for performance optimization
   const debouncedRender = debounce(renderPreview, 300);
   const debouncedUpdateMetrics = debounce(updateMetrics, 500);
   const debouncedValidate = debounce(updateEditorDiagnostics, 300);
 
-   state.editor = new EditorView({
-     doc: doc ? doc.content : '',
-     extensions: [
-       basicSetup,
-       markdown(),
-       EditorView.lineWrapping,
-       markdownDecorationsField,
-       markdownHoverTooltip,
-       EditorView.theme({
+  state.editor = new EditorView({
+    doc: doc ? doc.content : '',
+    extensions: [
+      basicSetup,
+      markdown(),
+      EditorView.lineWrapping,
+      markdownDecorationsField,
+      markdownHoverTooltip,
+      EditorView.theme({
         '&': { color: '#111827', backgroundColor: '#ffffff' },
         '.cm-content': { caretColor: '#0052cc' },
         '.cm-gutters': {
@@ -1346,13 +955,9 @@ function initEditor(): void {
         '.cm-activeLine': { backgroundColor: '#f0f4ff' },
         '.cm-activeLineGutter': { color: '#0052cc', backgroundColor: '#f0f4ff', fontWeight: '600' },
         '.cm-cursor': { borderLeftColor: '#0052cc' },
-        
-        // Selection highlighting - cor azul vibrante
         '.cm-selectionBackground': { backgroundColor: '#3b82f6 !important' },
         '&.cm-focused .cm-selectionBackground': { backgroundColor: '#3b82f6 !important' },
         '.cm-selectionMatch': { backgroundColor: '#fef08a' },
-        
-        // Markdown specific syntax coloring
         '.cm-heading': { color: '#111827', fontWeight: '700' },
         '.cm-heading1': { fontSize: '130%' },
         '.cm-heading2': { fontSize: '120%' },
@@ -1369,32 +974,18 @@ function initEditor(): void {
           const start = performance.now();
           const val = u.state.doc.toString();
 
-          // Marcar como modificado (dirty) imediatamente
-          markDocumentDirty();
-
-          // Update State (always persist immediately)
           const active = getCurrentDoc();
           if (active) {
             active.content = val;
             active.updated = Date.now();
             saveDocs();
-            // Marcar como salvo após persistir
-            markDocumentSaved();
           }
 
-           // Validar sintaxe Markdown em tempo real (com debounce para performance)
-           debouncedValidate(val);
-
-          // Debounced Render (300ms delay)
+          debouncedValidate(val);
           debouncedRender(val);
-
-          // Debounced Metrics Update (500ms delay)
           debouncedUpdateMetrics();
-
-          // Visual feedback
           flashStatus();
 
-          // Update latency display
           const end = performance.now();
           const renderLatencyEl = document.getElementById('render-latency');
           if (renderLatencyEl) {
@@ -1408,54 +999,27 @@ function initEditor(): void {
 
   if (doc) {
     renderPreview(doc.content);
-    // Carregar preferências do documento inicial
     if (state.currentId) {
       loadDocPreferences(state.currentId);
     }
   }
 }
 
-/**
- * Obtém o documento atualmente selecionado
- * 
- * @returns {Document | undefined} Documento ativo ou undefined se nenhum selecionado
- */
 function getCurrentDoc(): AppDocument | undefined {
   return state.docs.find((d) => d.id === state.currentId);
 }
 
-/**
- * Renderiza o preview do markdown no elemento preview
- * 
- * Processa markdown para HTML com sanitização,
- * delega renderização para UIRenderer que cuida de imagens A4.
- * 
- * @param {string} md - Conteúdo markdown a renderizar
- * @returns {Promise<void>}
- */
 async function renderPreview(md: string): Promise<void> {
   const preview = document.getElementById('preview')
   if (!preview) return
 
-  // Processar markdown (sanitização ocorre aqui)
   const html = processMarkdown(md)
-
-  // Renderizar via UIRenderer (que processa imagens)
   await uiRenderer.renderPreview(preview, html)
 
-  // Estimar páginas para log
   const estimatedPages = estimatePageCount(html)
-  Logger.log(`Renderizado em ~${estimatedPages} página(s) A4`, 'info')
+  Logger.log(`Renderizado em ~${estimatedPages} pagina(s) A4`, 'info')
 }
 
-/**
- * Renderiza a lista de documentos no sidebar
- * 
- * Delega para UIRenderer para renderização sem efeitos colaterais.
- * Atualiza input de nome do documento ativo.
- * 
- * @returns {void}
- */
 function renderList(): void {
   const list = document.getElementById('documents-list')
   if (!list) return
@@ -1468,7 +1032,6 @@ function renderList(): void {
     (id) => deleteDoc(id)
   )
 
-  // Update input name
   const input = document.getElementById('doc-name') as HTMLInputElement | null
   const current = getCurrentDoc()
   if (input && current) {
@@ -1476,14 +1039,6 @@ function renderList(): void {
   }
 }
 
-/**
- * Alterna para um documento diferente
- * 
- * Carrega documento selecionado no editor, renderiza preview e lista.
- * 
- * @param {number} id - ID do documento a selecionar
- * @returns {void}
- */
 function switchDoc(id: number): void {
   if (id === state.currentId) return;
   state.currentId = id;
@@ -1501,21 +1056,12 @@ function switchDoc(id: number): void {
   }
 }
 
-/**
- * Cria um novo documento
- * 
- * Delega para DocumentManager que cuida de criação e persistência.
- * Atualiza editor e renderiza interface.
- * 
- * @returns {void}
- */
 function createDoc(): void {
-  Logger.log('Tentando criar novo documento...')
+  Logger.log('Criando novo documento...')
   try {
     const newDoc = documentManager.create()
     state.currentId = newDoc.id
 
-    // Reset editor
     if (state.editor) {
       state.editor.dispatch({
         changes: { from: 0, to: state.editor.state.doc.length, insert: '' }
@@ -1530,17 +1076,8 @@ function createDoc(): void {
   }
 }
 
-/**
- * Deleta um documento
- * 
- * Delega para DocumentManager que cuida de lógica de deleção.
- * Alterna para primeiro documento se deletar o ativo.
- * 
- * @param {number} id - ID do documento a deletar
- * @returns {void}
- */
 function deleteDoc(id: number): void {
-  if (confirm('Confirmar exclusão?')) {
+  if (confirm('Confirmar exclusao?')) {
     const success = documentManager.delete(id)
     if (success) {
       if (state.currentId === id) {
@@ -1556,15 +1093,6 @@ function deleteDoc(id: number): void {
   }
 }
 
-// UI Utilities
-
-/**
- * Pisca o indicador de status
- * 
- * Delega para UIRenderer para renderização do flash.
- * 
- * @returns {void}
- */
 function flashStatus(): void {
   const dot = document.getElementById('status-indicator')
   if (dot) {
@@ -1572,14 +1100,6 @@ function flashStatus(): void {
   }
 }
 
-/**
- * Atualiza as métricas exibidas
- * 
- * Obtém tamanho total do DocumentManager e atualiza
- * elemento de exibição de memória (mem-usage).
- * 
- * @returns {void}
- */
 function updateMetrics(): void {
   const size = documentManager.getSize()
   const el = document.getElementById('mem-usage')
@@ -1588,131 +1108,75 @@ function updateMetrics(): void {
   }
 }
 
-/**
- * Faz o download do arquivo markdown atual
- * 
- * Cria blob com conteúdo markdown e inicia download via link temporário.
- * Limpa URL após conclusão.
- * 
- * @returns {void}
- */
-function downloadMarkdownFile(): void {
-  try {
-    const doc = getCurrentDoc();
-    if (!doc) {
-      Logger.error('Nenhum documento carregado');
-      return;
-    }
-
-    // Criar blob com conteúdo MD
-    const blob = new Blob([doc.content], { type: 'text/markdown;charset=utf-8' });
-    const url = URL.createObjectURL(blob);
-
-     // Criar e disparar download
-     const link = document.createElement('a');
-     link.href = url;
-     link.download = doc.name; // Já contém .md
-     document.body.appendChild(link);
-     link.click();
-     document.body.removeChild(link);
-
-     // Limpar URL temporária
-     URL.revokeObjectURL(url);
-
-     Logger.success(`✓ Download: ${doc.name} (${(blob.size / 1024).toFixed(2)}KB)`);
-  } catch (e) {
-    const errorMessage = e instanceof Error ? e.message : String(e);
-    Logger.error('Erro ao fazer download: ' + errorMessage);
-  }
-}
-
-/**
- * Configura todos os event listeners
- * 
- * Registra listeners para:
- * - Botão novo documento
- * - Botão download PDF
- * - Botão download Markdown
- * - Atalhos de teclado (Ctrl+Shift+P para preview de impressão)
- * - Input de nome de documento
- * 
- * @returns {void}
- */
 function setupEvents(): void {
-  // Create Button
   const btnNew = document.getElementById('new-doc-btn');
   if (btnNew) {
     btnNew.addEventListener('click', createDoc);
-  } else {
-    Logger.error('Botão Novo Doc não encontrado no DOM');
   }
 
-  // Download com validação
   const btnDown = document.getElementById('download-btn');
   if (btnDown) {
     btnDown.addEventListener('click', async (): Promise<void> => {
-      Logger.log('Validando conteúdo para impressão...');
+      Logger.log('Validando conteudo para impressao...');
 
       const preview = document.getElementById('preview');
       if (!preview) {
-        Logger.error('Preview não encontrado');
+        Logger.error('Preview nao encontrado');
         return;
       }
 
-      // Validar conteúdo
       const validation = validatePrintContent(preview.innerHTML);
 
-      // Mostrar avisos se houver
       if (validation.issues.length > 0) {
         validation.issues.forEach((issue): void => Logger.log(issue, 'warning'));
       }
 
-      // Gerar relatório detalhado com PrintReporter
       const doc = getCurrentDoc();
       const reporter = createReporter(preview.innerHTML, doc?.name || 'document');
       const checklist = reporter.generateChecklist();
 
-      // Mostrar checklist
-      Logger.log('=== PRÉ-IMPRESSÃO ===', 'info');
+      Logger.log('=== PRE-IMPRESSAO ===', 'info');
       checklist.checks.forEach((check): void => Logger.log(check, 'success'));
       checklist.warnings.forEach((warn): void => Logger.log(warn, 'warning'));
 
-      // Gerar relatório resumido
       const stats = reporter.analyze();
       Logger.log(
-        `📄 ${stats.estimatedPages}pp | 📝 ${stats.words} palavras | ⏱️ ~${stats.readingTime}min`
+        `${stats.estimatedPages}pp | ${stats.words} palavras | ~${stats.readingTime}min`
       );
 
-      // Iniciar impressão com printUtils melhorado
-      Logger.log('Abrindo diálogo de impressão...');
+      Logger.log('Abrindo dialogo de impressao...');
       const success = await printDocument(doc?.name || 'document', (msg: string): void =>
         Logger.log(msg)
       );
 
       if (success) {
-        Logger.success('✓ Impressão finalizada com sucesso');
+        Logger.success('Impressao finalizada com sucesso');
       }
     });
+  }
+
+  // Import MD Button
+  const btnImportMd = document.getElementById('import-md-btn');
+  if (btnImportMd) {
+    btnImportMd.addEventListener('click', importMarkdownFile);
   }
 
   // Download MD Button
   const btnDownloadMd = document.getElementById('download-md-btn');
   if (btnDownloadMd) {
     btnDownloadMd.addEventListener('click', downloadMarkdownFile);
-  } else {
-    Logger.error('Botão Download MD não encontrado no DOM');
   }
 
   // Atalhos de teclado globais
   document.addEventListener('keydown', (e: KeyboardEvent): void => {
-    // Ctrl+Shift+P (ou Cmd+Shift+P no Mac) - Preview de impressão
+    // Ctrl+Shift+P - Preview de impressao
     if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key === 'P') {
       e.preventDefault();
       togglePrintPreview();
       Logger.success(
         document.body.classList.contains('print-mode')
-          ? '📋 Preview de Impressão Ativado (ESC para sair)'
-          : '✓ Preview Desativado'
+          ? 'Preview de Impressao Ativado (ESC para sair)'
+          : 'Preview Desativado'
       );
     }
   });
@@ -1726,7 +1190,7 @@ function setupEvents(): void {
       if (doc) {
         doc.name = target.value;
         saveDocs();
-        renderList(); // Pode ser lento em cada tecla, mas mantém sync
+        renderList();
       }
     });
   }
@@ -1739,8 +1203,7 @@ function setupEvents(): void {
       if (doc?.content) {
         try {
           await navigator.clipboard.writeText(doc.content);
-          Logger.success('Conteúdo copiado para área de transferência');
-          // Feedback visual
+          Logger.success('Conteudo copiado para area de transferencia');
           const originalText = btnCopyMd.textContent;
           btnCopyMd.textContent = '[ OK! ]';
           btnCopyMd.classList.add('copied');
@@ -1752,7 +1215,7 @@ function setupEvents(): void {
           Logger.error('Falha ao copiar: ' + String(err));
         }
       } else {
-        Logger.log('Nenhum conteúdo para copiar', 'warning');
+        Logger.log('Nenhum conteudo para copiar', 'warning');
       }
     });
   }
@@ -1766,26 +1229,15 @@ function setupEvents(): void {
   });
 }
 
-/**
- * Configura navegação por teclado (WCAG 2.1 AA)
- * 
- * Implementa atalhos:
- * - Ctrl+N: Novo documento
- * - Ctrl+Shift+E: Exportar PDF
- * - Escape: Limpar preview de impressão
- * - Keyboard focus management em lista de documentos
- * 
- * @returns {void}
- */
 function setupKeyboardNavigation(): void {
   document.addEventListener('keydown', (e: KeyboardEvent): void => {
-    // Ctrl+N (ou Cmd+N no Mac) - Novo documento
+    // Ctrl+N - Novo documento
     if ((e.ctrlKey || e.metaKey) && e.key === 'n') {
       e.preventDefault();
       createDoc();
     }
 
-    // Ctrl+Shift+E (ou Cmd+Shift+E no Mac) - Exportar PDF
+    // Ctrl+Shift+E - Exportar PDF
     if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key === 'E') {
       e.preventDefault();
       const btnDown = document.getElementById('download-btn') as HTMLButtonElement | null;
@@ -1799,7 +1251,7 @@ function setupKeyboardNavigation(): void {
       if (document.body.classList.contains('print-mode')) {
         e.preventDefault();
         togglePrintPreview();
-        Logger.log('✓ Preview de Impressão desativado');
+        Logger.log('Preview de Impressao desativado');
       }
     }
   });
@@ -1814,7 +1266,6 @@ function setupKeyboardNavigation(): void {
       const activeItem = document.querySelector('.document-item.active') as HTMLElement | null;
       let currentIndex = activeItem ? items.indexOf(activeItem) : -1;
 
-      // Arrow Down - Próximo item
       if (e.key === 'ArrowDown') {
         e.preventDefault();
         const nextIndex = Math.min(currentIndex + 1, items.length - 1);
@@ -1822,7 +1273,6 @@ function setupKeyboardNavigation(): void {
         (items[nextIndex] as HTMLElement).focus();
       }
 
-      // Arrow Up - Item anterior
       if (e.key === 'ArrowUp') {
         e.preventDefault();
         const prevIndex = Math.max(currentIndex - 1, 0);
@@ -1830,7 +1280,6 @@ function setupKeyboardNavigation(): void {
         (items[prevIndex] as HTMLElement).focus();
       }
 
-      // Delete - Deletar documento (com confirmação)
       if (e.key === 'Delete' && activeItem) {
         e.preventDefault();
         const docNameEl = activeItem.querySelector('.doc-name') as HTMLElement | null;
@@ -1843,14 +1292,12 @@ function setupKeyboardNavigation(): void {
         }
       }
 
-      // Home - Primeiro item
       if (e.key === 'Home') {
         e.preventDefault();
         (items[0] as HTMLElement).click();
         (items[0] as HTMLElement).focus();
       }
 
-      // End - Último item
       if (e.key === 'End') {
         e.preventDefault();
         const lastItem = items[items.length - 1];
@@ -1858,7 +1305,6 @@ function setupKeyboardNavigation(): void {
         (lastItem as HTMLElement).focus();
       }
 
-      // Enter - Ativar documento (já faz click, mas reforçar para acessibilidade)
       if (e.key === 'Enter') {
         e.preventDefault();
         const target = e.target as HTMLElement;
@@ -1868,18 +1314,15 @@ function setupKeyboardNavigation(): void {
       }
     });
 
-    // Fazer itens focáveis
     const items = documentsList.querySelectorAll('.document-item') as NodeListOf<HTMLElement>;
     items.forEach((item: HTMLElement, index: number): void => {
       item.setAttribute('tabindex', index === 0 ? '0' : '-1');
     });
   }
 
-  // Focus na navegação do editor
   const editor = document.getElementById('editor') as HTMLElement | null;
   if (editor) {
     editor.addEventListener('keydown', (e: KeyboardEvent): void => {
-      // Ctrl+Shift+I - Focus na lista de documentos (para retroceder)
       if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key === 'I') {
         e.preventDefault();
         const firstDoc = documentsList?.querySelector('.document-item') as HTMLElement | null;
@@ -1890,15 +1333,11 @@ function setupKeyboardNavigation(): void {
     });
   }
 
-  Logger.success('✓ Navegação por teclado ativada');
+  Logger.success('Navegacao por teclado ativada');
   Logger.log('Atalhos: Ctrl+N=Novo | Ctrl+Shift+E=PDF | Arrow Keys=Navegar Docs');
 }
 
 // Boot
 document.addEventListener('DOMContentLoaded', initSystem);
 
-// PWA - Gerenciado automaticamente pelo Vite PWA
-// O registerSW é injetado automaticamente pelo vite-plugin-pwa
-
-// Exportar Logger globalmente
 export { Logger };
