@@ -601,15 +601,24 @@ body.print-mode #preview-wrapper {
 }
 
 /* ============================================================
+   HIDE MOBILE OVERLAY IN PRINT
+   ============================================================ */
+
+.mobile-block-overlay {
+    display: none !important;
+    visibility: hidden !important;
+}
+
+/* ============================================================
    MERMAID DIAGRAMS FOR PRINT
    ============================================================ */
 
 .mermaid {
     page-break-inside: avoid !important;
-    display: flex !important;
-    justify-content: center !important;
-    padding: 12pt !important;
-    margin: 12pt 0 !important;
+    display: block !important;
+    text-align: center !important;
+    padding: 8pt !important;
+    margin: 8pt 0 !important;
     background: white !important;
     border: 1pt solid #ccc !important;
     border-left: 3pt solid #0052cc !important;
@@ -617,8 +626,8 @@ body.print-mode #preview-wrapper {
 }
 
 .mermaid svg {
-    max-width: 100% !important;
-    height: auto !important;
+    display: block !important;
+    margin: 0 auto !important;
 }
 
 /* Hide loading and error states in print */

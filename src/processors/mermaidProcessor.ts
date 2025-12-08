@@ -23,15 +23,24 @@ async function ensureMermaidLoaded(): Promise<typeof import('mermaid').default> 
         theme: 'default',
         securityLevel: 'strict',
         fontFamily: 'JetBrains Mono, Fira Code, monospace',
+        fontSize: 9,
         flowchart: {
-          useMaxWidth: true,
-          htmlLabels: true
+          useMaxWidth: false,
+          htmlLabels: true,
+          curve: 'basis',
+          padding: 8
         },
         sequence: {
-          useMaxWidth: true
+          useMaxWidth: false,
+          boxMargin: 4,
+          noteMargin: 4
         },
         gantt: {
-          useMaxWidth: true
+          useMaxWidth: false,
+          fontSize: 9
+        },
+        themeVariables: {
+          fontSize: '9pt'
         }
       })
       mermaidInstance = mermaid
@@ -50,16 +59,16 @@ function generateMermaidId(): string {
 }
 
 /**
- * Decodes HTML entities in Mermaid source code
- * Required because source is stored escaped in data attribute
+ * Decodes base64 encoded Mermaid source code
+ * Required because source is stored as base64 to survive DOMPurify
  */
-function decodeHtmlEntities(text: string): string {
-  return text
-    .replace(/&amp;/g, '&')
-    .replace(/&lt;/g, '<')
-    .replace(/&gt;/g, '>')
-    .replace(/&quot;/g, '"')
-    .replace(/&#39;/g, "'")
+function decodeBase64Source(base64: string): string {
+  try {
+    return decodeURIComponent(escape(atob(base64)))
+  } catch (e) {
+    console.error('[Mermaid] Failed to decode base64:', e)
+    return ''
+  }
 }
 
 /**
@@ -81,7 +90,7 @@ export async function processMermaidDiagrams(container: HTMLElement | null): Pro
     const encodedSource = block.getAttribute('data-mermaid-source')
     if (!encodedSource) continue
 
-    const source = decodeHtmlEntities(encodedSource)
+    const source = decodeBase64Source(encodedSource)
 
     try {
       const id = generateMermaidId()
@@ -90,6 +99,7 @@ export async function processMermaidDiagrams(container: HTMLElement | null): Pro
       block.innerHTML = svg
       block.removeAttribute('data-mermaid-source')
       block.classList.add('mermaid-rendered')
+      
       processedCount++
     } catch (e) {
       const errorMessage = e instanceof Error ? e.message : 'Unknown error'
