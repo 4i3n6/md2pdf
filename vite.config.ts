@@ -81,6 +81,7 @@ export default defineConfig({
     },
     rollupOptions: {
       input: {
+        // EN-US (default)
         main: resolve(__dirname, 'index.html'),
         app: resolve(__dirname, 'app.html'),
         manual: resolve(__dirname, 'manual/index.html'),
@@ -92,6 +93,9 @@ export default defineConfig({
         'manual-print-export': resolve(__dirname, 'manual/print-export/index.html'),
         'manual-privacy-storage': resolve(__dirname, 'manual/privacy-storage/index.html'),
         'manual-offline-pwa': resolve(__dirname, 'manual/offline-pwa/index.html'),
+        // PT-BR
+        'pt-index': resolve(__dirname, 'pt/index.html'),
+        'pt-app': resolve(__dirname, 'pt/app.html'),
       },
       output: {
         manualChunks: {

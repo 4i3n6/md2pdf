@@ -1,14 +1,14 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     
     <!-- SEO Meta Tags -->
-    <title>MD2PDF - Markdown to PDF Editor</title>
-    <meta name="description" content="Free Markdown to PDF converter with no limits, no signup. Real-time editor with A4 preview. Works offline.">
+    <title>MD2PDF - Editor Markdown para PDF</title>
+    <meta name="description" content="Conversor de Markdown para PDF gratuito, sem limites, sem cadastro. Editor em tempo real com visualizacao A4. Funciona offline.">
     <meta name="robots" content="index, follow">
-    <link rel="canonical" href="https://md2pdf.xyz/app">
+    <link rel="canonical" href="https://md2pdf.xyz/pt/app">
     
     <!-- Hreflang Tags -->
     <link rel="alternate" hreflang="en" href="https://md2pdf.xyz/app">
@@ -30,37 +30,37 @@
 </head>
 <body>
     <!-- Skip to main content link (WCAG 2.1) -->
-    <a href="#main-editor" class="sr-only skip-link" tabindex="0">Skip to main editor</a>
+    <a href="#main-editor" class="sr-only skip-link" tabindex="0">Ir para editor principal</a>
     
-    <div class="app-grid" role="application" aria-label="MD2PDF - Markdown to PDF Converter Application">
+    <div class="app-grid" role="application" aria-label="MD2PDF - Aplicacao de Conversao de Markdown para PDF">
         <!-- Top Bar: Global Status & Controls (Toolbar role) -->
         <header class="top-bar" role="banner">
-            <h1 class="brand">MD2PDF <span class="version" aria-label="System version 2.0">SYS.V2.0</span> <a href="/manual/" class="manual-link" title="Open manual" aria-label="Open user manual">[?]</a></h1>
-            <div class="top-metrics" role="status" aria-label="Real-time system status" aria-live="polite">
-                <div class="metric">MEM: <span id="mem-usage" aria-label="Memory usage">--</span></div>
-                <div class="metric">LATENCY: <span id="render-latency" aria-label="Render latency">0ms</span></div>
-                <div class="metric status-ok system-status" aria-label="System online">SYSTEM: ONLINE</div>
+            <h1 class="brand">MD2PDF <span class="version" aria-label="Versao do sistema 2.0">SYS.V2.0</span> <a href="/pt/manual/" class="manual-link" title="Abrir manual" aria-label="Abrir manual de uso">[?]</a></h1>
+            <div class="top-metrics" role="status" aria-label="Status do sistema em tempo real" aria-live="polite">
+                <div class="metric">MEM: <span id="mem-usage" aria-label="Uso de memoria">--</span></div>
+                <div class="metric">LATENCY: <span id="render-latency" aria-label="Latencia de renderizacao">0ms</span></div>
+                <div class="metric status-ok system-status" aria-label="Sistema online">SYSTEM: ONLINE</div>
             </div>
-            <div class="top-controls" role="toolbar" aria-label="Main controls">
+            <div class="top-controls" role="toolbar" aria-label="Controles principais">
                 <button 
                     id="download-btn" 
                     class="action-btn" 
-                    aria-label="Export document as PDF"
-                    title="Export document as PDF (Ctrl+Shift+E)">
+                    aria-label="Exportar documento como PDF"
+                    title="Exportar documento como PDF (Ctrl+Shift+E)">
                     [ EXP_PDF ]
                 </button>
             </div>
         </header>
 
         <!-- Sidebar: Documents & Metrics (Navigation) -->
-        <aside class="sidebar" role="complementary" aria-label="Sidebar with documents and controls">
+        <aside class="sidebar" role="complementary" aria-label="Painel lateral de documentos e controles">
             <div class="panel-header" role="heading" aria-level="2">
                 <span>DOC_INDEX</span>
                 <button 
                     id="new-doc-btn" 
                     class="icon-btn" 
-                    aria-label="Create new document"
-                    title="Create new document (Ctrl+N)">
+                    aria-label="Criar novo documento"
+                    title="Criar novo documento (Ctrl+N)">
                     +
                 </button>
             </div>
@@ -68,12 +68,12 @@
                 id="documents-list" 
                 class="list-container" 
                 role="listbox"
-                aria-label="Documents list"
+                aria-label="Lista de documentos"
                 aria-describedby="doc-index-help">
                 <!-- Docs injected here -->
             </div>
             <span id="doc-index-help" class="sr-only">
-                Use up/down arrows to navigate documents. Enter to open, Delete to remove. Ctrl+N for new.
+                Use setas para cima/baixo para navegar documentos. Enter para abrir, Delete para remover. Ctrl+N para novo.
             </span>
             
             <div class="panel-header" role="heading" aria-level="2">ACTIONS</div>
@@ -82,41 +82,41 @@
                     id="import-md-btn" 
                     class="action-btn action-btn-secondary" 
                     style="width: 100%; font-size: 11px;" 
-                    aria-label="Import Markdown file"
-                    title="Import .md file from computer">
+                    aria-label="Importar arquivo Markdown"
+                    title="Importar arquivo .md do computador">
                     IMPORT MD
                 </button>
                 <button 
                     id="download-md-btn" 
                     class="action-btn action-btn-tertiary" 
                     style="width: 100%; font-size: 11px;" 
-                    aria-label="Export document as Markdown"
-                    title="Export document as .md file">
+                    aria-label="Exportar documento em formato Markdown"
+                    title="Exportar documento como arquivo .md">
                     EXPORT MD
                 </button>
             </div>
             
             <div class="panel-header" role="heading" aria-level="2">QUICK_TAGS</div>
-            <div class="quick-tags-container" role="toolbar" aria-label="Insert Markdown elements">
-                <button class="tag-btn tag-btn-clear" data-tag="clear" title="Remove HTML tags from selection">CLR</button>
-                <button class="tag-btn" data-tag="br" title="Line break">&crarr;</button>
-                <button class="tag-btn" data-tag="hr" title="Horizontal line / Page break">---</button>
-                <button class="tag-btn" data-tag="code" title="Code block">```</button>
-                <button class="tag-btn" data-tag="quote" title="Blockquote">&gt;</button>
-                <button class="tag-btn" data-tag="heading" title="Heading">#</button>
-                <button class="tag-btn" data-tag="bold" title="Bold">**</button>
-                <button class="tag-btn" data-tag="italic" title="Italic">*</button>
-                <button class="tag-btn" data-tag="strike" title="Strikethrough">~~</button>
-                <button class="tag-btn" data-tag="list" title="List">-</button>
-                <button class="tag-btn" data-tag="numlist" title="Numbered list">1.</button>
-                <button class="tag-btn" data-tag="checkbox" title="Checkbox / Task">[ ]</button>
+            <div class="quick-tags-container" role="toolbar" aria-label="Inserir elementos Markdown">
+                <button class="tag-btn tag-btn-clear" data-tag="clear" title="Remover tags HTML da selecao">CLR</button>
+                <button class="tag-btn" data-tag="br" title="Quebra de linha">&crarr;</button>
+                <button class="tag-btn" data-tag="hr" title="Linha horizontal / Quebra de pagina">---</button>
+                <button class="tag-btn" data-tag="code" title="Bloco de codigo">```</button>
+                <button class="tag-btn" data-tag="quote" title="Citacao (blockquote)">&gt;</button>
+                <button class="tag-btn" data-tag="heading" title="Titulo (heading)">#</button>
+                <button class="tag-btn" data-tag="bold" title="Negrito">**</button>
+                <button class="tag-btn" data-tag="italic" title="Italico">*</button>
+                <button class="tag-btn" data-tag="strike" title="Tachado (riscado)">~~</button>
+                <button class="tag-btn" data-tag="list" title="Lista">-</button>
+                <button class="tag-btn" data-tag="numlist" title="Lista numerada">1.</button>
+                <button class="tag-btn" data-tag="checkbox" title="Checkbox / Tarefa">[ ]</button>
                 <button class="tag-btn" data-tag="link" title="Link">[]()</button>
-                <button class="tag-btn" data-tag="table" title="Table">TBL</button>
-                <button class="tag-btn tag-btn-yellow" data-tag="mark-yellow" title="Yellow highlight">&#9632;</button>
-                <button class="tag-btn tag-btn-green" data-tag="mark-green" title="Green highlight">&#9632;</button>
-                <button class="tag-btn tag-btn-blue" data-tag="mark-blue" title="Blue highlight">&#9632;</button>
-                <button class="tag-btn tag-btn-red" data-tag="mark-red" title="Red highlight">&#9632;</button>
-                <select class="tag-select" id="tag-font" title="Apply font to selection">
+                <button class="tag-btn" data-tag="table" title="Tabela">TBL</button>
+                <button class="tag-btn tag-btn-yellow" data-tag="mark-yellow" title="Destaque amarelo">&#9632;</button>
+                <button class="tag-btn tag-btn-green" data-tag="mark-green" title="Destaque verde">&#9632;</button>
+                <button class="tag-btn tag-btn-blue" data-tag="mark-blue" title="Destaque azul">&#9632;</button>
+                <button class="tag-btn tag-btn-red" data-tag="mark-red" title="Destaque vermelho">&#9632;</button>
+                <select class="tag-select" id="tag-font" title="Aplicar fonte na selecao">
                     <option value="">Aa</option>
                     <option value="Inter, system-ui, sans-serif">Inter</option>
                     <option value="'Roboto', sans-serif">Roboto</option>
@@ -124,10 +124,10 @@
                     <option value="Georgia, serif">Georgia</option>
                     <option value="Arial, sans-serif">Arial</option>
                 </select>
-                <button class="tag-btn" data-tag="align-left" title="Align left">&lArr;</button>
-                <button class="tag-btn" data-tag="align-center" title="Center">&hArr;</button>
-                <button class="tag-btn" data-tag="align-right" title="Align right">&rArr;</button>
-                <button class="tag-btn" data-tag="align-justify" title="Justify">&equiv;</button>
+                <button class="tag-btn" data-tag="align-left" title="Alinhar esquerda">&lArr;</button>
+                <button class="tag-btn" data-tag="align-center" title="Centralizar">&hArr;</button>
+                <button class="tag-btn" data-tag="align-right" title="Alinhar direita">&rArr;</button>
+                <button class="tag-btn" data-tag="align-justify" title="Justificar">&equiv;</button>
             </div>
             
             <div class="panel-header problems-header" role="heading" aria-level="2">
@@ -137,9 +137,9 @@
                 id="problems-panel" 
                 class="problems-container" 
                 role="list" 
-                aria-label="Syntax problems list"
+                aria-label="Lista de problemas de sintaxe"
                 aria-live="polite">
-                <div class="problems-empty">No problems detected</div>
+                <div class="problems-empty">Nenhum problema detectado</div>
             </div>
             
             <div class="panel-header" role="heading" aria-level="2">SYS_LOGS</div>
@@ -147,7 +147,7 @@
                 id="console-log" 
                 class="console-container" 
                 role="log" 
-                aria-label="System log"
+                aria-label="Log de sistema"
                 aria-live="polite"
                 aria-atomic="false">
                 <div class="log-line system">> INIT SEQUENCE STARTED...</div>
@@ -155,19 +155,19 @@
         </aside>
 
         <!-- Main Area: Editor & Preview -->
-        <main class="workspace" role="main" id="main-editor" aria-label="Workspace - Editor and Preview">
+        <main class="workspace" role="main" id="main-editor" aria-label="Espaco de trabalho - Editor e Visualizacao">
             <!-- Editor Pane -->
             <div class="pane-container editor-pane">
                 <header class="pane-header editor-header-extended" id="editor-header">
                     <div class="editor-header-top">
                         <h2 style="margin: 0; font-size: 12px; font-weight: 600;">INPUT_STREAM</h2>
-                        <label for="doc-name" class="sr-only">Document name</label>
+                        <label for="doc-name" class="sr-only">Nome do documento</label>
                         <input 
                             type="text" 
                             id="doc-name" 
                             class="bare-input" 
                             value="Untitled"
-                            aria-label="Document name"
+                            aria-label="Nome do documento"
                             aria-describedby="editor-header"
                             spellcheck="true">
                     </div>
@@ -177,27 +177,27 @@
                             class="save-status save-status-saved" 
                             role="status" 
                             aria-live="polite"
-                            aria-label="Save status">
+                            aria-label="Status de salvamento">
                             <span class="save-dot"></span>
-                            <span class="save-text">Saved</span>
+                            <span class="save-text">Salvo</span>
                         </span>
                         <button 
                             id="force-save-btn" 
                             class="icon-btn save-btn" 
-                            aria-label="Force save"
-                            title="Force save (Ctrl+S)">
+                            aria-label="Forcar salvamento"
+                            title="Forcar salvamento (Ctrl+S)">
                             &#x21bb;
                         </button>
                         <button 
                             id="copy-md-btn" 
                             class="icon-btn copy-btn" 
-                            aria-label="Copy Markdown content"
-                            title="Copy Markdown content (Ctrl+Shift+C)">
+                            aria-label="Copiar conteudo Markdown"
+                            title="Copiar conteudo Markdown (Ctrl+Shift+C)">
                             COPY
                         </button>
                     </div>
                 </header>
-                <div id="editor" class="editor-frame" role="textbox" aria-multiline="true" aria-label="Markdown editor"></div>
+                <div id="editor" class="editor-frame" role="textbox" aria-multiline="true" aria-label="Editor de Markdown"></div>
             </div>
             
             <!-- Preview Pane -->
@@ -209,13 +209,13 @@
                             id="status-indicator" 
                             class="status-dot" 
                             role="status"
-                            aria-label="Render status indicator"
+                            aria-label="Indicador de status de renderizacao"
                             aria-live="polite">
                         </span>
                     </div>
                     <div class="preview-controls">
-                        <select id="preview-font" class="preview-select" title="Document font">
-                            <optgroup label="Modern">
+                        <select id="preview-font" class="preview-select" title="Fonte do documento">
+                            <optgroup label="Modernas">
                                 <option value="Inter, system-ui, sans-serif">Inter</option>
                                 <option value="'Roboto', sans-serif">Roboto</option>
                                 <option value="'Open Sans', sans-serif">Open Sans</option>
@@ -236,15 +236,15 @@
                                 <option value="Helvetica, sans-serif">Helvetica</option>
                             </optgroup>
                         </select>
-                        <div class="align-buttons" role="group" aria-label="Text alignment">
-                            <button class="align-btn active" data-align="left" title="Align left" aria-pressed="true">&lArr;</button>
-                            <button class="align-btn" data-align="center" title="Center" aria-pressed="false">&hArr;</button>
-                            <button class="align-btn" data-align="right" title="Align right" aria-pressed="false">&rArr;</button>
-                            <button class="align-btn" data-align="justify" title="Justify" aria-pressed="false">&equiv;</button>
+                        <div class="align-buttons" role="group" aria-label="Alinhamento do texto">
+                            <button class="align-btn active" data-align="left" title="Alinhar esquerda" aria-pressed="true">&lArr;</button>
+                            <button class="align-btn" data-align="center" title="Centralizar" aria-pressed="false">&hArr;</button>
+                            <button class="align-btn" data-align="right" title="Alinhar direita" aria-pressed="false">&rArr;</button>
+                            <button class="align-btn" data-align="justify" title="Justificar" aria-pressed="false">&equiv;</button>
                         </div>
                     </div>
                 </header>
-                <div id="preview-wrapper" role="region" aria-label="A4 output preview" aria-describedby="preview-header">
+                <div id="preview-wrapper" role="region" aria-label="Visualizacao de saida em A4" aria-describedby="preview-header">
                     <div id="preview" class="markdown-body" role="document"></div>
                 </div>
             </div>

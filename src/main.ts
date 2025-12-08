@@ -11,18 +11,22 @@ import OfflineManager from './utils/offlineManager'
 import SWUpdateNotifier from './utils/swUpdateNotifier'
 import { documentManager } from './services/documentManager'
 import { uiRenderer } from './services/uiRenderer'
+import { initI18n, t, getLocale } from './i18n/index'
 import type { AppState, LoggerInterface, Document as AppDocument } from '@/types/index'
 import './pwaRegister'
 import './styles.css'
 import './styles-print.css'
 
-// Logger do Sistema
+// Initialize i18n based on URL path
+initI18n()
+
+// Logger do Sistema (uses i18n locale for time formatting)
 const Logger: LoggerInterface = {
   log: (msg: string, type: 'info' | 'error' | 'success' | 'warning' = 'info'): void => {
     const consoleEl = document.getElementById('console-log');
     if (!consoleEl) return;
 
-    const time = new Date().toLocaleTimeString('pt-BR', { hour12: false });
+    const time = new Date().toLocaleTimeString(getLocale(), { hour12: false });
     const line = document.createElement('div');
     line.className = `log-line ${type}`;
     line.textContent = `[${time}] ${msg}`;
@@ -166,7 +170,7 @@ function loadDocPreferences(docId: number): void {
 let saveStatusInterval: ReturnType<typeof setInterval> | null = null;
 
 function formatTimeSinceSaved(lastSaved: number | null): string {
-  if (!lastSaved) return 'Nunca salvo';
+  if (!lastSaved) return t('time.never');
   
   const now = Date.now();
   const diff = now - lastSaved;
@@ -175,10 +179,10 @@ function formatTimeSinceSaved(lastSaved: number | null): string {
   const minutes = Math.floor(seconds / 60);
   const hours = Math.floor(minutes / 60);
   
-  if (seconds < 5) return 'Salvo agora';
-  if (seconds < 60) return `Salvo ha ${seconds}s`;
-  if (minutes < 60) return `Salvo ha ${minutes}min`;
-  return `Salvo ha ${hours}h`;
+  if (seconds < 5) return t('save.savedNow');
+  if (seconds < 60) return t('save.savedAgo', { time: t('time.seconds', { n: seconds }) });
+  if (minutes < 60) return t('save.savedAgo', { time: t('time.minutes', { n: minutes }) });
+  return t('save.savedAgo', { time: t('time.hours', { n: hours }) });
 }
 
 function updateSaveStatus(): void {
@@ -196,13 +200,13 @@ function updateSaveStatus(): void {
 function forceSave(): void {
   const doc = getCurrentDoc();
   if (!doc) {
-    Logger.log('Nenhum documento para salvar', 'warning');
+    Logger.log(t('logs.noDocToSave'), 'warning');
     return;
   }
   
   documentManager.setContent(doc.id, doc.content);
   updateSaveStatus();
-  Logger.success('Documento salvo');
+  Logger.success(t('logs.docSaved'));
 }
 
 function startSaveStatusUpdater(): void {
