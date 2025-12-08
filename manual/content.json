@@ -50,7 +50,7 @@
         "tips": [
           { "icon": "#", "title": "Headings with #", "text": "Use # for headings. More # = smaller level (## subtitle, ### section)." },
           { "icon": "Ctrl", "title": "Ctrl+Shift+E", "text": "Quick shortcut to export your document to PDF instantly." },
-          { "icon": "---", "title": "Page break", "text": "Use --- (horizontal rule) to force a page break in the PDF." },
+          { "icon": "[PB]", "title": "Page break", "text": "Use <!-- pagebreak --> to force a page break in the PDF. Click [PB] button to insert." },
           { "icon": "PWA", "title": "Install the app", "text": "MD2PDF works offline. Install as an app on your device." }
         ]
       }
@@ -210,7 +210,7 @@
               ["New line (same paragraph)", "Two spaces at end + Enter"],
               ["New line (alternative)", "<code>&lt;br&gt;</code> at end"],
               ["New paragraph", "Blank line between texts"],
-              ["Page break (PDF)", "<code>---</code> on separate line"]
+              ["Page break (PDF)", "<code>&lt;!-- pagebreak --&gt;</code> or [PB] button"]
             ]
           }
         },
@@ -437,7 +437,8 @@
         {
           "title": "Page Breaks",
           "list": [
-            "<strong>Manual:</strong> Use <code>---</code> to force break",
+            "<strong>Manual:</strong> Use <code>&lt;!-- pagebreak --&gt;</code> or click [PB] button",
+            "<strong>Visual indicator:</strong> Dashed box shows where page will break",
             "<strong>Automatic:</strong> Code blocks try to stay together"
           ]
         }

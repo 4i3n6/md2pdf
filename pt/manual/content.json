@@ -50,7 +50,7 @@
         "tips": [
           { "icon": "#", "title": "Títulos com #", "text": "Use # para títulos. Mais # = nível menor (## subtítulo, ### seção)." },
           { "icon": "Ctrl", "title": "Ctrl+Shift+E", "text": "Atalho rápido para exportar seu documento para PDF instantaneamente." },
-          { "icon": "---", "title": "Quebra de página", "text": "Use --- (linha horizontal) para forçar uma quebra de página no PDF." },
+          { "icon": "[PB]", "title": "Quebra de página", "text": "Use <!-- pagebreak --> para forçar uma quebra de página no PDF. Clique no botão [PB] para inserir." },
           { "icon": "PWA", "title": "Instale o app", "text": "MD2PDF funciona offline. Instale como app no seu dispositivo." }
         ]
       }
@@ -210,7 +210,7 @@
               ["Nova linha (mesmo parágrafo)", "Dois espaços no final + Enter"],
               ["Nova linha (alternativa)", "<code>&lt;br&gt;</code> no final"],
               ["Novo parágrafo", "Linha em branco entre textos"],
-              ["Quebra de página (PDF)", "<code>---</code> em linha separada"]
+              ["Quebra de página (PDF)", "<code>&lt;!-- pagebreak --&gt;</code> ou botão [PB]"]
             ]
           }
         },
@@ -437,7 +437,8 @@
         {
           "title": "Quebras de Página",
           "list": [
-            "<strong>Manual:</strong> Use <code>---</code> para forçar quebra",
+            "<strong>Manual:</strong> Use <code>&lt;!-- pagebreak --&gt;</code> ou clique no botão [PB]",
+            "<strong>Indicador visual:</strong> Caixa tracejada mostra onde a página quebrará",
             "<strong>Automática:</strong> Blocos de código tentam ficar juntos"
           ]
         }
