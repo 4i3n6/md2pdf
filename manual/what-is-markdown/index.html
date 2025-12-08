@@ -3,14 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Install MD2PDF as an app and use without internet connection.">
-    <meta name="keywords" content="pwa, progressive web app, offline, install app">
+    <meta name="description" content="Understand what Markdown is, its history, and why it's used everywhere from GitHub to AI responses.">
+    <meta name="keywords" content="what is markdown, markdown history, markdown format, plain text formatting, markdown syntax">
     <meta name="author" content="MD2PDF">
-    <title>Offline | MD2PDF</title>
-    <link rel="canonical" href="https://md2pdf.xyz/manual/offline-pwa/">
-    <link rel="alternate" hreflang="en" href="https://md2pdf.xyz/manual/offline-pwa/">
-    <link rel="alternate" hreflang="pt" href="https://md2pdf.xyz/pt/manual/offline-pwa/">
-    <link rel="alternate" hreflang="x-default" href="https://md2pdf.xyz/manual/offline-pwa/">
+    <title>What is Markdown | MD2PDF</title>
+    <link rel="canonical" href="https://md2pdf.xyz/manual/what-is-markdown/">
+    <link rel="alternate" hreflang="en" href="https://md2pdf.xyz/manual/what-is-markdown/">
+    <link rel="alternate" hreflang="pt" href="https://md2pdf.xyz/pt/manual/what-is-markdown/">
+    <link rel="alternate" hreflang="x-default" href="https://md2pdf.xyz/manual/what-is-markdown/">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -42,7 +42,7 @@
                     <span class="sidebar-icon">1</span>
                     <span class="sidebar-title">Getting Started</span>
                 </a>
-                <a href="/manual/what-is-markdown/" class="sidebar-item">
+                <a href="/manual/what-is-markdown/" class="sidebar-item active">
                     <span class="sidebar-icon">?</span>
                     <span class="sidebar-title">What is Markdown</span>
                 </a>
@@ -82,7 +82,7 @@
                     <span class="sidebar-icon">◉</span>
                     <span class="sidebar-title">Privacy</span>
                 </a>
-                <a href="/manual/offline-pwa/" class="sidebar-item active">
+                <a href="/manual/offline-pwa/" class="sidebar-item">
                     <span class="sidebar-icon">⚡</span>
                     <span class="sidebar-title">Offline</span>
                 </a>
@@ -100,59 +100,73 @@
                 <span class="breadcrumb-separator">&gt;</span>
                 <a href="/manual/">Manual</a>
                 <span class="breadcrumb-separator">&gt;</span>
-                <span class="breadcrumb-current">Offline</span>
+                <span class="breadcrumb-current">What is Markdown</span>
             </nav>
 
             <article class="content">
 
-            <h1>Offline Use and PWA</h1>
+            <h1>What is Markdown?</h1>
             <section>
-                <h2>What is PWA?</h2>
+                <h2>A Simple Formatting Language</h2>
+                <p>Markdown is a lightweight markup language created by John Gruber in 2004. It allows you to add formatting to plain text using simple symbols.</p>
+                <p>Unlike HTML or Word documents, Markdown files are readable even without special software. This makes it perfect for documentation, notes, and content that needs to be portable.</p>
+            </section>
+            <section>
+                <h2>Where Markdown is Used</h2>
                 <ul>
-                    <li>Progressive Web App</li>
-                    <li>Website that works like native app</li>
-                    <li>Installable on device</li>
-                    <li>Works 100% offline</li>
+                    <li><strong>GitHub & GitLab:</strong> README files, issues, pull requests</li>
+                    <li><strong>AI Responses:</strong> ChatGPT, Claude, Gemini format their outputs in Markdown</li>
+                    <li><strong>Documentation:</strong> Technical docs, wikis, knowledge bases</li>
+                    <li><strong>Note-taking:</strong> Obsidian, Notion, Bear, and many others</li>
+                    <li><strong>Blogs:</strong> Jekyll, Hugo, and many static site generators</li>
+                    <li><strong>Messaging:</strong> Slack, Discord, Reddit support Markdown</li>
                 </ul>
             </section>
             <section>
-                <h2>How to Install</h2>
-                <h3>Desktop (Chrome/Edge)</h3>
+                <h2>Why Use Markdown?</h2>
                 <ul>
-                    <li>Visit /app</li>
-                    <li>Click install icon in address bar</li>
-                    <li>Confirm "Install"</li>
-                </ul>
-                <h3>Android</h3>
-                <ul>
-                    <li>Menu (3 dots) → "Add to home screen"</li>
-                </ul>
-                <h3>iOS</h3>
-                <ul>
-                    <li>Share → "Add to Home Screen"</li>
+                    <li><strong>Portable:</strong> Plain text works everywhere</li>
+                    <li><strong>Future-proof:</strong> No proprietary format to worry about</li>
+                    <li><strong>Fast:</strong> No clicking through menus, just type</li>
+                    <li><strong>Readable:</strong> Makes sense even without rendering</li>
+                    <li><strong>Universal:</strong> Same syntax across all platforms</li>
                 </ul>
             </section>
             <section>
-                <h2>Offline Operation</h2>
-                <ul>
-                    <li>After first access, app is cached</li>
-                    <li>All features available offline</li>
-                    <li>Saved documents remain accessible</li>
-                    <li>Automatic updates when online</li>
-                </ul>
+                <h2>Markdown vs HTML</h2>
+                <p>Markdown is converted to HTML for display. You write <code># Title</code> and it becomes <code>&lt;h1&gt;Title&lt;/h1&gt;</code>.</p>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Markdown</th>
+                            <th>HTML</th>
+                            <th>Result</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr><td><code># Heading</code></td><td><code>&lt;h1&gt;Heading&lt;/h1&gt;</code></td><td>Large title</td></tr>
+                        <tr><td><code>**bold**</code></td><td><code>&lt;strong&gt;bold&lt;/strong&gt;</code></td><td>Bold text</td></tr>
+                        <tr><td><code>*italic*</code></td><td><code>&lt;em&gt;italic&lt;/em&gt;</code></td><td>Italic text</td></tr>
+                        <tr><td><code>[link](url)</code></td><td><code>&lt;a href="url"&gt;link&lt;/a&gt;</code></td><td>Clickable link</td></tr>
+                    </tbody>
+                </table>
+            </section>
+            <section>
+                <h2>Ready to learn?</h2>
+                <p>Now that you know what Markdown is, check out the <a href="/manual/markdown-syntax/">Markdown Guide</a> for the complete syntax reference.</p>
             </section>
             <nav class="page-nav">
-                <a href="/manual/privacy-storage/">
+                <a href="/manual/getting-started/">
                     <span class="nav-arrow">&larr;</span>
                     <div class="nav-direction">
                         <span class="nav-label">Previous</span>
-                        <span class="nav-title">Privacy</span>
+                        <span class="nav-title">Getting Started</span>
                     </div>
                 </a>
-                <a href="/manual/troubleshooting/">
+                <a href="/manual/markdown-syntax/">
                     <div class="nav-direction">
                         <span class="nav-label">Next</span>
-                        <span class="nav-title">Troubleshooting</span>
+                        <span class="nav-title">Markdown Guide</span>
                     </div>
                     <span class="nav-arrow">&rarr;</span>
                 </a>

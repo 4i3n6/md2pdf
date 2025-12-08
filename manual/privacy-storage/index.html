@@ -3,10 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Seus documentos ficam apenas no seu navegador. Sem servidores, sem rastreamento.">
-    <meta name="keywords" content="privacidade, armazenamento local, localStorage, segurança, md2pdf">
+    <meta name="description" content="Your documents stay only in your browser. No servers, no tracking.">
+    <meta name="keywords" content="privacy, local storage, localStorage, security">
     <meta name="author" content="MD2PDF">
-    <title>Privacidade e Armazenamento | MD2PDF</title>
+    <title>Privacy | MD2PDF</title>
     <link rel="canonical" href="https://md2pdf.xyz/manual/privacy-storage/">
     <link rel="alternate" hreflang="en" href="https://md2pdf.xyz/manual/privacy-storage/">
     <link rel="alternate" hreflang="pt" href="https://md2pdf.xyz/pt/manual/privacy-storage/">
@@ -36,39 +36,59 @@
             <nav class="sidebar-nav" aria-label="Manual">
                 <a href="/manual/" class="sidebar-item">
                     <span class="sidebar-icon">≡</span>
-                    <span class="sidebar-title">Índice</span>
+                    <span class="sidebar-title">Index</span>
                 </a>
                 <a href="/manual/getting-started/" class="sidebar-item">
                     <span class="sidebar-icon">1</span>
-                    <span class="sidebar-title">Primeiros Passos</span>
+                    <span class="sidebar-title">Getting Started</span>
+                </a>
+                <a href="/manual/what-is-markdown/" class="sidebar-item">
+                    <span class="sidebar-icon">?</span>
+                    <span class="sidebar-title">What is Markdown</span>
                 </a>
                 <a href="/manual/markdown-syntax/" class="sidebar-item">
                     <span class="sidebar-icon">#</span>
-                    <span class="sidebar-title">Guia Markdown</span>
+                    <span class="sidebar-title">Markdown Guide</span>
+                </a>
+                <a href="/manual/markdown-tables/" class="sidebar-item">
+                    <span class="sidebar-icon">▦</span>
+                    <span class="sidebar-title">Tables</span>
+                </a>
+                <a href="/manual/markdown-code-blocks/" class="sidebar-item">
+                    <span class="sidebar-icon">{}</span>
+                    <span class="sidebar-title">Code Blocks</span>
                 </a>
                 <a href="/manual/input-stream/" class="sidebar-item">
                     <span class="sidebar-icon">></span>
-                    <span class="sidebar-title">Área de Edição</span>
+                    <span class="sidebar-title">Editor</span>
                 </a>
                 <a href="/manual/render-output/" class="sidebar-item">
                     <span class="sidebar-icon">A4</span>
-                    <span class="sidebar-title">Preview e Saída</span>
+                    <span class="sidebar-title">Preview</span>
+                </a>
+                <a href="/manual/import-export/" class="sidebar-item">
+                    <span class="sidebar-icon">↔</span>
+                    <span class="sidebar-title">Import/Export</span>
                 </a>
                 <a href="/manual/keyboard-shortcuts/" class="sidebar-item">
                     <span class="sidebar-icon">⌘</span>
-                    <span class="sidebar-title">Atalhos</span>
+                    <span class="sidebar-title">Shortcuts</span>
                 </a>
                 <a href="/manual/print-export/" class="sidebar-item">
                     <span class="sidebar-icon">↓</span>
-                    <span class="sidebar-title">Exportar PDF</span>
+                    <span class="sidebar-title">Export PDF</span>
                 </a>
                 <a href="/manual/privacy-storage/" class="sidebar-item active">
                     <span class="sidebar-icon">◉</span>
-                    <span class="sidebar-title">Privacidade</span>
+                    <span class="sidebar-title">Privacy</span>
                 </a>
                 <a href="/manual/offline-pwa/" class="sidebar-item">
                     <span class="sidebar-icon">⚡</span>
-                    <span class="sidebar-title">Uso Offline</span>
+                    <span class="sidebar-title">Offline</span>
+                </a>
+                <a href="/manual/troubleshooting/" class="sidebar-item">
+                    <span class="sidebar-icon">!</span>
+                    <span class="sidebar-title">Troubleshooting</span>
                 </a>
             </nav>
         </aside>
@@ -80,56 +100,55 @@
                 <span class="breadcrumb-separator">&gt;</span>
                 <a href="/manual/">Manual</a>
                 <span class="breadcrumb-separator">&gt;</span>
-                <span class="breadcrumb-current">Privacidade e Armazenamento</span>
+                <span class="breadcrumb-current">Privacy</span>
             </nav>
 
             <article class="content">
 
-            <h1>Privacidade e Armazenamento</h1>
+            <h1>Privacy and Storage</h1>
             <div class="info-box highlight">
-                <p><strong>100% Local.</strong> Seus documentos ficam APENAS no seu navegador. Nada é enviado para servidores.</p>
+                <p><strong>100% Local.</strong> Your documents stay ONLY in your browser. Nothing is sent to servers.</p>
             </div>
             <section>
-                <h2>Privacidade Total</h2>
+                <h2>Complete Privacy</h2>
                 <ul>
-                    <li>Processamento 100% no navegador</li>
-                    <li>Zero rastreamento ou analytics</li>
-                    <li>Sem contas, sem login</li>
-                    <li>Funciona offline</li>
+                    <li>100% browser processing</li>
+                    <li>Zero tracking or analytics</li>
+                    <li>No accounts, no login</li>
+                    <li>Works offline</li>
                 </ul>
             </section>
             <section>
-                <h2>Armazenamento</h2>
+                <h2>Storage</h2>
                 <ul>
-                    <li>Dados no localStorage do navegador</li>
-                    <li>Limite: ~5MB por domínio</li>
-                    <li>Métrica <strong>MEM</strong> mostra uso atual</li>
-                    <li>Navegadores diferentes = dados separados</li>
+                    <li>Data in browser's localStorage</li>
+                    <li>Limit: ~5MB per domain</li>
+                    <li><strong>MEM</strong> metric shows current usage</li>
                 </ul>
             </section>
             <section>
                 <h2>Backup</h2>
                 <ul>
-                    <li>Use <strong>DOWNLOAD MD</strong> para salvar arquivos</li>
-                    <li>Use <strong>COPY</strong> para copiar conteúdo</li>
-                    <li>Faça backups regulares!</li>
+                    <li>Use <strong>EXPORT MD</strong> to save files</li>
+                    <li>Use <strong>COPY</strong> to copy content</li>
+                    <li>Make regular backups!</li>
                 </ul>
             </section>
             <div class="info-box">
-                <p><strong>Atenção:</strong> Limpar dados do navegador APAGA seus documentos. Modo privado/anônimo pode não salvar.</p>
+                <p><strong>Warning:</strong> Clearing browser data DELETES your documents.</p>
             </div>
             <nav class="page-nav">
                 <a href="/manual/print-export/">
                     <span class="nav-arrow">&larr;</span>
                     <div class="nav-direction">
                         <span class="nav-label">Previous</span>
-                        <span class="nav-title">Exportar PDF</span>
+                        <span class="nav-title">Export PDF</span>
                     </div>
                 </a>
                 <a href="/manual/offline-pwa/">
                     <div class="nav-direction">
                         <span class="nav-label">Next</span>
-                        <span class="nav-title">Uso Offline</span>
+                        <span class="nav-title">Offline</span>
                     </div>
                     <span class="nav-arrow">&rarr;</span>
                 </a>
@@ -145,7 +164,7 @@
                 <a href="/manual/">Manual</a>
                 <a href="/">Home</a>
             </div>
-            <p class="footer-version">MD2PDF v2.0 | Gratuito e sem limites</p>
+            <p class="footer-version">MD2PDF v2.0 | Free and unlimited</p>
         </div>
     </footer>
 </body>

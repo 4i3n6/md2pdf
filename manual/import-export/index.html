@@ -3,14 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Install MD2PDF as an app and use without internet connection.">
-    <meta name="keywords" content="pwa, progressive web app, offline, install app">
+    <meta name="description" content="Learn how to import Markdown files and export your documents in different formats.">
+    <meta name="keywords" content="import markdown, export markdown, md file, import md, export md, file management">
     <meta name="author" content="MD2PDF">
-    <title>Offline | MD2PDF</title>
-    <link rel="canonical" href="https://md2pdf.xyz/manual/offline-pwa/">
-    <link rel="alternate" hreflang="en" href="https://md2pdf.xyz/manual/offline-pwa/">
-    <link rel="alternate" hreflang="pt" href="https://md2pdf.xyz/pt/manual/offline-pwa/">
-    <link rel="alternate" hreflang="x-default" href="https://md2pdf.xyz/manual/offline-pwa/">
+    <title>Import/Export | MD2PDF</title>
+    <link rel="canonical" href="https://md2pdf.xyz/manual/import-export/">
+    <link rel="alternate" hreflang="en" href="https://md2pdf.xyz/manual/import-export/">
+    <link rel="alternate" hreflang="pt" href="https://md2pdf.xyz/pt/manual/import-export/">
+    <link rel="alternate" hreflang="x-default" href="https://md2pdf.xyz/manual/import-export/">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -66,7 +66,7 @@
                     <span class="sidebar-icon">A4</span>
                     <span class="sidebar-title">Preview</span>
                 </a>
-                <a href="/manual/import-export/" class="sidebar-item">
+                <a href="/manual/import-export/" class="sidebar-item active">
                     <span class="sidebar-icon">↔</span>
                     <span class="sidebar-title">Import/Export</span>
                 </a>
@@ -82,7 +82,7 @@
                     <span class="sidebar-icon">◉</span>
                     <span class="sidebar-title">Privacy</span>
                 </a>
-                <a href="/manual/offline-pwa/" class="sidebar-item active">
+                <a href="/manual/offline-pwa/" class="sidebar-item">
                     <span class="sidebar-icon">⚡</span>
                     <span class="sidebar-title">Offline</span>
                 </a>
@@ -100,59 +100,68 @@
                 <span class="breadcrumb-separator">&gt;</span>
                 <a href="/manual/">Manual</a>
                 <span class="breadcrumb-separator">&gt;</span>
-                <span class="breadcrumb-current">Offline</span>
+                <span class="breadcrumb-current">Import/Export</span>
             </nav>
 
             <article class="content">
 
-            <h1>Offline Use and PWA</h1>
+            <h1>Import and Export Files</h1>
             <section>
-                <h2>What is PWA?</h2>
-                <ul>
-                    <li>Progressive Web App</li>
-                    <li>Website that works like native app</li>
-                    <li>Installable on device</li>
-                    <li>Works 100% offline</li>
-                </ul>
+                <h2>Importing Markdown Files</h2>
+                <p>Bring your existing .md files into MD2PDF.</p>
+                <div class="info-box">
+                    <strong>Supported formats</strong>
+                    <p>.md, .markdown, and .txt files are accepted.</p>
+                </div>
+                <ol class="steps">
+                    <li>
+                        <strong>Click IMPORT MD</strong>
+                        In the sidebar, find the ACTIONS section.
+                    </li>
+                    <li>
+                        <strong>Select your file</strong>
+                        Choose a .md, .markdown, or .txt file from your computer.
+                    </li>
+                    <li>
+                        <strong>Edit and preview</strong>
+                        Your content is loaded into a new document.
+                    </li>
+                </ol>
             </section>
             <section>
-                <h2>How to Install</h2>
-                <h3>Desktop (Chrome/Edge)</h3>
-                <ul>
-                    <li>Visit /app</li>
-                    <li>Click install icon in address bar</li>
-                    <li>Confirm "Install"</li>
-                </ul>
-                <h3>Android</h3>
-                <ul>
-                    <li>Menu (3 dots) → "Add to home screen"</li>
-                </ul>
-                <h3>iOS</h3>
-                <ul>
-                    <li>Share → "Add to Home Screen"</li>
-                </ul>
+                <h2>Exporting as Markdown</h2>
+                <p>Save your document as a .md file for backup or use elsewhere.</p>
+                <ol class="steps">
+                    <li>
+                        <strong>Click EXPORT MD</strong>
+                        In the sidebar ACTIONS section.
+                    </li>
+                    <li>
+                        <strong>Save the file</strong>
+                        Browser downloads the .md file with your document name.
+                    </li>
+                </ol>
             </section>
             <section>
-                <h2>Offline Operation</h2>
-                <ul>
-                    <li>After first access, app is cached</li>
-                    <li>All features available offline</li>
-                    <li>Saved documents remain accessible</li>
-                    <li>Automatic updates when online</li>
-                </ul>
+                <h2>Exporting as PDF</h2>
+                <p>For PDF export, see the dedicated <a href="/manual/print-export/">Export PDF</a> page.</p>
+            </section>
+            <section>
+                <h2>Copying Content</h2>
+                <p>Use the COPY button or <code>Ctrl+Shift+C</code> to copy all Markdown to clipboard. Perfect for pasting into other apps.</p>
             </section>
             <nav class="page-nav">
-                <a href="/manual/privacy-storage/">
+                <a href="/manual/render-output/">
                     <span class="nav-arrow">&larr;</span>
                     <div class="nav-direction">
                         <span class="nav-label">Previous</span>
-                        <span class="nav-title">Privacy</span>
+                        <span class="nav-title">Preview</span>
                     </div>
                 </a>
-                <a href="/manual/troubleshooting/">
+                <a href="/manual/keyboard-shortcuts/">
                     <div class="nav-direction">
                         <span class="nav-label">Next</span>
-                        <span class="nav-title">Troubleshooting</span>
+                        <span class="nav-title">Shortcuts</span>
                     </div>
                     <span class="nav-arrow">&rarr;</span>
                 </a>

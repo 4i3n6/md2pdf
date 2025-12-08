@@ -48,7 +48,7 @@
     <priority>0.8</priority>
   </url>
   
-  <!-- Manual EN - Pages -->
+  <!-- Manual EN - Getting Started -->
   <url>
     <loc>https://md2pdf.xyz/manual/getting-started/</loc>
     <xhtml:link rel="alternate" hreflang="en" href="https://md2pdf.xyz/manual/getting-started/"/>
@@ -57,6 +57,18 @@
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
+  
+  <!-- Manual EN - What is Markdown -->
+  <url>
+    <loc>https://md2pdf.xyz/manual/what-is-markdown/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://md2pdf.xyz/manual/what-is-markdown/"/>
+    <xhtml:link rel="alternate" hreflang="pt" href="https://md2pdf.xyz/pt/manual/o-que-e-markdown/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://md2pdf.xyz/manual/what-is-markdown/"/>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  
+  <!-- Manual EN - Markdown Syntax -->
   <url>
     <loc>https://md2pdf.xyz/manual/markdown-syntax/</loc>
     <xhtml:link rel="alternate" hreflang="en" href="https://md2pdf.xyz/manual/markdown-syntax/"/>
@@ -65,6 +77,28 @@
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
+  
+  <!-- Manual EN - Tables -->
+  <url>
+    <loc>https://md2pdf.xyz/manual/markdown-tables/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://md2pdf.xyz/manual/markdown-tables/"/>
+    <xhtml:link rel="alternate" hreflang="pt" href="https://md2pdf.xyz/pt/manual/tabelas-markdown/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://md2pdf.xyz/manual/markdown-tables/"/>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  
+  <!-- Manual EN - Code Blocks -->
+  <url>
+    <loc>https://md2pdf.xyz/manual/markdown-code-blocks/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://md2pdf.xyz/manual/markdown-code-blocks/"/>
+    <xhtml:link rel="alternate" hreflang="pt" href="https://md2pdf.xyz/pt/manual/blocos-codigo/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://md2pdf.xyz/manual/markdown-code-blocks/"/>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  
+  <!-- Manual EN - Editor -->
   <url>
     <loc>https://md2pdf.xyz/manual/input-stream/</loc>
     <xhtml:link rel="alternate" hreflang="en" href="https://md2pdf.xyz/manual/input-stream/"/>
@@ -73,6 +107,8 @@
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
+  
+  <!-- Manual EN - Preview -->
   <url>
     <loc>https://md2pdf.xyz/manual/render-output/</loc>
     <xhtml:link rel="alternate" hreflang="en" href="https://md2pdf.xyz/manual/render-output/"/>
@@ -81,6 +117,18 @@
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
+  
+  <!-- Manual EN - Import/Export -->
+  <url>
+    <loc>https://md2pdf.xyz/manual/import-export/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://md2pdf.xyz/manual/import-export/"/>
+    <xhtml:link rel="alternate" hreflang="pt" href="https://md2pdf.xyz/pt/manual/importar-exportar/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://md2pdf.xyz/manual/import-export/"/>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  
+  <!-- Manual EN - Shortcuts -->
   <url>
     <loc>https://md2pdf.xyz/manual/keyboard-shortcuts/</loc>
     <xhtml:link rel="alternate" hreflang="en" href="https://md2pdf.xyz/manual/keyboard-shortcuts/"/>
@@ -89,6 +137,8 @@
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
+  
+  <!-- Manual EN - Export PDF -->
   <url>
     <loc>https://md2pdf.xyz/manual/print-export/</loc>
     <xhtml:link rel="alternate" hreflang="en" href="https://md2pdf.xyz/manual/print-export/"/>
@@ -97,6 +147,8 @@
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
+  
+  <!-- Manual EN - Privacy -->
   <url>
     <loc>https://md2pdf.xyz/manual/privacy-storage/</loc>
     <xhtml:link rel="alternate" hreflang="en" href="https://md2pdf.xyz/manual/privacy-storage/"/>
@@ -105,11 +157,23 @@
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
+  
+  <!-- Manual EN - Offline -->
   <url>
     <loc>https://md2pdf.xyz/manual/offline-pwa/</loc>
     <xhtml:link rel="alternate" hreflang="en" href="https://md2pdf.xyz/manual/offline-pwa/"/>
     <xhtml:link rel="alternate" hreflang="pt" href="https://md2pdf.xyz/pt/manual/uso-offline/"/>
     <xhtml:link rel="alternate" hreflang="x-default" href="https://md2pdf.xyz/manual/offline-pwa/"/>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  
+  <!-- Manual EN - Troubleshooting -->
+  <url>
+    <loc>https://md2pdf.xyz/manual/troubleshooting/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://md2pdf.xyz/manual/troubleshooting/"/>
+    <xhtml:link rel="alternate" hreflang="pt" href="https://md2pdf.xyz/pt/manual/solucao-problemas/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://md2pdf.xyz/manual/troubleshooting/"/>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
@@ -124,7 +188,7 @@
     <priority>0.8</priority>
   </url>
   
-  <!-- Manual PT - Pages -->
+  <!-- Manual PT - Primeiros Passos -->
   <url>
     <loc>https://md2pdf.xyz/pt/manual/primeiros-passos/</loc>
     <xhtml:link rel="alternate" hreflang="en" href="https://md2pdf.xyz/manual/getting-started/"/>
@@ -133,6 +197,18 @@
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
+  
+  <!-- Manual PT - O que é Markdown -->
+  <url>
+    <loc>https://md2pdf.xyz/pt/manual/o-que-e-markdown/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://md2pdf.xyz/manual/what-is-markdown/"/>
+    <xhtml:link rel="alternate" hreflang="pt" href="https://md2pdf.xyz/pt/manual/o-que-e-markdown/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://md2pdf.xyz/manual/what-is-markdown/"/>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  
+  <!-- Manual PT - Sintaxe Markdown -->
   <url>
     <loc>https://md2pdf.xyz/pt/manual/sintaxe-markdown/</loc>
     <xhtml:link rel="alternate" hreflang="en" href="https://md2pdf.xyz/manual/markdown-syntax/"/>
@@ -141,6 +217,28 @@
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
+  
+  <!-- Manual PT - Tabelas -->
+  <url>
+    <loc>https://md2pdf.xyz/pt/manual/tabelas-markdown/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://md2pdf.xyz/manual/markdown-tables/"/>
+    <xhtml:link rel="alternate" hreflang="pt" href="https://md2pdf.xyz/pt/manual/tabelas-markdown/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://md2pdf.xyz/manual/markdown-tables/"/>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  
+  <!-- Manual PT - Blocos de Código -->
+  <url>
+    <loc>https://md2pdf.xyz/pt/manual/blocos-codigo/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://md2pdf.xyz/manual/markdown-code-blocks/"/>
+    <xhtml:link rel="alternate" hreflang="pt" href="https://md2pdf.xyz/pt/manual/blocos-codigo/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://md2pdf.xyz/manual/markdown-code-blocks/"/>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  
+  <!-- Manual PT - Área de Edição -->
   <url>
     <loc>https://md2pdf.xyz/pt/manual/area-edicao/</loc>
     <xhtml:link rel="alternate" hreflang="en" href="https://md2pdf.xyz/manual/input-stream/"/>
@@ -149,6 +247,8 @@
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
+  
+  <!-- Manual PT - Preview -->
   <url>
     <loc>https://md2pdf.xyz/pt/manual/preview-saida/</loc>
     <xhtml:link rel="alternate" hreflang="en" href="https://md2pdf.xyz/manual/render-output/"/>
@@ -157,6 +257,18 @@
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
+  
+  <!-- Manual PT - Importar/Exportar -->
+  <url>
+    <loc>https://md2pdf.xyz/pt/manual/importar-exportar/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://md2pdf.xyz/manual/import-export/"/>
+    <xhtml:link rel="alternate" hreflang="pt" href="https://md2pdf.xyz/pt/manual/importar-exportar/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://md2pdf.xyz/manual/import-export/"/>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  
+  <!-- Manual PT - Atalhos -->
   <url>
     <loc>https://md2pdf.xyz/pt/manual/atalhos-teclado/</loc>
     <xhtml:link rel="alternate" hreflang="en" href="https://md2pdf.xyz/manual/keyboard-shortcuts/"/>
@@ -165,6 +277,8 @@
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
+  
+  <!-- Manual PT - Exportar PDF -->
   <url>
     <loc>https://md2pdf.xyz/pt/manual/exportar-pdf/</loc>
     <xhtml:link rel="alternate" hreflang="en" href="https://md2pdf.xyz/manual/print-export/"/>
@@ -173,6 +287,8 @@
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
+  
+  <!-- Manual PT - Privacidade -->
   <url>
     <loc>https://md2pdf.xyz/pt/manual/privacidade/</loc>
     <xhtml:link rel="alternate" hreflang="en" href="https://md2pdf.xyz/manual/privacy-storage/"/>
@@ -181,11 +297,23 @@
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
+  
+  <!-- Manual PT - Uso Offline -->
   <url>
     <loc>https://md2pdf.xyz/pt/manual/uso-offline/</loc>
     <xhtml:link rel="alternate" hreflang="en" href="https://md2pdf.xyz/manual/offline-pwa/"/>
     <xhtml:link rel="alternate" hreflang="pt" href="https://md2pdf.xyz/pt/manual/uso-offline/"/>
     <xhtml:link rel="alternate" hreflang="x-default" href="https://md2pdf.xyz/manual/offline-pwa/"/>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  
+  <!-- Manual PT - Solução de Problemas -->
+  <url>
+    <loc>https://md2pdf.xyz/pt/manual/solucao-problemas/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://md2pdf.xyz/manual/troubleshooting/"/>
+    <xhtml:link rel="alternate" hreflang="pt" href="https://md2pdf.xyz/pt/manual/solucao-problemas/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://md2pdf.xyz/manual/troubleshooting/"/>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>

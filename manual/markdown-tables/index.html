@@ -3,14 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Install MD2PDF as an app and use without internet connection.">
-    <meta name="keywords" content="pwa, progressive web app, offline, install app">
+    <meta name="description" content="Learn how to create tables in Markdown with alignment, formatting, and best practices.">
+    <meta name="keywords" content="markdown tables, create table markdown, table syntax, markdown table alignment">
     <meta name="author" content="MD2PDF">
-    <title>Offline | MD2PDF</title>
-    <link rel="canonical" href="https://md2pdf.xyz/manual/offline-pwa/">
-    <link rel="alternate" hreflang="en" href="https://md2pdf.xyz/manual/offline-pwa/">
-    <link rel="alternate" hreflang="pt" href="https://md2pdf.xyz/pt/manual/offline-pwa/">
-    <link rel="alternate" hreflang="x-default" href="https://md2pdf.xyz/manual/offline-pwa/">
+    <title>Tables | MD2PDF</title>
+    <link rel="canonical" href="https://md2pdf.xyz/manual/markdown-tables/">
+    <link rel="alternate" hreflang="en" href="https://md2pdf.xyz/manual/markdown-tables/">
+    <link rel="alternate" hreflang="pt" href="https://md2pdf.xyz/pt/manual/markdown-tables/">
+    <link rel="alternate" hreflang="x-default" href="https://md2pdf.xyz/manual/markdown-tables/">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -50,7 +50,7 @@
                     <span class="sidebar-icon">#</span>
                     <span class="sidebar-title">Markdown Guide</span>
                 </a>
-                <a href="/manual/markdown-tables/" class="sidebar-item">
+                <a href="/manual/markdown-tables/" class="sidebar-item active">
                     <span class="sidebar-icon">▦</span>
                     <span class="sidebar-title">Tables</span>
                 </a>
@@ -82,7 +82,7 @@
                     <span class="sidebar-icon">◉</span>
                     <span class="sidebar-title">Privacy</span>
                 </a>
-                <a href="/manual/offline-pwa/" class="sidebar-item active">
+                <a href="/manual/offline-pwa/" class="sidebar-item">
                     <span class="sidebar-icon">⚡</span>
                     <span class="sidebar-title">Offline</span>
                 </a>
@@ -100,59 +100,78 @@
                 <span class="breadcrumb-separator">&gt;</span>
                 <a href="/manual/">Manual</a>
                 <span class="breadcrumb-separator">&gt;</span>
-                <span class="breadcrumb-current">Offline</span>
+                <span class="breadcrumb-current">Tables</span>
             </nav>
 
             <article class="content">
 
-            <h1>Offline Use and PWA</h1>
+            <h1>Markdown Tables</h1>
             <section>
-                <h2>What is PWA?</h2>
+                <h2>Basic Table Syntax</h2>
+                <p>Create tables using <code>|</code> (pipe) and <code>-</code> (dash).</p>
+                <div class="code-example">
+                    <pre><code>| Column 1 | Column 2 | Column 3 |
+|----------|----------|----------|
+| Data 1   | Data 2   | Data 3   |
+| Data 4   | Data 5   | Data 6   |</code></pre>
+                    <p class="code-description">The second row with dashes separates the header from the body.</p>
+                </div>
+            </section>
+            <section>
+                <h2>Column Alignment</h2>
+                <p>Use colons <code>:</code> to align column content.</p>
+                <div class="code-example">
+                    <pre><code>| Left | Center | Right |
+|:-----|:------:|------:|
+| A    |   B    |     C |
+| 1    |   2    |     3 |</code></pre>
+                    <p class="code-description">Mix alignments as needed for your data.</p>
+                </div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Alignment</th>
+                            <th>Syntax</th>
+                            <th>Example</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>Left (default)</td><td><code>:---</code> or <code>---</code></td><td>Text aligned left</td></tr>
+                        <tr><td>Center</td><td><code>:---:</code></td><td>Text centered</td></tr>
+                        <tr><td>Right</td><td><code>---:</code></td><td>Text aligned right</td></tr>
+                    </tbody>
+                </table>
+            </section>
+            <section>
+                <h2>Formatting in Tables</h2>
+                <p>You can use Markdown formatting inside table cells.</p>
+                <div class="info-box">
+                    <strong>Tip</strong>
+                    <p>Keep tables simple. Complex layouts may not render well in all viewers.</p>
+                </div>
                 <ul>
-                    <li>Progressive Web App</li>
-                    <li>Website that works like native app</li>
-                    <li>Installable on device</li>
-                    <li>Works 100% offline</li>
+                    <li><strong>Bold:</strong> <code>**text**</code> works in cells</li>
+                    <li><strong>Italic:</strong> <code>*text*</code> works in cells</li>
+                    <li><strong>Code:</strong> <code>`code`</code> works in cells</li>
+                    <li><strong>Links:</strong> <code>[text](url)</code> works in cells</li>
                 </ul>
             </section>
             <section>
-                <h2>How to Install</h2>
-                <h3>Desktop (Chrome/Edge)</h3>
-                <ul>
-                    <li>Visit /app</li>
-                    <li>Click install icon in address bar</li>
-                    <li>Confirm "Install"</li>
-                </ul>
-                <h3>Android</h3>
-                <ul>
-                    <li>Menu (3 dots) → "Add to home screen"</li>
-                </ul>
-                <h3>iOS</h3>
-                <ul>
-                    <li>Share → "Add to Home Screen"</li>
-                </ul>
-            </section>
-            <section>
-                <h2>Offline Operation</h2>
-                <ul>
-                    <li>After first access, app is cached</li>
-                    <li>All features available offline</li>
-                    <li>Saved documents remain accessible</li>
-                    <li>Automatic updates when online</li>
-                </ul>
+                <h2>Quick Table Insertion</h2>
+                <p>In MD2PDF, click the <code>TBL</code> button in Quick Tags to insert a table template instantly.</p>
             </section>
             <nav class="page-nav">
-                <a href="/manual/privacy-storage/">
+                <a href="/manual/markdown-syntax/">
                     <span class="nav-arrow">&larr;</span>
                     <div class="nav-direction">
                         <span class="nav-label">Previous</span>
-                        <span class="nav-title">Privacy</span>
+                        <span class="nav-title">Markdown Guide</span>
                     </div>
                 </a>
-                <a href="/manual/troubleshooting/">
+                <a href="/manual/markdown-code-blocks/">
                     <div class="nav-direction">
                         <span class="nav-label">Next</span>
-                        <span class="nav-title">Troubleshooting</span>
+                        <span class="nav-title">Code Blocks</span>
                     </div>
                     <span class="nav-arrow">&rarr;</span>
                 </a>

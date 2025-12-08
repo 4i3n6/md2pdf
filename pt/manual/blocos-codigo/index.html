@@ -3,14 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Atalhos de teclado do MD2PDF para criar, exportar e navegar documentos rapidamente.">
-    <meta name="keywords" content="md2pdf atalhos, keyboard shortcuts, atalhos teclado">
+    <meta name="description" content="Aprenda a adicionar blocos de código com syntax highlighting em Markdown. Suporte para 100+ linguagens.">
+    <meta name="keywords" content="bloco de código markdown, syntax highlighting, formatação código, fenced code block, programação markdown">
     <meta name="author" content="MD2PDF">
-    <title>Atalhos | MD2PDF</title>
-    <link rel="canonical" href="https://md2pdf.xyz/pt/manual/atalhos-teclado/">
-    <link rel="alternate" hreflang="pt" href="https://md2pdf.xyz/pt/manual/atalhos-teclado/">
-    <link rel="alternate" hreflang="en" href="https://md2pdf.xyz/manual/atalhos-teclado/">
-    <link rel="alternate" hreflang="x-default" href="https://md2pdf.xyz/manual/atalhos-teclado/">
+    <title>Blocos de Código | MD2PDF</title>
+    <link rel="canonical" href="https://md2pdf.xyz/pt/manual/blocos-codigo/">
+    <link rel="alternate" hreflang="pt" href="https://md2pdf.xyz/pt/manual/blocos-codigo/">
+    <link rel="alternate" hreflang="en" href="https://md2pdf.xyz/manual/blocos-codigo/">
+    <link rel="alternate" hreflang="x-default" href="https://md2pdf.xyz/manual/blocos-codigo/">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -54,7 +54,7 @@
                     <span class="sidebar-icon">▦</span>
                     <span class="sidebar-title">Tabelas</span>
                 </a>
-                <a href="/pt/manual/blocos-codigo/" class="sidebar-item">
+                <a href="/pt/manual/blocos-codigo/" class="sidebar-item active">
                     <span class="sidebar-icon">{}</span>
                     <span class="sidebar-title">Blocos de Código</span>
                 </a>
@@ -70,7 +70,7 @@
                     <span class="sidebar-icon">↔</span>
                     <span class="sidebar-title">Importar/Exportar</span>
                 </a>
-                <a href="/pt/manual/atalhos-teclado/" class="sidebar-item active">
+                <a href="/pt/manual/atalhos-teclado/" class="sidebar-item">
                     <span class="sidebar-icon">⌘</span>
                     <span class="sidebar-title">Atalhos</span>
                 </a>
@@ -100,107 +100,76 @@
                 <span class="breadcrumb-separator">&gt;</span>
                 <a href="/pt/manual/">Manual</a>
                 <span class="breadcrumb-separator">&gt;</span>
-                <span class="breadcrumb-current">Atalhos</span>
+                <span class="breadcrumb-current">Blocos de Código</span>
             </nav>
 
             <article class="content">
 
-            <h1>Atalhos de Teclado</h1>
-            <section class="intro">
-                <p>Use atalhos para trabalhar mais rápido.</p>
-            </section>
+            <h1>Blocos de Código e Syntax Highlighting</h1>
             <section>
-                <h2>Atalhos da Aplicação</h2>
-                <table class="shortcuts-table">
-                    <thead>
-                        <tr>
-                            <th>Atalho</th>
-                            <th>Ação</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td><kbd>Ctrl</kbd>+<kbd>N</kbd></td>
-                            <td>Criar novo documento</td>
-                        </tr>
-                        <tr>
-                            <td><kbd>Ctrl</kbd>+<kbd>S</kbd></td>
-                            <td>Forçar salvamento</td>
-                        </tr>
-                        <tr>
-                            <td><kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>E</kbd></td>
-                            <td>Exportar PDF</td>
-                        </tr>
-                        <tr>
-                            <td><kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>C</kbd></td>
-                            <td>Copiar conteúdo Markdown</td>
-                        </tr>
-                        <tr>
-                            <td><kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>P</kbd></td>
-                            <td>Preview de impressão</td>
-                        </tr>
-                        <tr>
-                            <td><kbd>↑</kbd> / <kbd>↓</kbd></td>
-                            <td>Navegar documentos</td>
-                        </tr>
-                        <tr>
-                            <td><kbd>Enter</kbd></td>
-                            <td>Abrir documento selecionado</td>
-                        </tr>
-                        <tr>
-                            <td><kbd>Delete</kbd></td>
-                            <td>Deletar documento</td>
-                        </tr>
-                        <tr>
-                            <td><kbd>Escape</kbd></td>
-                            <td>Sair do preview</td>
-                        </tr>
-                    </tbody>
-                </table>
-            </section>
-            <section>
-                <h2>Atalhos do Editor</h2>
-                <table class="shortcuts-table">
-                    <thead>
-                        <tr>
-                            <th>Atalho</th>
-                            <th>Ação</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td><kbd>Ctrl</kbd>+<kbd>Z</kbd></td>
-                            <td>Desfazer</td>
-                        </tr>
-                        <tr>
-                            <td><kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>Z</kbd></td>
-                            <td>Refazer</td>
-                        </tr>
-                        <tr>
-                            <td><kbd>Ctrl</kbd>+<kbd>A</kbd></td>
-                            <td>Selecionar tudo</td>
-                        </tr>
-                    </tbody>
-                </table>
-            </section>
-            <section>
-                <h2>Usuários Mac</h2>
-                <div class="info-box">
-                    <p>Substitua <kbd>Ctrl</kbd> por <kbd>Cmd</kbd> (<kbd>⌘</kbd>)</p>
+                <h2>Código Inline</h2>
+                <p>Para código dentro de uma frase, envolva com crases simples.</p>
+                <div class="code-example">
+                    <pre><code>Use a função `console.log()` para debug.</code></pre>
+                    <p class="code-description">Código inline é perfeito para nomes de variáveis, funções ou comandos curtos.</p>
                 </div>
             </section>
+            <section>
+                <h2>Blocos de Código</h2>
+                <p>Para múltiplas linhas de código, use três crases (```) em linhas separadas.</p>
+                <div class="code-example">
+                    <pre><code>```
+function hello() {
+  console.log("Hello!");
+}
+```</code></pre>
+                    <p class="code-description">Tudo entre as crases é renderizado como código.</p>
+                </div>
+            </section>
+            <section>
+                <h2>Syntax Highlighting</h2>
+                <p>Adicione o nome da linguagem após as crases de abertura para colorização de sintaxe.</p>
+                <div class="code-example">
+                    <pre><code>```javascript
+function hello() {
+  console.log("Hello!");
+}
+```</code></pre>
+                    <p class="code-description">O nome da linguagem habilita a colorização apropriada.</p>
+                </div>
+            </section>
+            <section>
+                <h2>Linguagens Suportadas</h2>
+                <p>MD2PDF suporta 100+ linguagens via highlight.js. As mais comuns incluem:</p>
+                <div class="info-box">
+                    <strong>Linguagem desconhecida?</strong>
+                    <p>Se a linguagem não for reconhecida, o código ainda será exibido mas sem cores.</p>
+                </div>
+                <ul>
+                    <li><strong>Web:</strong> javascript, typescript, html, css, json</li>
+                    <li><strong>Backend:</strong> python, java, php, ruby, go, rust</li>
+                    <li><strong>Sistemas:</strong> c, cpp, csharp, swift, kotlin</li>
+                    <li><strong>Dados:</strong> sql, r, julia</li>
+                    <li><strong>Shell:</strong> bash, powershell, dockerfile</li>
+                    <li><strong>Config:</strong> yaml, toml, ini, xml</li>
+                </ul>
+            </section>
+            <section>
+                <h2>Inserção Rápida de Código</h2>
+                <p>No MD2PDF, clique no botão <code>```</code> nas Tags Rápidas para inserir um modelo de bloco de código.</p>
+            </section>
             <nav class="page-nav">
-                <a href="/pt/manual/importar-exportar/">
+                <a href="/pt/manual/tabelas-markdown/">
                     <span class="nav-arrow">&larr;</span>
                     <div class="nav-direction">
                         <span class="nav-label">Anterior</span>
-                        <span class="nav-title">Importar/Exportar</span>
+                        <span class="nav-title">Tabelas</span>
                     </div>
                 </a>
-                <a href="/pt/manual/exportar-pdf/">
+                <a href="/pt/manual/area-edicao/">
                     <div class="nav-direction">
                         <span class="nav-label">Próximo</span>
-                        <span class="nav-title">Exportar PDF</span>
+                        <span class="nav-title">Editor</span>
                     </div>
                     <span class="nav-arrow">&rarr;</span>
                 </a>

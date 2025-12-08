@@ -3,14 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Install MD2PDF as an app and use without internet connection.">
-    <meta name="keywords" content="pwa, progressive web app, offline, install app">
+    <meta name="description" content="Learn how to add code blocks with syntax highlighting in Markdown. Support for 100+ languages.">
+    <meta name="keywords" content="markdown code block, syntax highlighting, code formatting, fenced code block, programming markdown">
     <meta name="author" content="MD2PDF">
-    <title>Offline | MD2PDF</title>
-    <link rel="canonical" href="https://md2pdf.xyz/manual/offline-pwa/">
-    <link rel="alternate" hreflang="en" href="https://md2pdf.xyz/manual/offline-pwa/">
-    <link rel="alternate" hreflang="pt" href="https://md2pdf.xyz/pt/manual/offline-pwa/">
-    <link rel="alternate" hreflang="x-default" href="https://md2pdf.xyz/manual/offline-pwa/">
+    <title>Code Blocks | MD2PDF</title>
+    <link rel="canonical" href="https://md2pdf.xyz/manual/markdown-code-blocks/">
+    <link rel="alternate" hreflang="en" href="https://md2pdf.xyz/manual/markdown-code-blocks/">
+    <link rel="alternate" hreflang="pt" href="https://md2pdf.xyz/pt/manual/markdown-code-blocks/">
+    <link rel="alternate" hreflang="x-default" href="https://md2pdf.xyz/manual/markdown-code-blocks/">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -54,7 +54,7 @@
                     <span class="sidebar-icon">▦</span>
                     <span class="sidebar-title">Tables</span>
                 </a>
-                <a href="/manual/markdown-code-blocks/" class="sidebar-item">
+                <a href="/manual/markdown-code-blocks/" class="sidebar-item active">
                     <span class="sidebar-icon">{}</span>
                     <span class="sidebar-title">Code Blocks</span>
                 </a>
@@ -82,7 +82,7 @@
                     <span class="sidebar-icon">◉</span>
                     <span class="sidebar-title">Privacy</span>
                 </a>
-                <a href="/manual/offline-pwa/" class="sidebar-item active">
+                <a href="/manual/offline-pwa/" class="sidebar-item">
                     <span class="sidebar-icon">⚡</span>
                     <span class="sidebar-title">Offline</span>
                 </a>
@@ -100,59 +100,76 @@
                 <span class="breadcrumb-separator">&gt;</span>
                 <a href="/manual/">Manual</a>
                 <span class="breadcrumb-separator">&gt;</span>
-                <span class="breadcrumb-current">Offline</span>
+                <span class="breadcrumb-current">Code Blocks</span>
             </nav>
 
             <article class="content">
 
-            <h1>Offline Use and PWA</h1>
+            <h1>Code Blocks & Syntax Highlighting</h1>
             <section>
-                <h2>What is PWA?</h2>
+                <h2>Inline Code</h2>
+                <p>For code within a sentence, wrap with single backticks.</p>
+                <div class="code-example">
+                    <pre><code>Use the `console.log()` function for debugging.</code></pre>
+                    <p class="code-description">Inline code is perfect for variable names, functions, or short commands.</p>
+                </div>
+            </section>
+            <section>
+                <h2>Code Blocks</h2>
+                <p>For multiple lines of code, use three backticks (```) on separate lines.</p>
+                <div class="code-example">
+                    <pre><code>```
+function hello() {
+  console.log("Hello!");
+}
+```</code></pre>
+                    <p class="code-description">Everything between the backticks is rendered as code.</p>
+                </div>
+            </section>
+            <section>
+                <h2>Syntax Highlighting</h2>
+                <p>Add the language name after the opening backticks for colored syntax highlighting.</p>
+                <div class="code-example">
+                    <pre><code>```javascript
+function hello() {
+  console.log("Hello!");
+}
+```</code></pre>
+                    <p class="code-description">The language name enables proper color coding.</p>
+                </div>
+            </section>
+            <section>
+                <h2>Supported Languages</h2>
+                <p>MD2PDF supports 100+ languages through highlight.js. Common ones include:</p>
+                <div class="info-box">
+                    <strong>Unknown language?</strong>
+                    <p>If the language isn't recognized, code will still display but without colors.</p>
+                </div>
                 <ul>
-                    <li>Progressive Web App</li>
-                    <li>Website that works like native app</li>
-                    <li>Installable on device</li>
-                    <li>Works 100% offline</li>
+                    <li><strong>Web:</strong> javascript, typescript, html, css, json</li>
+                    <li><strong>Backend:</strong> python, java, php, ruby, go, rust</li>
+                    <li><strong>Systems:</strong> c, cpp, csharp, swift, kotlin</li>
+                    <li><strong>Data:</strong> sql, r, julia</li>
+                    <li><strong>Shell:</strong> bash, powershell, dockerfile</li>
+                    <li><strong>Config:</strong> yaml, toml, ini, xml</li>
                 </ul>
             </section>
             <section>
-                <h2>How to Install</h2>
-                <h3>Desktop (Chrome/Edge)</h3>
-                <ul>
-                    <li>Visit /app</li>
-                    <li>Click install icon in address bar</li>
-                    <li>Confirm "Install"</li>
-                </ul>
-                <h3>Android</h3>
-                <ul>
-                    <li>Menu (3 dots) → "Add to home screen"</li>
-                </ul>
-                <h3>iOS</h3>
-                <ul>
-                    <li>Share → "Add to Home Screen"</li>
-                </ul>
-            </section>
-            <section>
-                <h2>Offline Operation</h2>
-                <ul>
-                    <li>After first access, app is cached</li>
-                    <li>All features available offline</li>
-                    <li>Saved documents remain accessible</li>
-                    <li>Automatic updates when online</li>
-                </ul>
+                <h2>Quick Code Insertion</h2>
+                <p>In MD2PDF, click the <code>```</code> button in Quick Tags to insert a code block template.</p>
             </section>
             <nav class="page-nav">
-                <a href="/manual/privacy-storage/">
+                <a href="/manual/markdown-tables/">
                     <span class="nav-arrow">&larr;</span>
                     <div class="nav-direction">
                         <span class="nav-label">Previous</span>
-                        <span class="nav-title">Privacy</span>
+                        <span class="nav-title">Tables</span>
                     </div>
                 </a>
-                <a href="/manual/troubleshooting/">
+                <a href="/manual/input-stream/">
                     <div class="nav-direction">
                         <span class="nav-label">Next</span>
-                        <span class="nav-title">Troubleshooting</span>
+                        <span class="nav-title">Editor</span>
                     </div>
                     <span class="nav-arrow">&rarr;</span>
                 </a>

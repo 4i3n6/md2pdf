@@ -3,14 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Install MD2PDF as an app and use without internet connection.">
-    <meta name="keywords" content="pwa, progressive web app, offline, install app">
+    <meta name="description" content="Solutions to common problems with MD2PDF: PDF issues, formatting, offline mode, and more.">
+    <meta name="keywords" content="troubleshooting, problems, issues, help, faq, md2pdf help">
     <meta name="author" content="MD2PDF">
-    <title>Offline | MD2PDF</title>
-    <link rel="canonical" href="https://md2pdf.xyz/manual/offline-pwa/">
-    <link rel="alternate" hreflang="en" href="https://md2pdf.xyz/manual/offline-pwa/">
-    <link rel="alternate" hreflang="pt" href="https://md2pdf.xyz/pt/manual/offline-pwa/">
-    <link rel="alternate" hreflang="x-default" href="https://md2pdf.xyz/manual/offline-pwa/">
+    <title>Troubleshooting | MD2PDF</title>
+    <link rel="canonical" href="https://md2pdf.xyz/manual/troubleshooting/">
+    <link rel="alternate" hreflang="en" href="https://md2pdf.xyz/manual/troubleshooting/">
+    <link rel="alternate" hreflang="pt" href="https://md2pdf.xyz/pt/manual/troubleshooting/">
+    <link rel="alternate" hreflang="x-default" href="https://md2pdf.xyz/manual/troubleshooting/">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -82,11 +82,11 @@
                     <span class="sidebar-icon">◉</span>
                     <span class="sidebar-title">Privacy</span>
                 </a>
-                <a href="/manual/offline-pwa/" class="sidebar-item active">
+                <a href="/manual/offline-pwa/" class="sidebar-item">
                     <span class="sidebar-icon">⚡</span>
                     <span class="sidebar-title">Offline</span>
                 </a>
-                <a href="/manual/troubleshooting/" class="sidebar-item">
+                <a href="/manual/troubleshooting/" class="sidebar-item active">
                     <span class="sidebar-icon">!</span>
                     <span class="sidebar-title">Troubleshooting</span>
                 </a>
@@ -100,59 +100,88 @@
                 <span class="breadcrumb-separator">&gt;</span>
                 <a href="/manual/">Manual</a>
                 <span class="breadcrumb-separator">&gt;</span>
-                <span class="breadcrumb-current">Offline</span>
+                <span class="breadcrumb-current">Troubleshooting</span>
             </nav>
 
             <article class="content">
 
-            <h1>Offline Use and PWA</h1>
+            <h1>Troubleshooting Common Issues</h1>
             <section>
-                <h2>What is PWA?</h2>
-                <ul>
-                    <li>Progressive Web App</li>
-                    <li>Website that works like native app</li>
-                    <li>Installable on device</li>
-                    <li>Works 100% offline</li>
-                </ul>
+                <h2>PDF Issues</h2>
+                <div class="info-box">
+                    <strong>PDF looks different from preview?</strong>
+                    <p>Make sure browser zoom is at 100%. Check print settings: margins, scale, background graphics.</p>
+                </div>
+                <div class="info-box">
+                    <strong>Extra blank pages?</strong>
+                    <p>Check for extra <code>---</code> in your content. Each creates a page break.</p>
+                </div>
+                <div class="info-box">
+                    <strong>Images not showing in PDF?</strong>
+                    <p>Use direct image URLs (https://). Local file paths won't work in PDF.</p>
+                </div>
             </section>
             <section>
-                <h2>How to Install</h2>
-                <h3>Desktop (Chrome/Edge)</h3>
-                <ul>
-                    <li>Visit /app</li>
-                    <li>Click install icon in address bar</li>
-                    <li>Confirm "Install"</li>
-                </ul>
-                <h3>Android</h3>
-                <ul>
-                    <li>Menu (3 dots) → "Add to home screen"</li>
-                </ul>
-                <h3>iOS</h3>
-                <ul>
-                    <li>Share → "Add to Home Screen"</li>
-                </ul>
+                <h2>Formatting Issues</h2>
+                <div class="info-box">
+                    <strong>Markdown not rendering?</strong>
+                    <p>Check for spaces: <code># Title</code> needs space after #. <code>**bold**</code> needs no spaces inside.</p>
+                </div>
+                <div class="info-box">
+                    <strong>Links not working?</strong>
+                    <p>Use full URLs with protocol: <code>https://example.com</code></p>
+                </div>
+                <div class="info-box">
+                    <strong>Code not highlighted?</strong>
+                    <p>Add language after backticks: <code>```javascript</code></p>
+                </div>
             </section>
             <section>
-                <h2>Offline Operation</h2>
-                <ul>
-                    <li>After first access, app is cached</li>
-                    <li>All features available offline</li>
-                    <li>Saved documents remain accessible</li>
-                    <li>Automatic updates when online</li>
-                </ul>
+                <h2>Storage Issues</h2>
+                <div class="info-box">
+                    <strong>Documents disappeared?</strong>
+                    <p>Did you clear browser data? Use a different browser? Documents are per-browser.</p>
+                </div>
+                <div class="info-box">
+                    <strong>Can't save (MEM full)?</strong>
+                    <p>Export old documents and delete them to free space.</p>
+                </div>
+                <div class="info-box">
+                    <strong>Private/Incognito mode?</strong>
+                    <p>Documents may not persist. Use regular mode.</p>
+                </div>
+            </section>
+            <section>
+                <h2>Offline Issues</h2>
+                <div class="info-box">
+                    <strong>App not working offline?</strong>
+                    <p>Visit the app online first to cache it. Then offline will work.</p>
+                </div>
+                <div class="info-box">
+                    <strong>Can't install as PWA?</strong>
+                    <p>Only works on HTTPS. Use Chrome, Edge, or Safari.</p>
+                </div>
+                <div class="info-box">
+                    <strong>App not updating?</strong>
+                    <p>Clear site data and reload, or wait for auto-update.</p>
+                </div>
+            </section>
+            <section>
+                <h2>Still having issues?</h2>
+                <p>Check that you're using a modern browser (Chrome, Edge, Firefox, Safari). Clear cache and reload the page. Most issues are resolved by a fresh start.</p>
             </section>
             <nav class="page-nav">
-                <a href="/manual/privacy-storage/">
+                <a href="/manual/offline-pwa/">
                     <span class="nav-arrow">&larr;</span>
                     <div class="nav-direction">
                         <span class="nav-label">Previous</span>
-                        <span class="nav-title">Privacy</span>
+                        <span class="nav-title">Offline</span>
                     </div>
                 </a>
-                <a href="/manual/troubleshooting/">
+                <a href="/manual/">
                     <div class="nav-direction">
                         <span class="nav-label">Next</span>
-                        <span class="nav-title">Troubleshooting</span>
+                        <span class="nav-title">Index</span>
                     </div>
                     <span class="nav-arrow">&rarr;</span>
                 </a>

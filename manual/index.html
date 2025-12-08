@@ -3,10 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Manual completo do MD2PDF. Aprenda a converter Markdown para PDF de forma rápida e gratuita.">
-    <meta name="keywords" content="md2pdf manual, markdown tutorial, pdf converter guide, markdown para pdf, conversor markdown">
+    <meta name="description" content="Complete MD2PDF manual. Learn how to convert Markdown to PDF quickly and for free.">
+    <meta name="keywords" content="md2pdf manual, markdown tutorial, pdf converter guide, markdown to pdf, markdown converter">
     <meta name="author" content="MD2PDF">
-    <title>Manual do MD2PDF | MD2PDF</title>
+    <title>MD2PDF Manual | MD2PDF</title>
     <link rel="canonical" href="https://md2pdf.xyz/manual/">
     <link rel="alternate" hreflang="en" href="https://md2pdf.xyz/manual/">
     <link rel="alternate" hreflang="pt" href="https://md2pdf.xyz/pt/manual/">
@@ -36,39 +36,59 @@
             <nav class="sidebar-nav" aria-label="Manual">
                 <a href="/manual/" class="sidebar-item active">
                     <span class="sidebar-icon">≡</span>
-                    <span class="sidebar-title">Índice</span>
+                    <span class="sidebar-title">Index</span>
                 </a>
                 <a href="/manual/getting-started/" class="sidebar-item">
                     <span class="sidebar-icon">1</span>
-                    <span class="sidebar-title">Primeiros Passos</span>
+                    <span class="sidebar-title">Getting Started</span>
+                </a>
+                <a href="/manual/what-is-markdown/" class="sidebar-item">
+                    <span class="sidebar-icon">?</span>
+                    <span class="sidebar-title">What is Markdown</span>
                 </a>
                 <a href="/manual/markdown-syntax/" class="sidebar-item">
                     <span class="sidebar-icon">#</span>
-                    <span class="sidebar-title">Guia Markdown</span>
+                    <span class="sidebar-title">Markdown Guide</span>
+                </a>
+                <a href="/manual/markdown-tables/" class="sidebar-item">
+                    <span class="sidebar-icon">▦</span>
+                    <span class="sidebar-title">Tables</span>
+                </a>
+                <a href="/manual/markdown-code-blocks/" class="sidebar-item">
+                    <span class="sidebar-icon">{}</span>
+                    <span class="sidebar-title">Code Blocks</span>
                 </a>
                 <a href="/manual/input-stream/" class="sidebar-item">
                     <span class="sidebar-icon">></span>
-                    <span class="sidebar-title">Área de Edição</span>
+                    <span class="sidebar-title">Editor</span>
                 </a>
                 <a href="/manual/render-output/" class="sidebar-item">
                     <span class="sidebar-icon">A4</span>
-                    <span class="sidebar-title">Preview e Saída</span>
+                    <span class="sidebar-title">Preview</span>
+                </a>
+                <a href="/manual/import-export/" class="sidebar-item">
+                    <span class="sidebar-icon">↔</span>
+                    <span class="sidebar-title">Import/Export</span>
                 </a>
                 <a href="/manual/keyboard-shortcuts/" class="sidebar-item">
                     <span class="sidebar-icon">⌘</span>
-                    <span class="sidebar-title">Atalhos</span>
+                    <span class="sidebar-title">Shortcuts</span>
                 </a>
                 <a href="/manual/print-export/" class="sidebar-item">
                     <span class="sidebar-icon">↓</span>
-                    <span class="sidebar-title">Exportar PDF</span>
+                    <span class="sidebar-title">Export PDF</span>
                 </a>
                 <a href="/manual/privacy-storage/" class="sidebar-item">
                     <span class="sidebar-icon">◉</span>
-                    <span class="sidebar-title">Privacidade</span>
+                    <span class="sidebar-title">Privacy</span>
                 </a>
                 <a href="/manual/offline-pwa/" class="sidebar-item">
                     <span class="sidebar-icon">⚡</span>
-                    <span class="sidebar-title">Uso Offline</span>
+                    <span class="sidebar-title">Offline</span>
+                </a>
+                <a href="/manual/troubleshooting/" class="sidebar-item">
+                    <span class="sidebar-icon">!</span>
+                    <span class="sidebar-title">Troubleshooting</span>
                 </a>
             </nav>
         </aside>
@@ -83,11 +103,11 @@
 
             <article class="content">
 
-            <h1>Manual do MD2PDF</h1>
+            <h1>MD2PDF Manual</h1>
             
             <section class="intro">
-                <p>O <strong>MD2PDF</strong> é um conversor de Markdown para PDF gratuito, sem limites e sem necessidade de cadastro. Escreva em Markdown no editor, visualize em tempo real no formato A4 e exporte diretamente para PDF.</p>
-                <p>Neste manual você encontrará tudo o que precisa para dominar a ferramenta: desde os primeiros passos até recursos avançados de exportação e uso offline.</p>
+                <p><strong>MD2PDF</strong> is a free Markdown to PDF converter with no limits and no signup required. Write in Markdown in the editor, preview in real-time in A4 format, and export directly to PDF.</p>
+                <p>In this manual you'll find everything you need to master the tool: from getting started to advanced export features and offline use.</p>
             </section>
 
             <section class="toc">
@@ -96,57 +116,92 @@
                     <a href="/manual/getting-started/" class="toc-item">
                         <span class="toc-number">01</span>
                         <div class="toc-content">
-                            <span class="toc-title">Primeiros Passos</span>
-                            <span class="toc-desc">O que é Markdown e como começar</span>
+                            <span class="toc-title">Getting Started</span>
+                            <span class="toc-desc">Quick start guide</span>
+                        </div>
+                    </a>
+                    <a href="/manual/what-is-markdown/" class="toc-item">
+                        <span class="toc-number">02</span>
+                        <div class="toc-content">
+                            <span class="toc-title">What is Markdown</span>
+                            <span class="toc-desc">Understanding the format</span>
                         </div>
                     </a>
                     <a href="/manual/markdown-syntax/" class="toc-item">
-                        <span class="toc-number">02</span>
+                        <span class="toc-number">03</span>
                         <div class="toc-content">
-                            <span class="toc-title">Guia Markdown</span>
-                            <span class="toc-desc">Sintaxe completa com exemplos</span>
+                            <span class="toc-title">Markdown Guide</span>
+                            <span class="toc-desc">Complete syntax reference</span>
+                        </div>
+                    </a>
+                    <a href="/manual/markdown-tables/" class="toc-item">
+                        <span class="toc-number">04</span>
+                        <div class="toc-content">
+                            <span class="toc-title">Tables</span>
+                            <span class="toc-desc">Creating tables in Markdown</span>
+                        </div>
+                    </a>
+                    <a href="/manual/markdown-code-blocks/" class="toc-item">
+                        <span class="toc-number">05</span>
+                        <div class="toc-content">
+                            <span class="toc-title">Code Blocks</span>
+                            <span class="toc-desc">Syntax highlighting</span>
                         </div>
                     </a>
                     <a href="/manual/input-stream/" class="toc-item">
-                        <span class="toc-number">03</span>
+                        <span class="toc-number">06</span>
                         <div class="toc-content">
-                            <span class="toc-title">Área de Edição</span>
-                            <span class="toc-desc">Editor, documentos, botão COPY</span>
+                            <span class="toc-title">Editor</span>
+                            <span class="toc-desc">The editing area</span>
                         </div>
                     </a>
                     <a href="/manual/render-output/" class="toc-item">
-                        <span class="toc-number">04</span>
+                        <span class="toc-number">07</span>
                         <div class="toc-content">
-                            <span class="toc-title">Preview e Saída</span>
-                            <span class="toc-desc">Visualização A4 em tempo real</span>
+                            <span class="toc-title">Preview</span>
+                            <span class="toc-desc">A4 real-time preview</span>
+                        </div>
+                    </a>
+                    <a href="/manual/import-export/" class="toc-item">
+                        <span class="toc-number">08</span>
+                        <div class="toc-content">
+                            <span class="toc-title">Import/Export</span>
+                            <span class="toc-desc">File management</span>
                         </div>
                     </a>
                     <a href="/manual/keyboard-shortcuts/" class="toc-item">
-                        <span class="toc-number">05</span>
+                        <span class="toc-number">09</span>
                         <div class="toc-content">
-                            <span class="toc-title">Atalhos de Teclado</span>
-                            <span class="toc-desc">Produtividade com atalhos</span>
+                            <span class="toc-title">Shortcuts</span>
+                            <span class="toc-desc">Keyboard productivity</span>
                         </div>
                     </a>
                     <a href="/manual/print-export/" class="toc-item">
-                        <span class="toc-number">06</span>
+                        <span class="toc-number">10</span>
                         <div class="toc-content">
-                            <span class="toc-title">Exportar PDF</span>
-                            <span class="toc-desc">Como gerar seus PDFs</span>
+                            <span class="toc-title">Export PDF</span>
+                            <span class="toc-desc">Generate your PDFs</span>
                         </div>
                     </a>
                     <a href="/manual/privacy-storage/" class="toc-item">
-                        <span class="toc-number">07</span>
+                        <span class="toc-number">11</span>
                         <div class="toc-content">
-                            <span class="toc-title">Privacidade e Armazenamento</span>
-                            <span class="toc-desc">Seus dados são seus</span>
+                            <span class="toc-title">Privacy</span>
+                            <span class="toc-desc">Your data is yours</span>
                         </div>
                     </a>
                     <a href="/manual/offline-pwa/" class="toc-item">
-                        <span class="toc-number">08</span>
+                        <span class="toc-number">12</span>
                         <div class="toc-content">
-                            <span class="toc-title">Uso Offline e PWA</span>
-                            <span class="toc-desc">Instale e use sem internet</span>
+                            <span class="toc-title">Offline</span>
+                            <span class="toc-desc">Install and use offline</span>
+                        </div>
+                    </a>
+                    <a href="/manual/troubleshooting/" class="toc-item">
+                        <span class="toc-number">13</span>
+                        <div class="toc-content">
+                            <span class="toc-title">Troubleshooting</span>
+                            <span class="toc-desc">Common issues</span>
                         </div>
                     </a>
                 </nav>
@@ -158,29 +213,29 @@
                     <div class="tip-card">
                         <span class="tip-icon">#</span>
                         <div class="tip-content">
-                            <strong>Títulos com #</strong>
-                            <p>Use # para títulos. Quanto mais #, menor o nível (## subtítulo, ### seção).</p>
+                            <strong>Headings with #</strong>
+                            <p>Use # for headings. More # = smaller level (## subtitle, ### section).</p>
                         </div>
                     </div>
                     <div class="tip-card">
                         <span class="tip-icon">Ctrl</span>
                         <div class="tip-content">
                             <strong>Ctrl+Shift+E</strong>
-                            <p>Atalho rápido para exportar seu documento para PDF instantaneamente.</p>
+                            <p>Quick shortcut to export your document to PDF instantly.</p>
                         </div>
                     </div>
                     <div class="tip-card">
                         <span class="tip-icon">---</span>
                         <div class="tip-content">
-                            <strong>Quebra de página</strong>
-                            <p>Use --- (linha horizontal) para forçar uma quebra de página no PDF.</p>
+                            <strong>Page break</strong>
+                            <p>Use --- (horizontal rule) to force a page break in the PDF.</p>
                         </div>
                     </div>
                     <div class="tip-card">
                         <span class="tip-icon">PWA</span>
                         <div class="tip-content">
-                            <strong>Instale o app</strong>
-                            <p>MD2PDF funciona offline. Instale como app no seu dispositivo.</p>
+                            <strong>Install the app</strong>
+                            <p>MD2PDF works offline. Install as an app on your device.</p>
                         </div>
                     </div>
                 </div>
@@ -196,7 +251,7 @@
                 <a href="/manual/">Manual</a>
                 <a href="/">Home</a>
             </div>
-            <p class="footer-version">MD2PDF v2.0 | Gratuito e sem limites</p>
+            <p class="footer-version">MD2PDF v2.0 | Free and unlimited</p>
         </div>
     </footer>
 </body>

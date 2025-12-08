@@ -3,10 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Referência completa de sintaxe Markdown: títulos, formatação, listas, links, imagens, tabelas, código e muito mais.">
-    <meta name="keywords" content="markdown sintaxe, markdown guia, markdown referência, como escrever markdown, markdown cheatsheet">
+    <meta name="description" content="Complete Markdown syntax reference: headings, formatting, lists, links, images, tables, code, and more.">
+    <meta name="keywords" content="markdown syntax, markdown guide, markdown reference, how to write markdown, markdown cheatsheet">
     <meta name="author" content="MD2PDF">
-    <title>Guia Markdown | MD2PDF</title>
+    <title>Markdown Guide | MD2PDF</title>
     <link rel="canonical" href="https://md2pdf.xyz/manual/markdown-syntax/">
     <link rel="alternate" hreflang="en" href="https://md2pdf.xyz/manual/markdown-syntax/">
     <link rel="alternate" hreflang="pt" href="https://md2pdf.xyz/pt/manual/markdown-syntax/">
@@ -36,39 +36,59 @@
             <nav class="sidebar-nav" aria-label="Manual">
                 <a href="/manual/" class="sidebar-item">
                     <span class="sidebar-icon">≡</span>
-                    <span class="sidebar-title">Índice</span>
+                    <span class="sidebar-title">Index</span>
                 </a>
                 <a href="/manual/getting-started/" class="sidebar-item">
                     <span class="sidebar-icon">1</span>
-                    <span class="sidebar-title">Primeiros Passos</span>
+                    <span class="sidebar-title">Getting Started</span>
+                </a>
+                <a href="/manual/what-is-markdown/" class="sidebar-item">
+                    <span class="sidebar-icon">?</span>
+                    <span class="sidebar-title">What is Markdown</span>
                 </a>
                 <a href="/manual/markdown-syntax/" class="sidebar-item active">
                     <span class="sidebar-icon">#</span>
-                    <span class="sidebar-title">Guia Markdown</span>
+                    <span class="sidebar-title">Markdown Guide</span>
+                </a>
+                <a href="/manual/markdown-tables/" class="sidebar-item">
+                    <span class="sidebar-icon">▦</span>
+                    <span class="sidebar-title">Tables</span>
+                </a>
+                <a href="/manual/markdown-code-blocks/" class="sidebar-item">
+                    <span class="sidebar-icon">{}</span>
+                    <span class="sidebar-title">Code Blocks</span>
                 </a>
                 <a href="/manual/input-stream/" class="sidebar-item">
                     <span class="sidebar-icon">></span>
-                    <span class="sidebar-title">Área de Edição</span>
+                    <span class="sidebar-title">Editor</span>
                 </a>
                 <a href="/manual/render-output/" class="sidebar-item">
                     <span class="sidebar-icon">A4</span>
-                    <span class="sidebar-title">Preview e Saída</span>
+                    <span class="sidebar-title">Preview</span>
+                </a>
+                <a href="/manual/import-export/" class="sidebar-item">
+                    <span class="sidebar-icon">↔</span>
+                    <span class="sidebar-title">Import/Export</span>
                 </a>
                 <a href="/manual/keyboard-shortcuts/" class="sidebar-item">
                     <span class="sidebar-icon">⌘</span>
-                    <span class="sidebar-title">Atalhos</span>
+                    <span class="sidebar-title">Shortcuts</span>
                 </a>
                 <a href="/manual/print-export/" class="sidebar-item">
                     <span class="sidebar-icon">↓</span>
-                    <span class="sidebar-title">Exportar PDF</span>
+                    <span class="sidebar-title">Export PDF</span>
                 </a>
                 <a href="/manual/privacy-storage/" class="sidebar-item">
                     <span class="sidebar-icon">◉</span>
-                    <span class="sidebar-title">Privacidade</span>
+                    <span class="sidebar-title">Privacy</span>
                 </a>
                 <a href="/manual/offline-pwa/" class="sidebar-item">
                     <span class="sidebar-icon">⚡</span>
-                    <span class="sidebar-title">Uso Offline</span>
+                    <span class="sidebar-title">Offline</span>
+                </a>
+                <a href="/manual/troubleshooting/" class="sidebar-item">
+                    <span class="sidebar-icon">!</span>
+                    <span class="sidebar-title">Troubleshooting</span>
                 </a>
             </nav>
         </aside>
@@ -80,258 +100,139 @@
                 <span class="breadcrumb-separator">&gt;</span>
                 <a href="/manual/">Manual</a>
                 <span class="breadcrumb-separator">&gt;</span>
-                <span class="breadcrumb-current">Guia Markdown</span>
+                <span class="breadcrumb-current">Markdown Guide</span>
             </nav>
 
             <article class="content">
 
-            <h1>Guia Completo de Markdown</h1>
+            <h1>Complete Markdown Guide</h1>
             <nav class="page-anchors" aria-label="On this page">
                 <span class="anchors-title">On this page</span>
                 <div class="anchors-list">
-                    <a href="#titulos" class="anchor-item">Títulos</a>
-                    <a href="#texto" class="anchor-item">Formatação de Texto</a>
-                    <a href="#quebras" class="anchor-item">Quebras de Linha</a>
-                    <a href="#listas" class="anchor-item">Listas</a>
-                    <a href="#links" class="anchor-item">Links e Imagens</a>
-                    <a href="#codigo" class="anchor-item">Código</a>
-                    <a href="#citacoes" class="anchor-item">Citações</a>
-                    <a href="#tabelas" class="anchor-item">Tabelas</a>
-                    <a href="#especiais" class="anchor-item">Caracteres Especiais</a>
-                    <a href="#dicas" class="anchor-item">Dicas Avançadas</a>
+                    <a href="#headings" class="anchor-item">Headings</a>
+                    <a href="#text" class="anchor-item">Text Formatting</a>
+                    <a href="#breaks" class="anchor-item">Line Breaks</a>
+                    <a href="#lists" class="anchor-item">Lists</a>
+                    <a href="#links" class="anchor-item">Links & Images</a>
                 </div>
             </nav>
             <section class="intro">
-                <p>Esta página é sua referência completa de Markdown. Consulte sempre que precisar lembrar como formatar algo.</p>
+                <p>This page is your complete Markdown reference. Consult it whenever you need to remember how to format something.</p>
             </section>
-            <section id="titulos">
-                <h2>Títulos</h2>
-                <p>Use <code>#</code> para criar títulos. Quanto mais <code>#</code>, menor o nível do título.</p>
+            <section id="headings">
+                <h2>Headings</h2>
+                <p>Use <code>#</code> to create headings. More <code>#</code> symbols = smaller heading level.</p>
                 <div class="code-example">
-                    <pre><code># Título Principal (H1)
-## Subtítulo (H2)
-### Seção (H3)
-#### Subseção (H4)
-##### Menor (H5)
-###### Mínimo (H6)</code></pre>
-                    <p class="code-description">Os títulos H1 e H2 são os mais usados. H3 e H4 servem para subdivisões.</p>
+                    <pre><code># Main Title (H1)
+## Subtitle (H2)
+### Section (H3)
+#### Subsection (H4)
+##### Smaller (H5)
+###### Smallest (H6)</code></pre>
+                    <p class="code-description">H1 and H2 are most common. H3 and H4 are for subdivisions.</p>
                 </div>
                 <div class="info-box">
-                    <strong>Dica</strong>
-                    <p>Sempre deixe um espaço entre o <code>#</code> e o texto. <code>#Título</code> não funciona, use <code># Título</code>.</p>
+                    <strong>Tip</strong>
+                    <p>Always leave a space between <code>#</code> and the text. <code>#Title</code> won't work, use <code># Title</code>.</p>
                 </div>
             </section>
-            <section id="texto">
-                <h2>Formatação de Texto</h2>
-                <p>Formate palavras ou frases com símbolos ao redor do texto.</p>
-                <div class="info-box">
-                    <strong>Atenção</strong>
-                    <p>Não deixe espaço entre os símbolos e o texto. <code>** texto **</code> não funciona.</p>
-                </div>
+            <section id="text">
+                <h2>Text Formatting</h2>
+                <p>Format words or phrases with symbols around the text.</p>
                 <table>
                     <thead>
                         <tr>
-                            <th>Você escreve</th>
-                            <th>Resultado</th>
-                            <th>Uso</th>
+                            <th>You write</th>
+                            <th>Result</th>
+                            <th>Use</th>
                         </tr>
                     </thead>
                     <tbody>
-                        <tr><td><code>**texto**</code></td><td><strong>texto</strong></td><td>Destaque importante</td></tr>
-                        <tr><td><code>*texto*</code></td><td><em>texto</em></td><td>Ênfase sutil</td></tr>
-                        <tr><td><code>***texto***</code></td><td><strong><em>texto</em></strong></td><td>Máximo destaque</td></tr>
-                        <tr><td><code>~~texto~~</code></td><td><del>texto</del></td><td>Texto removido/errado</td></tr>
-                        <tr><td><code>`texto`</code></td><td><code>texto</code></td><td>Código ou comando</td></tr>
-                        <tr><td><code>==texto==</code></td><td><mark>texto</mark></td><td>Marcação (highlight)</td></tr>
+                        <tr><td><code>**text**</code></td><td><strong>text</strong></td><td>Important emphasis</td></tr>
+                        <tr><td><code>*text*</code></td><td><em>text</em></td><td>Subtle emphasis</td></tr>
+                        <tr><td><code>***text***</code></td><td><strong><em>text</em></strong></td><td>Maximum emphasis</td></tr>
+                        <tr><td><code>~~text~~</code></td><td><del>text</del></td><td>Deleted/wrong text</td></tr>
+                        <tr><td><code>`text`</code></td><td><code>text</code></td><td>Code or command</td></tr>
+                        <tr><td><code>==text==</code></td><td><mark>text</mark></td><td>Highlight</td></tr>
                     </tbody>
                 </table>
             </section>
-            <section id="quebras">
-                <h2>Quebras de Linha e Parágrafos</h2>
-                <p>Markdown trata quebras de linha de forma especial. Entender isso evita frustrações.</p>
-                <div class="code-example">
-                    <pre><code>Esta linha termina com dois espaços  
-e continua aqui na linha de baixo.
-
-Este é um novo parágrafo
-porque tem uma linha em branco acima.
-
----
-
-Isso força uma nova página no PDF.</code></pre>
-                    <p class="code-description">Os dois espaços no final são invisíveis mas necessários para quebra de linha simples.</p>
-                </div>
+            <section id="breaks">
+                <h2>Line Breaks and Paragraphs</h2>
+                <p>Markdown treats line breaks specially. Understanding this avoids frustration.</p>
                 <table>
                     <thead>
                         <tr>
-                            <th>O que você quer</th>
-                            <th>Como fazer</th>
+                            <th>What you want</th>
+                            <th>How to do it</th>
                         </tr>
                     </thead>
                     <tbody>
-                        <tr><td>Nova linha (mesmo parágrafo)</td><td>Dois espaços no final da linha + Enter</td></tr>
-                        <tr><td>Nova linha (alternativa)</td><td><code>&lt;br&gt;</code> no final da linha</td></tr>
-                        <tr><td>Novo parágrafo</td><td>Linha em branco entre os textos</td></tr>
-                        <tr><td>Quebra de página (PDF)</td><td><code>---</code> em linha separada</td></tr>
+                        <tr><td>New line (same paragraph)</td><td>Two spaces at end + Enter</td></tr>
+                        <tr><td>New line (alternative)</td><td><code>&lt;br&gt;</code> at end</td></tr>
+                        <tr><td>New paragraph</td><td>Blank line between texts</td></tr>
+                        <tr><td>Page break (PDF)</td><td><code>---</code> on separate line</td></tr>
                     </tbody>
                 </table>
-                <div class="info-box highlight">
-                    <strong>Importante</strong>
-                    <p>Se você apertar Enter uma vez sem os dois espaços, o Markdown junta as linhas no mesmo parágrafo.</p>
-                </div>
             </section>
-            <section id="listas">
-                <h2>Listas</h2>
-                <p>Crie listas com marcadores ou números.</p>
-                <h3>Lista com marcadores</h3>
+            <section id="lists">
+                <h2>Lists</h2>
+                <p>Create lists with bullets or numbers.</p>
+                <h3>Bullet list</h3>
                 <div class="code-example">
-                    <pre><code>- Item um
-- Item dois
-  - Subitem (2 espaços antes)
-  - Outro subitem
-- Item três</code></pre>
-                    <p class="code-description">Use <code>-</code>, <code>*</code> ou <code>+</code> para marcadores.</p>
+                    <pre><code>- Item one
+- Item two
+  - Subitem (2 spaces before)
+- Item three</code></pre>
+                    <p class="code-description">Use <code>-</code>, <code>*</code>, or <code>+</code> for bullets.</p>
                 </div>
-                <h3>Lista numerada</h3>
+                <h3>Numbered list</h3>
                 <div class="code-example">
-                    <pre><code>1. Primeiro item
-2. Segundo item
-   1. Subitem numerado
-   2. Outro subitem
-3. Terceiro item</code></pre>
-                    <p class="code-description">A numeração é automática. Você pode usar <code>1.</code> em todos os itens.</p>
+                    <pre><code>1. First item
+2. Second item
+3. Third item</code></pre>
+                    <p class="code-description">Numbering is automatic.</p>
                 </div>
-                <h3>Lista de tarefas</h3>
+                <h3>Task list</h3>
                 <div class="code-example">
-                    <pre><code>- [ ] Tarefa pendente
-- [x] Tarefa concluída
-- [ ] Outra pendente</code></pre>
-                    <p class="code-description">Use <code>[ ]</code> para pendente e <code>[x]</code> para concluído.</p>
+                    <pre><code>- [ ] Pending task
+- [x] Completed task</code></pre>
+                    <p class="code-description">Use <code>[ ]</code> for pending, <code>[x]</code> for done.</p>
                 </div>
             </section>
             <section id="links">
-                <h2>Links e Imagens</h2>
-                <p>Adicione links clicáveis e imagens ao seu documento.</p>
+                <h2>Links and Images</h2>
+                <p>Add clickable links and images to your document.</p>
                 <div class="info-box">
-                    <strong>Imagens no MD2PDF</strong>
-                    <p>Imagens são redimensionadas automaticamente para caber no A4. Use URLs completas ou cole imagens em base64.</p>
+                    <strong>Images in MD2PDF</strong>
+                    <p>Images are automatically resized to fit A4. Use complete URLs or paste base64 images.</p>
                 </div>
                 <table>
                     <thead>
                         <tr>
-                            <th>Tipo</th>
-                            <th>Sintaxe</th>
-                            <th>Exemplo</th>
+                            <th>Type</th>
+                            <th>Syntax</th>
+                            <th>Example</th>
                         </tr>
                     </thead>
                     <tbody>
-                        <tr><td>Link simples</td><td><code>[texto](url)</code></td><td><code>[Google](https://google.com)</code></td></tr>
-                        <tr><td>Link com título</td><td><code>[texto](url "título")</code></td><td><code>[Google](https://google.com "Buscador")</code></td></tr>
-                        <tr><td>URL direta</td><td><code>&lt;url&gt;</code></td><td><code>&lt;https://google.com&gt;</code></td></tr>
-                        <tr><td>Imagem</td><td><code>![alt](url)</code></td><td><code>![Logo](imagem.png)</code></td></tr>
-                        <tr><td>Imagem com link</td><td><code>[![alt](img)](url)</code></td><td>Imagem clicável</td></tr>
+                        <tr><td>Link</td><td><code>[text](url)</code></td><td><code>[Google](https://google.com)</code></td></tr>
+                        <tr><td>Image</td><td><code>![alt](url)</code></td><td><code>![Logo](image.png)</code></td></tr>
                     </tbody>
                 </table>
-            </section>
-            <section id="codigo">
-                <h2>Código</h2>
-                <p>Mostre código com formatação especial e syntax highlighting.</p>
-                <div class="info-box">
-                    <strong>Linguagens suportadas</strong>
-                    <p>javascript, typescript, python, java, c, cpp, csharp, php, ruby, go, rust, sql, html, css, json, yaml, bash, markdown e muitas outras.</p>
-                </div>
-                <h3>Código inline</h3>
-                <div class="code-example">
-                    <pre><code>Use `console.log()` para debug.</code></pre>
-                    <p class="code-description">Envolva com crases simples para código no meio do texto.</p>
-                </div>
-                <h3>Bloco de código</h3>
-                <div class="code-example">
-                    <pre><code>```javascript
-function hello() {
-  console.log("Hello!");
-}
-```</code></pre>
-                    <p class="code-description">Use três crases e opcionalmente o nome da linguagem para syntax highlighting.</p>
-                </div>
-            </section>
-            <section id="citacoes">
-                <h2>Citações (Blockquotes)</h2>
-                <p>Use <code>&gt;</code> para criar blocos de citação.</p>
-                <div class="code-example">
-                    <pre><code>&gt; Esta é uma citação.
-&gt; Pode ter múltiplas linhas.
-&gt;
-&gt; E parágrafos separados.
-
-&gt;&gt; Citação aninhada (dois &gt;)</code></pre>
-                    <p class="code-description">Citações são úteis para destacar informações importantes ou citar fontes.</p>
-                </div>
-            </section>
-            <section id="tabelas">
-                <h2>Tabelas</h2>
-                <p>Crie tabelas usando <code>|</code> e <code>-</code>.</p>
-                <div class="code-example">
-                    <pre><code>| Coluna 1 | Coluna 2 | Coluna 3 |
-|----------|:--------:|---------:|
-| Esquerda | Centro   | Direita  |
-| Texto    | Texto    | Texto    |</code></pre>
-                    <p class="code-description">Use <code>:</code> para alinhar: <code>:---</code> esquerda, <code>:---:</code> centro, <code>---:</code> direita.</p>
-                </div>
-                <div class="info-box">
-                    <strong>Dica</strong>
-                    <p>As colunas não precisam estar alinhadas no código. O Markdown entende mesmo desalinhado.</p>
-                </div>
-            </section>
-            <section id="especiais">
-                <h2>Caracteres Especiais</h2>
-                <p>Alguns caracteres têm significado especial no Markdown. Para usá-los literalmente, escape com <code>\</code>.</p>
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Caractere</th>
-                            <th>Escape</th>
-                            <th>Quando escapar</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr><td><code>*</code></td><td><code>\*</code></td><td>Quando não quer itálico/negrito</td></tr>
-                        <tr><td><code>#</code></td><td><code>\#</code></td><td>Quando não quer título</td></tr>
-                        <tr><td><code>[</code> <code>]</code></td><td><code>\[</code> <code>\]</code></td><td>Quando não quer link</td></tr>
-                        <tr><td><code>`</code></td><td><code>\`</code></td><td>Quando não quer código</td></tr>
-                        <tr><td><code>|</code></td><td><code>\|</code></td><td>Dentro de tabelas</td></tr>
-                        <tr><td><code>\</code></td><td><code>\\</code></td><td>Para mostrar a barra</td></tr>
-                    </tbody>
-                </table>
-            </section>
-            <section id="dicas">
-                <h2>Dicas Avançadas</h2>
-                <p>Truques úteis para documentos mais elaborados.</p>
-                <div class="info-box highlight">
-                    <strong>Copie e teste!</strong>
-                    <p>A melhor forma de aprender é experimentar. Copie os exemplos desta página, cole no MD2PDF e veja o resultado.</p>
-                </div>
-                <ul>
-                    <li><strong>Linha horizontal:</strong> Use <code>---</code>, <code>***</code> ou <code>___</code> em linha separada. No MD2PDF, isso também força quebra de página.</li>
-                    <li><strong>Comentários:</strong> Use <code>&lt;!-- comentário --&gt;</code> para texto que não aparece no resultado.</li>
-                    <li><strong>HTML inline:</strong> Você pode usar tags HTML como <code>&lt;br&gt;</code>, <code>&lt;sub&gt;</code>, <code>&lt;sup&gt;</code>, <code>&lt;kbd&gt;</code>.</li>
-                    <li><strong>Emojis:</strong> Cole emojis diretamente ou use códigos como <code>:smile:</code> (suporte varia).</li>
-                    <li><strong>Notas de rodapé:</strong> Use <code>[^1]</code> no texto e <code>[^1]: Nota aqui</code> no final.</li>
-                    <li><strong>Âncoras:</strong> Títulos geram IDs automáticos. Link com <code>[texto](#titulo-em-minusculas)</code>.</li>
-                </ul>
             </section>
             <nav class="page-nav">
-                <a href="/manual/getting-started/">
+                <a href="/manual/what-is-markdown/">
                     <span class="nav-arrow">&larr;</span>
                     <div class="nav-direction">
                         <span class="nav-label">Previous</span>
-                        <span class="nav-title">Primeiros Passos</span>
+                        <span class="nav-title">What is Markdown</span>
                     </div>
                 </a>
-                <a href="/manual/input-stream/">
+                <a href="/manual/markdown-tables/">
                     <div class="nav-direction">
                         <span class="nav-label">Next</span>
-                        <span class="nav-title">Área de Edição</span>
+                        <span class="nav-title">Tables</span>
                     </div>
                     <span class="nav-arrow">&rarr;</span>
                 </a>
@@ -347,7 +248,7 @@ function hello() {
                 <a href="/manual/">Manual</a>
                 <a href="/">Home</a>
             </div>
-            <p class="footer-version">MD2PDF v2.0 | Gratuito e sem limites</p>
+            <p class="footer-version">MD2PDF v2.0 | Free and unlimited</p>
         </div>
     </footer>
 </body>
