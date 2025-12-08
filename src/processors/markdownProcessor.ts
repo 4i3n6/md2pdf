@@ -98,21 +98,6 @@ class PrintRenderer extends Renderer {
    */
   override code(token: Tokens.Code): string {
     const lang = token.lang || 'plaintext'
-
-    // MERMAID: Return container for later rendering by mermaidProcessor
-    if (lang === 'mermaid') {
-      // Escape HTML to prevent XSS, preserve in data attribute for later processing
-      const escapedSource = token.text
-        .replace(/&/g, '&amp;')
-        .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;')
-        .replace(/"/g, '&quot;')
-      
-      return `<div class="mermaid" data-mermaid-source="${escapedSource}" aria-label="Mermaid Diagram">
-        <pre class="mermaid-loading">Loading diagram...</pre>
-      </div>\n`
-    }
-
     let highlightedCode = token.text
 
     try {
@@ -256,7 +241,47 @@ marked.setOptions({
 })
 
 // Usar instância da classe PrintRenderer
+// A classe estende Renderer e tem acesso a this.parser para processar tokens inline
 marked.use({ renderer: new PrintRenderer() })
+
+/**
+ * Extensão para interceptar blocos de código Mermaid
+ * 
+ * NOTA: No marked v17, a classe PrintRenderer funciona para a maioria dos métodos,
+ * mas precisamos de uma extensão separada para interceptar code blocks antes
+ * do renderer processar, para detectar Mermaid.
+ */
+marked.use({
+  extensions: [{
+    name: 'mermaidCodeBlock',
+    level: 'block',
+    start(src: string) {
+      return src.match(/^```mermaid/m)?.index
+    },
+    tokenizer(src: string) {
+      const match = /^```mermaid\n([\s\S]*?)```/.exec(src)
+      if (match) {
+        return {
+          type: 'mermaidCodeBlock',
+          raw: match[0],
+          text: match[1].trim()
+        }
+      }
+      return undefined
+    },
+    renderer(token: { text: string }) {
+      const escapedSource = token.text
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+      
+      return `<div class="mermaid" data-mermaid-source="${escapedSource}" aria-label="Mermaid Diagram">
+        <pre class="mermaid-loading">Loading diagram...</pre>
+      </div>\n`
+    }
+  }]
+})
 
 /**
  * Configuração segura do DOMPurify para sanitização de HTML
