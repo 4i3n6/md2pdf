@@ -49,7 +49,9 @@
     #console-log,
     .console-container,
     .panel-header,
-    .workspace > .pane-container:first-child {
+    .workspace > .pane-container:first-child,
+    .skip-link,
+    .sr-only {
         display: none !important;
         visibility: hidden !important;
         height: 0 !important;
@@ -122,58 +124,52 @@
         /* Permitir quebra antes se necessário */
         page-break-before: auto;
         color: black;
-        border: none;
-        text-transform: none;
-        letter-spacing: normal;
-        margin-top: 1.5em;
-        margin-bottom: 0.75em;
         font-weight: bold;
+        /* Consistência com screen: uppercase e letter-spacing */
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
     }
 
     .markdown-body h1 {
         font-size: 14pt;
-        border-bottom: none;
-        padding-bottom: 0;
+        border-bottom: 2px solid black;
+        padding-bottom: 6px;
         margin-top: 0.5em;
-        margin-bottom: 0.3em;
-        font-weight: bold;
+        margin-bottom: 0.5em;
     }
 
     .markdown-body h2 {
         font-size: 12pt;
-        border-bottom: none;
-        padding-bottom: 0;
-        margin-top: 0.3em;
-        margin-bottom: 0.15em;
-        font-weight: bold;
+        border-bottom: 2px solid black;
+        padding-bottom: 4px;
+        margin-top: 0.4em;
+        margin-bottom: 0.3em;
     }
 
     .markdown-body h3 {
         font-size: 11pt;
-        margin-top: 0.25em;
-        margin-bottom: 0.1em;
-        font-weight: bold;
+        border-bottom: 1px solid #666;
+        padding-bottom: 3px;
+        margin-top: 0.3em;
+        margin-bottom: 0.2em;
     }
 
     .markdown-body h4 {
         font-size: 10.5pt;
-        margin-top: 0.2em;
-        margin-bottom: 0.1em;
-        font-weight: bold;
+        margin-top: 0.25em;
+        margin-bottom: 0.15em;
     }
 
     .markdown-body h5 {
         font-size: 10pt;
-        margin-top: 0.15em;
+        margin-top: 0.2em;
         margin-bottom: 0.1em;
-        font-weight: bold;
     }
 
     .markdown-body h6 {
         font-size: 10pt;
-        margin-top: 0.1em;
-        margin-bottom: 0.05em;
-        font-weight: bold;
+        margin-top: 0.15em;
+        margin-bottom: 0.1em;
     }
 
     /* ============================================================
@@ -236,13 +232,13 @@
 
     .markdown-body code,
     .markdown-body .markdown-code-inline {
-        background: #f5f5f5;
-        border: 1px solid #ddd;
-        border-radius: 1px;
-        padding: 0px 2px;
+        background: #f0f0f0;
+        border: 1px solid #ccc;
+        border-radius: 2px;
+        padding: 1px 4px;
         font-family: 'Courier New', 'Monaco', monospace;
         font-size: 8pt;
-        color: #333;
+        color: black;
     }
 
     .markdown-body pre,
@@ -328,15 +324,15 @@
 
     .markdown-body blockquote,
     .markdown-body .markdown-blockquote {
-        background: white;
-        border-left: 2px solid #999;
-        margin: 0.1em 0;
-        padding: 0.1em 0 0.1em 0.4em;
+        background: #fafafa;
+        border-left: 3px solid #444;
+        margin: 0.5em 0;
+        padding: 0.3em 0 0.3em 0.8em;
         page-break-inside: avoid;
         font-style: italic;
-        color: #666;
+        color: #444;
         font-size: 9pt;
-        line-height: 1.1;
+        line-height: 1.3;
     }
 
     /* ============================================================
