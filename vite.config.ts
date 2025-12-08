@@ -59,7 +59,7 @@ export default defineConfig({
     })
   ],
   server: {
-    port: 3010,
+    port: 3000,
     open: '/app',
     headers: {
       'Service-Worker-Allowed': '/',
@@ -68,7 +68,7 @@ export default defineConfig({
     middlewareMode: false,
     hmr: {
       host: 'localhost',
-      port: 3010
+      port: 3000
     }
   },
   build: {
