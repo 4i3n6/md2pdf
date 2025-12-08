@@ -12,7 +12,7 @@ export const en = {
   // App Header
   header: {
     brand: 'MD2PDF',
-    version: 'v1.1.0',
+    version: 'v1.1.1',
     manualLink: 'Manual',
     manualTitle: 'Open user manual',
   },
