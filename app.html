@@ -60,14 +60,30 @@
             </span>
             
             <div class="panel-header" role="heading" aria-level="2">ACTIONS</div>
-            <div class="actions-section" style="padding: 10px;">
+            <div class="actions-section" style="padding: 10px; display: flex; flex-direction: column; gap: 6px;">
+                <button 
+                    id="open-file-btn" 
+                    class="action-btn action-btn-secondary" 
+                    style="width: 100%; font-size: 11px;" 
+                    aria-label="Abrir arquivo do disco"
+                    title="Abrir arquivo Markdown do disco (Ctrl+O)">
+                    OPEN FILE
+                </button>
+                <button 
+                    id="save-disk-btn" 
+                    class="action-btn action-btn-secondary" 
+                    style="width: 100%; font-size: 11px;" 
+                    aria-label="Salvar arquivo no disco"
+                    title="Salvar arquivo no disco (Ctrl+Shift+S)">
+                    SAVE TO DISK
+                </button>
                 <button 
                     id="download-md-btn" 
-                    class="action-btn" 
-                    style="width: 100%; font-size: 12px;" 
+                    class="action-btn action-btn-tertiary" 
+                    style="width: 100%; font-size: 11px;" 
                     aria-label="Baixar documento em formato Markdown"
                     title="Baixar documento em formato Markdown">
-                    ↓ DOWNLOAD MD
+                    DOWNLOAD MD
                 </button>
             </div>
             

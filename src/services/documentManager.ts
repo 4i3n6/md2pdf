@@ -186,6 +186,54 @@ export class DocumentManager {
      return newDoc
    }
 
+   /**
+    * Cria um documento a partir de um arquivo do disco
+    * 
+    * @param {string} name - Nome do arquivo
+    * @param {string} content - Conteúdo do arquivo
+    * @param {FileSystemFileHandle} fileHandle - Handle do arquivo para salvamento direto
+    * @returns {Document} Documento criado
+    */
+   createFromFile(name: string, content: string, fileHandle: FileSystemFileHandle): Document {
+     const newDoc: Document = {
+       id: Date.now(),
+       name,
+       content,
+       updated: Date.now(),
+       storage: 'disk',
+       lastSaved: Date.now(),
+       isDirty: false,
+       fileHandle
+     }
+     this.docs.unshift(newDoc)
+     this.save()
+     this.logger?.log?.(`Arquivo aberto: ${name} [ID: ${newDoc.id}]`)
+     return newDoc
+   }
+
+   /**
+    * Atualiza o fileHandle de um documento (após Save As)
+    * 
+    * @param {number} id - ID do documento
+    * @param {FileSystemFileHandle} fileHandle - Novo handle do arquivo
+    * @returns {Document | undefined} Documento atualizado ou undefined
+    */
+   setFileHandle(id: number, fileHandle: FileSystemFileHandle): Document | undefined {
+     const doc = this.getById(id)
+     if (!doc) {
+       this.logger?.error?.(`Documento ${id} não encontrado`)
+       return undefined
+     }
+     
+     doc.fileHandle = fileHandle
+     doc.storage = 'disk'
+     doc.lastSaved = Date.now()
+     doc.isDirty = false
+     this.save()
+     this.logger?.log?.(`Handle atualizado para doc ${id}`)
+     return doc
+   }
+
   /**
    * Atualiza um documento existente
    * 

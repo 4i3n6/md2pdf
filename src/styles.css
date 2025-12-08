@@ -98,6 +98,36 @@ body {
 }
 .action-btn:hover { background: var(--bg-core); color: var(--text-main); }
 
+.action-btn-secondary {
+    background: var(--bg-core);
+    color: var(--accent);
+    border: 1px solid var(--accent);
+}
+.action-btn-secondary:hover {
+    background: var(--accent);
+    color: var(--bg-core);
+}
+
+.action-btn-tertiary {
+    background: var(--bg-panel);
+    color: var(--text-dim);
+    border: 1px solid var(--border);
+}
+.action-btn-tertiary:hover {
+    background: var(--bg-core);
+    color: var(--text-main);
+    border-color: var(--text-main);
+}
+
+.action-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+.action-btn:disabled:hover {
+    background: inherit;
+    color: inherit;
+}
+
 /* Sidebar */
 .sidebar {
     background: var(--bg-panel);

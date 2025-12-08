@@ -11,6 +11,13 @@ import OfflineManager from './utils/offlineManager'
 import SWUpdateNotifier from './utils/swUpdateNotifier'
 import { documentManager } from './services/documentManager'
 import { uiRenderer } from './services/uiRenderer'
+import {
+  isFileSystemAccessSupported,
+  openFileFromDisk,
+  saveFileToDisk,
+  openFileFallback,
+  downloadFileFallback
+} from './services/fileSystemService'
 import type { AppState, LoggerInterface, Document as AppDocument } from '@/types/index'
 import './pwaRegister'
 import './styles.css'
@@ -194,6 +201,8 @@ function loadDocPreferences(docId: number): void {
 // ============================================
 
 let saveStatusInterval: ReturnType<typeof setInterval> | null = null;
+let diskAutoSaveTimeout: ReturnType<typeof setTimeout> | null = null;
+const DISK_AUTO_SAVE_DELAY = 2000; // 2 segundos de debounce para auto-save no disco
 
 /**
  * Formata tempo relativo desde último salvamento
@@ -265,6 +274,38 @@ function markDocumentDirty(): void {
   
   doc.isDirty = true;
   updateSaveStatus();
+  
+  // Para arquivos do disco, agendar auto-save debounced
+  if (doc.storage === 'disk' && doc.fileHandle && isFileSystemAccessSupported()) {
+    scheduleDiskAutoSave();
+  }
+}
+
+/**
+ * Agenda auto-save para arquivo do disco com debounce
+ */
+function scheduleDiskAutoSave(): void {
+  // Cancelar timeout anterior se existir
+  if (diskAutoSaveTimeout) {
+    clearTimeout(diskAutoSaveTimeout);
+  }
+  
+  diskAutoSaveTimeout = setTimeout(async () => {
+    const doc = getCurrentDoc();
+    if (!doc || !doc.isDirty || doc.storage !== 'disk' || !doc.fileHandle) {
+      return;
+    }
+    
+    try {
+      await saveFileToDisk(doc.content, { handle: doc.fileHandle });
+      markDocumentSaved();
+      // Nao logar para nao poluir - auto-save silencioso
+    } catch (e) {
+      // Falha silenciosa no auto-save - usuario pode salvar manualmente
+      const errorMsg = e instanceof Error ? e.message : String(e);
+      Logger.log(`Auto-save falhou: ${errorMsg}`, 'warning');
+    }
+  }, DISK_AUTO_SAVE_DELAY);
 }
 
 /**
@@ -303,6 +344,7 @@ function showSaveError(): void {
 
 /**
  * Força salvamento manual do documento atual
+ * Para documentos do disco, salva diretamente no arquivo
  */
 async function forceSave(): Promise<void> {
   const doc = getCurrentDoc();
@@ -314,10 +356,18 @@ async function forceSave(): Promise<void> {
   showSavingStatus();
   
   try {
-    // Para localStorage, é síncrono
+    // Sempre salvar no localStorage primeiro (backup)
     documentManager.setContent(doc.id, doc.content);
+    
+    // Se for arquivo do disco com handle, salvar no disco também
+    if (doc.storage === 'disk' && doc.fileHandle && isFileSystemAccessSupported()) {
+      await saveFileToDisk(doc.content, { handle: doc.fileHandle });
+      Logger.success(`Salvo no disco: ${doc.name}`);
+    } else {
+      Logger.success('Documento salvo');
+    }
+    
     markDocumentSaved();
-    Logger.success('Documento salvo');
   } catch (e) {
     showSaveError();
     const errorMsg = e instanceof Error ? e.message : String(e);
@@ -361,6 +411,162 @@ function setupSaveControls(): void {
   
   startSaveStatusUpdater();
   Logger.success('Controles de salvamento ativos');
+}
+
+// ============================================
+// FILE SYSTEM ACCESS API INTEGRATION
+// ============================================
+
+/**
+ * Abre um arquivo do disco e cria um novo documento
+ */
+async function handleOpenFile(): Promise<void> {
+  try {
+    if (isFileSystemAccessSupported()) {
+      const result = await openFileFromDisk();
+      
+      // Criar documento a partir do arquivo
+      const newDoc = documentManager.createFromFile(
+        result.name,
+        result.content,
+        result.handle
+      );
+      
+      // Alternar para o novo documento
+      state.currentId = newDoc.id;
+      
+      if (state.editor) {
+        state.editor.dispatch({
+          changes: { from: 0, to: state.editor.state.doc.length, insert: newDoc.content }
+        });
+      }
+      
+      renderList();
+      renderPreview(newDoc.content);
+      updateSaveStatus();
+      
+      Logger.success(`Arquivo aberto: ${result.name}`);
+    } else {
+      // Fallback para browsers sem suporte
+      const result = await openFileFallback();
+      
+      // Criar documento sem handle (será salvo como local)
+      const newDoc = documentManager.create(result.name);
+      documentManager.setContent(newDoc.id, result.content);
+      
+      state.currentId = newDoc.id;
+      
+      if (state.editor) {
+        state.editor.dispatch({
+          changes: { from: 0, to: state.editor.state.doc.length, insert: result.content }
+        });
+      }
+      
+      renderList();
+      renderPreview(result.content);
+      updateSaveStatus();
+      
+      Logger.success(`Arquivo importado: ${result.name} (modo local)`);
+      Logger.log('File System Access API nao suportada - salvo localmente', 'warning');
+    }
+  } catch (error) {
+    if (error instanceof Error) {
+      if (error.message === 'File selection cancelled') {
+        Logger.log('Selecao de arquivo cancelada', 'info');
+      } else {
+        Logger.error(`Erro ao abrir arquivo: ${error.message}`);
+      }
+    }
+  }
+}
+
+/**
+ * Salva o documento atual no disco
+ */
+async function handleSaveToDisk(): Promise<void> {
+  const doc = getCurrentDoc();
+  if (!doc) {
+    Logger.log('Nenhum documento para salvar', 'warning');
+    return;
+  }
+  
+  try {
+    showSavingStatus();
+    
+    if (isFileSystemAccessSupported()) {
+      const handle = await saveFileToDisk(doc.content, {
+        suggestedName: doc.name,
+        handle: doc.fileHandle
+      });
+      
+      // Atualizar documento com novo handle (caso seja Save As)
+      documentManager.setFileHandle(doc.id, handle);
+      
+      // Atualizar nome se mudou (Save As)
+      if (handle.name !== doc.name) {
+        documentManager.rename(doc.id, handle.name);
+        renderList();
+      }
+      
+      markDocumentSaved();
+      Logger.success(`Salvo no disco: ${handle.name}`);
+    } else {
+      // Fallback: download tradicional
+      downloadFileFallback(doc.content, doc.name);
+      markDocumentSaved();
+      Logger.success(`Download iniciado: ${doc.name}`);
+    }
+  } catch (error) {
+    showSaveError();
+    if (error instanceof Error) {
+      if (error.message === 'Save cancelled') {
+        Logger.log('Salvamento cancelado', 'info');
+        updateSaveStatus(); // Restaurar status anterior
+      } else {
+        Logger.error(`Erro ao salvar: ${error.message}`);
+      }
+    }
+  }
+}
+
+/**
+ * Configura event listeners para operacoes de arquivo
+ */
+function setupFileSystemControls(): void {
+  const openBtn = document.getElementById('open-file-btn');
+  const saveDiskBtn = document.getElementById('save-disk-btn');
+  
+  if (openBtn) {
+    openBtn.addEventListener('click', handleOpenFile);
+  }
+  
+  if (saveDiskBtn) {
+    saveDiskBtn.addEventListener('click', handleSaveToDisk);
+  }
+  
+  // Atalhos de teclado
+  document.addEventListener('keydown', (e: KeyboardEvent): void => {
+    // Ctrl+O para abrir arquivo
+    if ((e.ctrlKey || e.metaKey) && e.key === 'o') {
+      e.preventDefault();
+      handleOpenFile();
+    }
+    
+    // Ctrl+Shift+S para salvar no disco (Save As)
+    if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key === 'S') {
+      e.preventDefault();
+      handleSaveToDisk();
+    }
+  });
+  
+  // Mostrar/esconder botoes baseado no suporte
+  if (!isFileSystemAccessSupported()) {
+    if (saveDiskBtn) {
+      saveDiskBtn.title = 'Download arquivo (File System Access API nao suportada)';
+    }
+  }
+  
+  Logger.success('Controles de arquivo ativos');
 }
 
 /**
@@ -956,6 +1162,7 @@ function initSystem(): void {
   setupQuickTags();
   setupPreviewControls();
   setupSaveControls();
+  setupFileSystemControls();
   setupKeyboardNavigation();
   updateMetrics();
   updateSaveStatus();
