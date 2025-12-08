@@ -109,32 +109,37 @@ export function validateMarkdown(markdown: string): ValidationResult {
       const text = linkMatch[1];
       const url = linkMatch[2];
 
-      if (!text) {
+      // Se ambos estao vazios, reportar apenas um erro
+      if (!text && !url) {
         errors.push({
           line: lineNum,
           column: linkMatch.index + 1,
-          message: 'Link não pode ter texto vazio: [](url)',
+          message: 'Link vazio: []() - adicione texto e URL',
+          severity: 'error',
+          code: 'EMPTY_LINK'
+        });
+      } else if (!text) {
+        errors.push({
+          line: lineNum,
+          column: linkMatch.index + 1,
+          message: 'Link sem texto: [](url)',
           severity: 'error',
           code: 'EMPTY_LINK_TEXT'
         });
-      }
-
-      if (!url) {
+      } else if (!url) {
         errors.push({
           line: lineNum,
           column: linkMatch.index + 1,
-          message: 'Link não pode ter URL vazia: [text]()',
+          message: 'Link sem URL: [text]()',
           severity: 'error',
           code: 'EMPTY_LINK_URL'
         });
-      }
-
-      // Aviso: URL sem protocolo
-      if (url && !url.match(/^(https?:|#|\/)/)) {
+      } else if (!url.match(/^(https?:|#|\/|mailto:)/)) {
+        // Aviso: URL sem protocolo
         warnings.push({
           line: lineNum,
           column: linkMatch.index + 1,
-          message: 'URL deveria começar com http:, https:, # ou /',
+          message: 'URL deveria comecar com http:, https:, #, / ou mailto:',
           severity: 'warning',
           code: 'LINK_MISSING_PROTOCOL'
         });
@@ -298,19 +303,20 @@ export function validateMarkdown(markdown: string): ValidationResult {
  */
 export function getErrorDescription(code: string): string {
   const descriptions: Record<string, string> = {
-    INVALID_HEADING_LEVEL: 'Nível de heading inválido',
-    HEADING_MISSING_SPACE: 'Espaço ausente após heading',
+    INVALID_HEADING_LEVEL: 'Nivel de heading invalido',
+    HEADING_MISSING_SPACE: 'Espaco ausente apos heading',
+    EMPTY_LINK: 'Link completamente vazio',
     EMPTY_LINK_TEXT: 'Texto do link vazio',
     EMPTY_LINK_URL: 'URL do link vazia',
     LINK_MISSING_PROTOCOL: 'URL sem protocolo',
     MISSING_IMAGE_ALT: 'Texto alternativo (alt) da imagem ausente',
     EMPTY_IMAGE_SRC: 'Src da imagem vazio',
     UNBALANCED_BACKTICKS: 'Backticks desbalanceados',
-    UNBALANCED_EMPHASIS: 'Ênfase (bold/italic) desbalanceada',
-    BLOCKQUOTE_MISSING_SPACE: 'Espaço ausente após blockquote',
-    UNCLOSED_CODE_BLOCK: 'Bloco de código não fechado',
+    UNBALANCED_EMPHASIS: 'Enfase (bold/italic) desbalanceada',
+    BLOCKQUOTE_MISSING_SPACE: 'Espaco ausente apos blockquote',
+    UNCLOSED_CODE_BLOCK: 'Bloco de codigo nao fechado',
     UNKNOWN_CODE_LANGUAGE: 'Linguagem desconhecida',
-    INVALID_TABLE: 'Tabela inválida'
+    INVALID_TABLE: 'Tabela invalida'
   };
 
   return descriptions[code] || 'Erro desconhecido';
