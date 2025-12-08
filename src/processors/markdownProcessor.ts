@@ -98,6 +98,21 @@ class PrintRenderer extends Renderer {
    */
   override code(token: Tokens.Code): string {
     const lang = token.lang || 'plaintext'
+
+    // MERMAID: Return container for later rendering by mermaidProcessor
+    if (lang === 'mermaid') {
+      // Escape HTML to prevent XSS, preserve in data attribute for later processing
+      const escapedSource = token.text
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+      
+      return `<div class="mermaid" data-mermaid-source="${escapedSource}" aria-label="Mermaid Diagram">
+        <pre class="mermaid-loading">Loading diagram...</pre>
+      </div>\n`
+    }
+
     let highlightedCode = token.text
 
     try {
@@ -301,7 +316,7 @@ const DOMPURIFY_CONFIG = {
     'input',
     'mark'
   ],
-  ALLOWED_ATTR: ['href', 'src', 'alt', 'title', 'id', 'class', 'data-lang', 'loading', 'style', 'role', 'aria-label', 'aria-hidden', 'type', 'checked', 'disabled'],
+  ALLOWED_ATTR: ['href', 'src', 'alt', 'title', 'id', 'class', 'data-lang', 'data-mermaid-source', 'data-print-image', 'loading', 'style', 'role', 'aria-label', 'aria-hidden', 'type', 'checked', 'disabled'],
   ALLOW_DATA_ATTR: false,
   FORCE_BODY: false
 } as const

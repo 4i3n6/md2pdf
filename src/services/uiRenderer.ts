@@ -7,6 +7,7 @@
 
 import type { Document, LoggerInterface } from '@/types/index'
 import { processImagesInPreview } from '@/processors/markdownProcessor'
+import { processMermaidDiagrams } from '@/processors/mermaidProcessor'
 
 /**
  * Callback para evento de selecao de documento
@@ -141,6 +142,16 @@ export class UIRenderer {
       }
     } catch (e) {
       this.logger?.error?.(`Erro ao processar imagens: ${String(e)}`)
+    }
+
+    // Processar diagramas Mermaid (lazy loaded)
+    try {
+      const diagramsProcessed = await processMermaidDiagrams(container)
+      if (diagramsProcessed > 0) {
+        this.logger?.log?.(`${diagramsProcessed} diagrama(s) Mermaid renderizado(s)`, 'success')
+      }
+    } catch (e) {
+      this.logger?.error?.(`Erro ao processar diagramas Mermaid: ${String(e)}`)
     }
   }
 

@@ -599,3 +599,39 @@ body.print-mode::before {
 body.print-mode #preview-wrapper {
     padding-top: 50px; /* Para não sobrepor a mensagem */
 }
+
+/* ============================================================
+   MERMAID DIAGRAMS FOR PRINT
+   ============================================================ */
+
+.mermaid {
+    page-break-inside: avoid !important;
+    display: flex !important;
+    justify-content: center !important;
+    padding: 12pt !important;
+    margin: 12pt 0 !important;
+    background: white !important;
+    border: 1pt solid #ccc !important;
+    border-left: 3pt solid #0052cc !important;
+    border-radius: 0 !important;
+}
+
+.mermaid svg {
+    max-width: 100% !important;
+    height: auto !important;
+}
+
+/* Hide loading and error states in print */
+.mermaid-loading {
+    display: none !important;
+}
+
+.mermaid-error {
+    color: #ae0a04 !important;
+    font-size: 9pt !important;
+}
+
+.mermaid-error pre {
+    background: #f5f5f5 !important;
+    border: 1pt solid #ccc !important;
+}

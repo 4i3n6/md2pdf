@@ -20,6 +20,7 @@
     "dompurify": "^3.3.0",
     "highlight.js": "^11.11.1",
     "marked": "^17.0.1",
+    "mermaid": "^11.12.2",
     "vite": "^7.2.6"
   },
   "devDependencies": {

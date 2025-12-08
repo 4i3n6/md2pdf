@@ -119,7 +119,8 @@ export default defineConfig({
       output: {
         manualChunks: {
           codemirror: ['codemirror', '@codemirror/lang-markdown'],
-          marked: ['marked']
+          marked: ['marked'],
+          mermaid: ['mermaid']
         }
       }
     },

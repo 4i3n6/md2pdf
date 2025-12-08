@@ -1393,6 +1393,67 @@ nav:focus-visible {
     color: var(--text-main);
 }
 
+/* ============================================
+   MERMAID DIAGRAM STYLES
+   ============================================ */
+.mermaid {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 16px;
+    background: var(--bg-panel);
+    border: 1px solid var(--border);
+    border-left: 4px solid var(--accent);
+    border-radius: 4px;
+    margin: 16px 0;
+    overflow-x: auto;
+    min-height: 60px;
+}
+
+.mermaid-loading {
+    color: var(--text-dim);
+    font-style: italic;
+    font-size: 11px;
+    margin: 0;
+    padding: 0;
+}
+
+.mermaid-rendered {
+    background: var(--bg-core);
+}
+
+.mermaid-rendered svg {
+    max-width: 100%;
+    height: auto;
+}
+
+.mermaid-error-container {
+    background: #fff5f5;
+    border-color: var(--error);
+}
+
+.mermaid-error {
+    color: var(--error);
+    font-size: 12px;
+    text-align: left;
+    width: 100%;
+}
+
+.mermaid-error strong {
+    display: block;
+    margin-bottom: 8px;
+}
+
+.mermaid-error pre {
+    background: rgba(174, 10, 4, 0.1);
+    padding: 8px;
+    border-radius: 4px;
+    margin: 0;
+    white-space: pre-wrap;
+    word-break: break-word;
+    font-size: 11px;
+}
+
 /* Show overlay and hide app on mobile */
 @media (max-width: 767px) {
     .mobile-block-overlay {
