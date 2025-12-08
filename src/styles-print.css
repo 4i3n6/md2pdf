@@ -104,8 +104,8 @@
         box-shadow: none !important;
         color: black !important;
         /* font-family NÃO é definido aqui para respeitar a fonte escolhida pelo usuário via inline style */
-        font-size: 9pt !important;
-        line-height: 1.3 !important;
+        font-size: 10pt !important;
+        line-height: 1.6 !important;
         box-sizing: border-box !important;
     }
 
@@ -133,43 +133,42 @@
     .markdown-body h1 {
         font-size: 14pt;
         border-bottom: 2px solid black;
-        padding-bottom: 6px;
-        margin-top: 0.5em;
-        margin-bottom: 0.5em;
+        padding-bottom: 8px;
+        margin-top: 24px;
+        margin-bottom: 20px;
     }
 
     .markdown-body h2 {
         font-size: 12pt;
         border-bottom: 2px solid black;
-        padding-bottom: 4px;
-        margin-top: 0.4em;
-        margin-bottom: 0.3em;
+        padding-bottom: 8px;
+        margin-top: 20px;
+        margin-bottom: 16px;
     }
 
     .markdown-body h3 {
         font-size: 11pt;
-        border-bottom: 1px solid #666;
-        padding-bottom: 3px;
-        margin-top: 0.3em;
-        margin-bottom: 0.2em;
+        /* NO underline - matches screen styles */
+        margin-top: 16px;
+        margin-bottom: 12px;
     }
 
     .markdown-body h4 {
         font-size: 10.5pt;
-        margin-top: 0.25em;
-        margin-bottom: 0.15em;
+        margin-top: 16px;
+        margin-bottom: 12px;
     }
 
     .markdown-body h5 {
         font-size: 10pt;
-        margin-top: 0.2em;
-        margin-bottom: 0.1em;
+        margin-top: 14px;
+        margin-bottom: 10px;
     }
 
     .markdown-body h6 {
         font-size: 10pt;
-        margin-top: 0.15em;
-        margin-bottom: 0.1em;
+        margin-top: 12px;
+        margin-bottom: 8px;
     }
 
     /* ============================================================
@@ -177,12 +176,12 @@
        ============================================================ */
 
     .markdown-body p {
-        margin: 0.1em 0;
+        margin: 0 0 1em 0;
         text-align: left;
         /* Permitir quebra em parágrafos longos */
         page-break-inside: auto;
-        font-size: 9.5pt;
-        line-height: 1.15;
+        font-size: 10pt;
+        line-height: 1.6;
     }
 
     .markdown-body strong,
@@ -232,37 +231,66 @@
 
     .markdown-body code,
     .markdown-body .markdown-code-inline {
-        background: #f0f0f0;
-        border: 1px solid #ccc;
-        border-radius: 2px;
-        padding: 1px 4px;
+        background: #f3f4f6;
+        border: 1px solid #d1d5db;
+        border-radius: 3px;
+        padding: 2px 4px;
         font-family: 'Courier New', 'Monaco', monospace;
-        font-size: 8pt;
-        color: black;
+        font-size: 9pt;
+        color: #be185d !important; /* Rosa tecnico - matches screen */
+        font-weight: 600;
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
     }
 
     .markdown-body pre,
     .markdown-body .markdown-code-block {
-        background: #f8f8f8;
-        border: 1px solid #ddd;
-        border-radius: 1px;
-        padding: 4pt;
-        margin: 0.05em 0;
+        background: #f6f8fa !important;
+        border: 1px solid #e1e4e8 !important;
+        border-left: 4px solid #0052cc !important; /* Barra azul lateral - matches screen */
+        border-radius: 4px;
+        padding: 12px 15px;
+        margin: 15px 0;
         overflow-x: auto;
         /* Blocos de código devem evitar quebra (ficam ilegíveis se quebrados) */
         page-break-inside: avoid;
         font-family: 'Courier New', 'Monaco', monospace;
-        font-size: 7.5pt;
-        line-height: 1.1;
-        color: black;
+        font-size: 9pt;
+        line-height: 1.5;
+        color: #24292e;
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+        position: relative;
+    }
+
+    /* Language label for code blocks */
+    .markdown-body .markdown-code-block::before {
+        content: attr(data-lang);
+        display: inline-block;
+        font-size: 8pt;
+        font-weight: 700;
+        color: #6a737d;
+        margin-bottom: 8px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        background: #e1e4e8;
+        padding: 2px 6px;
+        border-radius: 3px;
+    }
+
+    /* Hide label if no language */
+    .markdown-body .markdown-code-block[data-lang=""]::before,
+    .markdown-body .markdown-code-block[data-lang="plaintext"]::before {
+        display: none;
     }
 
     .markdown-body pre code,
     .markdown-body .markdown-code-block code {
-        background: transparent;
-        border: none;
+        background: transparent !important;
+        border: none !important;
         padding: 0;
-        color: black;
+        color: #24292e !important;
+        font-weight: normal;
     }
 
     /* ============================================================
@@ -273,12 +301,12 @@
     .markdown-body ol,
     .markdown-body .markdown-list-unordered,
     .markdown-body .markdown-list-ordered {
-        margin: 0.5em 0;
-        padding-left: 1.8em;
+        margin: 12px 0;
+        padding-left: 24px;
         /* Permitir quebra dentro de listas longas */
         page-break-inside: auto;
-        font-size: 9.5pt;
-        line-height: 1.4;
+        font-size: 10pt;
+        line-height: 1.6;
     }
 
     /* Listas aninhadas - sem margens extras */
@@ -290,16 +318,16 @@
     .markdown-body .markdown-list-unordered .markdown-list-ordered,
     .markdown-body .markdown-list-ordered .markdown-list-unordered,
     .markdown-body .markdown-list-ordered .markdown-list-ordered {
-        margin: 0.2em 0;
-        padding-left: 1.8em;
+        margin: 0;
+        padding-left: 24px;
     }
 
     .markdown-body li {
-        margin-bottom: 0.3em;
+        margin-bottom: 6px;
         /* Permitir quebra em itens longos, evitar apenas em itens curtos */
         page-break-inside: auto;
-        font-size: 9.5pt;
-        line-height: 1.35;
+        font-size: 10pt;
+        line-height: 1.6;
     }
 
     .markdown-body ul li::marker,
@@ -324,15 +352,17 @@
 
     .markdown-body blockquote,
     .markdown-body .markdown-blockquote {
-        background: #fafafa;
-        border-left: 3px solid #444;
-        margin: 0.5em 0;
-        padding: 0.3em 0 0.3em 0.8em;
+        background: #f0f4ff !important;
+        border-left: 4px solid #0052cc !important;
+        margin: 16px 0;
+        padding: 10px 15px;
         page-break-inside: avoid;
         font-style: italic;
-        color: #444;
-        font-size: 9pt;
-        line-height: 1.3;
+        color: black;
+        font-size: 10pt;
+        line-height: 1.6;
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
     }
 
     /* ============================================================
@@ -343,24 +373,26 @@
     .markdown-body .markdown-table-content {
         width: 100%;
         border-collapse: collapse;
-        margin: 0.1em 0;
+        margin: 16px 0;
         page-break-inside: avoid;
-        border: 1px solid #ddd;
-        font-size: 8pt;
+        border: 1px solid #d1d5db;
+        font-size: 9pt;
     }
 
     .markdown-body th,
     .markdown-body td {
-        border: 1px solid #ddd;
-        padding: 2pt 3pt;
+        border: 1px solid #d1d5db;
+        padding: 8px;
         text-align: left;
     }
 
     .markdown-body th {
-        background: #f0f0f0;
+        background: #e8e8e8 !important;
         font-weight: bold;
         color: black;
-        font-size: 8pt;
+        font-size: 9pt;
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
     }
 
     /* Repetir header de tabela em cada página */
