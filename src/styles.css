@@ -1253,45 +1253,24 @@ nav:focus-visible {
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.5px;
-    display: inline-flex;
-    align-items: center;
-    gap: 4px;
-}
-
-.storage-badge::before {
-    font-size: 10px;
 }
 
 .storage-local {
-    background: linear-gradient(135deg, #f3f4f6 0%, #e5e7eb 100%);
+    background: #f3f4f6;
     color: #6b7280;
     border: 1px solid #d1d5db;
 }
 
-.storage-local::before {
-    content: "\1F4BE"; /* Floppy disk emoji - representa browser storage */
-}
-
 .storage-disk {
-    background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
+    background: #dbeafe;
     color: #1d4ed8;
-    border: 1px solid #60a5fa;
-    box-shadow: 0 1px 3px rgba(29, 78, 216, 0.15);
-}
-
-.storage-disk::before {
-    content: "\1F4C1"; /* Folder emoji - representa arquivo no disco */
+    border: 1px solid #3b82f6;
 }
 
 .storage-cloud {
-    background: linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%);
+    background: #d1fae5;
     color: #047857;
-    border: 1px solid #34d399;
-    box-shadow: 0 1px 3px rgba(4, 120, 87, 0.15);
-}
-
-.storage-cloud::before {
-    content: "\2601"; /* Cloud emoji */
+    border: 1px solid #10b981;
 }
 
 /* Save Status Indicator */

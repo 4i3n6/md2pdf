@@ -78,34 +78,34 @@ export class UIRenderer {
       name.setAttribute('aria-hidden', 'false')
       nameContainer.appendChild(name)
 
-      // Storage badge (pequeno) com icone
+      // Storage badge (pequeno) - apenas letra
       const storageBadge = document.createElement('span')
       storageBadge.className = `doc-storage-badge doc-storage-${doc.storage}`
       
-      // Icones e cores mais distintivos
-      let badgeIcon = '\uD83D\uDCBE' // Floppy disk para local
+      // Labels simples e cores distintivas
+      let badgeText = 'B' // Browser
       let badgeTitle = 'Browser'
       let badgeBg = '#f3f4f6'
       let badgeColor = '#6b7280'
       let badgeBorder = '#d1d5db'
       
       if (doc.storage === 'disk') {
-        badgeIcon = '\uD83D\uDCC1' // Folder para disk
-        badgeTitle = 'Arquivo'
+        badgeText = 'D' // Disk
+        badgeTitle = 'Arquivo no disco'
         badgeBg = '#dbeafe'
         badgeColor = '#1d4ed8'
-        badgeBorder = '#60a5fa'
+        badgeBorder = '#3b82f6'
       } else if (doc.storage === 'cloud') {
-        badgeIcon = '\u2601' // Cloud
+        badgeText = 'C' // Cloud
         badgeTitle = 'Nuvem'
         badgeBg = '#d1fae5'
         badgeColor = '#047857'
-        badgeBorder = '#34d399'
+        badgeBorder = '#10b981'
       }
       
-      storageBadge.textContent = badgeIcon
+      storageBadge.textContent = badgeText
       storageBadge.title = badgeTitle
-      storageBadge.style.cssText = `font-size: 10px; padding: 2px 4px; border-radius: 2px; flex-shrink: 0; background: ${badgeBg}; color: ${badgeColor}; border: 1px solid ${badgeBorder};`
+      storageBadge.style.cssText = `font-size: 8px; font-weight: 700; padding: 1px 4px; border-radius: 2px; flex-shrink: 0; background: ${badgeBg}; color: ${badgeColor}; border: 1px solid ${badgeBorder};`
 
       const deleteBtn = document.createElement('span')
       deleteBtn.textContent = '[x]'
