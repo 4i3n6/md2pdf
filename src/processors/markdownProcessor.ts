@@ -171,10 +171,11 @@ class PrintRenderer extends Renderer {
   }
 
   /**
-   * Renderiza linha horizontal (quebra de página em print)
+   * Renderiza linha horizontal (visual apenas, não quebra página)
+   * Para quebra de página usar <!-- pagebreak -->
    */
   override hr(): string {
-    return `<hr class="markdown-hr" style="page-break-after: always;">\n`
+    return `<hr class="markdown-hr">\n`
   }
 
   /**
@@ -300,7 +301,7 @@ const DOMPURIFY_CONFIG = {
     'input',
     'mark'
   ],
-  ALLOWED_ATTR: ['href', 'src', 'alt', 'title', 'id', 'class', 'data-lang', 'loading', 'style', 'role', 'aria-label', 'type', 'checked', 'disabled'],
+  ALLOWED_ATTR: ['href', 'src', 'alt', 'title', 'id', 'class', 'data-lang', 'loading', 'style', 'role', 'aria-label', 'aria-hidden', 'type', 'checked', 'disabled'],
   ALLOW_DATA_ATTR: false,
   FORCE_BODY: false
 } as const
@@ -328,7 +329,14 @@ export function processMarkdown(markdown: string): string {
       return '' // Conteúdo vazio não é erro
     }
 
-    const dirty = marked(markdown) as string
+    // Preprocessar: converter <!-- pagebreak --> para marcador HTML
+    // Isso é feito ANTES do marked para preservar o comentário HTML
+    const preprocessed = markdown.replace(
+      /<!--\s*pagebreak\s*-->/gi,
+      '\n<div class="page-break" aria-hidden="true"></div>\n'
+    )
+
+    const dirty = marked(preprocessed) as string
     const clean = DOMPurify.sanitize(dirty, DOMPURIFY_CONFIG as any) as unknown as string
 
     return clean

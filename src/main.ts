@@ -587,6 +587,11 @@ function insertTag(tag: string): void {
       cursorOffset = insert.length;
       break;
       
+    case 'pagebreak':
+      insert = '\n<!-- pagebreak -->\n';
+      cursorOffset = insert.length;
+      break;
+      
     case 'code':
       if (hasSelection) {
         insert = '```\n' + selectedText + '\n```';

@@ -403,12 +403,24 @@
     }
 
     /* ============================================================
-       HORIZONTAL RULE - Quebra de página
+       HORIZONTAL RULE - Visual line only (no page break)
        ============================================================ */
 
     .markdown-body hr,
     .markdown-body .markdown-hr {
+        border: none;
+        border-top: 1px solid #999;
+        margin: 1em 0;
+        padding: 0;
+    }
+
+    /* ============================================================
+       PAGE BREAK - Explicit page break via <!-- pagebreak -->
+       ============================================================ */
+
+    .markdown-body .page-break {
         visibility: hidden;
+        display: block;
         height: 0;
         margin: 0;
         padding: 0;

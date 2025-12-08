@@ -378,6 +378,47 @@ body {
 .markdown-body th, .markdown-body td { border: 1px solid var(--border); padding: 8px; }
 .markdown-body th { background: var(--bg-panel); color: var(--text-main); font-weight: 700; text-align: left; }
 
+/* Horizontal Rule - Visual line only */
+.markdown-body hr,
+.markdown-body .markdown-hr {
+    border: none;
+    border-top: 1px solid var(--border);
+    margin: 1.5em 0;
+}
+
+/* Page Break Indicator - Visual indicator for print page breaks */
+.markdown-body .page-break {
+    display: block;
+    height: 32px;
+    border: 2px dashed #d1d5db;
+    border-radius: 4px;
+    margin: 16px 0;
+    position: relative;
+    background: repeating-linear-gradient(
+        90deg,
+        transparent,
+        transparent 10px,
+        #f9fafb 10px,
+        #f9fafb 20px
+    );
+}
+
+.markdown-body .page-break::after {
+    content: 'PAGE BREAK';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: #fff;
+    padding: 2px 12px;
+    font-size: 10px;
+    font-family: var(--font-mono);
+    color: #9ca3af;
+    border: 1px solid #e5e7eb;
+    border-radius: 2px;
+    letter-spacing: 1px;
+}
+
 /* CodeMirror Light Theme Override */
 .cm-editor { height: 100%; background: var(--bg-core) !important; }
 .cm-scroller { overflow: auto !important; }
