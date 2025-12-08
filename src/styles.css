@@ -1334,3 +1334,76 @@ nav:focus-visible {
 .save-btn:active {
     transform: rotate(360deg);
 }
+
+/* ============================================
+   MOBILE BLOCK OVERLAY
+   ============================================ */
+
+.mobile-block-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: var(--bg-core);
+    z-index: 99999;
+    justify-content: center;
+    align-items: center;
+    padding: 24px;
+}
+
+.mobile-block-content {
+    text-align: center;
+    max-width: 320px;
+}
+
+.mobile-block-content h1 {
+    font-size: 28px;
+    font-weight: 800;
+    margin-bottom: 24px;
+    letter-spacing: 2px;
+    color: var(--text-main);
+}
+
+.mobile-block-content p {
+    font-size: 14px;
+    line-height: 1.7;
+    color: var(--text-dim);
+    margin-bottom: 16px;
+}
+
+.mobile-block-btn {
+    display: inline-block;
+    background: var(--text-main);
+    color: var(--bg-core);
+    padding: 14px 28px;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-top: 24px;
+    border: 2px solid var(--text-main);
+    transition: all 0.2s;
+}
+
+.mobile-block-btn:hover {
+    background: var(--bg-core);
+    color: var(--text-main);
+}
+
+/* Show overlay and hide app on mobile */
+@media (max-width: 767px) {
+    .mobile-block-overlay {
+        display: flex;
+    }
+    
+    .app-grid {
+        display: none !important;
+    }
+    
+    .skip-link {
+        display: none !important;
+    }
+}

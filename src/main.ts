@@ -17,6 +17,19 @@ import './pwaRegister'
 import './styles.css'
 import './styles-print.css'
 
+// Mobile detection - block app initialization on small screens
+const MOBILE_BREAKPOINT = 768;
+
+function isMobileViewport(): boolean {
+  return window.innerWidth < MOBILE_BREAKPOINT;
+}
+
+// If mobile, don't initialize the app - CSS will show the overlay
+if (isMobileViewport()) {
+  // Prevent any further initialization
+  throw new Error('Mobile viewport detected - app initialization blocked');
+}
+
 // Initialize i18n based on URL path
 initI18n()
 
