@@ -1582,6 +1582,148 @@ nav:focus-visible {
     font-size: 11px;
 }
 
+/* ==========================================================================
+   YAML BLOCKS - Structured rendering of YAML content
+   ========================================================================== */
+
+.yaml-block {
+    display: block;
+    background: var(--bg-panel);
+    border: 1px solid var(--border);
+    border-left: 4px solid #cb7832;
+    border-radius: 4px;
+    padding: 12px 16px;
+    margin: 16px 0;
+    font-family: var(--font-mono);
+    font-size: 12px;
+    line-height: 1.6;
+    overflow-x: auto;
+}
+
+.yaml-block::before {
+    content: "YAML";
+    display: inline-block;
+    font-size: 9px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: #cb7832;
+    background: rgba(203, 120, 50, 0.1);
+    padding: 2px 8px;
+    border-radius: 2px;
+    margin-bottom: 10px;
+}
+
+.yaml-block[data-yaml-type="frontmatter"]::before {
+    content: "FRONTMATTER";
+}
+
+.yaml-block.yaml-rendered {
+    background: var(--bg-core);
+}
+
+/* YAML Content Container */
+.yaml-content {
+    display: block;
+}
+
+/* YAML Entry (key-value pair) */
+.yaml-entry {
+    display: block;
+    padding-left: calc(var(--yaml-indent, 0) * 16px);
+    margin: 2px 0;
+}
+
+/* YAML Key - Always bold */
+.yaml-key {
+    font-weight: 700;
+    color: var(--text-main);
+}
+
+/* YAML Value - Normal weight */
+.yaml-value {
+    color: var(--text-dim);
+    margin-left: 4px;
+}
+
+/* Specific value types */
+.yaml-value.yaml-null {
+    color: #7c7c7c;
+    font-style: italic;
+}
+
+.yaml-value.yaml-boolean {
+    color: #0052cc;
+}
+
+.yaml-value.yaml-number {
+    color: #007328;
+}
+
+.yaml-value.yaml-string {
+    color: var(--text-dim);
+}
+
+.yaml-value.yaml-empty {
+    color: #7c7c7c;
+    font-style: italic;
+}
+
+/* Array items with bullet */
+.yaml-array-item {
+    display: block;
+    padding-left: calc(var(--yaml-indent, 0) * 16px);
+    margin: 2px 0;
+}
+
+.yaml-array-item::before {
+    content: "\2022  ";
+    color: var(--text-dim);
+}
+
+/* Loading state */
+.yaml-loading {
+    color: var(--text-dim);
+    font-style: italic;
+    font-size: 11px;
+    margin: 0;
+    padding: 0;
+}
+
+/* Error state container */
+.yaml-block.yaml-error-container {
+    background: #fff5f5;
+    border-color: var(--error);
+}
+
+.yaml-error {
+    color: var(--error);
+    font-size: 11px;
+    margin-bottom: 8px;
+}
+
+.yaml-error-message {
+    display: block;
+    font-weight: 600;
+}
+
+/* Fallback code block for invalid YAML */
+.yaml-fallback-code {
+    background: rgba(174, 10, 4, 0.05);
+    padding: 8px;
+    border-radius: 4px;
+    margin: 0;
+    white-space: pre-wrap;
+    word-break: break-word;
+    font-size: 11px;
+    color: var(--text-main);
+}
+
+.yaml-fallback-code code {
+    background: none;
+    padding: 0;
+}
+
 /* Show overlay and hide app on mobile */
 @media (max-width: 767px) {
     .mobile-block-overlay {

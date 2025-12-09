@@ -1,6 +1,6 @@
 {
   "name": "md2pdf",
-  "version": "1.1.8",
+  "version": "1.1.9",
   "description": "",
   "main": "index.js",
   "scripts": {
@@ -25,11 +25,13 @@
     "codemirror": "^6.0.2",
     "dompurify": "^3.3.0",
     "highlight.js": "^11.11.1",
+    "js-yaml": "^4.1.1",
     "marked": "^17.0.1",
     "mermaid": "^11.12.2",
     "vite": "^7.2.6"
   },
   "devDependencies": {
+    "@types/js-yaml": "^4.0.9",
     "@types/node": "^24.10.1",
     "terser": "^5.44.1",
     "typescript": "^5.9.3",

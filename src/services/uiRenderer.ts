@@ -8,6 +8,7 @@
 import type { Document, LoggerInterface } from '@/types/index'
 import { processImagesInPreview } from '@/processors/markdownProcessor'
 import { processMermaidDiagrams } from '@/processors/mermaidProcessor'
+import { processYamlBlocks } from '@/processors/yamlProcessor'
 
 /**
  * Callback para evento de selecao de documento
@@ -152,6 +153,16 @@ export class UIRenderer {
       }
     } catch (e) {
       this.logger?.error?.(`Erro ao processar diagramas Mermaid: ${String(e)}`)
+    }
+
+    // Processar blocos YAML (lazy loaded)
+    try {
+      const yamlProcessed = await processYamlBlocks(container)
+      if (yamlProcessed > 0) {
+        this.logger?.log?.(`${yamlProcessed} bloco(s) YAML renderizado(s)`, 'success')
+      }
+    } catch (e) {
+      this.logger?.error?.(`Erro ao processar blocos YAML: ${String(e)}`)
     }
   }
 

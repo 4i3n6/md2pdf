@@ -270,14 +270,78 @@ marked.use({
       return undefined
     },
     renderer(token: { text: string }) {
-      const escapedSource = token.text
-        .replace(/&/g, '&amp;')
-        .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;')
-        .replace(/"/g, '&quot;')
+      // Encode source as base64 to avoid DOMPurify stripping special characters
+      const base64Source = btoa(unescape(encodeURIComponent(token.text)))
       
-      return `<div class="mermaid" data-mermaid-source="${escapedSource}" aria-label="Mermaid Diagram">
+      return `<div class="mermaid" data-mermaid-source="${base64Source}" aria-label="Mermaid Diagram">
         <pre class="mermaid-loading">Loading diagram...</pre>
+      </div>\n`
+    }
+  }]
+})
+
+/**
+ * Extensão para interceptar YAML frontmatter no início do documento
+ * Formato: ---\n...\n--- (deve estar no início absoluto)
+ */
+marked.use({
+  extensions: [{
+    name: 'yamlFrontmatter',
+    level: 'block',
+    start(src: string) {
+      // Only match at the very beginning of the document
+      if (src.startsWith('---\n')) {
+        return 0
+      }
+      return undefined
+    },
+    tokenizer(src: string) {
+      // Must start at beginning and have closing ---
+      const match = /^---\n([\s\S]*?)\n---(?:\n|$)/.exec(src)
+      if (match) {
+        return {
+          type: 'yamlFrontmatter',
+          raw: match[0],
+          text: match[1].trim()
+        }
+      }
+      return undefined
+    },
+    renderer(token: { text: string }) {
+      const base64Source = btoa(unescape(encodeURIComponent(token.text)))
+      return `<div class="yaml-block" data-yaml-source="${base64Source}" data-yaml-type="frontmatter" aria-label="YAML Frontmatter">
+        <pre class="yaml-loading">Loading YAML...</pre>
+      </div>\n`
+    }
+  }]
+})
+
+/**
+ * Extensão para interceptar blocos de código YAML
+ * Formato: ```yaml ou ```yml
+ */
+marked.use({
+  extensions: [{
+    name: 'yamlCodeBlock',
+    level: 'block',
+    start(src: string) {
+      return src.match(/^```ya?ml\n/m)?.index
+    },
+    tokenizer(src: string) {
+      const match = /^```ya?ml\n([\s\S]*?)```/.exec(src)
+      if (match) {
+        return {
+          type: 'yamlCodeBlock',
+          raw: match[0],
+          text: match[1].trim()
+        }
+      }
+      return undefined
+    },
+    renderer(token: { text: string }) {
+      const base64Source = btoa(unescape(encodeURIComponent(token.text)))
+      return `<div class="yaml-block" data-yaml-source="${base64Source}" data-yaml-type="codeblock" aria-label="YAML Code Block">
+        <pre class="yaml-loading">Loading YAML...</pre>
       </div>\n`
     }
   }]
@@ -341,7 +405,7 @@ const DOMPURIFY_CONFIG = {
     'input',
     'mark'
   ],
-  ALLOWED_ATTR: ['href', 'src', 'alt', 'title', 'id', 'class', 'data-lang', 'data-mermaid-source', 'data-print-image', 'loading', 'style', 'role', 'aria-label', 'aria-hidden', 'type', 'checked', 'disabled'],
+  ALLOWED_ATTR: ['href', 'src', 'alt', 'title', 'id', 'class', 'data-lang', 'data-mermaid-source', 'data-yaml-source', 'data-yaml-type', 'data-print-image', 'loading', 'style', 'role', 'aria-label', 'aria-hidden', 'type', 'checked', 'disabled'],
   ALLOW_DATA_ATTR: false,
   FORCE_BODY: false
 } as const
