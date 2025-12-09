@@ -51,7 +51,8 @@
           { "icon": "#", "title": "Títulos com #", "text": "Use # para títulos. Mais # = nível menor (## subtítulo, ### seção)." },
           { "icon": "Ctrl", "title": "Ctrl+Shift+E", "text": "Atalho rápido para exportar seu documento para PDF instantaneamente." },
           { "icon": "[PB]", "title": "Quebra de página", "text": "Use <!-- pagebreak --> para forçar uma quebra de página no PDF. Clique no botão [PB] para inserir." },
-          { "icon": "PWA", "title": "Instale o app", "text": "MD2PDF funciona offline. Instale como app no seu dispositivo." }
+          { "icon": "PWA", "title": "Instale o app", "text": "MD2PDF funciona offline. Instale como app no seu dispositivo." },
+          { "icon": "MER", "title": "Diagramas Mermaid", "text": "Crie fluxogramas e diagramas usando blocos ```mermaid. Clique no botao MER para inserir template." }
         ]
       }
     },
@@ -369,6 +370,30 @@
           "content": [
             "No MD2PDF, clique no botão <code>```</code> nas Tags Rápidas para inserir um modelo de bloco de código."
           ]
+        },
+        {
+          "title": "Diagramas Mermaid",
+          "content": ["Crie fluxogramas, diagramas de sequencia e mais com sintaxe Mermaid. Os diagramas sao renderizados automaticamente no preview."],
+          "codeExample": {
+            "code": "```mermaid\nflowchart TD\n  A[Inicio] --> B{Decisao}\n  B -->|Sim| C[Acao]\n  B -->|Nao| D[Fim]\n```",
+            "description": "Use o botao MER nas Tags Rapidas para inserir um template."
+          },
+          "list": [
+            "<strong>Fluxogramas:</strong> flowchart TD, flowchart LR",
+            "<strong>Sequencia:</strong> sequenceDiagram",
+            "<strong>Classe:</strong> classDiagram",
+            "<strong>Estado:</strong> stateDiagram-v2",
+            "<strong>Gantt:</strong> gantt",
+            "<strong>Pizza:</strong> pie"
+          ]
+        },
+        {
+          "title": "Blocos YAML",
+          "content": ["Conteudo YAML e renderizado com formatacao estruturada - chaves em negrito, valores em peso normal. Perfeito para arquivos de configuracao e metadados."],
+          "codeExample": {
+            "code": "```yaml\nname: Meu Projeto\nversion: 1.0.0\nconfig:\n  debug: true\n  features:\n    - auth\n    - logging\n```",
+            "description": "Use o botao YML nas Tags Rapidas para inserir um template."
+          }
         }
       ]
     },
@@ -404,6 +429,16 @@
           "list": [
             "<strong>Atalho:</strong> <code>Ctrl+Shift+C</code>",
             "<strong>Função:</strong> Copia todo o Markdown para a área de transferência"
+          ]
+        },
+        {
+          "title": "Tags Rapidas",
+          "content": ["Insira elementos Markdown comuns com um clique."],
+          "list": [
+            "<strong>YML:</strong> Insere template de bloco YAML",
+            "<strong>MER:</strong> Insere template de diagrama Mermaid",
+            "<strong>TBL:</strong> Insere template de tabela",
+            "<strong>```:</strong> Insere bloco de codigo"
           ]
         }
       ]

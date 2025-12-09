@@ -802,6 +802,16 @@ function insertTag(tag: string): void {
       }
       break;
       
+    case 'yaml':
+      insert = '```yaml\nkey: value\nitems:\n  - item1\n  - item2\n```';
+      cursorOffset = 8;
+      break;
+      
+    case 'mermaid':
+      insert = '```mermaid\nflowchart TD\n  A[Start] --> B{Decision}\n  B -->|Yes| C[Action]\n  B -->|No| D[End]\n```';
+      cursorOffset = 12;
+      break;
+
     case 'table':
       insert = '\n| Coluna 1 | Coluna 2 | Coluna 3 |\n|----------|----------|----------|\n| dado 1   | dado 2   | dado 3   |\n';
       cursorOffset = 3;

@@ -238,7 +238,7 @@ export function validateMarkdown(markdown: string): ValidationResult {
     const language = codeBlockMatch[1];
     
     // Validar se é linguagem conhecida (apenas aviso)
-    const knownLanguages = ['js', 'javascript', 'ts', 'typescript', 'python', 'java', 'cpp', 'c', 'html', 'css', 'json', 'xml', 'bash', 'sh', 'sql', 'php', 'ruby', 'go', 'rust', 'md', 'markdown'];
+    const knownLanguages = ['js', 'javascript', 'ts', 'typescript', 'python', 'java', 'cpp', 'c', 'html', 'css', 'json', 'xml', 'bash', 'sh', 'sql', 'php', 'ruby', 'go', 'rust', 'md', 'markdown', 'yaml', 'yml', 'mermaid'];
     
     if (language && !knownLanguages.includes(language.toLowerCase())) {
       const lineNum = markdown.substring(0, codeBlockMatch.index).split('\n').length;

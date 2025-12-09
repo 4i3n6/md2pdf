@@ -51,6 +51,7 @@
           { "icon": "#", "title": "Headings with #", "text": "Use # for headings. More # = smaller level (## subtitle, ### section)." },
           { "icon": "Ctrl", "title": "Ctrl+Shift+E", "text": "Quick shortcut to export your document to PDF instantly." },
           { "icon": "[PB]", "title": "Page break", "text": "Use <!-- pagebreak --> to force a page break in the PDF. Click [PB] button to insert." },
+          { "icon": "MER", "title": "Mermaid Diagrams", "text": "Create flowcharts and diagrams using ```mermaid blocks. Click MER button to insert template." },
           { "icon": "PWA", "title": "Install the app", "text": "MD2PDF works offline. Install as an app on your device." }
         ]
       }
@@ -369,6 +370,30 @@
           "content": [
             "In MD2PDF, click the <code>```</code> button in Quick Tags to insert a code block template."
           ]
+        },
+        {
+          "title": "Mermaid Diagrams",
+          "content": ["Create flowcharts, sequence diagrams, and more with Mermaid syntax. Diagrams are rendered automatically in the preview."],
+          "codeExample": {
+            "code": "```mermaid\nflowchart TD\n  A[Start] --> B{Decision}\n  B -->|Yes| C[Action]\n  B -->|No| D[End]\n```",
+            "description": "Use the MER button in Quick Tags to insert a template."
+          },
+          "list": [
+            "<strong>Flowcharts:</strong> flowchart TD, flowchart LR",
+            "<strong>Sequence:</strong> sequenceDiagram",
+            "<strong>Class:</strong> classDiagram",
+            "<strong>State:</strong> stateDiagram-v2",
+            "<strong>Gantt:</strong> gantt",
+            "<strong>Pie:</strong> pie"
+          ]
+        },
+        {
+          "title": "YAML Blocks",
+          "content": ["YAML content is rendered with structured formatting - keys in bold, values in normal weight. Perfect for configuration files and metadata."],
+          "codeExample": {
+            "code": "```yaml\nname: My Project\nversion: 1.0.0\nconfig:\n  debug: true\n  features:\n    - auth\n    - logging\n```",
+            "description": "Use the YML button in Quick Tags to insert a template."
+          }
         }
       ]
     },
@@ -397,6 +422,16 @@
             "<strong>Click on name:</strong> Opens the document",
             "<strong>Click [x]:</strong> Deletes (with confirmation)",
             "<strong>Auto-save:</strong> Changes saved instantly"
+          ]
+        },
+        {
+          "title": "Quick Tags",
+          "content": ["Insert common Markdown elements with one click."],
+          "list": [
+            "<strong>YML:</strong> Insert YAML code block template",
+            "<strong>MER:</strong> Insert Mermaid diagram template",
+            "<strong>TBL:</strong> Insert table template",
+            "<strong>```:</strong> Insert code block"
           ]
         },
         {

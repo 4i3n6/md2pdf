@@ -158,6 +158,43 @@ function hello() {
                 <h2>Quick Code Insertion</h2>
                 <p>In MD2PDF, click the <code>```</code> button in Quick Tags to insert a code block template.</p>
             </section>
+            <section>
+                <h2>Mermaid Diagrams</h2>
+                <p>Create flowcharts, sequence diagrams, and more with Mermaid syntax. Diagrams are rendered automatically in the preview.</p>
+                <div class="code-example">
+                    <pre><code>```mermaid
+flowchart TD
+  A[Start] --&gt; B{Decision}
+  B --&gt;|Yes| C[Action]
+  B --&gt;|No| D[End]
+```</code></pre>
+                    <p class="code-description">Use the MER button in Quick Tags to insert a template.</p>
+                </div>
+                <ul>
+                    <li><strong>Flowcharts:</strong> flowchart TD, flowchart LR</li>
+                    <li><strong>Sequence:</strong> sequenceDiagram</li>
+                    <li><strong>Class:</strong> classDiagram</li>
+                    <li><strong>State:</strong> stateDiagram-v2</li>
+                    <li><strong>Gantt:</strong> gantt</li>
+                    <li><strong>Pie:</strong> pie</li>
+                </ul>
+            </section>
+            <section>
+                <h2>YAML Blocks</h2>
+                <p>YAML content is rendered with structured formatting - keys in bold, values in normal weight. Perfect for configuration files and metadata.</p>
+                <div class="code-example">
+                    <pre><code>```yaml
+name: My Project
+version: 1.0.0
+config:
+  debug: true
+  features:
+    - auth
+    - logging
+```</code></pre>
+                    <p class="code-description">Use the YML button in Quick Tags to insert a template.</p>
+                </div>
+            </section>
             <nav class="page-nav">
                 <a href="/manual/markdown-tables/">
                     <span class="nav-arrow">&larr;</span>

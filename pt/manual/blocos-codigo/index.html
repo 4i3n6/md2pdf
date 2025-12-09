@@ -158,6 +158,43 @@ function hello() {
                 <h2>Inserção Rápida de Código</h2>
                 <p>No MD2PDF, clique no botão <code>```</code> nas Tags Rápidas para inserir um modelo de bloco de código.</p>
             </section>
+            <section>
+                <h2>Diagramas Mermaid</h2>
+                <p>Crie fluxogramas, diagramas de sequencia e mais com sintaxe Mermaid. Os diagramas sao renderizados automaticamente no preview.</p>
+                <div class="code-example">
+                    <pre><code>```mermaid
+flowchart TD
+  A[Inicio] --&gt; B{Decisao}
+  B --&gt;|Sim| C[Acao]
+  B --&gt;|Nao| D[Fim]
+```</code></pre>
+                    <p class="code-description">Use o botao MER nas Tags Rapidas para inserir um template.</p>
+                </div>
+                <ul>
+                    <li><strong>Fluxogramas:</strong> flowchart TD, flowchart LR</li>
+                    <li><strong>Sequencia:</strong> sequenceDiagram</li>
+                    <li><strong>Classe:</strong> classDiagram</li>
+                    <li><strong>Estado:</strong> stateDiagram-v2</li>
+                    <li><strong>Gantt:</strong> gantt</li>
+                    <li><strong>Pizza:</strong> pie</li>
+                </ul>
+            </section>
+            <section>
+                <h2>Blocos YAML</h2>
+                <p>Conteudo YAML e renderizado com formatacao estruturada - chaves em negrito, valores em peso normal. Perfeito para arquivos de configuracao e metadados.</p>
+                <div class="code-example">
+                    <pre><code>```yaml
+name: Meu Projeto
+version: 1.0.0
+config:
+  debug: true
+  features:
+    - auth
+    - logging
+```</code></pre>
+                    <p class="code-description">Use o botao YML nas Tags Rapidas para inserir um template.</p>
+                </div>
+            </section>
             <nav class="page-nav">
                 <a href="/pt/manual/tabelas-markdown/">
                     <span class="nav-arrow">&larr;</span>
