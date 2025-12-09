@@ -162,14 +162,16 @@ export async function processMermaidDiagrams(container: HTMLElement | null): Pro
       figure.appendChild(diagramContainer)
       
       // Check if diagram needs landscape rotation
-      // Rotate ANY diagram that exceeds page width to prevent overflow
+      // Only rotate WIDE diagrams (width > height) that exceed page width
+      // Tall diagrams should flow naturally across pages
       const svgElement = diagramContainer.querySelector('svg')
       if (svgElement) {
         const svgWidth = parseFloat(svgElement.getAttribute('width') || '0')
+        const svgHeight = parseFloat(svgElement.getAttribute('height') || '0')
         const MAX_PAGE_WIDTH = 480 // ~170mm at 72dpi
         
-        // Rotate any diagram that exceeds page width
-        if (svgWidth > MAX_PAGE_WIDTH) {
+        // Rotate only if: exceeds page width AND is wider than tall
+        if (svgWidth > MAX_PAGE_WIDTH && svgWidth > svgHeight) {
           figure.classList.add('mermaid-landscape')
         }
       }

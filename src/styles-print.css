@@ -637,7 +637,10 @@ body.print-mode #preview-wrapper {
     margin: 14pt 0 !important;
     page-break-inside: avoid !important;
     break-inside: avoid !important;
+    page-break-before: auto !important;
     overflow: visible !important;
+    position: relative !important;
+    z-index: 1 !important;
 }
 
 /* Figure container */
@@ -651,6 +654,7 @@ body.print-mode #preview-wrapper {
     margin: 0 !important;
     padding: 0 !important;
     overflow: visible !important;
+    position: relative !important;
 }
 
 /* Diagram type indicator (top label) */
