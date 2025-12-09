@@ -610,37 +610,122 @@ body.print-mode #preview-wrapper {
 }
 
 /* ============================================================
-   MERMAID DIAGRAMS FOR PRINT
+   MERMAID DIAGRAMS FOR PRINT - Professional Documentation Style
    ============================================================ */
 
+/* Counter for automatic diagram numbering */
+.markdown-body {
+    counter-reset: diagram-counter;
+}
+
+/* Main wrapper - reset styles */
 .mermaid {
     page-break-inside: avoid !important;
     display: block !important;
-    text-align: center !important;
-    padding: 8pt !important;
-    margin: 8pt 0 !important;
-    background: white !important;
-    border: 1pt solid #ccc !important;
-    border-left: 3pt solid #0052cc !important;
-    border-radius: 0 !important;
+    background: transparent !important;
+    border: none !important;
+    padding: 0 !important;
+    margin: 0 !important;
 }
 
-.mermaid svg {
+.mermaid.mermaid-rendered {
+    background: transparent !important;
+    border: none !important;
+    padding: 0 !important;
+    margin: 14pt 0 !important;
+}
+
+/* Figure container */
+.mermaid-figure {
+    counter-increment: diagram-counter;
+    page-break-inside: avoid !important;
+    display: block !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    text-align: center !important;
+}
+
+/* Diagram type indicator (top label) */
+.mermaid-figure::before {
+    content: attr(data-diagram-type);
+    display: inline-block !important;
+    font-size: 7pt !important;
+    font-weight: 600 !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.5pt !important;
+    color: #57606a !important;
+    background: #eef1f4 !important;
+    padding: 2pt 8pt !important;
+    border-radius: 2pt !important;
+    margin-bottom: 8pt !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+}
+
+/* Diagram container */
+.mermaid-figure .mermaid-diagram {
+    display: inline-block !important;
+    background: #fafbfc !important;
+    border: 1pt solid #d0d7de !important;
+    border-radius: 4pt !important;
+    padding: 12pt !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+}
+
+/* SVG inside diagram */
+.mermaid-figure .mermaid-diagram svg {
     display: block !important;
     margin: 0 auto !important;
 }
 
-/* Hide loading and error states in print */
+/* Caption - academic/technical documentation style */
+.mermaid-figure .mermaid-caption {
+    display: block !important;
+    font-size: 8pt !important;
+    color: #57606a !important;
+    text-align: center !important;
+    margin-top: 8pt !important;
+    line-height: 1.4 !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+}
+
+/* Diagram number - auto generated */
+.mermaid-figure .diagram-number::before {
+    content: "Diagrama " counter(diagram-counter) ": ";
+    font-weight: 700 !important;
+    font-style: normal !important;
+    color: #24292f !important;
+}
+
+/* Diagram title */
+.mermaid-figure .diagram-title {
+    font-style: italic !important;
+}
+
+/* Hide loading state in print */
 .mermaid-loading {
     display: none !important;
 }
 
+/* Error state */
 .mermaid-error {
     color: #ae0a04 !important;
     font-size: 9pt !important;
+    text-align: left !important;
+    background: #fff5f5 !important;
+    border: 1pt solid #ae0a04 !important;
+    padding: 8pt !important;
+    border-radius: 3pt !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
 }
 
 .mermaid-error pre {
     background: #f5f5f5 !important;
     border: 1pt solid #ccc !important;
+    padding: 6pt !important;
+    margin-top: 6pt !important;
+    font-size: 8pt !important;
 }

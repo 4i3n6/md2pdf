@@ -1396,18 +1396,20 @@ nav:focus-visible {
 /* ============================================
    MERMAID DIAGRAM STYLES
    ============================================ */
+
+/* Main wrapper - base state */
 .mermaid {
-    display: flex;
-    justify-content: center;
-    align-items: center;
+    display: block;
+    text-align: center;
     padding: 16px;
     background: var(--bg-panel);
     border: 1px solid var(--border);
     border-left: 4px solid var(--accent);
     border-radius: 4px;
     margin: 16px 0;
-    overflow-x: auto;
+    overflow: hidden;
     min-height: 60px;
+    max-width: 100%;
 }
 
 .mermaid-loading {
@@ -1418,15 +1420,75 @@ nav:focus-visible {
     padding: 0;
 }
 
-.mermaid-rendered {
+/* Rendered state - reset for figure structure */
+.mermaid.mermaid-rendered {
+    background: transparent;
+    border: none;
+    border-left: none;
+    padding: 0;
+    overflow: visible;
+}
+
+/* Figure container */
+.mermaid-figure {
+    display: block;
+    margin: 0;
+    padding: 0;
+    text-align: center;
+}
+
+/* Diagram type indicator (top label) */
+.mermaid-figure::before {
+    content: attr(data-diagram-type);
+    display: inline-block;
+    font-size: 10px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--text-dim);
+    background: var(--bg-panel);
+    padding: 3px 10px;
+    border-radius: 3px;
+    margin-bottom: 10px;
+    border: 1px solid var(--border);
+}
+
+/* Diagram container */
+.mermaid-figure .mermaid-diagram {
+    display: inline-block;
     background: var(--bg-core);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 16px;
 }
 
-.mermaid-rendered svg {
-    max-width: 100%;
-    height: auto;
+/* SVG inside diagram */
+.mermaid-figure .mermaid-diagram svg {
+    display: block;
+    margin: 0 auto;
 }
 
+/* Caption */
+.mermaid-figure .mermaid-caption {
+    display: block;
+    font-size: 11px;
+    color: var(--text-dim);
+    text-align: center;
+    margin-top: 10px;
+    line-height: 1.4;
+}
+
+.mermaid-figure .diagram-number {
+    font-weight: 700;
+    font-style: normal;
+    color: var(--text);
+}
+
+.mermaid-figure .diagram-title {
+    font-style: italic;
+}
+
+/* Error states */
 .mermaid-error-container {
     background: #fff5f5;
     border-color: var(--error);
