@@ -618,43 +618,39 @@ body.print-mode #preview-wrapper {
     counter-reset: diagram-counter;
 }
 
-/* Main wrapper - reset styles */
+/* Main wrapper - each diagram gets its own block */
 .mermaid {
-    page-break-inside: avoid !important;
-    break-inside: avoid !important;
     display: block !important;
     background: transparent !important;
     border: none !important;
     padding: 0 !important;
     margin: 0 !important;
-    overflow: visible !important;
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
 }
 
 .mermaid.mermaid-rendered {
+    display: block !important;
     background: transparent !important;
     border: none !important;
     padding: 0 !important;
-    margin: 14pt 0 !important;
+    margin: 16pt 0 !important;
     page-break-inside: avoid !important;
     break-inside: avoid !important;
     page-break-before: auto !important;
-    overflow: visible !important;
-    position: relative !important;
-    z-index: 1 !important;
+    break-before: auto !important;
 }
 
 /* Figure container */
 .mermaid-figure {
     counter-increment: diagram-counter;
-    page-break-inside: avoid !important;
-    break-inside: avoid !important;
     display: flex !important;
     flex-direction: column !important;
     align-items: center !important;
     margin: 0 !important;
     padding: 0 !important;
-    overflow: visible !important;
-    position: relative !important;
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
 }
 
 /* Diagram type indicator (top label) */
@@ -676,7 +672,7 @@ body.print-mode #preview-wrapper {
 
 /* Diagram container */
 .mermaid-figure .mermaid-diagram {
-    display: inline-block !important;
+    display: block !important;
     background: #fafbfc !important;
     border: 1pt solid #d0d7de !important;
     border-radius: 4pt !important;
@@ -685,7 +681,6 @@ body.print-mode #preview-wrapper {
     print-color-adjust: exact !important;
     page-break-inside: avoid !important;
     break-inside: avoid !important;
-    overflow: visible !important;
 }
 
 /* SVG inside diagram */
@@ -720,34 +715,36 @@ body.print-mode #preview-wrapper {
 }
 
 /* ============================================================
-   LANDSCAPE MODE - For diagrams that exceed page width (170mm)
+   LANDSCAPE MODE - For wide diagrams that exceed page width
    ============================================================ */
 
-/* Container for landscape diagrams */
+/* Landscape diagram gets dedicated page */
 .mermaid:has(.mermaid-landscape) {
     page-break-before: always !important;
     page-break-after: always !important;
-    break-before: always !important;
-    break-after: always !important;
+    break-before: page !important;
+    break-after: page !important;
+    margin: 0 !important;
+    padding: 0 !important;
 }
 
 .mermaid-figure.mermaid-landscape {
     page-break-before: always !important;
     page-break-after: always !important;
     page-break-inside: avoid !important;
-    break-before: always !important;
-    break-after: always !important;
+    break-before: page !important;
+    break-after: page !important;
     break-inside: avoid !important;
     justify-content: center !important;
-    min-height: 250mm !important;
+    align-items: center !important;
+    min-height: 257mm !important; /* A4 height - margins */
     width: 100% !important;
 }
 
 .mermaid-figure.mermaid-landscape .mermaid-diagram {
     transform: rotate(90deg) !important;
     transform-origin: center center !important;
-    max-width: none !important;
-    max-height: 170mm !important; /* Limit height to page width when rotated */
+    max-height: 170mm !important;
 }
 
 /* Hide loading state in print */
