@@ -161,6 +161,17 @@ export async function processMermaidDiagrams(container: HTMLElement | null): Pro
       diagramContainer.innerHTML = svg
       figure.appendChild(diagramContainer)
       
+      // Check if diagram exceeds page width (170mm ~ 480px at 72dpi)
+      const svgElement = diagramContainer.querySelector('svg')
+      if (svgElement) {
+        const svgWidth = parseFloat(svgElement.getAttribute('width') || '0')
+        const MAX_PAGE_WIDTH = 480
+        
+        if (svgWidth > MAX_PAGE_WIDTH) {
+          figure.classList.add('mermaid-landscape')
+        }
+      }
+      
       // Add figcaption if title exists
       if (diagramTitle) {
         const caption = document.createElement('figcaption')

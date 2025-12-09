@@ -639,10 +639,11 @@ body.print-mode #preview-wrapper {
 .mermaid-figure {
     counter-increment: diagram-counter;
     page-break-inside: avoid !important;
-    display: block !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
     margin: 0 !important;
     padding: 0 !important;
-    text-align: center !important;
 }
 
 /* Diagram type indicator (top label) */
@@ -702,6 +703,25 @@ body.print-mode #preview-wrapper {
 /* Diagram title */
 .mermaid-figure .diagram-title {
     font-style: italic !important;
+}
+
+/* ============================================================
+   LANDSCAPE MODE - For diagrams that exceed page width (170mm)
+   ============================================================ */
+
+.mermaid-figure.mermaid-landscape {
+    page-break-before: always !important;
+    page-break-after: always !important;
+    page-break-inside: avoid !important;
+    justify-content: center !important;
+    min-height: 250mm !important;
+    width: 100% !important;
+}
+
+.mermaid-figure.mermaid-landscape .mermaid-diagram {
+    transform: rotate(90deg) !important;
+    transform-origin: center center !important;
+    max-width: none !important;
 }
 
 /* Hide loading state in print */

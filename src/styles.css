@@ -1431,10 +1431,11 @@ nav:focus-visible {
 
 /* Figure container */
 .mermaid-figure {
-    display: block;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
     margin: 0;
     padding: 0;
-    text-align: center;
 }
 
 /* Diagram type indicator (top label) */
