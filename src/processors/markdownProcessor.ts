@@ -281,42 +281,6 @@ marked.use({
 })
 
 /**
- * Extensão para interceptar YAML frontmatter no início do documento
- * Formato: ---\n...\n--- (deve estar no início absoluto)
- */
-marked.use({
-  extensions: [{
-    name: 'yamlFrontmatter',
-    level: 'block',
-    start(src: string) {
-      // Only match at the very beginning of the document
-      if (src.startsWith('---\n')) {
-        return 0
-      }
-      return undefined
-    },
-    tokenizer(src: string) {
-      // Must start at beginning and have closing ---
-      const match = /^---\n([\s\S]*?)\n---(?:\n|$)/.exec(src)
-      if (match) {
-        return {
-          type: 'yamlFrontmatter',
-          raw: match[0],
-          text: match[1].trim()
-        }
-      }
-      return undefined
-    },
-    renderer(token: { text: string }) {
-      const base64Source = btoa(unescape(encodeURIComponent(token.text)))
-      return `<div class="yaml-block" data-yaml-source="${base64Source}" data-yaml-type="frontmatter" aria-label="YAML Frontmatter">
-        <pre class="yaml-loading">Loading YAML...</pre>
-      </div>\n`
-    }
-  }]
-})
-
-/**
  * Extensão para interceptar blocos de código YAML
  * Formato: ```yaml ou ```yml
  */
