@@ -95,19 +95,9 @@ class PrintRenderer extends Renderer {
 
   /**
    * Renderiza blocos de código com syntax highlighting
-   * YAML e YML são tratados especialmente para renderização estruturada
    */
   override code(token: Tokens.Code): string {
     const lang = (token.lang || 'plaintext').toLowerCase()
-    
-    // Interceptar YAML para renderização estruturada
-    if (lang === 'yaml' || lang === 'yml') {
-      const base64Source = btoa(unescape(encodeURIComponent(token.text)))
-      return `<div class="yaml-block" data-yaml-source="${base64Source}" data-yaml-type="codeblock" aria-label="YAML Code Block">
-        <pre class="yaml-loading">Loading YAML...</pre>
-      </div>\n`
-    }
-    
     let highlightedCode = token.text
 
     try {
@@ -255,39 +245,64 @@ marked.setOptions({
 marked.use({ renderer: new PrintRenderer() })
 
 /**
- * Extensão para interceptar blocos de código Mermaid
+ * Extensões para interceptar blocos de código especiais (Mermaid, YAML)
  * 
- * NOTA: No marked v17, a classe PrintRenderer funciona para a maioria dos métodos,
- * mas precisamos de uma extensão separada para interceptar code blocks antes
- * do renderer processar, para detectar Mermaid.
+ * NOTA: No marked v17, precisamos de extensões separadas para interceptar 
+ * code blocks antes do renderer padrão processar.
  */
 marked.use({
-  extensions: [{
-    name: 'mermaidCodeBlock',
-    level: 'block',
-    start(src: string) {
-      return src.match(/^```mermaid/m)?.index
-    },
-    tokenizer(src: string) {
-      const match = /^```mermaid\n([\s\S]*?)```/.exec(src)
-      if (match) {
-        return {
-          type: 'mermaidCodeBlock',
-          raw: match[0],
-          text: match[1].trim()
+  extensions: [
+    // Extensão Mermaid
+    {
+      name: 'mermaidCodeBlock',
+      level: 'block',
+      start(src: string) {
+        return src.match(/^```mermaid/m)?.index
+      },
+      tokenizer(src: string) {
+        const match = /^```mermaid\n([\s\S]*?)```/.exec(src)
+        if (match) {
+          return {
+            type: 'mermaidCodeBlock',
+            raw: match[0],
+            text: match[1].trim()
+          }
         }
+        return undefined
+      },
+      renderer(token: { text: string }) {
+        const base64Source = btoa(unescape(encodeURIComponent(token.text)))
+        return `<div class="mermaid" data-mermaid-source="${base64Source}" aria-label="Mermaid Diagram">
+          <pre class="mermaid-loading">Loading diagram...</pre>
+        </div>\n`
       }
-      return undefined
     },
-    renderer(token: { text: string }) {
-      // Encode source as base64 to avoid DOMPurify stripping special characters
-      const base64Source = btoa(unescape(encodeURIComponent(token.text)))
-      
-      return `<div class="mermaid" data-mermaid-source="${base64Source}" aria-label="Mermaid Diagram">
-        <pre class="mermaid-loading">Loading diagram...</pre>
-      </div>\n`
+    // Extensão YAML
+    {
+      name: 'yamlCodeBlock',
+      level: 'block',
+      start(src: string) {
+        return src.match(/^```ya?ml\n/m)?.index
+      },
+      tokenizer(src: string) {
+        const match = /^```ya?ml\n([\s\S]*?)```/.exec(src)
+        if (match) {
+          return {
+            type: 'yamlCodeBlock',
+            raw: match[0],
+            text: match[1].trim()
+          }
+        }
+        return undefined
+      },
+      renderer(token: { text: string }) {
+        const base64Source = btoa(unescape(encodeURIComponent(token.text)))
+        return `<div class="yaml-block" data-yaml-source="${base64Source}" data-yaml-type="codeblock" aria-label="YAML Code Block">
+          <pre class="yaml-loading">Loading YAML...</pre>
+        </div>\n`
+      }
     }
-  }]
+  ]
 })
 
 
