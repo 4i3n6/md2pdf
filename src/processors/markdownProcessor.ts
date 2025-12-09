@@ -95,9 +95,19 @@ class PrintRenderer extends Renderer {
 
   /**
    * Renderiza blocos de código com syntax highlighting
+   * YAML e YML são tratados especialmente para renderização estruturada
    */
   override code(token: Tokens.Code): string {
-    const lang = token.lang || 'plaintext'
+    const lang = (token.lang || 'plaintext').toLowerCase()
+    
+    // Interceptar YAML para renderização estruturada
+    if (lang === 'yaml' || lang === 'yml') {
+      const base64Source = btoa(unescape(encodeURIComponent(token.text)))
+      return `<div class="yaml-block" data-yaml-source="${base64Source}" data-yaml-type="codeblock" aria-label="YAML Code Block">
+        <pre class="yaml-loading">Loading YAML...</pre>
+      </div>\n`
+    }
+    
     let highlightedCode = token.text
 
     try {
@@ -280,36 +290,7 @@ marked.use({
   }]
 })
 
-/**
- * Extensão para interceptar blocos de código YAML
- * Formato: ```yaml ou ```yml
- */
-marked.use({
-  extensions: [{
-    name: 'yamlCodeBlock',
-    level: 'block',
-    start(src: string) {
-      return src.match(/^```ya?ml\n/m)?.index
-    },
-    tokenizer(src: string) {
-      const match = /^```ya?ml\n([\s\S]*?)```/.exec(src)
-      if (match) {
-        return {
-          type: 'yamlCodeBlock',
-          raw: match[0],
-          text: match[1].trim()
-        }
-      }
-      return undefined
-    },
-    renderer(token: { text: string }) {
-      const base64Source = btoa(unescape(encodeURIComponent(token.text)))
-      return `<div class="yaml-block" data-yaml-source="${base64Source}" data-yaml-type="codeblock" aria-label="YAML Code Block">
-        <pre class="yaml-loading">Loading YAML...</pre>
-      </div>\n`
-    }
-  }]
-})
+
 
 /**
  * Configuração segura do DOMPurify para sanitização de HTML
