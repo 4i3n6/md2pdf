@@ -75,6 +75,11 @@ function renderValue(value: unknown, indent: number = 0): string {
 
   // Handle string
   if (typeof value === 'string') {
+    // Check if string contains newlines (multiline string from | or >)
+    if (value.includes('\n')) {
+      const lines = value.split('\n').map(line => escapeHtml(line))
+      return `<div class="yaml-value yaml-multiline">${lines.join('<br>')}</div>`
+    }
     return `<span class="yaml-value yaml-string">${escapeHtml(value)}</span>`
   }
 

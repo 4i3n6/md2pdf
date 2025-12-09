@@ -837,6 +837,13 @@ body.print-mode #preview-wrapper {
     font-style: italic !important;
 }
 
+.yaml-value.yaml-multiline {
+    color: #57606a !important;
+    display: block !important;
+    margin-left: 12pt !important;
+    white-space: pre-wrap !important;
+}
+
 /* Array items */
 .yaml-array-item {
     display: block !important;

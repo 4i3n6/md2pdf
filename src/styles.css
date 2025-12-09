@@ -1647,6 +1647,13 @@ nav:focus-visible {
     color: var(--text-dim);
 }
 
+.yaml-value.yaml-multiline {
+    color: var(--text-dim);
+    display: block;
+    margin-left: 16px;
+    white-space: pre-wrap;
+}
+
 .yaml-value.yaml-empty {
     color: #7c7c7c;
     font-style: italic;
