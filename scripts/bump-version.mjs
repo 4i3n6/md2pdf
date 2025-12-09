@@ -2,21 +2,30 @@
 /**
  * Version Bump Script
  * 
- * Automatically increments the patch version on each build.
- * Updates package.json and i18n files to keep version in sync.
+ * Automatically increments the version and syncs across all files.
+ * Single source of truth: package.json
  * 
  * Usage:
  *   node scripts/bump-version.mjs        # Increment patch (1.1.0 -> 1.1.1)
  *   node scripts/bump-version.mjs minor  # Increment minor (1.1.0 -> 1.2.0)
  *   node scripts/bump-version.mjs major  # Increment major (1.1.0 -> 2.0.0)
+ *   node scripts/bump-version.mjs sync   # Sync current version to all files (no increment)
  */
 
-import { readFileSync, writeFileSync } from 'fs'
+import { readFileSync, writeFileSync, existsSync } from 'fs'
 import { join, dirname } from 'path'
 import { fileURLToPath } from 'url'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
 const rootDir = join(__dirname, '..')
+
+// All files that contain version references
+const VERSION_FILES = [
+  'src/i18n/en.ts',
+  'src/i18n/pt.ts',
+  'app.html',
+  'pt/app.html'
+]
 
 /**
  * Increments version based on type
@@ -39,21 +48,58 @@ function incrementVersion(version, type = 'patch') {
 }
 
 /**
- * Updates version in a file using regex replacement
+ * Finds and replaces version patterns in file content
+ * Handles both "1.2.3" and "v1.2.3" formats
+ * @param {string} content - File content
+ * @param {string} newVersion - New version to set
+ * @returns {string} Updated content
+ */
+function replaceVersionInContent(content, newVersion) {
+  // Pattern matches semantic versions: 1.2.3 or v1.2.3
+  // Only matches versions that look like our app version (not dependencies)
+  const patterns = [
+    // version: 'v1.2.3' or version: "v1.2.3" in TS/JS
+    /(version:\s*['"])v?\d+\.\d+\.\d+(['"])/g,
+    // >v1.2.3< in HTML (between tags)
+    /(>)v?\d+\.\d+\.\d+(<)/g,
+    // "version": "1.2.3" in JSON
+    /("version":\s*")(\d+\.\d+\.\d+)(")/g
+  ]
+  
+  let result = content
+  
+  // Replace version: 'vX.X.X' pattern (i18n files)
+  result = result.replace(/(version:\s*['"])v?\d+\.\d+\.\d+(['"])/g, `$1v${newVersion}$2`)
+  
+  // Replace >vX.X.X< pattern (HTML files)
+  result = result.replace(/(>)v?\d+\.\d+\.\d+(<)/g, `$1v${newVersion}$2`)
+  
+  return result
+}
+
+/**
+ * Updates version in a specific file
  * @param {string} filePath - Path to file
- * @param {string} oldVersion - Version to replace
  * @param {string} newVersion - New version
  */
-function updateFileVersion(filePath, oldVersion, newVersion) {
+function updateFileVersion(filePath, newVersion) {
+  const fullPath = join(rootDir, filePath)
+  
+  if (!existsSync(fullPath)) {
+    console.log(`  Skipped (not found): ${filePath}`)
+    return
+  }
+  
   try {
-    let content = readFileSync(filePath, 'utf-8')
-    const versionRegex = new RegExp(`v?${oldVersion.replace(/\./g, '\\.')}`, 'g')
-    content = content.replace(versionRegex, (match) => {
-      // Preserve 'v' prefix if present
-      return match.startsWith('v') ? `v${newVersion}` : newVersion
-    })
-    writeFileSync(filePath, content, 'utf-8')
-    console.log(`  Updated: ${filePath}`)
+    const content = readFileSync(fullPath, 'utf-8')
+    const updated = replaceVersionInContent(content, newVersion)
+    
+    if (content !== updated) {
+      writeFileSync(fullPath, updated, 'utf-8')
+      console.log(`  Updated: ${filePath}`)
+    } else {
+      console.log(`  No changes: ${filePath}`)
+    }
   } catch (err) {
     console.error(`  Error updating ${filePath}:`, err.message)
   }
@@ -61,30 +107,30 @@ function updateFileVersion(filePath, oldVersion, newVersion) {
 
 // Main execution
 const bumpType = process.argv[2] || 'patch'
+const isSync = bumpType === 'sync'
 
 // Read current version from package.json
 const packageJsonPath = join(rootDir, 'package.json')
 const packageJson = JSON.parse(readFileSync(packageJsonPath, 'utf-8'))
 const currentVersion = packageJson.version
 
-// Calculate new version
-const newVersion = incrementVersion(currentVersion, bumpType)
+// Calculate new version (or keep current for sync)
+const newVersion = isSync ? currentVersion : incrementVersion(currentVersion, bumpType)
 
-console.log(`\nBumping version: ${currentVersion} -> ${newVersion} (${bumpType})\n`)
-
-// Update package.json
-packageJson.version = newVersion
-writeFileSync(packageJsonPath, JSON.stringify(packageJson, null, 2) + '\n', 'utf-8')
-console.log(`  Updated: package.json`)
-
-// Update i18n files
-const i18nFiles = [
-  join(rootDir, 'src/i18n/en.ts'),
-  join(rootDir, 'src/i18n/pt.ts')
-]
-
-for (const file of i18nFiles) {
-  updateFileVersion(file, currentVersion, newVersion)
+if (isSync) {
+  console.log(`\nSyncing version ${newVersion} to all files\n`)
+} else {
+  console.log(`\nBumping version: ${currentVersion} -> ${newVersion} (${bumpType})\n`)
+  
+  // Update package.json
+  packageJson.version = newVersion
+  writeFileSync(packageJsonPath, JSON.stringify(packageJson, null, 2) + '\n', 'utf-8')
+  console.log(`  Updated: package.json`)
 }
 
-console.log(`\nVersion bumped to ${newVersion}\n`)
+// Update all version files
+for (const file of VERSION_FILES) {
+  updateFileVersion(file, newVersion)
+}
+
+console.log(`\nVersion ${isSync ? 'synced' : 'bumped'} to ${newVersion}\n`)
