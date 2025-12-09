@@ -621,11 +621,13 @@ body.print-mode #preview-wrapper {
 /* Main wrapper - reset styles */
 .mermaid {
     page-break-inside: avoid !important;
+    break-inside: avoid !important;
     display: block !important;
     background: transparent !important;
     border: none !important;
     padding: 0 !important;
     margin: 0 !important;
+    overflow: visible !important;
 }
 
 .mermaid.mermaid-rendered {
@@ -633,17 +635,22 @@ body.print-mode #preview-wrapper {
     border: none !important;
     padding: 0 !important;
     margin: 14pt 0 !important;
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+    overflow: visible !important;
 }
 
 /* Figure container */
 .mermaid-figure {
     counter-increment: diagram-counter;
     page-break-inside: avoid !important;
+    break-inside: avoid !important;
     display: flex !important;
     flex-direction: column !important;
     align-items: center !important;
     margin: 0 !important;
     padding: 0 !important;
+    overflow: visible !important;
 }
 
 /* Diagram type indicator (top label) */
@@ -672,6 +679,9 @@ body.print-mode #preview-wrapper {
     padding: 12pt !important;
     -webkit-print-color-adjust: exact !important;
     print-color-adjust: exact !important;
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+    overflow: visible !important;
 }
 
 /* SVG inside diagram */
