@@ -719,10 +719,21 @@ body.print-mode #preview-wrapper {
    LANDSCAPE MODE - For diagrams that exceed page width (170mm)
    ============================================================ */
 
+/* Container for landscape diagrams */
+.mermaid:has(.mermaid-landscape) {
+    page-break-before: always !important;
+    page-break-after: always !important;
+    break-before: always !important;
+    break-after: always !important;
+}
+
 .mermaid-figure.mermaid-landscape {
     page-break-before: always !important;
     page-break-after: always !important;
     page-break-inside: avoid !important;
+    break-before: always !important;
+    break-after: always !important;
+    break-inside: avoid !important;
     justify-content: center !important;
     min-height: 250mm !important;
     width: 100% !important;
@@ -732,6 +743,7 @@ body.print-mode #preview-wrapper {
     transform: rotate(90deg) !important;
     transform-origin: center center !important;
     max-width: none !important;
+    max-height: 170mm !important; /* Limit height to page width when rotated */
 }
 
 /* Hide loading state in print */
