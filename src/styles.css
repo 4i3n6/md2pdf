@@ -1588,38 +1588,21 @@ nav:focus-visible {
 
 .yaml-block {
     display: block;
-    background: var(--bg-panel);
-    border: 1px solid var(--border);
-    border-left: 4px solid #cb7832;
-    border-radius: 4px;
-    padding: 12px 16px;
+    background: transparent;
+    border: none;
+    padding: 0;
     margin: 16px 0;
     font-family: var(--font-mono);
     font-size: 12px;
     line-height: 1.6;
-    overflow-x: auto;
 }
 
 .yaml-block::before {
-    content: "YAML";
-    display: inline-block;
-    font-size: 9px;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    color: #cb7832;
-    background: rgba(203, 120, 50, 0.1);
-    padding: 2px 8px;
-    border-radius: 2px;
-    margin-bottom: 10px;
-}
-
-.yaml-block[data-yaml-type="frontmatter"]::before {
-    content: "FRONTMATTER";
+    display: none;
 }
 
 .yaml-block.yaml-rendered {
-    background: var(--bg-core);
+    background: transparent;
 }
 
 /* YAML Content Container */
