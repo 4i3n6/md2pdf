@@ -45,7 +45,7 @@
     <div class="app-grid" role="application" aria-label="MD2PDF - Markdown to PDF Converter Application">
         <!-- Top Bar: Global Status & Controls (Toolbar role) -->
         <header class="top-bar" role="banner">
-            <h1 class="brand">MD2PDF <span class="version" aria-label="System version 2.0">v1.1.7</span> <a href="/manual/" class="manual-link" title="Open manual" aria-label="Open user manual">[?]</a></h1>
+            <h1 class="brand">MD2PDF <span class="version" aria-label="System version 2.0">v1.1.8</span> <a href="/manual/" class="manual-link" title="Open manual" aria-label="Open user manual">[?]</a></h1>
             <div class="top-metrics" role="status" aria-label="Real-time system status" aria-live="polite">
                 <div class="metric">MEM: <span id="mem-usage" aria-label="Memory usage">--</span></div>
                 <div class="metric">LATENCY: <span id="render-latency" aria-label="Render latency">0ms</span></div>
@@ -168,7 +168,7 @@
         <!-- Main Area: Editor & Preview -->
         <main class="workspace" role="main" id="main-editor" aria-label="Workspace - Editor and Preview">
             <!-- Editor Pane -->
-            <div class="pane-container editor-pane">
+            <div class="pane-container editor-pane" id="editor-pane">
                 <header class="pane-header editor-header-extended" id="editor-header">
                     <div class="editor-header-top">
                         <h2 style="margin: 0; font-size: 12px; font-weight: 600;">INPUT_STREAM</h2>
@@ -211,8 +211,13 @@
                 <div id="editor" class="editor-frame" role="textbox" aria-multiline="true" aria-label="Markdown editor"></div>
             </div>
             
+            <!-- Splitter - Resize handle between panels -->
+            <div class="workspace-splitter" id="workspace-splitter" role="separator" aria-label="Resize panels" title="Drag to resize. Double-click to reset.">
+                <div class="splitter-handle"></div>
+            </div>
+            
             <!-- Preview Pane -->
-            <div class="pane-container preview-pane">
+            <div class="pane-container preview-pane" id="preview-pane">
                 <header class="pane-header preview-header-extended" id="preview-header">
                     <div class="preview-header-top">
                         <h2 style="margin: 0; font-size: 12px; font-weight: 600;">RENDER_OUTPUT</h2>

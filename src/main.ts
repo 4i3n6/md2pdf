@@ -367,6 +367,103 @@ function setupPreviewControls(): void {
   Logger.success('Controles do preview ativados');
 }
 
+
+// ============================================
+// SPLITTER - Resizable Panels
+// ============================================
+
+const SPLITTER_STORAGE_KEY = 'md2pdf-splitter-ratio';
+const SPLITTER_MIN_RATIO = 0.30; // 30% minimum
+const SPLITTER_MAX_RATIO = 0.70; // 70% maximum
+const SPLITTER_DEFAULT_RATIO = 0.50; // 50/50 default
+
+function initSplitter(): void {
+  const splitter = document.getElementById('workspace-splitter');
+  const editorPane = document.getElementById('editor-pane');
+  const workspace = document.querySelector('.workspace') as HTMLElement | null;
+  
+  if (!splitter || !editorPane || !workspace) {
+    Logger.log('Splitter elements not found', 'warning');
+    return;
+  }
+  
+  // Load saved ratio
+  const savedRatio = localStorage.getItem(SPLITTER_STORAGE_KEY);
+  let currentRatio = savedRatio ? parseFloat(savedRatio) : SPLITTER_DEFAULT_RATIO;
+  
+  // Validate saved ratio
+  if (isNaN(currentRatio) || currentRatio < SPLITTER_MIN_RATIO || currentRatio > SPLITTER_MAX_RATIO) {
+    currentRatio = SPLITTER_DEFAULT_RATIO;
+  }
+  
+  // Apply initial ratio
+  applyRatio(currentRatio);
+  
+  let isDragging = false;
+  let startX = 0;
+  let startWidth = 0;
+  
+  // Mouse down - start dragging
+  splitter.addEventListener('mousedown', (e: MouseEvent) => {
+    isDragging = true;
+    startX = e.clientX;
+    startWidth = editorPane.offsetWidth;
+    document.body.classList.add('splitter-dragging');
+    e.preventDefault();
+  });
+  
+  // Mouse move - drag
+  document.addEventListener('mousemove', (e: MouseEvent) => {
+    if (!isDragging) return;
+    
+    const deltaX = e.clientX - startX;
+    const workspaceWidth = workspace.offsetWidth;
+    const splitterWidth = splitter.offsetWidth;
+    const availableWidth = workspaceWidth - splitterWidth;
+    const newWidth = startWidth + deltaX;
+    const newRatio = newWidth / availableWidth;
+    
+    // Apply limits
+    currentRatio = Math.max(SPLITTER_MIN_RATIO, Math.min(SPLITTER_MAX_RATIO, newRatio));
+    applyRatio(currentRatio);
+  });
+  
+  // Mouse up - finish dragging
+  document.addEventListener('mouseup', () => {
+    if (!isDragging) return;
+    
+    isDragging = false;
+    document.body.classList.remove('splitter-dragging');
+    
+    // Save ratio
+    localStorage.setItem(SPLITTER_STORAGE_KEY, currentRatio.toString());
+    Logger.log(`Panel ratio: ${Math.round(currentRatio * 100)}%`);
+  });
+  
+  // Double click - restore 50/50
+  splitter.addEventListener('dblclick', () => {
+    currentRatio = SPLITTER_DEFAULT_RATIO;
+    applyRatio(currentRatio);
+    localStorage.setItem(SPLITTER_STORAGE_KEY, currentRatio.toString());
+    Logger.log('Panel ratio reset to 50%');
+  });
+  
+  function applyRatio(ratio: number): void {
+    const workspaceWidth = workspace!.offsetWidth;
+    const splitterWidth = splitter!.offsetWidth;
+    const availableWidth = workspaceWidth - splitterWidth;
+    const editorWidth = Math.round(availableWidth * ratio);
+    editorPane!.style.width = `${editorWidth}px`;
+  }
+  
+  // Handle window resize
+  window.addEventListener('resize', () => {
+    applyRatio(currentRatio);
+  });
+  
+  Logger.success('Splitter initialized');
+}
+
 function insertFontTag(font: string): void {
   if (!state.editor) return;
   
@@ -855,6 +952,7 @@ function initSystem(): void {
   setupPreviewControls();
   setupSaveControls();
   setupKeyboardNavigation();
+  initSplitter();
   updateMetrics();
   updateSaveStatus();
   Logger.success('Sistema pronto.');

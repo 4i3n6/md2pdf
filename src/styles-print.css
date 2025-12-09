@@ -50,6 +50,7 @@
     .console-container,
     .panel-header,
     .workspace > .pane-container:first-child,
+    .workspace-splitter,
     .skip-link,
     .sr-only {
         display: none !important;

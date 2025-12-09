@@ -226,7 +226,72 @@ body {
     border-right: 1px solid var(--border);
     min-width: 0;
 }
-.pane-container:last-child { border-right: none; }
+
+/* Editor pane - controlled width via JS */
+.pane-container.editor-pane {
+    flex: none;
+    width: 50%; /* Default, overridden by JS */
+}
+
+/* Preview pane - takes remaining space */
+.pane-container.preview-pane {
+    flex: 1;
+    border-right: none;
+}
+
+/* ============================================
+   WORKSPACE SPLITTER - Resizable Panels
+   ============================================ */
+
+.workspace-splitter {
+    width: 6px;
+    background: var(--bg-panel);
+    border-left: 1px solid var(--border);
+    border-right: 1px solid var(--border);
+    cursor: col-resize;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    transition: background 0.15s ease;
+    z-index: 10;
+}
+
+.workspace-splitter:hover {
+    background: var(--accent);
+}
+
+.workspace-splitter:active {
+    background: var(--accent);
+}
+
+.workspace-splitter .splitter-handle {
+    width: 2px;
+    height: 40px;
+    background: var(--text-dim);
+    border-radius: 1px;
+    opacity: 0.4;
+    transition: opacity 0.15s ease, background 0.15s ease;
+}
+
+.workspace-splitter:hover .splitter-handle {
+    opacity: 1;
+    background: white;
+}
+
+/* Dragging state - applied to body */
+body.splitter-dragging {
+    cursor: col-resize !important;
+    user-select: none !important;
+}
+
+body.splitter-dragging * {
+    cursor: col-resize !important;
+}
+
+body.splitter-dragging iframe {
+    pointer-events: none !important;
+}
 
 .pane-header {
     padding: 8px 15px;
