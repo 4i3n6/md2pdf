@@ -1714,6 +1714,37 @@ nav:focus-visible {
     padding: 0;
 }
 
+/* ==========================================================================
+   SQL CODE BLOCKS - Enhanced styling for SQL/DDL code
+   ========================================================================== */
+
+pre:has(code.language-sql),
+pre:has(code.language-ddl) {
+    position: relative;
+}
+
+pre:has(code.language-sql)::before,
+pre:has(code.language-ddl)::before {
+    content: 'SQL';
+    position: absolute;
+    top: 0.5rem;
+    right: 0.5rem;
+    font-size: 0.65rem;
+    font-weight: 600;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    background: var(--bg-elevated);
+    padding: 2px 6px;
+    border-radius: 3px;
+    z-index: 1;
+}
+
+pre code.language-sql,
+pre code.language-ddl {
+    font-family: var(--font-mono);
+}
+
 /* Show overlay and hide app on mobile */
 @media (max-width: 767px) {
     .mobile-block-overlay {

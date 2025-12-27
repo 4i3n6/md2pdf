@@ -812,6 +812,16 @@ function insertTag(tag: string): void {
       cursorOffset = 12;
       break;
 
+    case 'sql':
+      insert = '```sql\nSELECT * FROM users WHERE id = 1;\n```';
+      cursorOffset = 7;
+      break;
+
+    case 'ddl':
+      insert = '```sql\nCREATE TABLE users (\n  id UUID PRIMARY KEY,\n  name VARCHAR(255) NOT NULL,\n  email VARCHAR(255) UNIQUE NOT NULL,\n  created_at TIMESTAMP DEFAULT NOW(),\n  updated_at TIMESTAMP DEFAULT NOW()\n);\n```';
+      cursorOffset = 7;
+      break;
+
     case 'table':
       insert = '\n| Coluna 1 | Coluna 2 | Coluna 3 |\n|----------|----------|----------|\n| dado 1   | dado 2   | dado 3   |\n';
       cursorOffset = 3;

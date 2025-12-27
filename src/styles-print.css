@@ -881,3 +881,30 @@ body.print-mode #preview-wrapper {
     font-size: 8pt !important;
     white-space: pre-wrap !important;
 }
+
+/* ============================================================
+   SQL CODE BLOCKS - Print styling
+   ============================================================ */
+
+pre:has(code.language-sql),
+pre:has(code.language-ddl) {
+    position: relative !important;
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+}
+
+pre:has(code.language-sql)::before,
+pre:has(code.language-ddl)::before {
+    content: 'SQL' !important;
+    position: absolute !important;
+    top: 4pt !important;
+    right: 4pt !important;
+    font-size: 6pt !important;
+    font-weight: 600 !important;
+    color: #666 !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.05em !important;
+    background: #f0f0f0 !important;
+    padding: 1pt 4pt !important;
+    border-radius: 2pt !important;
+}
