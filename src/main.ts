@@ -1153,7 +1153,48 @@ async function renderPreview(md: string): Promise<void> {
   const preview = document.getElementById('preview')
   if (!preview) return
 
-  const html = processMarkdown(md)
+  // Pre-process content based on file extension
+  let content = md
+  const currentDoc = getCurrentDoc()
+  if (currentDoc) {
+    const ext = currentDoc.name.split('.').pop()?.toLowerCase()
+    // Wrap non-markdown files in code blocks for syntax highlighting
+    if (ext === 'sql' || ext === 'ddl') {
+      content = '```sql\n' + md + '\n```'
+    } else if (ext === 'json') {
+      content = '```json\n' + md + '\n```'
+    } else if (ext === 'yaml' || ext === 'yml') {
+      content = '```yaml\n' + md + '\n```'
+    } else if (ext === 'js' || ext === 'javascript') {
+      content = '```javascript\n' + md + '\n```'
+    } else if (ext === 'ts' || ext === 'typescript') {
+      content = '```typescript\n' + md + '\n```'
+    } else if (ext === 'css') {
+      content = '```css\n' + md + '\n```'
+    } else if (ext === 'html' || ext === 'htm') {
+      content = '```html\n' + md + '\n```'
+    } else if (ext === 'xml') {
+      content = '```xml\n' + md + '\n```'
+    } else if (ext === 'sh' || ext === 'bash') {
+      content = '```bash\n' + md + '\n```'
+    } else if (ext === 'py' || ext === 'python') {
+      content = '```python\n' + md + '\n```'
+    } else if (ext === 'go') {
+      content = '```go\n' + md + '\n```'
+    } else if (ext === 'rs' || ext === 'rust') {
+      content = '```rust\n' + md + '\n```'
+    } else if (ext === 'java') {
+      content = '```java\n' + md + '\n```'
+    } else if (ext === 'c' || ext === 'cpp' || ext === 'h' || ext === 'hpp') {
+      content = '```cpp\n' + md + '\n```'
+    } else if (ext === 'php') {
+      content = '```php\n' + md + '\n```'
+    } else if (ext === 'rb' || ext === 'ruby') {
+      content = '```ruby\n' + md + '\n```'
+    }
+  }
+
+  const html = processMarkdown(content)
   await uiRenderer.renderPreview(preview, html)
 
   const estimatedPages = estimatePageCount(html)
