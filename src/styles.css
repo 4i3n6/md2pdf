@@ -630,7 +630,7 @@ body.splitter-dragging iframe {
     font-family: var(--font-mono) !important;
     font-size: 12px !important;
     line-height: 1.6 !important;
-    color: #24292e !important;
+    color: #24292e; /* Removed !important to allow highlight.js colors */
     background: transparent !important;
     border: none !important;
     padding: 0 !important;
