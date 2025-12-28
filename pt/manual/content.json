@@ -1,7 +1,7 @@
 {
   "site": {
     "title": "MD2PDF",
-    "version": "2.0",
+    "version": "1.1.20",
     "tagline": "Gratuito e sem limites"
   },
   "navigation": [
@@ -320,7 +320,7 @@
       "slug": "blocos-codigo",
       "title": "Blocos de Código",
       "pageTitle": "Blocos de Código e Syntax Highlighting",
-      "description": "Aprenda a adicionar blocos de código com syntax highlighting em Markdown. Suporte para 100+ linguagens.",
+      "description": "Aprenda a adicionar blocos de código com syntax highlighting em Markdown. Suporte para linguagens comuns.",
       "keywords": "bloco de código markdown, syntax highlighting, formatação código, fenced code block, programação markdown",
       "prev": { "slug": "tabelas-markdown", "title": "Tabelas" },
       "next": { "slug": "area-edicao", "title": "Editor" },
@@ -351,14 +351,15 @@
         },
         {
           "title": "Linguagens Suportadas",
-          "content": ["MD2PDF suporta 100+ linguagens via highlight.js. As mais comuns incluem:"],
+          "content": ["MD2PDF suporta um conjunto curado de linguagens comuns por performance. As mais usadas incluem:"],
           "list": [
             "<strong>Web:</strong> javascript, typescript, html, css, json",
             "<strong>Backend:</strong> python, java, php, ruby, go, rust",
-            "<strong>Sistemas:</strong> c, cpp, csharp, swift, kotlin",
-            "<strong>Dados:</strong> sql, r, julia",
-            "<strong>Shell:</strong> bash, powershell, dockerfile",
-            "<strong>Config:</strong> yaml, toml, ini, xml"
+            "<strong>Sistemas:</strong> c, cpp, csharp",
+            "<strong>Dados:</strong> sql",
+            "<strong>Shell:</strong> bash",
+            "<strong>Config:</strong> yaml, xml",
+            "<strong>Docs:</strong> markdown, plaintext"
           ],
           "infoBox": {
             "title": "Linguagem desconhecida?",
@@ -508,6 +509,19 @@
             { "title": "Clique EXPORT MD", "text": "Na seção ACTIONS da sidebar." },
             { "title": "Salve o arquivo", "text": "O navegador baixa o arquivo .md com o nome do seu documento." }
           ]
+        },
+        {
+          "title": "Backup e Restauracao",
+          "content": ["Crie um backup completo de todos os documentos e preferencias."],
+          "steps": [
+            { "title": "Clique em BACKUP TOTAL", "text": "Na seção ACTIONS da sidebar." },
+            { "title": "Salve o arquivo", "text": "Guarde o .json em local seguro." },
+            { "title": "Restaure quando precisar", "text": "Clique em RESTAURAR, selecione o backup e confirme. Isso substitui os documentos atuais." }
+          ],
+          "infoBox": {
+            "title": "Formato do backup",
+            "text": "Arquivo JSON com documentos, preferencias e metadados."
+          }
         },
         {
           "title": "Exportando como PDF",

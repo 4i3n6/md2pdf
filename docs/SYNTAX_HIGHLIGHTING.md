@@ -1,7 +1,7 @@
 # Syntax Highlighting - Documentação Completa
 
-**Data:** 2 de Dezembro de 2024  
-**Versão:** 2.1.0  
+**Data:** 28 de Dezembro de 2025  
+**Versão:** 1.1.20  
 **Status:** ✅ Implementado e Testado
 
 ---
@@ -12,7 +12,7 @@ O MD2PDF agora possui **Syntax Highlighting profissional** integrado com **highl
 
 ### Características Principais
 
-- ✅ **Múltiplas Linguagens** - Suporte para 190+ linguagens
+- ✅ **Linguagens Comuns** - Conjunto curado para performance e bundle menor
 - ✅ **Auto-Detect** - Detecta linguagem automaticamente
 - ✅ **GitHub Light Theme** - Tema limpo e profissional
 - ✅ **Seguro** - Sanitização com DOMPurify
@@ -57,23 +57,31 @@ O tema escolhido é o **GitHub Light**, que oferece:
 ✅ PHP
 ✅ Ruby
 ✅ Go
-✅ Rust
-✅ Swift
-✅ Kotlin
-✅ SQL
-✅ HTML / XML
-✅ CSS / SCSS
+✅ JavaScript / TypeScript
 ✅ JSON
-✅ YAML
+✅ HTML / XML
+✅ CSS
 ✅ Bash / Shell
-✅ PowerShell
-✅ Docker
+✅ YAML
+✅ SQL
+✅ Python
+✅ Java
+✅ C / C++
+✅ C#
+✅ Go
+✅ Rust
+✅ PHP
+✅ Ruby
 ✅ Markdown
+✅ Plaintext
 ```
 
-### Total de Linguagens
+### Conjunto Atual
 
-O highlight.js suporta **190+ linguagens** documentadas. Veja a lista completa em:
+Para manter o bundle leve, registramos apenas linguagens comuns. Linguagens fora da lista
+aparecem sem cores, mas continuam renderizadas corretamente.
+
+A lista completa de linguagens do highlight.js pode ser consultada em:
 https://github.com/highlightjs/highlight.js/blob/main/SUPPORTED_LANGUAGES.md
 
 ---
@@ -105,7 +113,8 @@ SELECT * FROM users WHERE id = 1;
 
 ### Auto-Detect
 
-Se não especificar a linguagem, o highlight.js tenta detectar automaticamente:
+Se não especificar a linguagem, o highlight.js tenta detectar automaticamente entre as
+linguagens registradas:
 
 ```markdown
 \`\`\`
@@ -123,7 +132,7 @@ Este texto não será destacado
 apenas exibido como está
 \`\`\`
 
-# ou simplesmente sem linguagem explícita
+# sem linguagem explícita (auto-detect)
 \`\`\`
 código sem highlight
 \`\`\`
@@ -139,7 +148,7 @@ código sem highlight
 2. **DOMPurify** - Sanitiza o HTML gerado para remover scripts perigosos
 
 ```javascript
-// Configuração em markdownProcessor.js
+// Configuração em markdownProcessor.ts
 const sanitized = DOMPurify.sanitize(highlightedCode, {
     ALLOWED_TAGS: ['span', 'br'],
     ALLOWED_ATTR: ['class']
@@ -187,12 +196,13 @@ Para mudar as cores, edite em `src/styles.css`:
 
 ### Arquivos Modificados
 
-1. **src/main.js**
-   - Import de `highlight.js`
+1. **src/main.ts**
+   - Import do tema do highlight.js
    - Import de CSS theme
 
-2. **src/processors/markdownProcessor.js**
+2. **src/processors/markdownProcessor.ts**
    - Integração com `hljs` no renderer
+   - Registro explícito de linguagens
    - Detecção de linguagem
    - Sanitização com DOMPurify
 
@@ -234,7 +244,7 @@ Renderização na Tela
 
 ### Otimizações
 
-- Lazy loading do highlight.js
+- Registro explícito de linguagens no highlight.js
 - Code splitting automático do Vite
 - Cache do navegador (cache buster)
 - Processamento async de imagens
@@ -344,8 +354,8 @@ SELECT * FROM users;
 ### Código Adicionado
 
 ```
-markdownProcessor.js:  +30 linhas (integração highlight.js)
-main.js:               +2 linhas (imports)
+markdownProcessor.ts:  +30 linhas (integração highlight.js)
+main.ts:               +2 linhas (imports)
 styles.css:            +93 linhas (tema e estilos)
 ─────────────────────────────────
 Total:                 +125 linhas
@@ -353,10 +363,9 @@ Total:                 +125 linhas
 
 ### Bundle Size Impact
 
-- highlight.js: ~50KB (minificado)
+- highlight.js (core + linguagens selecionadas)
 - CSS theme: ~2KB
-- Total adicionado: ~52KB (descompactado)
-- Gzip: ~13KB
+- Total adicionado depende do conjunto de linguagens
 
 ### Compatibilidade
 
@@ -434,4 +443,3 @@ O Syntax Highlighting está completamente implementado e pronto para uso em prod
 **Próximo Passo:** Deploy em produção
 
 ---
-

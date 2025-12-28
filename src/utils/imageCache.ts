@@ -3,6 +3,9 @@
  * Cache persistente em localStorage para dimensões de imagens
  */
 
+import { CacheImagensConfig } from '@/constants'
+import { logAviso } from '@/utils/logger'
+
 interface Dimensions {
   width: number
   height: number
@@ -25,9 +28,9 @@ interface CacheStats {
   storageAvailable: boolean
 }
 
-const CACHE_KEY = 'md2pdf-image-cache-v1'
-const CACHE_EXPIRATION = 30 * 24 * 60 * 60 * 1000
-const MAX_CACHE_SIZE = 50 * 1024
+const CACHE_KEY = CacheImagensConfig.storageKey
+const CACHE_EXPIRATION = CacheImagensConfig.expiracaoMs
+const MAX_CACHE_SIZE = CacheImagensConfig.maxTamanhoBytes
 
 class ImageCacheManager {
   private memory: Map<string, CacheEntry> = new Map()
@@ -53,7 +56,8 @@ class ImageCacheManager {
           })
         }
       } catch (e) {
-        console.warn('Erro ao carregar cache de localStorage:', e)
+        const errorMsg = e instanceof Error ? e.message : String(e)
+        logAviso(`Erro ao carregar cache de localStorage: ${errorMsg}`)
       }
     }
   }
@@ -77,7 +81,8 @@ class ImageCacheManager {
       try {
         this.localStorage.setItem(CACHE_KEY, JSON.stringify(data))
       } catch (e) {
-        console.warn('Erro ao salvar cache limpo:', e)
+        const errorMsg = e instanceof Error ? e.message : String(e)
+        logAviso(`Erro ao salvar cache limpo: ${errorMsg}`)
       }
     }
   }
@@ -118,7 +123,7 @@ class ImageCacheManager {
     if (this.localStorage) {
       try {
         let data: CacheData = {
-          version: 1,
+          version: CacheImagensConfig.versao,
           lastUpdated: Date.now(),
           cache: {}
         }
@@ -129,7 +134,8 @@ class ImageCacheManager {
             data = JSON.parse(stored)
           }
         } catch (e) {
-          console.warn('Erro ao ler cache do localStorage:', e)
+          const errorMsg = e instanceof Error ? e.message : String(e)
+          logAviso(`Erro ao ler cache do localStorage: ${errorMsg}`)
         }
 
         data.cache[src] = entry
@@ -142,10 +148,11 @@ class ImageCacheManager {
         this.localStorage.setItem(CACHE_KEY, JSON.stringify(data))
       } catch (e) {
         if (e instanceof DOMException && e.name === 'QuotaExceededError') {
-          console.warn('localStorage cheio, limpando cache de imagens')
+          logAviso('localStorage cheio, limpando cache de imagens')
           this.clear()
         } else {
-          console.warn('Erro ao salvar no cache:', e)
+          const errorMsg = e instanceof Error ? e.message : String(e)
+          logAviso(`Erro ao salvar no cache: ${errorMsg}`)
         }
       }
     }
@@ -178,7 +185,8 @@ class ImageCacheManager {
       try {
         this.localStorage.removeItem(CACHE_KEY)
       } catch (e) {
-        console.warn('Erro ao limpar cache:', e)
+        const errorMsg = e instanceof Error ? e.message : String(e)
+        logAviso(`Erro ao limpar cache: ${errorMsg}`)
       }
     }
   }

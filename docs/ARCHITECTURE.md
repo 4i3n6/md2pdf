@@ -1,4 +1,4 @@
-# 📚 DOCUMENTAÇÃO TÉCNICA COMPLETA - MD2PDF V2.0
+# 📚 DOCUMENTAÇÃO TÉCNICA COMPLETA - MD2PDF v1.1.20
 
 ## Índice
 
@@ -19,23 +19,23 @@
 
 ```
 ┌─────────────────────────────────────────────────┐
-│              UI Layer (main.js)                 │
+│              UI Layer (main.ts)                 │
 │         Handlers, Listeners, Logger             │
 └────────────────┬────────────────────────────────┘
                  │
 ┌────────────────▼────────────────────────────────┐
 │          Business Logic Layer                   │
 ├─────────────────────────────────────────────────┤
-│ • printUtils.js (Print Control)                 │
-│ • printReporter.js (Analytics)                  │
-│ • markdownProcessor.js (Parsing)                │
-│ • imageProcessor.js (Media Handling)            │
+│ • printUtils.ts (Print Control)                 │
+│ • printReporter.ts (Analytics)                  │
+│ • markdownProcessor.ts (Parsing)                │
+│ • imageProcessor.ts (Media Handling)            │
 └────────────────┬────────────────────────────────┘
                  │
 ┌────────────────▼────────────────────────────────┐
 │           Data Layer                            │
 ├─────────────────────────────────────────────────┤
-│ • imageCache.js (Persistence)                   │
+│ • imageCache.ts (Persistence)                   │
 │ • localStorage (State)                          │
 └─────────────────────────────────────────────────┘
                  │
@@ -50,7 +50,7 @@
 ### Padrão State Management: Singleton + Reactive
 
 ```javascript
-// Global State (src/main.js)
+// Global State (src/main.ts)
 const state = {
     docs: [],          // Array de documentos
     currentId: null,   // ID do documento atual
@@ -67,7 +67,7 @@ const state = {
 
 ## 📦 Módulos
 
-### 1. **markdownProcessor.js** (208 linhas)
+### 1. **markdownProcessor.ts** (208 linhas)
 
 **Responsabilidade**: Parse e renderização segura de markdown
 
@@ -105,7 +105,7 @@ const state = {
 
 ---
 
-### 2. **imageProcessor.js** (240+ linhas)
+### 2. **imageProcessor.ts** (240+ linhas)
 
 **Responsabilidade**: Processamento de imagens para A4
 
@@ -137,14 +137,14 @@ Future requests: cache hit ✓
 
 ---
 
-### 3. **printUtils.js** (300+ linhas)
+### 3. **printUtils.ts** (300+ linhas)
 
 **Responsabilidade**: Orquestração de impressão
 
 ```
 User Click [ EXP_PDF ]
     ↓
-validatePrintContent() → [issues]
+await validatePrintContent() → {isValid, issues}
     ↓
 User Confirm?
     ↓
@@ -158,14 +158,14 @@ Done
 ```
 
 **Funções Exportadas**:
-- `validatePrintContent(html)` - {isValid, issues}
+- `validatePrintContent(content)` - Promise<{isValid, issues}>
 - `optimizeForPrint()` - Esconde UI
 - `restoreAfterPrint()` - Restaura UI
 - `printDocument(name, logger)` - Promise<boolean>
 - `togglePrintPreview()` - CSS mode
 - `enterPrintPreview()` / `exitPrintPreview()` - Controle
 - `getPrintStatistics(html)` - {words, pages, images...}
-- `generatePrintReport(name, html)` - String
+- `generatePrintReport(name, html)` - Promise<string>
 
 **Validações Implementadas**:
 - Imagens > 170mm x 257mm (avisos)
@@ -175,7 +175,7 @@ Done
 
 ---
 
-### 4. **imageCache.js** (200+ linhas)
+### 4. **imageCache.ts** (200+ linhas)
 
 **Responsabilidade**: Persistência de dimensões
 
@@ -214,7 +214,7 @@ Request: getCachedImageDimensions(src)
 
 ---
 
-### 5. **printReporter.js** (NEW - 300+ linhas)
+### 5. **printReporter.ts** (NEW - 300+ linhas)
 
 **Responsabilidade**: Análise e relatórios de documento
 
@@ -281,7 +281,7 @@ generateChecklist() → {checks, warnings, ready}
 
 ```javascript
 // Todos os módulos usam ES6 modules
-import { function } from './path/to/module.js';
+import { function } from './path/to/module.ts';
 ```
 
 ### markdownProcessor
@@ -292,7 +292,7 @@ import {
     validateMarkdown, 
     estimatePageCount,
     processImagesInPreview 
-} from './processors/markdownProcessor.js';
+} from './processors/markdownProcessor.ts';
 
 // Use
 const html = processMarkdown(markdown);
@@ -311,12 +311,14 @@ import {
     exitPrintPreview,
     getPrintStatistics,
     generatePrintReport 
-} from './utils/printUtils.js';
+} from './utils/printUtils.ts';
 
 // Use
 await printDocument('my-doc');
 togglePrintPreview(); // Ctrl+Shift+P
 const stats = getPrintStatistics(html);
+const validation = await validatePrintContent(html);
+const report = await generatePrintReport('my-doc', html);
 ```
 
 ### imageProcessor
@@ -328,7 +330,7 @@ import {
     getCachedImageDimensions,
     processImagesForPrint,
     validateImageForA4 
-} from './processors/imageProcessor.js';
+} from './processors/imageProcessor.ts';
 
 // Use
 const dims = await getImageDimensions('https://example.com/img.jpg');
@@ -344,7 +346,7 @@ import {
     cacheSet, 
     cacheClear, 
     cacheStats 
-} from './utils/imageCache.js';
+} from './utils/imageCache.ts';
 
 // Use
 cacheSet(src, {width: 800, height: 600});
@@ -360,7 +362,7 @@ import {
     reportToConsole,
     reportToHtml,
     getAnalysis 
-} from './utils/printReporter.js';
+} from './utils/printReporter.ts';
 
 // Use
 const reporter = createReporter(html, 'my-doc');
@@ -392,7 +394,7 @@ Logger.log("Renderizado em ~2 páginas A4")
 
 ```
 onClick → async () => {
-    1. validatePrintContent() → [issues]
+    1. await validatePrintContent() → {isValid, issues}
        └─ Se houver, mostrar avisos
     
     2. createReporter() → Análise detalhada
@@ -626,7 +628,7 @@ Impressão:
 localStorage.removeItem('md2pdf-image-cache-v1');
 
 // Or in console
-import { cacheClear } from './utils/imageCache.js';
+import { cacheClear } from './utils/imageCache.ts';
 cacheClear();
 ```
 
@@ -642,7 +644,7 @@ cacheClear();
 **Solução**:
 ```javascript
 // Debugar performance
-import { cacheStats } from './utils/imageCache.js';
+import { cacheStats } from './utils/imageCache.ts';
 console.log(cacheStats());
 
 // Limitar batch size
@@ -670,7 +672,7 @@ await processImagesForPrint(batch);
 
 **Causa**: Cache cresceu > 50KB (limite auto-cleanup)
 
-**Solução**: Auto-implementada em imageCache.js
+**Solução**: Auto-implementada em imageCache.ts
 ```javascript
 // Trim operation (remove entradas antigas)
 // Libera ~50% do espaço automaticamente
@@ -696,7 +698,7 @@ window.DEBUG_PRINT = true;
 ### Export Relatório
 
 ```javascript
-import { createReporter } from './utils/printReporter.js';
+import { createReporter } from './utils/printReporter.ts';
 
 const preview = document.getElementById('preview');
 const reporter = createReporter(preview.innerHTML, 'debug');
@@ -743,4 +745,3 @@ const code = 'block';
 - [CSS Print Media](https://developer.mozilla.org/en-US/docs/Web/CSS/@media/print)
 - [localStorage API](https://developer.mozilla.org/en-US/docs/Web/API/Window/localStorage)
 - [Image API](https://developer.mozilla.org/en-US/docs/Web/API/HTMLImageElement)
-

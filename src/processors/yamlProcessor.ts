@@ -7,6 +7,7 @@
  */
 
 import type { load as YamlLoad } from 'js-yaml'
+import { logErro } from '@/utils/logger'
 
 let yamlInstance: { load: typeof YamlLoad } | null = null
 let initPromise: Promise<void> | null = null
@@ -37,7 +38,8 @@ function decodeBase64Source(base64: string): string {
   try {
     return decodeURIComponent(escape(atob(base64)))
   } catch (e) {
-    console.error('[YAML] Failed to decode base64:', e)
+    const errorMsg = e instanceof Error ? e.message : String(e)
+    logErro(`[YAML] Falha ao decodificar base64: ${errorMsg}`)
     return ''
   }
 }
@@ -223,7 +225,7 @@ export async function processYamlBlocks(container: HTMLElement | null): Promise<
     } catch (e) {
       // Parse error - render as code block fallback
       const errorMessage = e instanceof Error ? e.message : 'Unknown parsing error'
-      console.error('[YAML] Parse error:', e)
+      logErro(`[YAML] Erro de parse: ${errorMessage}`)
       
       block.innerHTML = renderAsCodeBlock(source, errorMessage)
       block.classList.add('yaml-error-container')

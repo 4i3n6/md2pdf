@@ -8,6 +8,7 @@
  * - Type-safe document management
  */
 
+import { ChavesStorage } from '@/constants'
 import type { Document, LoggerInterface } from '@/types/index'
 
 /**
@@ -21,7 +22,6 @@ type DocumentChangeCallback = (docs: Document[]) => void
 export class DocumentManager {
   private docs: Document[] = []
   private observers: DocumentChangeCallback[] = []
-  private readonly STORAGE_KEY = 'md2pdf-docs-v3'
   private readonly defaultDoc: Document = {
     id: 1,
     name: 'README.md',
@@ -31,6 +31,16 @@ export class DocumentManager {
   }
 
   constructor(private logger?: LoggerInterface) {}
+
+  /**
+   * Define o logger apos a instancia criada
+   * 
+   * @param {LoggerInterface} logger - Logger global
+   * @returns {void}
+   */
+  setLogger(logger: LoggerInterface): void {
+    this.logger = logger
+  }
 
   /**
    * Inicializa o gerenciador carregando documentos do localStorage
@@ -49,30 +59,81 @@ export class DocumentManager {
    * @returns {void}
    */
   private load(): void {
-    try {
-      const raw = localStorage.getItem(this.STORAGE_KEY)
-      if (raw) {
-        const parsed = JSON.parse(raw)
-        // Garantir que cada doc tem os campos necessarios
-        this.docs = parsed.map((doc: Partial<Document>) => ({
-          id: doc.id || Date.now(),
-          name: doc.name || 'Untitled.md',
-          content: doc.content || '',
-          updated: doc.updated || Date.now(),
-          lastSaved: doc.lastSaved || Date.now()
-        }))
-        if (this.docs.length === 0) {
-          this.docs = [this.defaultDoc]
-        }
-      } else {
-        this.docs = [this.defaultDoc]
-        this.logger?.log?.('Nenhum dado encontrado. Criando documento padrao.')
-      }
-    } catch (e) {
-      const errorMessage = e instanceof Error ? e.message : String(e)
-      this.logger?.error?.(`Falha ao carregar documentos: ${errorMessage}`)
-      this.docs = [this.defaultDoc]
+    const currentDocs = this.carregarDoStorage(ChavesStorage.documentos)
+    if (currentDocs && currentDocs.length > 0) {
+        this.docs = currentDocs
+        return
     }
+
+    const legacyDocs = this.carregarDoStorage(ChavesStorage.documentosLegado)
+    if (legacyDocs && legacyDocs.length > 0) {
+        this.docs = legacyDocs
+        this.persistir()
+        this.logger?.success?.('Migracao concluida: md2pdf-docs-v2 -> md2pdf-docs-v3')
+        return
+    }
+
+    this.docs = [this.defaultDoc]
+    this.logger?.log?.('Nenhum dado encontrado. Criando documento padrao.')
+  }
+
+  /**
+   * Carrega e normaliza documentos de uma chave especifica
+   * 
+   * @param {string} storageKey - Chave do localStorage
+   * @returns {Document[] | null} Documentos normalizados ou null
+   */
+  private carregarDoStorage(storageKey: string): Document[] | null {
+    try {
+        const raw = localStorage.getItem(storageKey)
+        if (!raw) {
+            return null
+        }
+
+        const parsed = JSON.parse(raw)
+        const docs = this.normalizarDocumentos(parsed)
+        return docs
+    } catch (e) {
+        const errorMessage = e instanceof Error ? e.message : String(e)
+        this.logger?.error?.(`Falha ao ler ${storageKey}: ${errorMessage}`)
+        return null
+    }
+  }
+
+  /**
+   * Normaliza documentos para o schema atual
+   * 
+   * @param {unknown} rawDocs - Dados brutos do storage
+   * @returns {Document[]} Documentos normalizados
+   */
+  private normalizarDocumentos(rawDocs: unknown): Document[] {
+    if (!Array.isArray(rawDocs)) {
+        return []
+    }
+
+    return rawDocs.map((item: unknown, index: number) => {
+        const doc = item && typeof item === 'object' ? (item as Partial<Document>) : {}
+        const updated = typeof doc.updated === 'number' ? doc.updated : Date.now()
+        const lastSaved = typeof doc.lastSaved === 'number' ? doc.lastSaved : updated
+
+        return {
+            id: typeof doc.id === 'number' ? doc.id : this.gerarIdDocumento(index),
+            name: typeof doc.name === 'string' && doc.name.length > 0 ? doc.name : 'Untitled.md',
+            content: typeof doc.content === 'string' ? doc.content : '',
+            updated,
+            lastSaved
+        }
+    })
+  }
+
+  /**
+   * Gera um ID simples para documentos sem ID
+   * 
+   * @param {number} index - Indice do documento
+   * @returns {number} ID gerado
+   */
+  private gerarIdDocumento(index: number = 0): number {
+    return Date.now() + index + Math.floor(Math.random() * 1000)
   }
 
   /**
@@ -83,12 +144,21 @@ export class DocumentManager {
    */
   private save(): void {
     try {
-      localStorage.setItem(this.STORAGE_KEY, JSON.stringify(this.docs))
+      localStorage.setItem(ChavesStorage.documentos, JSON.stringify(this.docs))
       this.notifyObservers()
     } catch (e) {
       const errorMessage = e instanceof Error ? e.message : String(e)
       this.logger?.error?.(`Erro ao salvar documentos: ${errorMessage}`)
     }
+  }
+
+  /**
+   * Persiste o estado atual no localStorage
+   * 
+   * @returns {void}
+   */
+  persistir(): void {
+    this.save()
   }
 
   /**
@@ -239,6 +309,25 @@ export class DocumentManager {
    */
   setContent(id: number, content: string): Document | undefined {
     return this.update(id, { content })
+  }
+
+  /**
+   * Substitui todos os documentos com um novo conjunto
+   * 
+   * @param {Document[]} docs - Lista de documentos para restauracao
+   * @returns {void}
+   */
+  replaceAll(docs: Document[]): void {
+    const normalized = this.normalizarDocumentos(docs)
+    if (normalized.length === 0) {
+      this.docs = [this.defaultDoc]
+      this.save()
+      this.logger?.log?.('Backup vazio. Documento padrao restaurado.')
+      return
+    }
+
+    this.docs = normalized
+    this.save()
   }
 
   /**

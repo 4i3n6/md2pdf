@@ -229,7 +229,7 @@ export function validateMarkdown(markdown: string): ValidationResult {
   });
 
   // 9. Validar blocos de código em bloco (triplo backtick)
-  const codeBlockRegex = /```([a-z]*)\n([\s\S]*?)```/g;
+  const codeBlockRegex = /```([a-z0-9#+-]*)\n([\s\S]*?)```/g;
   let codeBlockMatch;
   let codeBlockCount = 0;
   
@@ -238,7 +238,44 @@ export function validateMarkdown(markdown: string): ValidationResult {
     const language = codeBlockMatch[1];
     
     // Validar se é linguagem conhecida (apenas aviso)
-    const knownLanguages = ['js', 'javascript', 'ts', 'typescript', 'python', 'java', 'cpp', 'c', 'html', 'css', 'json', 'xml', 'bash', 'sh', 'sql', 'php', 'ruby', 'go', 'rust', 'md', 'markdown', 'yaml', 'yml', 'mermaid'];
+    const knownLanguages = [
+      'bash',
+      'c',
+      'c#',
+      'c++',
+      'cpp',
+      'csharp',
+      'css',
+      'cs',
+      'ddl',
+      'go',
+      'html',
+      'java',
+      'javascript',
+      'jsx',
+      'json',
+      'markdown',
+      'md',
+      'php',
+      'plaintext',
+      'python',
+      'ruby',
+      'rust',
+      'shell',
+      'sh',
+      'sql',
+      'text',
+      'ts',
+      'tsx',
+      'typescript',
+      'txt',
+      'xhtml',
+      'htm',
+      'xml',
+      'yaml',
+      'yml',
+      'mermaid'
+    ];
     
     if (language && !knownLanguages.includes(language.toLowerCase())) {
       const lineNum = markdown.substring(0, codeBlockMatch.index).split('\n').length;

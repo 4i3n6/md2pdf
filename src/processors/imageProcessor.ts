@@ -3,7 +3,9 @@
  * Redimensionamento automático e cache para imagens em A4
  */
 
+import { ImpressaoLimites } from '@/constants'
 import { imageCache } from '@/utils/imageCache'
+import { logAviso } from '@/utils/logger'
 
 interface ImageDimensions {
   width: number
@@ -50,7 +52,7 @@ export function getImageDimensions(src: string): Promise<ImageDimensions | null>
     }
 
     img.onerror = () => {
-      console.warn(`Falha ao carregar imagem: ${src}`)
+      logAviso(`Falha ao carregar imagem: ${src}`)
       resolve(null)
     }
 
@@ -88,24 +90,21 @@ export function calculatePrintDimensions(width: number, height: number): PrintDi
     }
   }
 
-  const A4_WIDTH_MM = 210
-  const A4_HEIGHT_MM = 297
-  const MARGIN_MM = 20
-  const MAX_WIDTH_MM = A4_WIDTH_MM - MARGIN_MM * 2
-  const MAX_HEIGHT_MM = A4_HEIGHT_MM - MARGIN_MM * 2
-  const PX_PER_MM = 3.779
+  const maxWidthMm = ImpressaoLimites.maxLarguraMm
+  const maxHeightMm = ImpressaoLimites.maxAlturaMm
+  const pxPorMm = ImpressaoLimites.pxPorMm
 
-  const widthMm = width / PX_PER_MM
-  const heightMm = height / PX_PER_MM
+  const widthMm = width / pxPorMm
+  const heightMm = height / pxPorMm
 
   let scale = 1
 
-  if (widthMm > MAX_WIDTH_MM) {
-    scale = Math.min(scale, MAX_WIDTH_MM / widthMm)
+  if (widthMm > maxWidthMm) {
+    scale = Math.min(scale, maxWidthMm / widthMm)
   }
 
-  if (heightMm > MAX_HEIGHT_MM) {
-    scale = Math.min(scale, MAX_HEIGHT_MM / heightMm)
+  if (heightMm > maxHeightMm) {
+    scale = Math.min(scale, maxHeightMm / heightMm)
   }
 
   scale = Math.min(scale, 1)
@@ -197,9 +196,9 @@ export async function processImagesForPrint(
         img.style.maxWidth = printDims.maxWidth
 
         // Armazenar metadados para debugging/análise
-        img.dataset.originalWidth = String(dimensions.width)
-        img.dataset.originalHeight = String(dimensions.height)
-        img.dataset.printScale = String(printDims.scale ?? 1)
+        img.dataset['originalWidth'] = String(dimensions.width)
+        img.dataset['originalHeight'] = String(dimensions.height)
+        img.dataset['printScale'] = String(printDims.scale ?? 1)
       })
     )
 
@@ -209,7 +208,8 @@ export async function processImagesForPrint(
         processed++
       } else {
         // Log de erro sem quebrar o fluxo
-        console.warn('Falha ao processar imagem:', result.reason)
+        const errorMsg = result.reason instanceof Error ? result.reason.message : String(result.reason)
+        logAviso(`Falha ao processar imagem: ${errorMsg}`)
       }
     })
   }
@@ -228,14 +228,14 @@ export async function processImagesForPrint(
  * @returns {ValidationResult} Objeto com fits (boolean) e message
  */
 export function validateImageForA4(width: number, height: number): ValidationResult {
-  const MAX_WIDTH_MM = 170
-  const MAX_HEIGHT_MM = 257
-  const PX_PER_MM = 3.779
+  const maxWidthMm = ImpressaoLimites.maxLarguraMm
+  const maxHeightMm = ImpressaoLimites.maxAlturaMm
+  const pxPorMm = ImpressaoLimites.pxPorMm
 
-  const widthMm = width / PX_PER_MM
-  const heightMm = height / PX_PER_MM
+  const widthMm = width / pxPorMm
+  const heightMm = height / pxPorMm
 
-  if (widthMm <= MAX_WIDTH_MM && heightMm <= MAX_HEIGHT_MM) {
+  if (widthMm <= maxWidthMm && heightMm <= maxHeightMm) {
     return {
       fits: true,
       message: `✓ Imagem (${widthMm.toFixed(1)}x${heightMm.toFixed(1)}mm) cabe em A4`
@@ -244,6 +244,6 @@ export function validateImageForA4(width: number, height: number): ValidationRes
 
   return {
     fits: false,
-    message: `✗ Imagem (${widthMm.toFixed(1)}x${heightMm.toFixed(1)}mm) não cabe em A4 (max 170x257mm) - será redimensionada`
+    message: `✗ Imagem (${widthMm.toFixed(1)}x${heightMm.toFixed(1)}mm) não cabe em A4 (max ${maxWidthMm}x${maxHeightMm}mm) - será redimensionada`
   }
 }

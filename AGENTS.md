@@ -37,7 +37,7 @@ npm run preview  # Preview da build de produção
 - **DOM**: Seleção por ID com `document.getElementById()`
 - **Eventos**: Event listeners com `addEventListener`
 - **Renderização**: Funções puras como `renderList()`, `renderPreview()` sem side effects desnecessários
-- **Persistência**: localStorage com chave `md2pdf-docs-v2`
+- **Persistência**: localStorage com chave `md2pdf-docs-v3`
 
 ### Build & Otimizações
 - **Minificação**: Terser com `drop_console: true` e `drop_debugger: true`

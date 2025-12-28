@@ -1,8 +1,16 @@
-# 🧪 TESTE DE FEATURES - MD2PDF V2.0
+# 🧪 TESTE DE FEATURES - MD2PDF v1.1.20
 
 ## Status do Servidor
 
 ✅ **Servidor rodando em: http://localhost:3000**
+
+---
+
+## Comandos Rapidos
+
+- `npm run typecheck` (valida tipos)
+- `npm run build` (gera dist)
+- `npm run smoke` (valida dist)
 
 ---
 
@@ -15,7 +23,7 @@
   - Esperado: versão instalada
 
 - [ ] **Markdown Processor Carregado**
-  - No console do navegador: `curl http://localhost:3000/src/processors/markdownProcessor.js`
+  - No console do navegador: `curl http://localhost:3000/src/processors/markdownProcessor.ts`
   - Esperado: arquivo respondendo 200
 
 - [ ] **CSS Print Carregado**
@@ -27,6 +35,11 @@
   - Verificar console de logs no painel (direita)
   - Esperado: "Sistema pronto" mensagem
 
+- [ ] **Migracao de Storage v2 -> v3**
+  - No DevTools, criar `md2pdf-docs-v2` com JSON valido e remover `md2pdf-docs-v3`
+  - Recarregar a pagina
+  - Esperado: documentos aparecem e `md2pdf-docs-v3` e criado
+
 ---
 
 ### SPRINT 2: Funcionalidade ✅
@@ -34,6 +47,12 @@
 - [ ] **Preview Renderiza Markdown**
   - Digitar: `# Teste\n\nParágrafo com **negrito**`
   - Esperado: Preview mostra "Teste" como H1 e texto formatado
+
+- [ ] **Status de Salvamento**
+  - Digitar no editor
+  - Esperado: status mostra "Nao salvo"
+  - Aguardar ~1s sem editar ou usar Ctrl/Cmd+S
+  - Esperado: status muda para "Salvo agora"
 
 - [ ] **Validação Prévio ao Imprimir**
   - Clicar em [ EXP_PDF ]
@@ -73,6 +92,12 @@
   - Colar conteúdo com problema
   - Clicar [ EXP_PDF ]
   - Esperado: mostra avisos específicos
+
+- [ ] **Backup/Restauracao Completa**
+  - Gerar backup
+  - Criar novo documento vazio ou apagar docs
+  - Restaurar backup
+  - Esperado: lista e conteudo restaurados
 
 ---
 
@@ -293,4 +318,3 @@ Quando todos os testes acima forem ✅, o projeto está:
 - Validado em múltiplos casos de uso
 
 🚀 **LAUNCH READY!** 🚀
-

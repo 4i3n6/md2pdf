@@ -3,6 +3,9 @@
  * Funções de validação, otimização e controle de impressão
  */
 
+import { ImpressaoLimites } from '@/constants'
+import { logAviso, logErro, logInfo } from '@/utils/logger'
+
 /**
  * Resultado de validação de conteúdo para impressão
  */
@@ -24,47 +27,102 @@ interface PrintStatistics {
   estimatedReadTime: number;
 }
 
+type PrintContentTarget = string | HTMLElement;
+
+function criarContainerTemporario(htmlContent: string): HTMLElement {
+    const container = document.createElement('div');
+    container.innerHTML = htmlContent;
+    return container;
+}
+
+async function aguardarImagensCarregadas(
+    images: HTMLImageElement[],
+    timeoutMs: number = 2000
+): Promise<void> {
+    const pendentes = images.filter((img) => !img.complete);
+    if (pendentes.length === 0) return;
+
+    await Promise.race([
+        Promise.all(
+            pendentes.map(
+                (img) =>
+                    new Promise<void>((resolve) => {
+                        const onDone = (): void => resolve();
+                        img.addEventListener('load', onDone, { once: true });
+                        img.addEventListener('error', onDone, { once: true });
+                    })
+            )
+        ),
+        new Promise<void>((resolve) => setTimeout(resolve, timeoutMs))
+    ]);
+}
+
+function obterDimensoesImagem(img: HTMLImageElement): { widthPx: number; heightPx: number } {
+    const rect = img.getBoundingClientRect();
+    const datasetWidth = Number(img.dataset['originalWidth'] || 0);
+    const datasetHeight = Number(img.dataset['originalHeight'] || 0);
+
+    return {
+        widthPx: rect.width || datasetWidth || img.naturalWidth || 0,
+        heightPx: rect.height || datasetHeight || img.naturalHeight || 0
+    };
+}
+
+function obterLarguraTabela(table: HTMLTableElement): number {
+    const rect = table.getBoundingClientRect();
+    return rect.width || table.scrollWidth || table.offsetWidth || 0;
+}
+
 /**
  * Valida conteúdo renderizado para possíveis problemas de impressão
  * @param htmlContent - Conteúdo HTML renderizado
  * @returns Resultado da validação com lista de problemas encontrados
  */
-export function validatePrintContent(htmlContent: string): ValidationResult {
+export async function validatePrintContent(content: PrintContentTarget): Promise<ValidationResult> {
   const issues: string[] = [];
 
-  if (!htmlContent) {
+  if (!content || (typeof content === 'string' && content.length === 0)) {
     return { isValid: false, issues: ['Nenhum conteúdo para imprimir'] };
   }
 
-  // Validar imagens muito grandes
-  const tempDiv = document.createElement('div');
-  tempDiv.innerHTML = htmlContent;
+  const container = typeof content === 'string' ? criarContainerTemporario(content) : content;
+  const isLive = container.isConnected;
 
-  const images = tempDiv.querySelectorAll('img');
-  images.forEach((img, idx) => {
-    // Tentar carregar dimensões
-    if (img.naturalWidth > 0 && img.naturalHeight > 0) {
-      const maxWidth = 170; // mm em A4
-      const maxHeight = 250; // mm em A4
-      const imgWidthMm = img.naturalWidth / 3.779; // px to mm
-      const imgHeightMm = img.naturalHeight / 3.779;
-
-      if (imgWidthMm > maxWidth || imgHeightMm > maxHeight) {
-        issues.push(`⚠️ Imagem ${idx + 1}: ${img.naturalWidth}x${img.naturalHeight}px pode não caber na página A4`);
-      }
+  if (isLive) {
+    const images = Array.from(container.querySelectorAll('img'));
+    if (images.length > 0) {
+        await aguardarImagensCarregadas(images);
     }
-  });
 
-  // Validar tabelas muito largas
-  const tables = tempDiv.querySelectorAll('table');
-  tables.forEach((table, idx) => {
-    const tableWidthMm = table.offsetWidth / 3.779;
-    if (tableWidthMm > 170) {
-      issues.push(`⚠️ Tabela ${idx + 1}: ${Math.round(tableWidthMm)}mm de largura pode não caber na página A4 (máx 170mm)`);
-    }
-  });
+    images.forEach((img, idx) => {
+        const dims = obterDimensoesImagem(img);
+        if (dims.widthPx <= 0 || dims.heightPx <= 0) return;
+
+        const maxWidthMm = ImpressaoLimites.maxLarguraMm
+        const maxHeightMm = ImpressaoLimites.maxAlturaMm
+        const pxPorMm = ImpressaoLimites.pxPorMm
+        const imgWidthMm = dims.widthPx / pxPorMm
+        const imgHeightMm = dims.heightPx / pxPorMm
+
+        if (imgWidthMm > maxWidthMm || imgHeightMm > maxHeightMm) {
+            issues.push(`⚠️ Imagem ${idx + 1}: ${Math.round(dims.widthPx)}x${Math.round(dims.heightPx)}px pode não caber na página A4`);
+        }
+    });
+
+    const tables = Array.from(container.querySelectorAll('table'));
+    tables.forEach((table, idx) => {
+        const tableWidthPx = obterLarguraTabela(table);
+        if (tableWidthPx <= 0) return;
+
+        const tableWidthMm = tableWidthPx / ImpressaoLimites.pxPorMm;
+        if (tableWidthMm > ImpressaoLimites.maxLarguraMm) {
+            issues.push(`⚠️ Tabela ${idx + 1}: ${Math.round(tableWidthMm)}mm de largura pode não caber na página A4 (máx ${ImpressaoLimites.maxLarguraMm}mm)`);
+        }
+    });
+  }
 
   // Validar linhas muito longas (URLs)
+  const htmlContent = typeof content === 'string' ? content : container.innerHTML;
   const longLines = htmlContent.match(/https?:\/\/[^\s<>"]{80,}/g);
   if (longLines && longLines.length > 0) {
     issues.push(`⚠️ ${longLines.length} URL(s) muito longa(s) podem transbordar em impressão`);
@@ -98,7 +156,8 @@ export function optimizeForPrint(): boolean {
     
     return true;
   } catch (error) {
-    console.error('Erro ao otimizar para print:', error);
+    const errorMsg = error instanceof Error ? error.message : String(error);
+    logErro(`Erro ao otimizar para print: ${errorMsg}`);
     return false;
   }
 }
@@ -127,7 +186,8 @@ export function restoreAfterPrint(): boolean {
 
     return true;
   } catch (error) {
-    console.error('Erro ao restaurar após print:', error);
+    const errorMsg = error instanceof Error ? error.message : String(error);
+    logErro(`Erro ao restaurar após print: ${errorMsg}`);
     return false;
   }
 }
@@ -140,74 +200,79 @@ export function restoreAfterPrint(): boolean {
  */
 export function printDocument(
   docName: string = 'document',
-  logger: (message: string) => void = console.log
+  logger: (message: string) => void = logInfo
 ): Promise<boolean> {
   return new Promise((resolve) => {
-    try {
-      // Validar conteúdo antes de imprimir
-      const preview = document.getElementById('preview') as HTMLElement | null;
-      if (!preview) {
-        logger('Erro: elemento preview não encontrado');
-        resolve(false);
-        return;
-      }
-
-      const validation = validatePrintContent(preview.innerHTML);
-      if (validation.issues.length > 0) {
-        validation.issues.forEach((issue) => logger(issue));
-
-        // Perguntar ao usuário se deseja continuar
-        if (!confirm(`${validation.issues.length} aviso(s) de impressão.\nContinuar mesmo assim?`)) {
+    const executar = async (): Promise<void> => {
+      try {
+        // Validar conteúdo antes de imprimir
+        const preview = document.getElementById('preview') as HTMLElement | null;
+        if (!preview) {
+          logger('Erro: elemento preview não encontrado');
           resolve(false);
           return;
         }
-      }
 
-      // Guardar título original e definir nome do documento como título
-      // Navegadores usam o título da página como nome padrão do PDF
-      const originalTitle = document.title;
-      const pdfName = docName.replace(/\.md$/i, ''); // Remove extensão .md
-      document.title = pdfName;
+        const validation = await validatePrintContent(preview);
+        if (validation.issues.length > 0) {
+          validation.issues.forEach((issue) => logger(issue));
 
-      // Flag para evitar múltiplas restaurações
-      let hasRestored = false;
-      
-      const doRestore = (): void => {
-        if (hasRestored) return;
-        hasRestored = true;
-        // Restaurar título original
-        document.title = originalTitle;
-        restoreAfterPrint();
-        resolve(true);
-      };
-
-      // Aguardar fechamento do diálogo de impressão
-      const afterPrintHandler = (): void => {
-        // Pequeno delay para garantir que o navegador terminou o processo
-        setTimeout(doRestore, 100);
-      };
-
-      // Registrar handler ANTES de chamar print()
-      window.addEventListener('afterprint', afterPrintHandler, { once: true });
-
-      // Abrir diálogo de impressão
-      // O CSS @media print cuida de esconder/mostrar elementos automaticamente
-      window.print();
-
-      // Fallback: se afterprint não disparar em 5 segundos, restaurar mesmo assim
-      // Alguns navegadores (especialmente ao salvar como PDF) podem não disparar afterprint
-      setTimeout(() => {
-        if (!hasRestored) {
-          console.log('[Print] Fallback: restaurando após timeout');
-          doRestore();
+          // Perguntar ao usuário se deseja continuar
+          if (!confirm(`${validation.issues.length} aviso(s) de impressão.\nContinuar mesmo assim?`)) {
+            resolve(false);
+            return;
+          }
         }
-      }, 5000);
 
-    } catch (error) {
-      console.error('Erro ao imprimir:', error);
-      restoreAfterPrint();
-      resolve(false);
-    }
+        // Guardar título original e definir nome do documento como título
+        // Navegadores usam o título da página como nome padrão do PDF
+        const originalTitle = document.title;
+        const pdfName = docName.replace(/\.md$/i, ''); // Remove extensão .md
+        document.title = pdfName;
+
+        // Flag para evitar múltiplas restaurações
+        let hasRestored = false;
+        
+        const doRestore = (): void => {
+          if (hasRestored) return;
+          hasRestored = true;
+          // Restaurar título original
+          document.title = originalTitle;
+          restoreAfterPrint();
+          resolve(true);
+        };
+
+        // Aguardar fechamento do diálogo de impressão
+        const afterPrintHandler = (): void => {
+          // Pequeno delay para garantir que o navegador terminou o processo
+          setTimeout(doRestore, 100);
+        };
+
+        // Registrar handler ANTES de chamar print()
+        window.addEventListener('afterprint', afterPrintHandler, { once: true });
+
+        // Abrir diálogo de impressão
+        // O CSS @media print cuida de esconder/mostrar elementos automaticamente
+        window.print();
+
+        // Fallback: se afterprint não disparar em 5 segundos, restaurar mesmo assim
+        // Alguns navegadores (especialmente ao salvar como PDF) podem não disparar afterprint
+        setTimeout(() => {
+          if (!hasRestored) {
+            logAviso('[Print] Fallback: restaurando apos timeout');
+            doRestore();
+          }
+        }, 5000);
+
+      } catch (error) {
+        const errorMsg = error instanceof Error ? error.message : String(error);
+        logErro(`Erro ao imprimir: ${errorMsg}`);
+        restoreAfterPrint();
+        resolve(false);
+      }
+    };
+
+    executar();
   });
 }
 
@@ -289,9 +354,9 @@ export function getPrintStatistics(htmlContent: string): PrintStatistics {
  * @param htmlContent - Conteúdo HTML
  * @returns Relatório formatado
  */
-export function generatePrintReport(docName: string, htmlContent: string): string {
+export async function generatePrintReport(docName: string, htmlContent: string): Promise<string> {
   const stats = getPrintStatistics(htmlContent);
-  const validation = validatePrintContent(htmlContent);
+  const validation = await validatePrintContent(htmlContent);
 
   return `
 === RELATÓRIO DE IMPRESSÃO ===

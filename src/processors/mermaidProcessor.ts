@@ -5,6 +5,9 @@
  * Uses lazy loading to avoid impacting the initial bundle size.
  */
 
+import { MermaidConfig } from '@/constants'
+import { logErro } from '@/utils/logger'
+
 let mermaidInstance: typeof import('mermaid').default | null = null
 let initPromise: Promise<void> | null = null
 
@@ -66,7 +69,8 @@ function decodeBase64Source(base64: string): string {
   try {
     return decodeURIComponent(escape(atob(base64)))
   } catch (e) {
-    console.error('[Mermaid] Failed to decode base64:', e)
+    const errorMsg = e instanceof Error ? e.message : String(e)
+    logErro(`[Mermaid] Falha ao decodificar base64: ${errorMsg}`)
     return ''
   }
 }
@@ -76,7 +80,7 @@ function decodeBase64Source(base64: string): string {
  * Used for labeling and styling purposes
  */
 function detectDiagramType(source: string): string {
-  const firstLine = source.trim().split('\n')[0].toLowerCase()
+  const firstLine = (source.trim().split('\n')[0] || '').toLowerCase()
   
   if (firstLine.startsWith('flowchart') || firstLine.startsWith('graph')) return 'flowchart'
   if (firstLine.startsWith('sequencediagram') || firstLine.startsWith('sequence')) return 'sequence'
@@ -107,13 +111,13 @@ function detectDiagramType(source: string): string {
 function extractDiagramTitle(source: string): string | null {
   // Try YAML frontmatter: ---\ntitle: My Title\n---
   const yamlMatch = source.match(/^---\s*\n[\s\S]*?title:\s*["']?(.+?)["']?\s*\n[\s\S]*?---/m)
-  if (yamlMatch) return yamlMatch[1].trim()
+  if (yamlMatch && yamlMatch[1]) return yamlMatch[1].trim()
   
   // Try Mermaid comment: %% My Title
   const lines = source.trim().split('\n')
   for (const line of lines) {
     const commentMatch = line.match(/^%%\s*(.+)$/)
-    if (commentMatch && !commentMatch[1].startsWith('{')) {
+    if (commentMatch && commentMatch[1] && !commentMatch[1].startsWith('{')) {
       return commentMatch[1].trim()
     }
   }
@@ -168,7 +172,7 @@ export async function processMermaidDiagrams(container: HTMLElement | null): Pro
       if (svgElement) {
         const svgWidth = parseFloat(svgElement.getAttribute('width') || '0')
         const svgHeight = parseFloat(svgElement.getAttribute('height') || '0')
-        const MAX_PAGE_WIDTH = 480 // ~170mm at 72dpi
+        const MAX_PAGE_WIDTH = MermaidConfig.maxLarguraPaginaPx // ~170mm at 72dpi
         
         // Rotate only if: exceeds page width AND is wider than tall
         if (svgWidth > MAX_PAGE_WIDTH && svgWidth > svgHeight) {
@@ -193,7 +197,7 @@ export async function processMermaidDiagrams(container: HTMLElement | null): Pro
       processedCount++
     } catch (e) {
       const errorMessage = e instanceof Error ? e.message : 'Unknown error'
-      console.error('Error rendering Mermaid diagram:', e)
+      logErro(`Erro ao renderizar Mermaid: ${errorMessage}`)
       
       block.innerHTML = `<div class="mermaid-error">
         <strong>Diagram error:</strong>

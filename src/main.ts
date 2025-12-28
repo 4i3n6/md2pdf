@@ -12,16 +12,15 @@ import SWUpdateNotifier from './utils/swUpdateNotifier'
 import { documentManager } from './services/documentManager'
 import { uiRenderer } from './services/uiRenderer'
 import { initI18n, t, getLocale } from './i18n/index'
+import { BackupConfig, BreakpointsLayout, SalvamentoConfig, SplitterConfig, obterChavePreferenciasDocumento } from '@/constants'
 import type { AppState, LoggerInterface, Document as AppDocument } from '@/types/index'
 import './pwaRegister'
 import './styles.css'
 import './styles-print.css'
 
 // Mobile detection - block app initialization on small screens
-const MOBILE_BREAKPOINT = 768;
-
 function isMobileViewport(): boolean {
-  return window.innerWidth < MOBILE_BREAKPOINT;
+  return window.innerWidth < BreakpointsLayout.mobilePx;
 }
 
 // If mobile, don't initialize the app - CSS will show the overlay
@@ -34,6 +33,8 @@ if (isMobileViewport()) {
 initI18n()
 
 // Logger do Sistema (uses i18n locale for time formatting)
+const APP_VERSION = __APP_VERSION__ || '0.0.0'
+
 const Logger: LoggerInterface = {
   log: (msg: string, type: 'info' | 'error' | 'success' | 'warning' = 'info'): void => {
     const consoleEl = document.getElementById('console-log');
@@ -58,6 +59,31 @@ declare global {
   }
 }
 window.Logger = Logger;
+
+function atualizarVersaoUI(): void {
+  const versionEl = document.querySelector('[data-app-version]') as HTMLElement | null;
+  if (versionEl) {
+    versionEl.textContent = `v${APP_VERSION}`;
+    const lang = document.documentElement.lang || 'en';
+    const label = lang.startsWith('pt')
+      ? `Versao do sistema ${APP_VERSION}`
+      : `System version ${APP_VERSION}`;
+    versionEl.setAttribute('aria-label', label);
+  }
+}
+
+documentManager.setLogger(Logger);
+uiRenderer.setLogger(Logger);
+
+window.addEventListener('error', (event: ErrorEvent): void => {
+    const message = event.message || 'Erro inesperado';
+    Logger.error(`Erro inesperado: ${message}`);
+});
+
+window.addEventListener('unhandledrejection', (event: PromiseRejectionEvent): void => {
+    const reason = event.reason instanceof Error ? event.reason.message : String(event.reason);
+    Logger.error(`Promise rejeitada: ${reason}`);
+});
 
 /**
  * Estado da aplicacao (UI-only)
@@ -100,13 +126,21 @@ type DocumentPreferences = {
   align: string;
 };
 
+type BackupPayload = {
+  version: number;
+  appVersion: string;
+  exportedAt: string;
+  docs: AppDocument[];
+  prefs: Record<string, DocumentPreferences>;
+};
+
 const DEFAULT_PREFS: DocumentPreferences = {
   font: "'JetBrains Mono', monospace",
   align: 'left'
 };
 
 function getDocPreferences(docId: number): DocumentPreferences {
-  const key = `md2pdf-doc-prefs-${docId}`;
+  const key = obterChavePreferenciasDocumento(docId);
   const saved = localStorage.getItem(key);
   if (saved) {
     try {
@@ -119,7 +153,7 @@ function getDocPreferences(docId: number): DocumentPreferences {
 }
 
 function saveDocPreferences(docId: number, prefs: DocumentPreferences): void {
-  const key = `md2pdf-doc-prefs-${docId}`;
+  const key = obterChavePreferenciasDocumento(docId);
   localStorage.setItem(key, JSON.stringify(prefs));
 }
 
@@ -181,6 +215,7 @@ function loadDocPreferences(docId: number): void {
 // ============================================
 
 let saveStatusInterval: ReturnType<typeof setInterval> | null = null;
+const SALVAR_DEBOUNCE_MS = SalvamentoConfig.debounceMs;
 
 function formatTimeSinceSaved(lastSaved: number | null): string {
   if (!lastSaved) return t('time.never');
@@ -198,6 +233,13 @@ function formatTimeSinceSaved(lastSaved: number | null): string {
   return t('save.savedAgo', { time: t('time.hours', { n: hours }) });
 }
 
+function documentoEstaModificado(doc: AppDocument): boolean {
+    if (!doc.lastSaved) {
+        return true;
+    }
+    return doc.updated > doc.lastSaved;
+}
+
 function updateSaveStatus(): void {
   const doc = getCurrentDoc();
   if (!doc) return;
@@ -205,9 +247,40 @@ function updateSaveStatus(): void {
   const statusEl = document.getElementById('save-status');
   if (!statusEl) return;
   
+  if (documentoEstaModificado(doc)) {
+    statusEl.className = 'save-status save-status-modified';
+    statusEl.innerHTML = `<span class="save-dot modified"></span><span class="save-text">${t('save.notSaved')}</span>`;
+    return;
+  }
+
   const statusText = formatTimeSinceSaved(doc.lastSaved);
   statusEl.className = 'save-status save-status-saved';
   statusEl.innerHTML = `<span class="save-dot saved"></span><span class="save-text">${statusText}</span>`;
+}
+
+function marcarDocumentosSalvos(): void {
+    const now = Date.now();
+    state.docs.forEach((doc) => {
+        if (!doc.lastSaved || doc.updated > doc.lastSaved) {
+            doc.lastSaved = now;
+        }
+    });
+}
+
+function salvarDocumentosAgora(): void {
+    marcarDocumentosSalvos();
+    documentManager.persistir();
+    updateMetrics();
+    updateSaveStatus();
+}
+
+const salvarDocumentosDebounced = debounce(() => {
+    salvarDocumentosAgora();
+}, SALVAR_DEBOUNCE_MS);
+
+function agendarSalvamento(): void {
+    salvarDocumentosDebounced();
+    updateSaveStatus();
 }
 
 function forceSave(): void {
@@ -217,8 +290,7 @@ function forceSave(): void {
     return;
   }
   
-  documentManager.setContent(doc.id, doc.content);
-  updateSaveStatus();
+  salvarDocumentosAgora();
   Logger.success(t('logs.docSaved'));
 }
 
@@ -326,6 +398,174 @@ function downloadMarkdownFile(): void {
   }
 }
 
+function gerarNomeBackup(): string {
+  const now = new Date();
+  const pad = (value: number): string => String(value).padStart(2, '0');
+  const data = `${now.getFullYear()}${pad(now.getMonth() + 1)}${pad(now.getDate())}`;
+  const hora = `${pad(now.getHours())}${pad(now.getMinutes())}`;
+  return `md2pdf-backup-${data}-${hora}.json`;
+}
+
+function montarBackupPayload(): BackupPayload {
+  const docs = documentManager.getAll();
+  const prefs: Record<string, DocumentPreferences> = {};
+
+  docs.forEach((doc) => {
+    prefs[String(doc.id)] = getDocPreferences(doc.id);
+  });
+
+  return {
+    version: BackupConfig.versao,
+    appVersion: APP_VERSION,
+    exportedAt: new Date().toISOString(),
+    docs,
+    prefs
+  };
+}
+
+function normalizarBackupPayload(raw: unknown): BackupPayload | null {
+  if (Array.isArray(raw)) {
+    return {
+      version: 0,
+      appVersion: 'unknown',
+      exportedAt: new Date().toISOString(),
+      docs: raw as AppDocument[],
+      prefs: {}
+    };
+  }
+
+  if (!raw || typeof raw !== 'object') return null;
+
+  const payload = raw as Partial<BackupPayload>;
+  if (!Array.isArray(payload.docs)) return null;
+
+  const prefsBrutas = payload.prefs && typeof payload.prefs === 'object'
+    ? (payload.prefs as Record<string, unknown>)
+    : {};
+
+  const prefs: Record<string, DocumentPreferences> = {};
+  Object.entries(prefsBrutas).forEach(([docId, valor]) => {
+    if (!valor || typeof valor !== 'object') return;
+    const pref = valor as Partial<DocumentPreferences>;
+    if (typeof pref.font !== 'string' || typeof pref.align !== 'string') return;
+    prefs[docId] = { font: pref.font, align: pref.align };
+  });
+
+  return {
+    version: typeof payload.version === 'number' ? payload.version : 0,
+    appVersion: typeof payload.appVersion === 'string' ? payload.appVersion : 'unknown',
+    exportedAt: typeof payload.exportedAt === 'string' ? payload.exportedAt : new Date().toISOString(),
+    docs: payload.docs as AppDocument[],
+    prefs
+  };
+}
+
+function aplicarBackup(payload: BackupPayload): void {
+  documentManager.replaceAll(payload.docs);
+
+  Object.entries(payload.prefs).forEach(([docId, pref]) => {
+    const id = Number(docId);
+    if (!Number.isNaN(id)) {
+      saveDocPreferences(id, pref);
+    }
+  });
+
+  const docsAtualizados = documentManager.getAll();
+  state.docs = docsAtualizados;
+  state.currentId = docsAtualizados[0]?.id ?? null;
+
+  const docAtual = getCurrentDoc();
+  if (state.editor) {
+    state.editor.dispatch({
+      changes: {
+        from: 0,
+        to: state.editor.state.doc.length,
+        insert: docAtual?.content || ''
+      }
+    });
+  }
+
+  renderList();
+  if (docAtual) {
+    renderPreview(docAtual.content);
+    loadDocPreferences(docAtual.id);
+  } else {
+    renderPreview('');
+  }
+  updateMetrics();
+  updateSaveStatus();
+}
+
+function exportarBackupDocumentos(): void {
+  try {
+    const payload = montarBackupPayload();
+    const content = JSON.stringify(payload, null, 2);
+    const blob = new Blob([content], { type: 'application/json;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = gerarNomeBackup();
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+
+    URL.revokeObjectURL(url);
+    Logger.success(`Backup gerado com ${payload.docs.length} documento(s)`);
+  } catch (e) {
+    const errorMessage = e instanceof Error ? e.message : String(e);
+    Logger.error('Falha ao gerar backup: ' + errorMessage);
+  }
+}
+
+async function processarArquivoBackup(file: File): Promise<void> {
+  try {
+    const text = await file.text();
+    const parsed = JSON.parse(text) as unknown;
+    const payload = normalizarBackupPayload(parsed);
+
+    if (!payload) {
+      Logger.error('Backup invalido ou formato nao reconhecido');
+      return;
+    }
+
+    if (!confirm('Esta acao substitui todos os documentos atuais. Deseja continuar?')) {
+      Logger.log('Restauracao cancelada pelo usuario', 'warning');
+      return;
+    }
+
+    if (payload.version > BackupConfig.versao) {
+      Logger.log('Backup gerado por versao mais nova. Alguns dados podem ser ignorados.', 'warning');
+    }
+
+    if (payload.appVersion !== 'unknown' && payload.appVersion !== APP_VERSION) {
+      Logger.log(`Backup gerado na versao ${payload.appVersion}`, 'info');
+    }
+
+    aplicarBackup(payload);
+    Logger.success(`Backup restaurado (${payload.docs.length} documento(s))`);
+  } catch (e) {
+    const errorMessage = e instanceof Error ? e.message : String(e);
+    Logger.error('Falha ao restaurar backup: ' + errorMessage);
+  }
+}
+
+function importarBackupDocumentos(): void {
+  const input = document.createElement('input');
+  input.type = 'file';
+  input.accept = '.json,application/json';
+
+  input.onchange = (event: Event): void => {
+    const target = event.target as HTMLInputElement;
+    const file = target.files?.[0];
+    if (!file) return;
+
+    void processarArquivoBackup(file);
+  };
+
+  input.click();
+}
+
 // ============================================
 // PREVIEW CONTROLS
 // ============================================
@@ -372,10 +612,10 @@ function setupPreviewControls(): void {
 // SPLITTER - Resizable Panels
 // ============================================
 
-const SPLITTER_STORAGE_KEY = 'md2pdf-splitter-ratio';
-const SPLITTER_MIN_RATIO = 0.30; // 30% minimum
-const SPLITTER_MAX_RATIO = 0.70; // 70% maximum
-const SPLITTER_DEFAULT_RATIO = 0.50; // 50/50 default
+const SPLITTER_STORAGE_KEY = SplitterConfig.storageKey;
+const SPLITTER_MIN_RATIO = SplitterConfig.minRatio; // 30% minimum
+const SPLITTER_MAX_RATIO = SplitterConfig.maxRatio; // 70% maximum
+const SPLITTER_DEFAULT_RATIO = SplitterConfig.defaultRatio; // 50/50 default
 
 function initSplitter(): void {
   const splitter = document.getElementById('workspace-splitter');
@@ -948,7 +1188,9 @@ function debounce<T extends (...args: any[]) => any>(
 // ============================================
 
 function initSystem(): void {
+  atualizarVersaoUI();
   Logger.log('Inicializando nucleo...');
+  Logger.log(`Versao ${APP_VERSION}`);
   Logger.success('Markdown processor carregado');
   Logger.success('Estilos de impressao A4 ativos');
 
@@ -997,8 +1239,7 @@ function saveDocs(): void {
   const doc = getCurrentDoc()
   if (!doc) return
 
-  documentManager.setContent(doc.id, doc.content)
-  updateMetrics()
+  salvarDocumentosAgora()
 }
 
 function updateEditorDiagnostics(content: string): void {
@@ -1118,7 +1359,7 @@ function initEditor(): void {
           if (active) {
             active.content = val;
             active.updated = Date.now();
-            saveDocs();
+            agendarSalvamento();
           }
 
           debouncedValidate(val);
@@ -1222,6 +1463,10 @@ function renderList(): void {
 
 function switchDoc(id: number): void {
   if (id === state.currentId) return;
+  const currentDoc = getCurrentDoc();
+  if (currentDoc && documentoEstaModificado(currentDoc)) {
+    salvarDocumentosAgora();
+  }
   state.currentId = id;
 
   const doc = getCurrentDoc();
@@ -1306,7 +1551,7 @@ function setupEvents(): void {
         return;
       }
 
-      const validation = validatePrintContent(preview.innerHTML);
+      const validation = await validatePrintContent(preview);
 
       if (validation.issues.length > 0) {
         validation.issues.forEach((issue): void => Logger.log(issue, 'warning'));
@@ -1346,6 +1591,16 @@ function setupEvents(): void {
   const btnDownloadMd = document.getElementById('download-md-btn');
   if (btnDownloadMd) {
     btnDownloadMd.addEventListener('click', downloadMarkdownFile);
+  }
+
+  const btnBackup = document.getElementById('backup-btn');
+  if (btnBackup) {
+    btnBackup.addEventListener('click', exportarBackupDocumentos);
+  }
+
+  const btnRestore = document.getElementById('restore-btn');
+  if (btnRestore) {
+    btnRestore.addEventListener('click', importarBackupDocumentos);
   }
 
   // Atalhos de teclado globais

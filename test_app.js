@@ -1,20 +1,12 @@
-// Teste rápido dos módulos
-import { processMarkdown } from './src/processors/markdownProcessor.js';
-import { printReporter } from './src/utils/printReporter.js';
+/**
+ * Smoke test wrapper (legado)
+ * Use `npm run smoke`
+ */
 
-const markdown = `# Teste
+const { execSync } = require('node:child_process')
 
-Este é um parágrafo.
-
-![Imagem](https://via.placeholder.com/800x600)
-
-| A | B |
-|---|---|
-| 1 | 2 |
-`;
-
-console.log('🧪 Testando markdownProcessor...');
-const html = processMarkdown(markdown);
-console.log('✅ HTML gerado:', html.substring(0, 100));
-
-console.log('✅ Todos os módulos funcionando!');
+try {
+    execSync('node scripts/smoke-test.mjs', { stdio: 'inherit' })
+} catch (e) {
+    process.exit(1)
+}

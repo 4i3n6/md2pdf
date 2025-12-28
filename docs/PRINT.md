@@ -6,14 +6,14 @@ A SPRINT 1 e 2 da correção de impressão foram completamente implementadas com
 
 ### SPRINT 1: Infraestrutura
 - ✅ **DOMPurify** instalado para sanitização de HTML
-- ✅ **markdownProcessor.js** - Renderizador customizado com sanitização integrada
+- ✅ **markdownProcessor.ts** - Renderizador customizado com sanitização integrada
 - ✅ **styles-print.css** - CSS otimizado para A4 profissional (210x297mm, margens 20mm)
-- ✅ **Integração** em main.js com suporte a validação
+- ✅ **Integração** em main.ts com suporte a validação
 
 ### SPRINT 2: Funcionalidade
-- ✅ **printUtils.js** - Validação, otimização e controle de impressão
-- ✅ **imageProcessor.js** - Redimensionamento automático de imagens para A4
-- ✅ **imageCache.js** - Cache persistente em localStorage (30 dias de expiração)
+- ✅ **printUtils.ts** - Validação, otimização e controle de impressão
+- ✅ **imageProcessor.ts** - Redimensionamento automático de imagens para A4
+- ✅ **imageCache.ts** - Cache persistente em localStorage (30 dias de expiração)
 - ✅ **Validação prévio ao imprimir** - Alerta ao usuário sobre problemas
 
 ---
@@ -64,7 +64,11 @@ Se houver problemas, um aviso é mostrado e você pode continuar mesmo assim.
 
 ### Preview de Impressão
 
-Ative o modo preview no DevTools:
+Modo nativo no app:
+- `Ctrl/Cmd + Shift + P` ativa/desativa `print-mode`.
+- `ESC` sai do preview.
+
+Alternativa via DevTools:
 - Chrome/Firefox: `F12` → Rendering → Check "Emulate print media"
 - Safari: `Cmd+Option+U` → Rendering → Check "Emulate print media"
 
@@ -74,25 +78,25 @@ Ative o modo preview no DevTools:
 
 ```
 src/
-├── main.js                      # Integração principal
+├── main.ts                      # Integração principal
 ├── styles.css                   # Estilos UI
 ├── styles-print.css             # Estilos para impressão A4 (novo)
 ├── processors/
-│   ├── markdownProcessor.js     # Parser + Renderer customizado (novo)
-│   └── imageProcessor.js        # Redimensionamento de imagens (novo)
+│   ├── markdownProcessor.ts     # Parser + Renderer customizado (novo)
+│   └── imageProcessor.ts        # Redimensionamento de imagens (novo)
 └── utils/
-    ├── printUtils.js            # Validação e controle de impressão (novo)
-    └── imageCache.js            # Cache localStorage de imagens (novo)
+    ├── printUtils.ts            # Validação e controle de impressão (novo)
+    └── imageCache.ts            # Cache localStorage de imagens (novo)
 ```
 
 ---
 
 ## 🔧 API Pública
 
-### markdownProcessor.js
+### markdownProcessor.ts
 
 ```javascript
-import { processMarkdown, validateMarkdown, estimatePageCount, processImagesInPreview } from './processors/markdownProcessor.js';
+import { processMarkdown, validateMarkdown, estimatePageCount, processImagesInPreview } from './processors/markdownProcessor.ts';
 
 // Processar markdown para HTML seguro
 const html = processMarkdown(markdownContent);
@@ -107,7 +111,7 @@ const pages = estimatePageCount(html);
 const processed = await processImagesInPreview(containerElement, true);
 ```
 
-### printUtils.js
+### printUtils.ts
 
 ```javascript
 import { 
@@ -116,16 +120,16 @@ import {
     generatePrintReport,
     togglePrintPreview,
     getPrintStatistics
-} from './utils/printUtils.js';
+} from './utils/printUtils.ts';
 
 // Abrir diálogo de impressão com validação
 await printDocument('meu-documento');
 
 // Validar conteúdo renderizado
-const { isValid, issues } = validatePrintContent(htmlContent);
+const { isValid, issues } = await validatePrintContent(htmlContent);
 
 // Gerar relatório de impressão
-const report = generatePrintReport('nome', htmlContent);
+const report = await generatePrintReport('nome', htmlContent);
 
 // Toggle preview de impressão
 togglePrintPreview(); // Ativa body.print-mode
@@ -135,7 +139,7 @@ const stats = getPrintStatistics(htmlContent);
 // { words, paragraphs, images, tables, lists, estimatedPages, estimatedReadTime }
 ```
 
-### imageProcessor.js
+### imageProcessor.ts
 
 ```javascript
 import { 
@@ -144,7 +148,7 @@ import {
     getCachedImageDimensions,
     processImagesForPrint,
     validateImageForA4
-} from './processors/imageProcessor.js';
+} from './processors/imageProcessor.ts';
 
 // Obter dimensões reais da imagem
 const dims = await getImageDimensions(imageSrc);
@@ -162,10 +166,10 @@ const count = await processImagesForPrint(container);
 const { fits, message } = validateImageForA4(1200, 800);
 ```
 
-### imageCache.js
+### imageCache.ts
 
 ```javascript
-import { imageCache, cacheGet, cacheSet, cacheClear, cacheStats } from './utils/imageCache.js';
+import { imageCache, cacheGet, cacheSet, cacheClear, cacheStats } from './utils/imageCache.ts';
 
 // Get/Set individual
 cacheSet(src, { width: 800, height: 600 });

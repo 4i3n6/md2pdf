@@ -6,15 +6,17 @@
  * O VitePWA já injeta o registro automaticamente via 'injectRegister: script-defer'.
  */
 
+import { logErro, logInfo } from '@/utils/logger'
+
 export function registerServiceWorker(): void {
   // Não registrar SW em desenvolvimento - VitePWA não gera SW em dev mode
   if (import.meta.env.DEV) {
-    console.log('[PWA] Service Worker desabilitado em desenvolvimento');
+    logInfo('[PWA] Service Worker desabilitado em desenvolvimento');
     return;
   }
 
   if (!('serviceWorker' in navigator)) {
-    console.log('[PWA] Service Worker não suportado neste navegador');
+    logInfo('[PWA] Service Worker nao suportado neste navegador');
     return;
   }
 
@@ -25,7 +27,7 @@ export function registerServiceWorker(): void {
       // Verificar se já existe um SW registrado (pelo VitePWA)
       const existingRegistration = await navigator.serviceWorker.getRegistration('/');
       if (existingRegistration) {
-        console.log('[PWA] Service Worker já registrado pelo VitePWA');
+        logInfo('[PWA] Service Worker ja registrado pelo VitePWA');
         
         // Listener para atualizações
         existingRegistration.addEventListener('updatefound', () => {
@@ -33,7 +35,7 @@ export function registerServiceWorker(): void {
           if (newWorker) {
             newWorker.addEventListener('statechange', () => {
               if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
-                console.log('[PWA] Nova versão disponível - recarregue para atualizar');
+                logInfo('[PWA] Nova versao disponivel - recarregue para atualizar');
               }
             });
           }
@@ -46,11 +48,12 @@ export function registerServiceWorker(): void {
         scope: '/'
       });
 
-      console.log('[PWA] Service Worker registrado (fallback):', registration.scope);
+      logInfo(`[PWA] Service Worker registrado (fallback): ${registration.scope}`);
     } catch (error) {
       // Silenciar erro em dev, logar apenas em produção
       if (import.meta.env.PROD) {
-        console.error('[PWA] Falha ao registrar Service Worker:', error);
+        const errorMsg = error instanceof Error ? error.message : String(error);
+        logErro(`[PWA] Falha ao registrar Service Worker: ${errorMsg}`);
       }
     }
   });

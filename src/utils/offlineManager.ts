@@ -3,7 +3,9 @@
  * Detecta conectividade e gerencia operações offline/online
  */
 
+import { ChavesStorage } from '@/constants'
 import type { SyncQueueItem, ConnectivityStatus } from '@/types/index'
+import { logErro, logInfo, logSucesso } from '@/utils/logger'
 
 type StatusChangeCallback = (isOnline: boolean) => void
 
@@ -38,7 +40,8 @@ class OfflineManager {
       try {
         cb(isOnline)
       } catch (e) {
-        console.error('Erro em callback de conectividade:', e)
+        const errorMsg = e instanceof Error ? e.message : String(e)
+        logErro(`Erro em callback de conectividade: ${errorMsg}`)
       }
     })
   }
@@ -117,9 +120,10 @@ class OfflineManager {
    */
   private persistSyncQueue(): void {
     try {
-      localStorage.setItem('md2pdf-sync-queue', JSON.stringify(this.syncQueue))
+      localStorage.setItem(ChavesStorage.filaSync, JSON.stringify(this.syncQueue))
     } catch (e) {
-      console.error('Erro ao persistir fila de sync:', e)
+      const errorMsg = e instanceof Error ? e.message : String(e)
+      logErro(`Erro ao persistir fila de sync: ${errorMsg}`)
     }
   }
 
@@ -128,12 +132,13 @@ class OfflineManager {
    */
   loadSyncQueue(): void {
     try {
-      const stored = localStorage.getItem('md2pdf-sync-queue')
+      const stored = localStorage.getItem(ChavesStorage.filaSync)
       if (stored) {
         this.syncQueue = JSON.parse(stored) as SyncQueueItem[]
       }
     } catch (e) {
-      console.error('Erro ao carregar fila de sync:', e)
+      const errorMsg = e instanceof Error ? e.message : String(e)
+      logErro(`Erro ao carregar fila de sync: ${errorMsg}`)
     }
   }
 
@@ -143,7 +148,7 @@ class OfflineManager {
   private processSyncQueue(): void {
     if (this.syncQueue.length === 0) return
 
-    console.log(`Processando ${this.syncQueue.length} operações de sincronização...`)
+    logInfo(`Processando ${this.syncQueue.length} operacoes de sincronizacao...`)
 
     const processed: string[] = []
     this.syncQueue.forEach((op) => {
@@ -153,7 +158,8 @@ class OfflineManager {
           processed.push(op.id)
         }
       } catch (e) {
-        console.error('Erro ao processar operação de sync:', e)
+        const errorMsg = e instanceof Error ? e.message : String(e)
+        logErro(`Erro ao processar operacao de sync: ${errorMsg}`)
       }
     })
 
@@ -162,7 +168,7 @@ class OfflineManager {
     this.persistSyncQueue()
 
     if (processed.length > 0) {
-      console.log(`✓ ${processed.length} operações sincronizadas`)
+      logSucesso(`${processed.length} operacoes sincronizadas`)
     }
   }
 

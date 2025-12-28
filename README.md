@@ -1,6 +1,6 @@
 # MD2PDF - Conversor Markdown para PDF
 
-> **SISTEMA DE CONVERSÃO V2.0 | STATUS: PRONTO PARA PRODUÇÃO**
+> **SISTEMA DE CONVERSÃO v1.1.20 | STATUS: PRONTO PARA PRODUÇÃO**
 
 Clone ultrapolido e otimizado do markdowntopdf.com com interface moderna estilo **painel financeiro hacker**. Conversor de Markdown para PDF gratuito, sem limites e sem necessidade de autenticação.
 
@@ -23,6 +23,7 @@ Clone ultrapolido e otimizado do markdowntopdf.com com interface moderna estilo 
 - ✓ **Drag & Drop** - Arraste arquivos .md para o editor
 - ✓ **Atalhos de teclado** - Ctrl/Cmd+S para salvar, Ctrl/Cmd+P para PDF
 - ✓ **Modos de visualização** - Split, Editor-only ou Preview-only
+- ✓ **Backup completo** - Exportação e restauração de todos os documentos
 - ✓ **Export PDF nativo** - Window.print() do navegador
 - ✓ **PWA Ready** - Instalável como app
 
@@ -49,9 +50,20 @@ npm run dev
 # Build para produção
 npm run build
 
+# Typecheck
+npm run typecheck
+
+# Smoke test (requer build)
+npm run smoke
+
 # Preview da build de produção
 npm run preview
 ```
+
+## 📚 Documentacao
+
+- `docs/README.md` (indice geral)
+- `docs/sdd/README.md` (SDD por funcionalidade)
 
 ## 🎯 Como Usar
 
@@ -103,7 +115,7 @@ Edite as variáveis CSS em `src/styles.css`:
 
 ### Modificar conteúdo padrão
 
-Edite a constante `defaultContent` em `src/main.js`
+Edite o `defaultDoc` em `src/services/documentManager.ts`
 
 ## 🚀 Deploy
 

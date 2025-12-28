@@ -3,6 +3,12 @@
  * Gera relatórios detalhados e estatísticas do documento
  */
 
+import { ImpressaoLimites } from '@/constants'
+import { logInfo } from '@/utils/logger'
+
+const formatoA4 = `${ImpressaoLimites.a4LarguraMm}mm × ${ImpressaoLimites.a4AlturaMm}mm`
+const margemA4 = `${ImpressaoLimites.margemMm}mm`
+
 /**
  * Interface para contagem de headings por nível
  */
@@ -230,8 +236,8 @@ export class PrintReporter {
 📄 IMPRESSÃO
   Páginas Estimadas:       ${stats.estimatedPages}
   Tempo de Leitura:        ~${stats.readingTime} min
-  Formato:                 A4 (210mm × 297mm)
-  Margens:                 20mm
+  Formato:                 A4 (${formatoA4})
+  Margens:                 ${margemA4}
 
 ════════════════════════════════════════════════════════════════
 `;
@@ -279,7 +285,7 @@ export class PrintReporter {
         estimatedPages: stats.estimatedPages,
         readingTimeMinutes: stats.readingTime,
         format: 'A4',
-        margins: '20mm',
+        margins: margemA4,
       },
     };
   }
@@ -319,8 +325,8 @@ export class PrintReporter {
     <h3 style="margin-top: 20px; color: #333;">Impressão</h3>
     <ul>
         <li>Páginas Estimadas: <strong>${stats.estimatedPages}</strong></li>
-        <li>Formato: A4 (210mm × 297mm)</li>
-        <li>Margens: 20mm</li>
+        <li>Formato: A4 (${formatoA4})</li>
+        <li>Margens: ${margemA4}</li>
     </ul>
 </div>
     `;
@@ -377,7 +383,7 @@ export function reportToConsole(
   docName: string = 'document'
 ): void {
   const reporter = new PrintReporter(htmlContent, docName);
-  console.log(reporter.generateTextReport());
+  logInfo(reporter.generateTextReport());
 }
 
 /**

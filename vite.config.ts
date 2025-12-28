@@ -1,11 +1,18 @@
+import { readFileSync } from 'node:fs'
 import { defineConfig } from 'vite'
 import { VitePWA } from 'vite-plugin-pwa'
 import path from 'path'
 import { resolve } from 'path'
 
+const packageJson = JSON.parse(
+    readFileSync(new URL('./package.json', import.meta.url), 'utf-8')
+)
+const appVersion = typeof packageJson.version === 'string' ? packageJson.version : '0.0.0'
+
 export default defineConfig({
   define: {
-    __VITE_SW_SCOPE__: JSON.stringify('/')
+    __VITE_SW_SCOPE__: JSON.stringify('/'),
+    __APP_VERSION__: JSON.stringify(appVersion)
   },
   resolve: {
     alias: {
@@ -120,7 +127,10 @@ export default defineConfig({
         manualChunks: {
           codemirror: ['codemirror', '@codemirror/lang-markdown'],
           marked: ['marked'],
-          mermaid: ['mermaid']
+          mermaid: ['mermaid'],
+          highlight: ['highlight.js'],
+          dompurify: ['dompurify'],
+          yaml: ['js-yaml']
         }
       }
     },

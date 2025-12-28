@@ -3,6 +3,8 @@
  * Detecta quando há nova versão do app e notifica o usuário
  */
 
+import { logErro } from '@/utils/logger'
+
 class SWUpdateNotifier {
   /**
    * Inicializa o notificador de updates
@@ -31,7 +33,8 @@ class SWUpdateNotifier {
         await registration.update()
       }
     } catch (e) {
-      console.error('Erro ao verificar updates:', e)
+      const errorMsg = e instanceof Error ? e.message : String(e)
+      logErro(`Erro ao verificar updates: ${errorMsg}`)
     }
   }
 

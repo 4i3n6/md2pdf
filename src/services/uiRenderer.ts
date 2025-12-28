@@ -27,6 +27,16 @@ export class UIRenderer {
   constructor(private logger?: LoggerInterface) {}
 
   /**
+   * Define o logger apos a instancia criada
+   * 
+   * @param {LoggerInterface} logger - Logger global
+   * @returns {void}
+   */
+  setLogger(logger: LoggerInterface): void {
+    this.logger = logger
+  }
+
+  /**
    * Renderiza lista de documentos
    * 
    * @param {HTMLElement} container - Container onde renderizar

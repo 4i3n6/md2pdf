@@ -16,7 +16,7 @@ Este documento lista possíveis melhorias e funcionalidades adicionais para o pr
 
 #### 1. Themes para Code Blocks ✅ IMPLEMENTADO
 - [x] GitHub Light Theme para syntax highlighting
-- [x] 190+ linguagens suportadas
+- [x] Conjunto curado de linguagens comuns
 - [x] Auto-detect de linguagem
 - [ ] Theme Dark (One Dark)
 - [ ] Seletor de tema na UI
@@ -37,7 +37,7 @@ import { githubLight } from '@uiw/codemirror-theme-github';
 
 #### 3. Syntax Highlighting em Blocos de Código ✅ IMPLEMENTADO
 - [x] highlight.js integrado
-- [x] 190+ linguagens suportadas
+- [x] Linguagens comuns registradas (bundle otimizado)
 - [x] GitHub Light Theme
 - [x] Sanitização com DOMPurify
 - [ ] Números de linha automáticos
@@ -54,7 +54,7 @@ import { githubLight } from '@uiw/codemirror-theme-github';
 Transformar a aplicação em PWA para uso offline:
 
 ```javascript
-// vite.config.js
+// vite.config.ts
 import { VitePWA } from 'vite-plugin-pwa';
 
 export default {
@@ -124,7 +124,7 @@ const debouncedUpdate = debounce(updatePreview, 300);
 - Minificação agressiva
 
 ```javascript
-// vite.config.js
+// vite.config.ts
 build: {
   rollupOptions: {
     output: {

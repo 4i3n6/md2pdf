@@ -1,7 +1,87 @@
 import { marked, Renderer } from 'marked'
 import type { Tokens } from 'marked'
 import DOMPurify from 'dompurify'
-import hljs from 'highlight.js'
+import hljs from 'highlight.js/lib/core'
+import type { LanguageFn } from 'highlight.js'
+import bash from 'highlight.js/lib/languages/bash'
+import c from 'highlight.js/lib/languages/c'
+import cpp from 'highlight.js/lib/languages/cpp'
+import csharp from 'highlight.js/lib/languages/csharp'
+import css from 'highlight.js/lib/languages/css'
+import go from 'highlight.js/lib/languages/go'
+import xml from 'highlight.js/lib/languages/xml'
+import java from 'highlight.js/lib/languages/java'
+import javascript from 'highlight.js/lib/languages/javascript'
+import json from 'highlight.js/lib/languages/json'
+import markdown from 'highlight.js/lib/languages/markdown'
+import php from 'highlight.js/lib/languages/php'
+import plaintext from 'highlight.js/lib/languages/plaintext'
+import python from 'highlight.js/lib/languages/python'
+import ruby from 'highlight.js/lib/languages/ruby'
+import rust from 'highlight.js/lib/languages/rust'
+import sql from 'highlight.js/lib/languages/sql'
+import typescript from 'highlight.js/lib/languages/typescript'
+import yaml from 'highlight.js/lib/languages/yaml'
+import { logErro } from '@/utils/logger'
+
+// Registro explicito para manter o bundle de highlight.js enxuto.
+const linguagensHighlight: Array<[string, LanguageFn]> = [
+    ['bash', bash],
+    ['c', c],
+    ['cpp', cpp],
+    ['csharp', csharp],
+    ['css', css],
+    ['go', go],
+    ['java', java],
+    ['javascript', javascript],
+    ['json', json],
+    ['markdown', markdown],
+    ['php', php],
+    ['plaintext', plaintext],
+    ['python', python],
+    ['ruby', ruby],
+    ['rust', rust],
+    ['sql', sql],
+    ['typescript', typescript],
+    ['yaml', yaml],
+    ['xml', xml]
+]
+
+for (const [nome, definicao] of linguagensHighlight) {
+    hljs.registerLanguage(nome, definicao)
+}
+
+const mapaAliasLinguagens: Record<string, string> = {
+    js: 'javascript',
+    jsx: 'javascript',
+    ts: 'typescript',
+    tsx: 'typescript',
+    sh: 'bash',
+    shell: 'bash',
+    yml: 'yaml',
+    md: 'markdown',
+    text: 'plaintext',
+    txt: 'plaintext',
+    'c++': 'cpp',
+    'c#': 'csharp',
+    cs: 'csharp',
+    ddl: 'sql',
+    htm: 'html',
+    xhtml: 'xml'
+}
+
+function normalizarLinguagem(lang?: string): string {
+    const partes = (lang || 'plaintext')
+        .toLowerCase()
+        .trim()
+        .split(/\s+/)
+    const bruto = partes[0] || 'plaintext'
+    const limpo = bruto.replace(/[^a-z0-9#+.-]/g, '')
+
+    if (!limpo) return 'plaintext'
+
+    return mapaAliasLinguagens[limpo] ?? limpo
+}
 
 /**
  * PrintRenderer - Renderer customizado otimizado para impressão em A4
@@ -97,15 +177,17 @@ class PrintRenderer extends Renderer {
    * Renderiza blocos de código com syntax highlighting
    */
   override code(token: Tokens.Code): string {
-    const lang = (token.lang || 'plaintext').toLowerCase()
+    const linguagemBruta = typeof token.lang === 'string' ? token.lang.trim() : ''
+    const lang = normalizarLinguagem(linguagemBruta)
+    const temLinguagem = linguagemBruta.length > 0
     let highlightedCode = token.text
 
     try {
-      if (lang && hljs.getLanguage(lang)) {
+      if (lang === 'plaintext' && temLinguagem) {
+        highlightedCode = DOMPurify.sanitize(token.text)
+      } else if (lang !== 'plaintext' && hljs.getLanguage(lang)) {
         const highlighted = hljs.highlight(token.text, { language: lang, ignoreIllegals: true })
         highlightedCode = highlighted.value
-      } else if (lang === 'plaintext') {
-        highlightedCode = DOMPurify.sanitize(token.text)
       } else {
         try {
           const highlighted = hljs.highlightAuto(token.text)
@@ -261,7 +343,7 @@ marked.use({
       },
       tokenizer(src: string) {
         const match = /^```mermaid\n([\s\S]*?)```/.exec(src)
-        if (match) {
+        if (match && match[1]) {
           return {
             type: 'mermaidCodeBlock',
             raw: match[0],
@@ -270,8 +352,10 @@ marked.use({
         }
         return undefined
       },
-      renderer(token: { text: string }) {
-        const base64Source = btoa(unescape(encodeURIComponent(token.text)))
+      renderer(token: Tokens.Generic) {
+        const tokenData = token as { text?: string }
+        const tokenText: string = typeof tokenData.text === 'string' ? tokenData.text : ''
+        const base64Source = btoa(unescape(encodeURIComponent(tokenText)))
         return `<div class="mermaid" data-mermaid-source="${base64Source}" aria-label="Mermaid Diagram">
           <pre class="mermaid-loading">Loading diagram...</pre>
         </div>\n`
@@ -286,7 +370,7 @@ marked.use({
       },
       tokenizer(src: string) {
         const match = /^```ya?ml\n([\s\S]*?)```/.exec(src)
-        if (match) {
+        if (match && match[1]) {
           return {
             type: 'yamlCodeBlock',
             raw: match[0],
@@ -295,8 +379,10 @@ marked.use({
         }
         return undefined
       },
-      renderer(token: { text: string }) {
-        const base64Source = btoa(unescape(encodeURIComponent(token.text)))
+      renderer(token: Tokens.Generic) {
+        const tokenData = token as { text?: string }
+        const tokenText: string = typeof tokenData.text === 'string' ? tokenData.text : ''
+        const base64Source = btoa(unescape(encodeURIComponent(tokenText)))
         return `<div class="yaml-block" data-yaml-source="${base64Source}" data-yaml-type="codeblock" aria-label="YAML Code Block">
           <pre class="yaml-loading">Loading YAML...</pre>
         </div>\n`
@@ -406,7 +492,7 @@ export function processMarkdown(markdown: string): string {
     return clean
   } catch (e) {
     const errorMsg = e instanceof Error ? e.message : 'Erro desconhecido'
-    console.error('Erro ao processar markdown:', e)
+    logErro(`Erro ao processar markdown: ${errorMsg}`)
     return `<p class="error">Erro ao processar markdown: ${DOMPurify.sanitize(errorMsg)}</p>`
   }
 }
@@ -481,7 +567,8 @@ export async function processImagesInPreview(container: HTMLElement | null, useC
     const { processImagesForPrint } = await import('./imageProcessor')
     return await processImagesForPrint(container, useCache)
   } catch (e) {
-    console.error('Erro ao processar imagens para print:', e)
+    const errorMsg = e instanceof Error ? e.message : String(e)
+    logErro(`Erro ao processar imagens para print: ${errorMsg}`)
     return 0
   }
 }
