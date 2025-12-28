@@ -1,6 +1,6 @@
 # MD2PDF - Conversor Markdown para PDF
 
-> **SISTEMA DE CONVERSÃO v1.1.20 | STATUS: PRONTO PARA PRODUÇÃO**
+> **SISTEMA DE CONVERSÃO v1.1.21 | STATUS: PRONTO PARA PRODUÇÃO**
 
 Clone ultrapolido e otimizado do markdowntopdf.com com interface moderna estilo **painel financeiro hacker**. Conversor de Markdown para PDF gratuito, sem limites e sem necessidade de autenticação.
 

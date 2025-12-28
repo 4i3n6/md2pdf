@@ -32,6 +32,9 @@ export default defineConfig({
         enabled: false
       },
       workbox: {
+        // Evita falha do terser no generateSW e mantém logs de dev desativados.
+        mode: 'development',
+        disableDevLogs: true,
         globPatterns: ['**/*.{js,css,html,ico,png,svg,woff,woff2}'],
         cleanupOutdatedCaches: true,
         skipWaiting: true,

@@ -66,6 +66,9 @@ const mapaAliasLinguagens: Record<string, string> = {
     'c#': 'csharp',
     cs: 'csharp',
     ddl: 'sql',
+    postgres: 'sql',
+    postgresql: 'sql',
+    psql: 'sql',
     htm: 'html',
     xhtml: 'xml'
 }

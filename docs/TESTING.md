@@ -1,4 +1,4 @@
-# 🧪 TESTE DE FEATURES - MD2PDF v1.1.20
+# 🧪 TESTE DE FEATURES - MD2PDF v1.1.21
 
 ## Status do Servidor
 

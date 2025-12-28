@@ -1,7 +1,7 @@
 # Syntax Highlighting - Documentação Completa
 
 **Data:** 28 de Dezembro de 2025  
-**Versão:** 1.1.20  
+**Versão:** 1.1.21  
 **Status:** ✅ Implementado e Testado
 
 ---
