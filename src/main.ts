@@ -1,6 +1,7 @@
 import { EditorView, basicSetup } from 'codemirror'
 import { Decoration, hoverTooltip } from '@codemirror/view'
-import { StateField, StateEffect } from '@codemirror/state'
+import { StateField, StateEffect, Compartment, type Extension } from '@codemirror/state'
+import { language } from '@codemirror/language'
 import { markdown } from '@codemirror/lang-markdown'
 import 'highlight.js/styles/github.css'
 import { processMarkdown, estimatePageCount } from './processors/markdownProcessor'
@@ -93,6 +94,130 @@ const state: AppState = {
   docs: [],
   currentId: null,
   editor: null
+}
+
+// Compartimento para alternar linguagem do editor dinamicamente
+const compartimentoLinguagem = new Compartment();
+let requisicaoLinguagemEditor = 0;
+let modoEditorAtual = '';
+
+const extensoesMarkdown = new Set(['', 'md', 'markdown', 'txt']);
+
+const carregarSql = async (): Promise<Extension> => {
+    const { sql, PostgreSQL } = await import('@codemirror/lang-sql')
+    return sql({ dialect: PostgreSQL })
+}
+
+const carregarJson = async (): Promise<Extension> => {
+    const { json } = await import('@codemirror/lang-json')
+    return json()
+}
+
+const carregarYaml = async (): Promise<Extension> => {
+    const { yaml } = await import('@codemirror/lang-yaml')
+    return yaml()
+}
+
+const carregarJavaScript = async (
+    config?: { jsx?: boolean; typescript?: boolean }
+): Promise<Extension> => {
+    const { javascript } = await import('@codemirror/lang-javascript')
+    return javascript(config)
+}
+
+const carregarCss = async (): Promise<Extension> => {
+    const { css } = await import('@codemirror/lang-css')
+    return css()
+}
+
+const carregarHtml = async (): Promise<Extension> => {
+    const { html } = await import('@codemirror/lang-html')
+    return html()
+}
+
+const carregarXml = async (): Promise<Extension> => {
+    const { xml } = await import('@codemirror/lang-xml')
+    return xml()
+}
+
+const carregarShell = async (): Promise<Extension> => {
+    const [{ StreamLanguage }, { shell }] = await Promise.all([
+        import('@codemirror/language'),
+        import('@codemirror/legacy-modes/mode/shell')
+    ])
+    return StreamLanguage.define(shell)
+}
+
+const carregarPython = async (): Promise<Extension> => {
+    const { python } = await import('@codemirror/lang-python')
+    return python()
+}
+
+const carregarGo = async (): Promise<Extension> => {
+    const { go } = await import('@codemirror/lang-go')
+    return go()
+}
+
+const carregarRust = async (): Promise<Extension> => {
+    const { rust } = await import('@codemirror/lang-rust')
+    return rust()
+}
+
+const carregarJava = async (): Promise<Extension> => {
+    const { java } = await import('@codemirror/lang-java')
+    return java()
+}
+
+const carregarCpp = async (): Promise<Extension> => {
+    const { cpp } = await import('@codemirror/lang-cpp')
+    return cpp()
+}
+
+const carregarPhp = async (): Promise<Extension> => {
+    const { php } = await import('@codemirror/lang-php')
+    return php()
+}
+
+const carregarRuby = async (): Promise<Extension> => {
+    const [{ StreamLanguage }, { ruby }] = await Promise.all([
+        import('@codemirror/language'),
+        import('@codemirror/legacy-modes/mode/ruby')
+    ])
+    return StreamLanguage.define(ruby)
+}
+
+const carregadoresLinguagem: Record<string, () => Promise<Extension>> = {
+    sql: carregarSql,
+    ddl: carregarSql,
+    json: carregarJson,
+    yaml: carregarYaml,
+    yml: carregarYaml,
+    js: () => carregarJavaScript(),
+    javascript: () => carregarJavaScript(),
+    jsx: () => carregarJavaScript({ jsx: true }),
+    ts: () => carregarJavaScript({ typescript: true }),
+    typescript: () => carregarJavaScript({ typescript: true }),
+    tsx: () => carregarJavaScript({ typescript: true, jsx: true }),
+    css: carregarCss,
+    html: carregarHtml,
+    htm: carregarHtml,
+    xml: carregarXml,
+    bash: carregarShell,
+    sh: carregarShell,
+    shell: carregarShell,
+    py: carregarPython,
+    python: carregarPython,
+    go: carregarGo,
+    rs: carregarRust,
+    rust: carregarRust,
+    java: carregarJava,
+    c: carregarCpp,
+    cpp: carregarCpp,
+    h: carregarCpp,
+    hpp: carregarCpp,
+    php: carregarPhp,
+    rb: carregarRuby,
+    ruby: carregarRuby
 }
 
 // CodeMirror Decorations Setup
@@ -357,6 +482,7 @@ function importMarkdownFile(): void {
       renderList();
       renderPreview(content);
       updateSaveStatus();
+      void atualizarLinguagemEditor(newDoc.name);
       
       Logger.success(`Arquivo importado: ${file.name}`);
     } catch (error) {
@@ -1242,8 +1368,98 @@ function saveDocs(): void {
   salvarDocumentosAgora()
 }
 
+function obterExtensaoDocumento(nome?: string): string {
+    const origem = (nome ?? getCurrentDoc()?.name ?? '').trim()
+    const partes = origem.split('.')
+    if (partes.length < 2) {
+        return ''
+    }
+    return (partes.pop() || '').toLowerCase().trim()
+}
+
+function documentoEhMarkdown(nome?: string): boolean {
+    return extensoesMarkdown.has(obterExtensaoDocumento(nome))
+}
+
+function obterModoEditor(nome?: string): string {
+    if (documentoEhMarkdown(nome)) {
+        return 'markdown'
+    }
+    const ext = obterExtensaoDocumento(nome)
+    return ext || 'plaintext'
+}
+
+async function carregarLinguagemEditor(nome?: string): Promise<Extension> {
+    if (documentoEhMarkdown(nome)) {
+        return markdown()
+    }
+
+    const ext = obterExtensaoDocumento(nome)
+    const carregador = carregadoresLinguagem[ext]
+    if (!carregador) {
+        return []
+    }
+    return await carregador()
+}
+
+async function atualizarLinguagemEditor(nome?: string): Promise<void> {
+    if (!state.editor) return
+
+    const modo = obterModoEditor(nome)
+    if (modo === modoEditorAtual) {
+        return
+    }
+
+    if (modo !== 'markdown') {
+        limparDiagnosticosEditor()
+    }
+
+    const requisicaoAtual = ++requisicaoLinguagemEditor
+    try {
+        const extensao = await carregarLinguagemEditor(nome)
+        if (!state.editor || requisicaoAtual !== requisicaoLinguagemEditor) {
+            return
+        }
+        state.editor.dispatch({
+            effects: compartimentoLinguagem.reconfigure(extensao)
+        })
+        modoEditorAtual = modo
+        const linguagemAtiva = state.editor.state.facet(language)
+        const nomeLinguagem = linguagemAtiva?.name || 'nenhuma'
+        Logger.log(`Editor ajustado para ${modo} (${nomeLinguagem})`)
+    } catch (e) {
+        const errorMsg = e instanceof Error ? e.message : String(e)
+        Logger.error(`Falha ao carregar linguagem do editor: ${errorMsg}`)
+        if (state.editor && requisicaoAtual === requisicaoLinguagemEditor) {
+            state.editor.dispatch({
+                effects: compartimentoLinguagem.reconfigure(markdown())
+            })
+            modoEditorAtual = 'markdown'
+        }
+    }
+}
+
+function limparDiagnosticosEditor(): void {
+    currentIssues = []
+    renderProblemsPanel([])
+    if (!state.editor) return
+    try {
+        state.editor.dispatch({
+            effects: [updateDecorationsEffect.of(Decoration.none)]
+        })
+    } catch (e) {
+        const errorMsg = e instanceof Error ? e.message : String(e)
+        Logger.log(`Falha ao limpar diagnosticos: ${errorMsg}`, 'warning')
+    }
+}
+
 function updateEditorDiagnostics(content: string): void {
   if (!state.editor) return;
+
+  if (!documentoEhMarkdown()) {
+    limparDiagnosticosEditor()
+    return
+  }
 
   const validation = validateMarkdown(content);
   const decorationRanges: any[] = [];
@@ -1321,7 +1537,7 @@ function initEditor(): void {
     doc: doc ? doc.content : '',
     extensions: [
       basicSetup,
-      markdown(),
+      compartimentoLinguagem.of(markdown()),
       EditorView.lineWrapping,
       markdownDecorationsField,
       markdownHoverTooltip,
@@ -1383,6 +1599,7 @@ function initEditor(): void {
     if (state.currentId) {
       loadDocPreferences(state.currentId);
     }
+    void atualizarLinguagemEditor(doc.name);
   }
 }
 
@@ -1398,7 +1615,7 @@ async function renderPreview(md: string): Promise<void> {
   let content = md
   const currentDoc = getCurrentDoc()
   if (currentDoc) {
-    const ext = currentDoc.name.split('.').pop()?.toLowerCase()
+    const ext = currentDoc.name.trim().split('.').pop()?.toLowerCase().trim()
     // Wrap non-markdown files in code blocks for syntax highlighting
     if (ext === 'sql' || ext === 'ddl') {
       content = '```sql\n' + md + '\n```'
@@ -1478,6 +1695,7 @@ function switchDoc(id: number): void {
     renderList();
     loadDocPreferences(id);
     updateSaveStatus();
+    void atualizarLinguagemEditor(doc.name);
     Logger.log(`Alternado para doc ID: ${id}`);
   }
 }
@@ -1495,6 +1713,7 @@ function createDoc(): void {
     }
     renderList()
     renderPreview('')
+    void atualizarLinguagemEditor(newDoc.name)
     Logger.success(`Documento criado [ID: ${newDoc.id}]`)
   } catch (e) {
     const errorMessage = e instanceof Error ? e.message : String(e)
@@ -1624,9 +1843,15 @@ function setupEvents(): void {
       const target = e.target as HTMLInputElement;
       const doc = getCurrentDoc();
       if (doc) {
+        const extAnterior = obterExtensaoDocumento(doc.name)
         doc.name = target.value;
         saveDocs();
         renderList();
+        const extNovo = obterExtensaoDocumento(doc.name)
+        if (extAnterior !== extNovo) {
+          void renderPreview(doc.content);
+          void atualizarLinguagemEditor(doc.name);
+        }
       }
     });
   }

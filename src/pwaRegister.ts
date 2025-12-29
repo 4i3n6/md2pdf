@@ -6,12 +6,37 @@
  * O VitePWA já injeta o registro automaticamente via 'injectRegister: script-defer'.
  */
 
-import { logErro, logInfo } from '@/utils/logger'
+import { logErro, logInfo, logSucesso } from '@/utils/logger'
 
 export function registerServiceWorker(): void {
   // Não registrar SW em desenvolvimento - VitePWA não gera SW em dev mode
   if (import.meta.env.DEV) {
     logInfo('[PWA] Service Worker desabilitado em desenvolvimento');
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.getRegistrations()
+        .then((registrations) => {
+          if (registrations.length === 0) return;
+          return Promise.all(registrations.map((registration) => registration.unregister()))
+            .then(() => {
+              logSucesso('[PWA] Service Worker removido em desenvolvimento');
+            })
+        })
+        .catch((error) => {
+          const errorMsg = error instanceof Error ? error.message : String(error);
+          logErro(`[PWA] Falha ao remover Service Worker em dev: ${errorMsg}`);
+        });
+    }
+    if ('caches' in window) {
+      caches.keys()
+        .then((keys) => Promise.all(keys.map((key) => caches.delete(key))))
+        .then(() => {
+          logSucesso('[PWA] Cache limpo em desenvolvimento');
+        })
+        .catch((error) => {
+          const errorMsg = error instanceof Error ? error.message : String(error);
+          logErro(`[PWA] Falha ao limpar cache em dev: ${errorMsg}`);
+        });
+    }
     return;
   }
 

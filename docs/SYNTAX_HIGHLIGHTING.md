@@ -19,6 +19,13 @@ O MD2PDF agora possui **Syntax Highlighting profissional** integrado com **highl
 - ✅ **Print-Ready** - Compatível com A4 e impressão
 - ✅ **Performance** - Highlighting rápido e eficiente
 
+### Editor (CodeMirror)
+
+- ✅ **Linguagem por Extensão** - O `INPUT_STREAM` alterna a linguagem do editor conforme o sufixo do arquivo
+- ✅ **Lazy Load** - Linguagens carregadas sob demanda para manter o bundle enxuto
+- ✅ **Fallback Seguro** - Extensões desconhecidas ficam em texto simples
+- ✅ **Atualizacao Dinamica** - Renomear o arquivo atualiza editor e preview automaticamente
+
 ---
 
 ## 🎨 Tema: GitHub Light

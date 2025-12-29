@@ -33,7 +33,7 @@
         background: white !important;
         color: black !important;
         font-size: 10pt;
-        font-family: 'Courier New', 'Courier', monospace;
+        font-family: 'Liberation Mono', 'DejaVu Sans Mono', 'Consolas', 'Monaco', monospace;
         -webkit-print-color-adjust: exact !important;
         print-color-adjust: exact !important;
     }
@@ -236,7 +236,7 @@
         border: 1px solid #d1d5db;
         border-radius: 3px;
         padding: 2px 4px;
-        font-family: 'Courier New', 'Monaco', monospace;
+        font-family: 'Liberation Mono', 'DejaVu Sans Mono', 'Consolas', 'Monaco', monospace;
         font-size: 9pt;
         color: #be185d !important; /* Rosa tecnico - matches screen */
         font-weight: 600;
@@ -255,7 +255,7 @@
         overflow-x: auto;
         /* Blocos de código devem evitar quebra (ficam ilegíveis se quebrados) */
         page-break-inside: avoid;
-        font-family: 'Courier New', 'Monaco', monospace;
+        font-family: 'Liberation Mono', 'DejaVu Sans Mono', 'Consolas', 'Monaco', monospace;
         font-size: 9pt;
         line-height: 1.5;
         color: #24292e;
