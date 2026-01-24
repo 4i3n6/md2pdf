@@ -14,7 +14,7 @@ export const pt: Translations = {
   // App Header
   header: {
     brand: 'MD2PDF',
-    version: 'v1.1.23',
+    version: 'v1.1.24',
     manualLink: 'Manual',
     manualTitle: 'Abrir manual de uso',
   },
@@ -87,6 +87,7 @@ export const pt: Translations = {
   preview: {
     renderOutput: 'SAÍDA',
     fontLabel: 'Fonte do documento',
+    fontSizeLabel: 'Tamanho da fonte',
     alignLabel: 'Alinhamento do texto',
   },
 

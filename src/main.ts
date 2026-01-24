@@ -249,6 +249,7 @@ let currentIssues: MarkdownError[] = [];
 type DocumentPreferences = {
   font: string;
   align: string;
+  fontSize: string;
 };
 
 type BackupPayload = {
@@ -261,7 +262,8 @@ type BackupPayload = {
 
 const DEFAULT_PREFS: DocumentPreferences = {
   font: "'JetBrains Mono', monospace",
-  align: 'left'
+  align: 'left',
+  fontSize: '9pt'
 };
 
 function getDocPreferences(docId: number): DocumentPreferences {
@@ -300,6 +302,24 @@ function applyPreviewFont(font: string): void {
   }
 }
 
+function applyPreviewFontSize(size: string): void {
+  const preview = document.getElementById('preview');
+  if (preview) {
+    preview.style.fontSize = size;
+  }
+  
+  const fontSizeSelect = document.getElementById('preview-font-size') as HTMLSelectElement;
+  if (fontSizeSelect) {
+    fontSizeSelect.value = size;
+  }
+  
+  if (state.currentId) {
+    const prefs = getDocPreferences(state.currentId);
+    prefs.fontSize = size;
+    saveDocPreferences(state.currentId, prefs);
+  }
+}
+
 function applyPreviewAlign(align: string): void {
   const preview = document.getElementById('preview');
   if (preview) {
@@ -332,6 +352,7 @@ function updateAlignButtons(activeAlign: string): void {
 function loadDocPreferences(docId: number): void {
   const prefs = getDocPreferences(docId);
   applyPreviewFont(prefs.font);
+  applyPreviewFontSize(prefs.fontSize);
   applyPreviewAlign(prefs.align);
 }
 
@@ -574,7 +595,8 @@ function normalizarBackupPayload(raw: unknown): BackupPayload | null {
     if (!valor || typeof valor !== 'object') return;
     const pref = valor as Partial<DocumentPreferences>;
     if (typeof pref.font !== 'string' || typeof pref.align !== 'string') return;
-    prefs[docId] = { font: pref.font, align: pref.align };
+    const fontSize = typeof pref.fontSize === 'string' ? pref.fontSize : '9pt';
+    prefs[docId] = { font: pref.font, align: pref.align, fontSize };
   });
 
   return {
@@ -706,6 +728,18 @@ function setupPreviewControls(): void {
         applyPreviewFont(font);
         const fontName = font.split(',')[0]?.replace(/'/g, '') || font;
         Logger.log(`Fonte do documento: ${fontName}`);
+      }
+    });
+  }
+  
+  const fontSizeSelect = document.getElementById('preview-font-size') as HTMLSelectElement | null;
+  if (fontSizeSelect) {
+    fontSizeSelect.addEventListener('change', (e) => {
+      const target = e.target as HTMLSelectElement;
+      const size = target.value;
+      if (size) {
+        applyPreviewFontSize(size);
+        Logger.log(`Tamanho da fonte: ${size}`);
       }
     });
   }

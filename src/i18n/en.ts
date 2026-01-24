@@ -12,7 +12,7 @@ export const en = {
   // App Header
   header: {
     brand: 'MD2PDF',
-    version: 'v1.1.23',
+    version: 'v1.1.24',
     manualLink: 'Manual',
     manualTitle: 'Open user manual',
   },
@@ -85,6 +85,7 @@ export const en = {
   preview: {
     renderOutput: 'RENDER_OUTPUT',
     fontLabel: 'Document font',
+    fontSizeLabel: 'Font size',
     alignLabel: 'Text alignment',
   },
 
