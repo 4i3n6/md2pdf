@@ -214,16 +214,9 @@
         word-break: break-word;
     }
 
+    /* URLs não são exibidas após links para manter fidelidade com preview */
     .markdown-body a[href]::after {
-        content: " (" attr(href) ")";
-        font-size: 9pt;
-        color: #666;
-        word-break: break-all;
-    }
-
-    /* Não mostrar URLs para links âncora */
-    .markdown-body a[href^="#"]::after {
-        content: '';
+        content: none;
     }
 
     /* ============================================================
