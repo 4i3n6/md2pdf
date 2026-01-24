@@ -372,12 +372,14 @@
 
     .markdown-body table,
     .markdown-body .markdown-table-content {
-        width: 100%;
+        width: auto;
+        max-width: 100%;
         border-collapse: collapse;
         margin: 16px 0;
         page-break-inside: avoid;
         border: 1px solid #d1d5db;
         font-size: inherit;
+        table-layout: auto;
     }
 
     .markdown-body th,
@@ -385,6 +387,7 @@
         border: 1px solid #d1d5db;
         padding: 8px;
         text-align: left;
+        white-space: nowrap;
     }
 
     .markdown-body th {
