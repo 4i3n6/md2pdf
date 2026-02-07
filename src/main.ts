@@ -4,12 +4,12 @@ import { StateField, StateEffect, Compartment, type Extension } from '@codemirro
 import { language } from '@codemirror/language'
 import { markdown } from '@codemirror/lang-markdown'
 import 'highlight.js/styles/github.css'
-import { processMarkdown, estimatePageCount } from './processors/markdownProcessor'
 import { validateMarkdown, type MarkdownError } from './processors/markdownValidator'
 import { printDocument, validatePrintContent, togglePrintPreview } from './utils/printUtils'
 import { createReporter } from './utils/printReporter'
 import OfflineManager from './utils/offlineManager'
 import SWUpdateNotifier from './utils/swUpdateNotifier'
+import { PreviewService } from './services/previewService'
 import { documentManager } from './services/documentManager'
 import { uiRenderer } from './services/uiRenderer'
 import { initI18n, t, getLocale } from './i18n/index'
@@ -61,6 +61,8 @@ declare global {
   }
 }
 window.Logger = Logger;
+
+const previewService = new PreviewService(uiRenderer, Logger)
 
 function atualizarVersaoUI(): void {
   const versionEl = document.querySelector('[data-app-version]') as HTMLElement | null;
@@ -1653,56 +1655,12 @@ function getCurrentDoc(): AppDocument | undefined {
   return state.docs.find((d) => d.id === state.currentId);
 }
 
-async function renderPreview(md: string): Promise<void> {
+function renderPreview(md: string): void {
   const preview = document.getElementById('preview')
   if (!preview) return
 
-  // Pre-process content based on file extension
-  let content = md
   const currentDoc = getCurrentDoc()
-  if (currentDoc) {
-    const ext = currentDoc.name.trim().split('.').pop()?.toLowerCase().trim()
-    // Wrap non-markdown files in code blocks for syntax highlighting
-    if (ext === 'sql' || ext === 'ddl') {
-      content = '```sql\n' + md + '\n```'
-    } else if (ext === 'json') {
-      content = '```json\n' + md + '\n```'
-    } else if (ext === 'yaml' || ext === 'yml') {
-      content = '```yaml\n' + md + '\n```'
-    } else if (ext === 'js' || ext === 'javascript') {
-      content = '```javascript\n' + md + '\n```'
-    } else if (ext === 'ts' || ext === 'typescript') {
-      content = '```typescript\n' + md + '\n```'
-    } else if (ext === 'css') {
-      content = '```css\n' + md + '\n```'
-    } else if (ext === 'html' || ext === 'htm') {
-      content = '```html\n' + md + '\n```'
-    } else if (ext === 'xml') {
-      content = '```xml\n' + md + '\n```'
-    } else if (ext === 'sh' || ext === 'bash') {
-      content = '```bash\n' + md + '\n```'
-    } else if (ext === 'py' || ext === 'python') {
-      content = '```python\n' + md + '\n```'
-    } else if (ext === 'go') {
-      content = '```go\n' + md + '\n```'
-    } else if (ext === 'rs' || ext === 'rust') {
-      content = '```rust\n' + md + '\n```'
-    } else if (ext === 'java') {
-      content = '```java\n' + md + '\n```'
-    } else if (ext === 'c' || ext === 'cpp' || ext === 'h' || ext === 'hpp') {
-      content = '```cpp\n' + md + '\n```'
-    } else if (ext === 'php') {
-      content = '```php\n' + md + '\n```'
-    } else if (ext === 'rb' || ext === 'ruby') {
-      content = '```ruby\n' + md + '\n```'
-    }
-  }
-
-  const html = processMarkdown(content)
-  await uiRenderer.renderPreview(preview, html)
-
-  const estimatedPages = estimatePageCount(html)
-  Logger.log(`Renderizado em ~${estimatedPages} pagina(s) A4`, 'info')
+  previewService.requestRender(preview, md, currentDoc?.name || '')
 }
 
 function renderList(): void {
