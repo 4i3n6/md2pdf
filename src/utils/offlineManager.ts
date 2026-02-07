@@ -13,16 +13,23 @@ class OfflineManager {
   private isOnline: boolean = navigator.onLine
   private callbacks: StatusChangeCallback[] = []
   private syncQueue: SyncQueueItem[] = []
+  private initialized: boolean = false
 
   /**
    * Inicializa o gerenciador de conectividade
    */
   init(): void {
+    if (this.initialized) return
+    this.initialized = true
+
     window.addEventListener('online', () => this.handleOnline())
     window.addEventListener('offline', () => this.handleOffline())
 
     // Verificação periódica de conectividade (fallback)
     setInterval(() => this.checkConnectivity(), 10000)
+
+    // Garantir que a UI reflita o status inicial (especialmente ao abrir offline)
+    this.updateUI()
   }
 
   /**

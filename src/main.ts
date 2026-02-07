@@ -268,7 +268,13 @@ const DEFAULT_PREFS: DocumentPreferences = {
 
 function getDocPreferences(docId: number): DocumentPreferences {
   const key = obterChavePreferenciasDocumento(docId);
-  const saved = localStorage.getItem(key);
+  let saved: string | null = null;
+  try {
+    saved = localStorage.getItem(key);
+  } catch (e) {
+    const errorMsg = e instanceof Error ? e.message : String(e);
+    Logger.log(`Falha ao ler preferencias do documento: ${errorMsg}`, 'warning');
+  }
   if (saved) {
     try {
       return JSON.parse(saved);
@@ -281,7 +287,12 @@ function getDocPreferences(docId: number): DocumentPreferences {
 
 function saveDocPreferences(docId: number, prefs: DocumentPreferences): void {
   const key = obterChavePreferenciasDocumento(docId);
-  localStorage.setItem(key, JSON.stringify(prefs));
+  try {
+    localStorage.setItem(key, JSON.stringify(prefs));
+  } catch (e) {
+    const errorMsg = e instanceof Error ? e.message : String(e);
+    Logger.error(`Falha ao salvar preferencias do documento: ${errorMsg}`);
+  }
 }
 
 function applyPreviewFont(font: string): void {
@@ -788,7 +799,13 @@ function initSplitter(): void {
   }
   
   // Load saved ratio
-  const savedRatio = localStorage.getItem(SPLITTER_STORAGE_KEY);
+  let savedRatio: string | null = null;
+  try {
+    savedRatio = localStorage.getItem(SPLITTER_STORAGE_KEY);
+  } catch (e) {
+    const errorMsg = e instanceof Error ? e.message : String(e);
+    Logger.log(`Falha ao ler splitter ratio: ${errorMsg}`, 'warning');
+  }
   let currentRatio = savedRatio ? parseFloat(savedRatio) : SPLITTER_DEFAULT_RATIO;
   
   // Validate saved ratio
@@ -836,7 +853,12 @@ function initSplitter(): void {
     document.body.classList.remove('splitter-dragging');
     
     // Save ratio
-    localStorage.setItem(SPLITTER_STORAGE_KEY, currentRatio.toString());
+    try {
+      localStorage.setItem(SPLITTER_STORAGE_KEY, currentRatio.toString());
+    } catch (e) {
+      const errorMsg = e instanceof Error ? e.message : String(e);
+      Logger.error(`Falha ao salvar splitter ratio: ${errorMsg}`);
+    }
     Logger.log(`Panel ratio: ${Math.round(currentRatio * 100)}%`);
   });
   
@@ -844,7 +866,12 @@ function initSplitter(): void {
   splitter.addEventListener('dblclick', () => {
     currentRatio = SPLITTER_DEFAULT_RATIO;
     applyRatio(currentRatio);
-    localStorage.setItem(SPLITTER_STORAGE_KEY, currentRatio.toString());
+    try {
+      localStorage.setItem(SPLITTER_STORAGE_KEY, currentRatio.toString());
+    } catch (e) {
+      const errorMsg = e instanceof Error ? e.message : String(e);
+      Logger.error(`Falha ao salvar splitter ratio: ${errorMsg}`);
+    }
     Logger.log('Panel ratio reset to 50%');
   });
   
@@ -1762,8 +1789,8 @@ function deleteDoc(id: number): void {
       if (state.currentId === id) {
         const docs = documentManager.getAll()
         if (docs.length > 0 && docs[0]) {
-          state.currentId = docs[0].id
-          switchDoc(state.currentId)
+          // Nao setar state.currentId antes do switchDoc, para evitar early-return.
+          switchDoc(docs[0].id)
         }
       }
       renderList()
