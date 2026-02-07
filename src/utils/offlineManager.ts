@@ -6,6 +6,7 @@
 import { ChavesStorage } from '@/constants'
 import type { SyncQueueItem, ConnectivityStatus } from '@/types/index'
 import { logErro, logInfo, logSucesso } from '@/utils/logger'
+import { storageGetJson, storageSetJson } from '@/utils/storage'
 
 type StatusChangeCallback = (isOnline: boolean) => void
 
@@ -126,26 +127,23 @@ class OfflineManager {
    * Persiste fila de sincronização em localStorage
    */
   private persistSyncQueue(): void {
-    try {
-      localStorage.setItem(ChavesStorage.filaSync, JSON.stringify(this.syncQueue))
-    } catch (e) {
-      const errorMsg = e instanceof Error ? e.message : String(e)
-      logErro(`Erro ao persistir fila de sync: ${errorMsg}`)
-    }
+    storageSetJson(
+      ChavesStorage.filaSync,
+      this.syncQueue,
+      (msg) => logErro(msg)
+    )
   }
 
   /**
    * Carrega fila de sincronização do localStorage
    */
   loadSyncQueue(): void {
-    try {
-      const stored = localStorage.getItem(ChavesStorage.filaSync)
-      if (stored) {
-        this.syncQueue = JSON.parse(stored) as SyncQueueItem[]
-      }
-    } catch (e) {
-      const errorMsg = e instanceof Error ? e.message : String(e)
-      logErro(`Erro ao carregar fila de sync: ${errorMsg}`)
+    const stored = storageGetJson<SyncQueueItem[]>(
+      ChavesStorage.filaSync,
+      (msg) => logErro(msg)
+    )
+    if (stored && Array.isArray(stored)) {
+      this.syncQueue = stored
     }
   }
 
