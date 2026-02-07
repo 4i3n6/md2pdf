@@ -60,13 +60,9 @@ export function setupKeyboardNavigation(deps: KeyboardNavigationDeps): void {
 
             if (e.key === 'Delete' && activeItem) {
                 e.preventDefault()
-                const docNameEl = activeItem.querySelector('.doc-name') as HTMLElement | null
-                const docName = docNameEl?.textContent || 'documento'
-                if (confirm(`Tem certeza que deseja deletar "${docName}"?`)) {
-                    const docId = activeItem.getAttribute('data-doc-id')
-                    if (docId) {
-                        deps.deleteDoc(parseInt(docId, 10))
-                    }
+                const docId = activeItem.getAttribute('data-doc-id')
+                if (docId) {
+                    deps.deleteDoc(parseInt(docId, 10))
                 }
             }
 
@@ -114,4 +110,3 @@ export function setupKeyboardNavigation(deps: KeyboardNavigationDeps): void {
     deps.logger.success('Navegacao por teclado ativada')
     deps.logger.log('Atalhos: Ctrl+N=Novo | Ctrl+Shift+E=PDF | Arrow Keys=Navegar Docs')
 }
-

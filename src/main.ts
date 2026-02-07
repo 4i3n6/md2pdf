@@ -855,7 +855,9 @@ function createDoc(): void {
 }
 
 function deleteDoc(id: number): void {
-  if (confirm('Confirmar exclusao?')) {
+  const doc = state.docs.find((d) => d.id === id)
+  const nome = doc?.name || 'documento'
+  if (confirm(`Tem certeza que deseja deletar "${nome}"?`)) {
     const success = documentManager.delete(id)
     if (success) {
       if (state.currentId === id) {
