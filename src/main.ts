@@ -11,11 +11,17 @@ import OfflineManager from './utils/offlineManager'
 import SWUpdateNotifier from './utils/swUpdateNotifier'
 import { PreviewService } from './services/previewService'
 import { initSplitter } from './services/splitterService'
+import {
+  getDocPreferences,
+  loadDocPreferences,
+  saveDocPreferences,
+  setupPreviewControls,
+  type DocumentPreferences
+} from './services/previewPreferencesService'
 import { documentManager } from './services/documentManager'
 import { uiRenderer } from './services/uiRenderer'
 import { initI18n, t, getLocale } from './i18n/index'
-import { BackupConfig, BreakpointsLayout, SalvamentoConfig, obterChavePreferenciasDocumento } from '@/constants'
-import { storageGetItem, storageSetJson } from '@/utils/storage'
+import { BackupConfig, BreakpointsLayout, SalvamentoConfig } from '@/constants'
 import type { AppState, LoggerInterface, Document as AppDocument } from '@/types/index'
 import './pwaRegister'
 import './styles.css'
@@ -249,13 +255,6 @@ const markdownDecorationsField = StateField.define({
 // Global issues storage for tooltip and panel
 let currentIssues: MarkdownError[] = [];
 
-// Document preferences type
-type DocumentPreferences = {
-  font: string;
-  align: string;
-  fontSize: string;
-};
-
 type BackupPayload = {
   version: number;
   appVersion: string;
@@ -263,102 +262,6 @@ type BackupPayload = {
   docs: AppDocument[];
   prefs: Record<string, DocumentPreferences>;
 };
-
-const DEFAULT_PREFS: DocumentPreferences = {
-  font: "'JetBrains Mono', monospace",
-  align: 'left',
-  fontSize: '9pt'
-};
-
-function getDocPreferences(docId: number): DocumentPreferences {
-  const key = obterChavePreferenciasDocumento(docId);
-  const saved = storageGetItem(key, (msg) => Logger.log(msg, 'warning'));
-  if (saved) {
-    try {
-      return JSON.parse(saved);
-    } catch {
-      return { ...DEFAULT_PREFS };
-    }
-  }
-  return { ...DEFAULT_PREFS };
-}
-
-function saveDocPreferences(docId: number, prefs: DocumentPreferences): void {
-  const key = obterChavePreferenciasDocumento(docId);
-  storageSetJson(key, prefs, (msg) => Logger.error(msg));
-}
-
-function applyPreviewFont(font: string): void {
-  const preview = document.getElementById('preview');
-  if (preview) {
-    preview.style.fontFamily = font;
-  }
-  
-  const fontSelect = document.getElementById('preview-font') as HTMLSelectElement;
-  if (fontSelect) {
-    fontSelect.value = font;
-  }
-  
-  if (state.currentId) {
-    const prefs = getDocPreferences(state.currentId);
-    prefs.font = font;
-    saveDocPreferences(state.currentId, prefs);
-  }
-}
-
-function applyPreviewFontSize(size: string): void {
-  const preview = document.getElementById('preview');
-  if (preview) {
-    preview.style.fontSize = size;
-  }
-  
-  const fontSizeSelect = document.getElementById('preview-font-size') as HTMLSelectElement;
-  if (fontSizeSelect) {
-    fontSizeSelect.value = size;
-  }
-  
-  if (state.currentId) {
-    const prefs = getDocPreferences(state.currentId);
-    prefs.fontSize = size;
-    saveDocPreferences(state.currentId, prefs);
-  }
-}
-
-function applyPreviewAlign(align: string): void {
-  const preview = document.getElementById('preview');
-  if (preview) {
-    preview.style.textAlign = align;
-  }
-  
-  updateAlignButtons(align);
-  
-  if (state.currentId) {
-    const prefs = getDocPreferences(state.currentId);
-    prefs['align'] = align;
-    saveDocPreferences(state.currentId, prefs);
-  }
-}
-
-function updateAlignButtons(activeAlign: string): void {
-  const buttons = document.querySelectorAll('.align-btn');
-  buttons.forEach(btn => {
-    const btnAlign = (btn as HTMLElement).dataset['align'];
-    if (btnAlign === activeAlign) {
-      btn.classList.add('active');
-      btn.setAttribute('aria-pressed', 'true');
-    } else {
-      btn.classList.remove('active');
-      btn.setAttribute('aria-pressed', 'false');
-    }
-  });
-}
-
-function loadDocPreferences(docId: number): void {
-  const prefs = getDocPreferences(docId);
-  applyPreviewFont(prefs.font);
-  applyPreviewFontSize(prefs.fontSize);
-  applyPreviewAlign(prefs.align);
-}
 
 // ============================================
 // SAVE STATUS MANAGEMENT
@@ -562,7 +465,7 @@ function montarBackupPayload(): BackupPayload {
   const prefs: Record<string, DocumentPreferences> = {};
 
   docs.forEach((doc) => {
-    prefs[String(doc.id)] = getDocPreferences(doc.id);
+    prefs[String(doc.id)] = getDocPreferences(doc.id, Logger);
   });
 
   return {
@@ -618,7 +521,7 @@ function aplicarBackup(payload: BackupPayload): void {
   Object.entries(payload.prefs).forEach(([docId, pref]) => {
     const id = Number(docId);
     if (!Number.isNaN(id)) {
-      saveDocPreferences(id, pref);
+      saveDocPreferences(id, pref, Logger);
     }
   });
 
@@ -640,7 +543,7 @@ function aplicarBackup(payload: BackupPayload): void {
   renderList();
   if (docAtual) {
     renderPreview(docAtual.content);
-    loadDocPreferences(docAtual.id);
+    loadDocPreferences(state, Logger, docAtual.id);
   } else {
     renderPreview('');
   }
@@ -722,80 +625,9 @@ function importarBackupDocumentos(): void {
 // PREVIEW CONTROLS
 // ============================================
 
-function setupPreviewControls(): void {
-  const fontSelect = document.getElementById('preview-font') as HTMLSelectElement | null;
-  if (fontSelect) {
-    fontSelect.addEventListener('change', (e) => {
-      const target = e.target as HTMLSelectElement;
-      const font = target.value;
-      if (font) {
-        applyPreviewFont(font);
-        const fontName = font.split(',')[0]?.replace(/'/g, '') || font;
-        Logger.log(`Fonte do documento: ${fontName}`);
-      }
-    });
-  }
-  
-  const fontSizeSelect = document.getElementById('preview-font-size') as HTMLSelectElement | null;
-  if (fontSizeSelect) {
-    fontSizeSelect.addEventListener('change', (e) => {
-      const target = e.target as HTMLSelectElement;
-      const size = target.value;
-      if (size) {
-        applyPreviewFontSize(size);
-        Logger.log(`Tamanho da fonte: ${size}`);
-      }
-    });
-  }
-  
-  document.querySelectorAll('.align-btn').forEach(btn => {
-    btn.addEventListener('click', (e) => {
-      const target = e.target as HTMLElement;
-      const align = target.dataset['align'];
-      if (align) {
-        applyPreviewAlign(align);
-        Logger.log(`Alinhamento: ${align}`);
-      }
-    });
-  });
-  
-  const tagFontSelect = document.getElementById('tag-font') as HTMLSelectElement;
-  tagFontSelect?.addEventListener('change', (e) => {
-    const font = (e.target as HTMLSelectElement).value;
-    if (font) {
-      insertFontTag(font);
-      (e.target as HTMLSelectElement).selectedIndex = 0;
-    }
-  });
-  
-  Logger.success('Controles do preview ativados');
-}
-
-
 // ============================================
 // SPLITTER - Resizable Panels
 // ============================================
-
-function insertFontTag(font: string): void {
-  if (!state.editor) return;
-  
-  const { from, to } = state.editor.state.selection.main;
-  if (from === to) {
-    Logger.log('Selecione um texto para aplicar a fonte', 'warning');
-    return;
-  }
-  
-  const selectedText = state.editor.state.sliceDoc(from, to);
-  const insert = `<span style="font-family: ${font}">${selectedText}</span>`;
-  
-  state.editor.dispatch({
-    changes: { from, to, insert },
-    selection: { anchor: from + insert.length }
-  });
-  
-  state.editor.focus();
-  Logger.log(`Fonte aplicada na selecao`);
-}
 
 // ============================================
 // MARKDOWN VALIDATION
@@ -1283,7 +1115,7 @@ function initSystem(): void {
   initEditor();
   setupEvents();
   setupQuickTags();
-  setupPreviewControls();
+  setupPreviewControls(state, Logger);
   setupSaveControls();
   setupKeyboardNavigation();
   initSplitter(Logger);
@@ -1540,13 +1372,13 @@ function initEditor(): void {
     parent: el
   });
 
-  if (doc) {
-    renderPreview(doc.content);
-    if (state.currentId) {
-      loadDocPreferences(state.currentId);
-    }
-    void atualizarLinguagemEditor(doc.name);
-  }
+	  if (doc) {
+	    renderPreview(doc.content);
+	    if (state.currentId) {
+	      loadDocPreferences(state, Logger, state.currentId);
+	    }
+	    void atualizarLinguagemEditor(doc.name);
+	  }
 }
 
 function getCurrentDoc(): AppDocument | undefined {
@@ -1593,13 +1425,13 @@ function switchDoc(id: number): void {
     state.editor.dispatch({
       changes: { from: 0, to: state.editor.state.doc.length, insert: doc.content }
     });
-    renderPreview(doc.content);
-    renderList();
-    loadDocPreferences(id);
-    updateSaveStatus();
-    void atualizarLinguagemEditor(doc.name);
-    Logger.log(`Alternado para doc ID: ${id}`);
-  }
+	    renderPreview(doc.content);
+	    renderList();
+	    loadDocPreferences(state, Logger, id);
+	    updateSaveStatus();
+	    void atualizarLinguagemEditor(doc.name);
+	    Logger.log(`Alternado para doc ID: ${id}`);
+	  }
 }
 
 function createDoc(): void {
