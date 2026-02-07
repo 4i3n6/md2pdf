@@ -11,6 +11,7 @@ import OfflineManager from './utils/offlineManager'
 import SWUpdateNotifier from './utils/swUpdateNotifier'
 import { PreviewService } from './services/previewService'
 import { initSplitter } from './services/splitterService'
+import { createSaveStatusService, documentoEstaModificado } from './services/saveStatusService'
 import {
   getDocPreferences,
   loadDocPreferences,
@@ -106,6 +107,16 @@ const state: AppState = {
   currentId: null,
   editor: null
 }
+
+const saveStatusService = createSaveStatusService({
+  state,
+  logger: Logger,
+  getCurrentDoc,
+  persistDocs: () => documentManager.persistir(),
+  updateMetrics,
+  t,
+  debounceMs: SalvamentoConfig.debounceMs
+})
 
 // Compartimento para alternar linguagem do editor dinamicamente
 const compartimentoLinguagem = new Compartment();
@@ -265,117 +276,6 @@ type BackupPayload = {
 };
 
 // ============================================
-// SAVE STATUS MANAGEMENT
-// ============================================
-
-let saveStatusInterval: ReturnType<typeof setInterval> | null = null;
-const SALVAR_DEBOUNCE_MS = SalvamentoConfig.debounceMs;
-
-function formatTimeSinceSaved(lastSaved: number | null): string {
-  if (!lastSaved) return t('time.never');
-  
-  const now = Date.now();
-  const diff = now - lastSaved;
-  
-  const seconds = Math.floor(diff / 1000);
-  const minutes = Math.floor(seconds / 60);
-  const hours = Math.floor(minutes / 60);
-  
-  if (seconds < 5) return t('save.savedNow');
-  if (seconds < 60) return t('save.savedAgo', { time: t('time.seconds', { n: seconds }) });
-  if (minutes < 60) return t('save.savedAgo', { time: t('time.minutes', { n: minutes }) });
-  return t('save.savedAgo', { time: t('time.hours', { n: hours }) });
-}
-
-function documentoEstaModificado(doc: AppDocument): boolean {
-    if (!doc.lastSaved) {
-        return true;
-    }
-    return doc.updated > doc.lastSaved;
-}
-
-function updateSaveStatus(): void {
-  const doc = getCurrentDoc();
-  if (!doc) return;
-  
-  const statusEl = document.getElementById('save-status');
-  if (!statusEl) return;
-  
-  if (documentoEstaModificado(doc)) {
-    statusEl.className = 'save-status save-status-modified';
-    statusEl.innerHTML = `<span class="save-dot modified"></span><span class="save-text">${t('save.notSaved')}</span>`;
-    return;
-  }
-
-  const statusText = formatTimeSinceSaved(doc.lastSaved);
-  statusEl.className = 'save-status save-status-saved';
-  statusEl.innerHTML = `<span class="save-dot saved"></span><span class="save-text">${statusText}</span>`;
-}
-
-function marcarDocumentosSalvos(): void {
-    const now = Date.now();
-    state.docs.forEach((doc) => {
-        if (!doc.lastSaved || doc.updated > doc.lastSaved) {
-            doc.lastSaved = now;
-        }
-    });
-}
-
-function salvarDocumentosAgora(): void {
-    marcarDocumentosSalvos();
-    documentManager.persistir();
-    updateMetrics();
-    updateSaveStatus();
-}
-
-const salvarDocumentosDebounced = debounce(() => {
-    salvarDocumentosAgora();
-}, SALVAR_DEBOUNCE_MS);
-
-function agendarSalvamento(): void {
-    salvarDocumentosDebounced();
-    updateSaveStatus();
-}
-
-function forceSave(): void {
-  const doc = getCurrentDoc();
-  if (!doc) {
-    Logger.log(t('logs.noDocToSave'), 'warning');
-    return;
-  }
-  
-  salvarDocumentosAgora();
-  Logger.success(t('logs.docSaved'));
-}
-
-function startSaveStatusUpdater(): void {
-  if (saveStatusInterval) {
-    clearInterval(saveStatusInterval);
-  }
-  saveStatusInterval = setInterval(() => {
-    updateSaveStatus();
-  }, 10000);
-}
-
-function setupSaveControls(): void {
-  const forceSaveBtn = document.getElementById('force-save-btn');
-  
-  if (forceSaveBtn) {
-    forceSaveBtn.addEventListener('click', forceSave);
-  }
-  
-  document.addEventListener('keydown', (e: KeyboardEvent): void => {
-    if ((e.ctrlKey || e.metaKey) && e.key === 's') {
-      e.preventDefault();
-      forceSave();
-    }
-  });
-  
-  startSaveStatusUpdater();
-  Logger.success('Controles de salvamento ativos');
-}
-
-// ============================================
 // IMPORT/EXPORT FUNCTIONS
 // ============================================
 
@@ -410,7 +310,7 @@ function importMarkdownFile(): void {
       
       renderList();
       renderPreview(content);
-      updateSaveStatus();
+      saveStatusService.updateSaveStatus();
       void atualizarLinguagemEditor(newDoc.name);
       
       Logger.success(`Arquivo importado: ${file.name}`);
@@ -549,7 +449,7 @@ function aplicarBackup(payload: BackupPayload): void {
     renderPreview('');
   }
   updateMetrics();
-  updateSaveStatus();
+  saveStatusService.updateSaveStatus();
 }
 
 function exportarBackupDocumentos(): void {
@@ -1100,11 +1000,11 @@ function initSystem(): void {
   setupEvents();
   setupQuickTags();
   setupPreviewControls(state, Logger);
-  setupSaveControls();
+  saveStatusService.setupSaveControls();
   setupKeyboardNavigation();
   initSplitter(Logger);
   updateMetrics();
-  updateSaveStatus();
+  saveStatusService.updateSaveStatus();
   Logger.success('Sistema pronto.');
 }
 
@@ -1127,7 +1027,7 @@ function saveDocs(): void {
   const doc = getCurrentDoc()
   if (!doc) return
 
-  salvarDocumentosAgora()
+  saveStatusService.salvarDocumentosAgora()
 }
 
 function obterExtensaoDocumento(nome?: string): string {
@@ -1337,7 +1237,7 @@ function initEditor(): void {
           if (active) {
             active.content = val;
             active.updated = Date.now();
-            agendarSalvamento();
+            saveStatusService.agendarSalvamento();
           }
 
           debouncedValidate(val);
@@ -1400,7 +1300,7 @@ function switchDoc(id: number): void {
   if (id === state.currentId) return;
   const currentDoc = getCurrentDoc();
   if (currentDoc && documentoEstaModificado(currentDoc)) {
-    salvarDocumentosAgora();
+    saveStatusService.salvarDocumentosAgora();
   }
   state.currentId = id;
 
@@ -1409,13 +1309,13 @@ function switchDoc(id: number): void {
     state.editor.dispatch({
       changes: { from: 0, to: state.editor.state.doc.length, insert: doc.content }
     });
-	    renderPreview(doc.content);
-	    renderList();
-	    loadDocPreferences(state, Logger, id);
-	    updateSaveStatus();
-	    void atualizarLinguagemEditor(doc.name);
-	    Logger.log(`Alternado para doc ID: ${id}`);
-	  }
+    renderPreview(doc.content);
+    renderList();
+    loadDocPreferences(state, Logger, id);
+    saveStatusService.updateSaveStatus();
+    void atualizarLinguagemEditor(doc.name);
+    Logger.log(`Alternado para doc ID: ${id}`);
+  }
 }
 
 function createDoc(): void {
