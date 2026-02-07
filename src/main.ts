@@ -5,8 +5,7 @@ import { language } from '@codemirror/language'
 import { markdown } from '@codemirror/lang-markdown'
 import 'highlight.js/styles/github.css'
 import { validateMarkdown, type MarkdownError } from './processors/markdownValidator'
-import { printDocument, validatePrintContent, togglePrintPreview } from './utils/printUtils'
-import { createReporter } from './utils/printReporter'
+import { togglePrintPreview } from './utils/printUtils'
 import OfflineManager from './utils/offlineManager'
 import SWUpdateNotifier from './utils/swUpdateNotifier'
 import { PreviewService } from './services/previewService'
@@ -15,6 +14,7 @@ import { createSaveStatusService, documentoEstaModificado } from './services/sav
 import { createDocumentIoService } from './services/documentIoService'
 import { setupKeyboardNavigation } from './services/keyboardNavigationService'
 import { setupQuickTags } from './services/quickTagsService'
+import { createPrintWorkflowService } from './services/printWorkflowService'
 import {
   loadDocPreferences,
   setupPreviewControls
@@ -116,6 +116,11 @@ const saveStatusService = createSaveStatusService({
   updateMetrics,
   t,
   debounceMs: SalvamentoConfig.debounceMs
+})
+
+const printWorkflowService = createPrintWorkflowService({
+  logger: Logger,
+  getCurrentDoc
 })
 
 const documentIoService = createDocumentIoService({
@@ -876,43 +881,9 @@ function setupEvents(): void {
 
   const btnDown = document.getElementById('download-btn');
   if (btnDown) {
-    btnDown.addEventListener('click', async (): Promise<void> => {
-      Logger.log('Validando conteudo para impressao...');
-
-      const preview = document.getElementById('preview');
-      if (!preview) {
-        Logger.error('Preview nao encontrado');
-        return;
-      }
-
-      const validation = await validatePrintContent(preview);
-
-      if (validation.issues.length > 0) {
-        validation.issues.forEach((issue): void => Logger.log(issue, 'warning'));
-      }
-
-      const doc = getCurrentDoc();
-      const reporter = createReporter(preview.innerHTML, doc?.name || 'document');
-      const checklist = reporter.generateChecklist();
-
-      Logger.log('=== PRE-IMPRESSAO ===', 'info');
-      checklist.checks.forEach((check): void => Logger.log(check, 'success'));
-      checklist.warnings.forEach((warn): void => Logger.log(warn, 'warning'));
-
-      const stats = reporter.analyze();
-      Logger.log(
-        `${stats.estimatedPages}pp | ${stats.words} palavras | ~${stats.readingTime}min`
-      );
-
-      Logger.log('Abrindo dialogo de impressao...');
-      const success = await printDocument(doc?.name || 'document', (msg: string): void =>
-        Logger.log(msg)
-      );
-
-      if (success) {
-        Logger.success('Impressao finalizada com sucesso');
-      }
-    });
+    btnDown.addEventListener('click', (): void => {
+      void printWorkflowService.imprimirDocumentoAtual();
+    })
   }
 
   // Import MD Button
