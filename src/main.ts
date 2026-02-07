@@ -23,6 +23,7 @@ import { uiRenderer } from './services/uiRenderer'
 import { initI18n, t, getLocale } from './i18n/index'
 import { BackupConfig, BreakpointsLayout, SalvamentoConfig } from '@/constants'
 import type { AppState, LoggerInterface, Document as AppDocument } from '@/types/index'
+import { debounce } from '@/utils/debounce'
 import './pwaRegister'
 import './styles.css'
 import './styles-print.css'
@@ -1069,23 +1070,6 @@ function setupQuickTags(): void {
 // ============================================
 // UTILITY FUNCTIONS
 // ============================================
-
-function debounce<T extends (...args: any[]) => any>(
-  fn: T,
-  delay: number
-): (...args: Parameters<T>) => void {
-  let timeoutId: NodeJS.Timeout | null = null
-  
-  return (...args: Parameters<T>): void => {
-    if (timeoutId !== null) {
-      clearTimeout(timeoutId)
-    }
-    timeoutId = setTimeout(() => {
-      fn(...args)
-      timeoutId = null
-    }, delay)
-  }
-}
 
 // ============================================
 // CORE FUNCTIONS
