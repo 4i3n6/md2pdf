@@ -12,17 +12,15 @@ import SWUpdateNotifier from './utils/swUpdateNotifier'
 import { PreviewService } from './services/previewService'
 import { initSplitter } from './services/splitterService'
 import { createSaveStatusService, documentoEstaModificado } from './services/saveStatusService'
+import { createDocumentIoService } from './services/documentIoService'
 import {
-  getDocPreferences,
   loadDocPreferences,
-  saveDocPreferences,
-  setupPreviewControls,
-  type DocumentPreferences
+  setupPreviewControls
 } from './services/previewPreferencesService'
 import { documentManager } from './services/documentManager'
 import { uiRenderer } from './services/uiRenderer'
 import { initI18n, t, getLocale } from './i18n/index'
-import { BackupConfig, BreakpointsLayout, SalvamentoConfig } from '@/constants'
+import { BreakpointsLayout, SalvamentoConfig } from '@/constants'
 import type { AppState, LoggerInterface, Document as AppDocument } from '@/types/index'
 import { debounce } from '@/utils/debounce'
 import './pwaRegister'
@@ -116,6 +114,19 @@ const saveStatusService = createSaveStatusService({
   updateMetrics,
   t,
   debounceMs: SalvamentoConfig.debounceMs
+})
+
+const documentIoService = createDocumentIoService({
+  state,
+  logger: Logger,
+  appVersion: APP_VERSION,
+  documentManager,
+  getCurrentDoc,
+  renderList,
+  renderPreview,
+  updateMetrics,
+  updateSaveStatus: () => saveStatusService.updateSaveStatus(),
+  atualizarLinguagemEditor
 })
 
 // Compartimento para alternar linguagem do editor dinamicamente
@@ -266,271 +277,6 @@ const markdownDecorationsField = StateField.define({
 
 // Global issues storage for tooltip and panel
 let currentIssues: MarkdownError[] = [];
-
-type BackupPayload = {
-  version: number;
-  appVersion: string;
-  exportedAt: string;
-  docs: AppDocument[];
-  prefs: Record<string, DocumentPreferences>;
-};
-
-// ============================================
-// IMPORT/EXPORT FUNCTIONS
-// ============================================
-
-/**
- * Importa um arquivo .md do computador
- */
-function importMarkdownFile(): void {
-  const input = document.createElement('input');
-  input.type = 'file';
-  input.accept = '.md,.markdown,.txt';
-  
-  input.onchange = async (e: Event): Promise<void> => {
-    const target = e.target as HTMLInputElement;
-    const file = target.files?.[0];
-    
-    if (!file) {
-      Logger.log('Nenhum arquivo selecionado', 'info');
-      return;
-    }
-    
-    try {
-      const content = await file.text();
-      const newDoc = documentManager.createFromImport(file.name, content);
-      
-      state.currentId = newDoc.id;
-      
-      if (state.editor) {
-        state.editor.dispatch({
-          changes: { from: 0, to: state.editor.state.doc.length, insert: content }
-        });
-      }
-      
-      renderList();
-      renderPreview(content);
-      saveStatusService.updateSaveStatus();
-      void atualizarLinguagemEditor(newDoc.name);
-      
-      Logger.success(`Arquivo importado: ${file.name}`);
-    } catch (error) {
-      const errorMsg = error instanceof Error ? error.message : String(error);
-      Logger.error(`Erro ao importar arquivo: ${errorMsg}`);
-    }
-  };
-  
-  input.click();
-}
-
-/**
- * Exporta o documento atual como arquivo .md
- */
-function downloadMarkdownFile(): void {
-  try {
-    const doc = getCurrentDoc();
-    if (!doc) {
-      Logger.error('Nenhum documento carregado');
-      return;
-    }
-
-    const blob = new Blob([doc.content], { type: 'text/markdown;charset=utf-8' });
-    const url = URL.createObjectURL(blob);
-
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = doc.name;
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-
-    URL.revokeObjectURL(url);
-
-    Logger.success(`Download: ${doc.name} (${(blob.size / 1024).toFixed(2)}KB)`);
-  } catch (e) {
-    const errorMessage = e instanceof Error ? e.message : String(e);
-    Logger.error('Erro ao fazer download: ' + errorMessage);
-  }
-}
-
-function gerarNomeBackup(): string {
-  const now = new Date();
-  const pad = (value: number): string => String(value).padStart(2, '0');
-  const data = `${now.getFullYear()}${pad(now.getMonth() + 1)}${pad(now.getDate())}`;
-  const hora = `${pad(now.getHours())}${pad(now.getMinutes())}`;
-  return `md2pdf-backup-${data}-${hora}.json`;
-}
-
-function montarBackupPayload(): BackupPayload {
-  const docs = documentManager.getAll();
-  const prefs: Record<string, DocumentPreferences> = {};
-
-  docs.forEach((doc) => {
-    prefs[String(doc.id)] = getDocPreferences(doc.id, Logger);
-  });
-
-  return {
-    version: BackupConfig.versao,
-    appVersion: APP_VERSION,
-    exportedAt: new Date().toISOString(),
-    docs,
-    prefs
-  };
-}
-
-function normalizarBackupPayload(raw: unknown): BackupPayload | null {
-  if (Array.isArray(raw)) {
-    return {
-      version: 0,
-      appVersion: 'unknown',
-      exportedAt: new Date().toISOString(),
-      docs: raw as AppDocument[],
-      prefs: {}
-    };
-  }
-
-  if (!raw || typeof raw !== 'object') return null;
-
-  const payload = raw as Partial<BackupPayload>;
-  if (!Array.isArray(payload.docs)) return null;
-
-  const prefsBrutas = payload.prefs && typeof payload.prefs === 'object'
-    ? (payload.prefs as Record<string, unknown>)
-    : {};
-
-  const prefs: Record<string, DocumentPreferences> = {};
-  Object.entries(prefsBrutas).forEach(([docId, valor]) => {
-    if (!valor || typeof valor !== 'object') return;
-    const pref = valor as Partial<DocumentPreferences>;
-    if (typeof pref.font !== 'string' || typeof pref.align !== 'string') return;
-    const fontSize = typeof pref.fontSize === 'string' ? pref.fontSize : '9pt';
-    prefs[docId] = { font: pref.font, align: pref.align, fontSize };
-  });
-
-  return {
-    version: typeof payload.version === 'number' ? payload.version : 0,
-    appVersion: typeof payload.appVersion === 'string' ? payload.appVersion : 'unknown',
-    exportedAt: typeof payload.exportedAt === 'string' ? payload.exportedAt : new Date().toISOString(),
-    docs: payload.docs as AppDocument[],
-    prefs
-  };
-}
-
-function aplicarBackup(payload: BackupPayload): void {
-  documentManager.replaceAll(payload.docs);
-
-  Object.entries(payload.prefs).forEach(([docId, pref]) => {
-    const id = Number(docId);
-    if (!Number.isNaN(id)) {
-      saveDocPreferences(id, pref, Logger);
-    }
-  });
-
-  const docsAtualizados = documentManager.getAll();
-  state.docs = docsAtualizados;
-  state.currentId = docsAtualizados[0]?.id ?? null;
-
-  const docAtual = getCurrentDoc();
-  if (state.editor) {
-    state.editor.dispatch({
-      changes: {
-        from: 0,
-        to: state.editor.state.doc.length,
-        insert: docAtual?.content || ''
-      }
-    });
-  }
-
-  renderList();
-  if (docAtual) {
-    renderPreview(docAtual.content);
-    loadDocPreferences(state, Logger, docAtual.id);
-  } else {
-    renderPreview('');
-  }
-  updateMetrics();
-  saveStatusService.updateSaveStatus();
-}
-
-function exportarBackupDocumentos(): void {
-  try {
-    const payload = montarBackupPayload();
-    const content = JSON.stringify(payload, null, 2);
-    const blob = new Blob([content], { type: 'application/json;charset=utf-8' });
-    const url = URL.createObjectURL(blob);
-
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = gerarNomeBackup();
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-
-    URL.revokeObjectURL(url);
-    Logger.success(`Backup gerado com ${payload.docs.length} documento(s)`);
-  } catch (e) {
-    const errorMessage = e instanceof Error ? e.message : String(e);
-    Logger.error('Falha ao gerar backup: ' + errorMessage);
-  }
-}
-
-async function processarArquivoBackup(file: File): Promise<void> {
-  try {
-    const text = await file.text();
-    const parsed = JSON.parse(text) as unknown;
-    const payload = normalizarBackupPayload(parsed);
-
-    if (!payload) {
-      Logger.error('Backup invalido ou formato nao reconhecido');
-      return;
-    }
-
-    if (!confirm('Esta acao substitui todos os documentos atuais. Deseja continuar?')) {
-      Logger.log('Restauracao cancelada pelo usuario', 'warning');
-      return;
-    }
-
-    if (payload.version > BackupConfig.versao) {
-      Logger.log('Backup gerado por versao mais nova. Alguns dados podem ser ignorados.', 'warning');
-    }
-
-    if (payload.appVersion !== 'unknown' && payload.appVersion !== APP_VERSION) {
-      Logger.log(`Backup gerado na versao ${payload.appVersion}`, 'info');
-    }
-
-    aplicarBackup(payload);
-    Logger.success(`Backup restaurado (${payload.docs.length} documento(s))`);
-  } catch (e) {
-    const errorMessage = e instanceof Error ? e.message : String(e);
-    Logger.error('Falha ao restaurar backup: ' + errorMessage);
-  }
-}
-
-function importarBackupDocumentos(): void {
-  const input = document.createElement('input');
-  input.type = 'file';
-  input.accept = '.json,application/json';
-
-  input.onchange = (event: Event): void => {
-    const target = event.target as HTMLInputElement;
-    const file = target.files?.[0];
-    if (!file) return;
-
-    void processarArquivoBackup(file);
-  };
-
-  input.click();
-}
-
-// ============================================
-// PREVIEW CONTROLS
-// ============================================
-
-// ============================================
-// SPLITTER - Resizable Panels
-// ============================================
-
-// ============================================
 // MARKDOWN VALIDATION
 // ============================================
 
@@ -1421,23 +1167,23 @@ function setupEvents(): void {
   // Import MD Button
   const btnImportMd = document.getElementById('import-md-btn');
   if (btnImportMd) {
-    btnImportMd.addEventListener('click', importMarkdownFile);
+    btnImportMd.addEventListener('click', documentIoService.importMarkdownFile);
   }
 
   // Download MD Button
   const btnDownloadMd = document.getElementById('download-md-btn');
   if (btnDownloadMd) {
-    btnDownloadMd.addEventListener('click', downloadMarkdownFile);
+    btnDownloadMd.addEventListener('click', documentIoService.downloadMarkdownFile);
   }
 
   const btnBackup = document.getElementById('backup-btn');
   if (btnBackup) {
-    btnBackup.addEventListener('click', exportarBackupDocumentos);
+    btnBackup.addEventListener('click', documentIoService.exportarBackupDocumentos);
   }
 
   const btnRestore = document.getElementById('restore-btn');
   if (btnRestore) {
-    btnRestore.addEventListener('click', importarBackupDocumentos);
+    btnRestore.addEventListener('click', documentIoService.importarBackupDocumentos);
   }
 
   // Atalhos de teclado globais
