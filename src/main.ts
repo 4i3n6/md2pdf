@@ -10,11 +10,12 @@ import { createReporter } from './utils/printReporter'
 import OfflineManager from './utils/offlineManager'
 import SWUpdateNotifier from './utils/swUpdateNotifier'
 import { PreviewService } from './services/previewService'
+import { initSplitter } from './services/splitterService'
 import { documentManager } from './services/documentManager'
 import { uiRenderer } from './services/uiRenderer'
 import { initI18n, t, getLocale } from './i18n/index'
-import { BackupConfig, BreakpointsLayout, SalvamentoConfig, SplitterConfig, obterChavePreferenciasDocumento } from '@/constants'
-import { storageGetItem, storageSetItem, storageSetJson } from '@/utils/storage'
+import { BackupConfig, BreakpointsLayout, SalvamentoConfig, obterChavePreferenciasDocumento } from '@/constants'
+import { storageGetItem, storageSetJson } from '@/utils/storage'
 import type { AppState, LoggerInterface, Document as AppDocument } from '@/types/index'
 import './pwaRegister'
 import './styles.css'
@@ -775,109 +776,6 @@ function setupPreviewControls(): void {
 // SPLITTER - Resizable Panels
 // ============================================
 
-const SPLITTER_STORAGE_KEY = SplitterConfig.storageKey;
-const SPLITTER_MIN_RATIO = SplitterConfig.minRatio; // 30% minimum
-const SPLITTER_MAX_RATIO = SplitterConfig.maxRatio; // 70% maximum
-const SPLITTER_DEFAULT_RATIO = SplitterConfig.defaultRatio; // 50/50 default
-
-function initSplitter(): void {
-  const splitter = document.getElementById('workspace-splitter');
-  const editorPane = document.getElementById('editor-pane');
-  const workspace = document.querySelector('.workspace') as HTMLElement | null;
-  
-  if (!splitter || !editorPane || !workspace) {
-    Logger.log('Splitter elements not found', 'warning');
-    return;
-  }
-  
-  // Load saved ratio
-  const savedRatio = storageGetItem(
-    SPLITTER_STORAGE_KEY,
-    (msg) => Logger.log(msg, 'warning')
-  );
-  let currentRatio = savedRatio ? parseFloat(savedRatio) : SPLITTER_DEFAULT_RATIO;
-  
-  // Validate saved ratio
-  if (isNaN(currentRatio) || currentRatio < SPLITTER_MIN_RATIO || currentRatio > SPLITTER_MAX_RATIO) {
-    currentRatio = SPLITTER_DEFAULT_RATIO;
-  }
-  
-  // Apply initial ratio
-  applyRatio(currentRatio);
-  
-  let isDragging = false;
-  let startX = 0;
-  let startWidth = 0;
-  
-  // Mouse down - start dragging
-  splitter.addEventListener('mousedown', (e: MouseEvent) => {
-    isDragging = true;
-    startX = e.clientX;
-    startWidth = editorPane.offsetWidth;
-    document.body.classList.add('splitter-dragging');
-    e.preventDefault();
-  });
-  
-  // Mouse move - drag
-  document.addEventListener('mousemove', (e: MouseEvent) => {
-    if (!isDragging) return;
-    
-    const deltaX = e.clientX - startX;
-    const workspaceWidth = workspace.offsetWidth;
-    const splitterWidth = splitter.offsetWidth;
-    const availableWidth = workspaceWidth - splitterWidth;
-    const newWidth = startWidth + deltaX;
-    const newRatio = newWidth / availableWidth;
-    
-    // Apply limits
-    currentRatio = Math.max(SPLITTER_MIN_RATIO, Math.min(SPLITTER_MAX_RATIO, newRatio));
-    applyRatio(currentRatio);
-  });
-  
-  // Mouse up - finish dragging
-  document.addEventListener('mouseup', () => {
-    if (!isDragging) return;
-    
-    isDragging = false;
-    document.body.classList.remove('splitter-dragging');
-    
-    // Save ratio
-    storageSetItem(
-      SPLITTER_STORAGE_KEY,
-      currentRatio.toString(),
-      (msg) => Logger.error(msg)
-    );
-    Logger.log(`Panel ratio: ${Math.round(currentRatio * 100)}%`);
-  });
-  
-  // Double click - restore 50/50
-  splitter.addEventListener('dblclick', () => {
-    currentRatio = SPLITTER_DEFAULT_RATIO;
-    applyRatio(currentRatio);
-    storageSetItem(
-      SPLITTER_STORAGE_KEY,
-      currentRatio.toString(),
-      (msg) => Logger.error(msg)
-    );
-    Logger.log('Panel ratio reset to 50%');
-  });
-  
-  function applyRatio(ratio: number): void {
-    const workspaceWidth = workspace!.offsetWidth;
-    const splitterWidth = splitter!.offsetWidth;
-    const availableWidth = workspaceWidth - splitterWidth;
-    const editorWidth = Math.round(availableWidth * ratio);
-    editorPane!.style.width = `${editorWidth}px`;
-  }
-  
-  // Handle window resize
-  window.addEventListener('resize', () => {
-    applyRatio(currentRatio);
-  });
-  
-  Logger.success('Splitter initialized');
-}
-
 function insertFontTag(font: string): void {
   if (!state.editor) return;
   
@@ -1388,7 +1286,7 @@ function initSystem(): void {
   setupPreviewControls();
   setupSaveControls();
   setupKeyboardNavigation();
-  initSplitter();
+  initSplitter(Logger);
   updateMetrics();
   updateSaveStatus();
   Logger.success('Sistema pronto.');
