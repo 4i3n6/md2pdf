@@ -15,6 +15,7 @@ import { createDocumentIoService } from './services/documentIoService'
 import { setupKeyboardNavigation } from './services/keyboardNavigationService'
 import { setupQuickTags } from './services/quickTagsService'
 import { createPrintWorkflowService } from './services/printWorkflowService'
+import { setupAppEvents } from './services/appEventsService'
 import {
   loadDocPreferences,
   setupPreviewControls
@@ -499,7 +500,19 @@ function initSystem(): void {
 
   loadDocs();
   initEditor();
-  setupEvents();
+  setupAppEvents({
+    logger: Logger,
+    createDoc,
+    imprimirDocumentoAtual: () => printWorkflowService.imprimirDocumentoAtual(),
+    documentIoService,
+    togglePrintPreview,
+    getCurrentDoc,
+    obterExtensaoDocumento,
+    saveDocs,
+    renderList,
+    renderPreview,
+    atualizarLinguagemEditor
+  })
   setupQuickTags({ state, logger: Logger });
   setupPreviewControls(state, Logger);
   saveStatusService.setupSaveControls();
@@ -871,109 +884,6 @@ function updateMetrics(): void {
   if (el) {
     uiRenderer.updateMemoryMetric(el, size)
   }
-}
-
-function setupEvents(): void {
-  const btnNew = document.getElementById('new-doc-btn');
-  if (btnNew) {
-    btnNew.addEventListener('click', createDoc);
-  }
-
-  const btnDown = document.getElementById('download-btn');
-  if (btnDown) {
-    btnDown.addEventListener('click', (): void => {
-      void printWorkflowService.imprimirDocumentoAtual();
-    })
-  }
-
-  // Import MD Button
-  const btnImportMd = document.getElementById('import-md-btn');
-  if (btnImportMd) {
-    btnImportMd.addEventListener('click', documentIoService.importMarkdownFile);
-  }
-
-  // Download MD Button
-  const btnDownloadMd = document.getElementById('download-md-btn');
-  if (btnDownloadMd) {
-    btnDownloadMd.addEventListener('click', documentIoService.downloadMarkdownFile);
-  }
-
-  const btnBackup = document.getElementById('backup-btn');
-  if (btnBackup) {
-    btnBackup.addEventListener('click', documentIoService.exportarBackupDocumentos);
-  }
-
-  const btnRestore = document.getElementById('restore-btn');
-  if (btnRestore) {
-    btnRestore.addEventListener('click', documentIoService.importarBackupDocumentos);
-  }
-
-  // Atalhos de teclado globais
-  document.addEventListener('keydown', (e: KeyboardEvent): void => {
-    // Ctrl+Shift+P - Preview de impressao
-    if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key === 'P') {
-      e.preventDefault();
-      togglePrintPreview();
-      Logger.success(
-        document.body.classList.contains('print-mode')
-          ? 'Preview de Impressao Ativado (ESC para sair)'
-          : 'Preview Desativado'
-      );
-    }
-  });
-
-  // Name Input
-  const inputName = document.getElementById('doc-name') as HTMLInputElement | null;
-  if (inputName) {
-    inputName.addEventListener('input', (e: Event): void => {
-      const target = e.target as HTMLInputElement;
-      const doc = getCurrentDoc();
-      if (doc) {
-        const extAnterior = obterExtensaoDocumento(doc.name)
-        doc.name = target.value;
-        saveDocs();
-        renderList();
-        const extNovo = obterExtensaoDocumento(doc.name)
-        if (extAnterior !== extNovo) {
-          void renderPreview(doc.content);
-          void atualizarLinguagemEditor(doc.name);
-        }
-      }
-    });
-  }
-
-  // Copy Markdown Button
-  const btnCopyMd = document.getElementById('copy-md-btn');
-  if (btnCopyMd) {
-    btnCopyMd.addEventListener('click', async (): Promise<void> => {
-      const doc = getCurrentDoc();
-      if (doc?.content) {
-        try {
-          await navigator.clipboard.writeText(doc.content);
-          Logger.success('Conteudo copiado para area de transferencia');
-          const originalText = btnCopyMd.textContent;
-          btnCopyMd.textContent = '[ OK! ]';
-          btnCopyMd.classList.add('copied');
-          setTimeout(() => {
-            btnCopyMd.textContent = originalText;
-            btnCopyMd.classList.remove('copied');
-          }, 1500);
-        } catch (err) {
-          Logger.error('Falha ao copiar: ' + String(err));
-        }
-      } else {
-        Logger.log('Nenhum conteudo para copiar', 'warning');
-      }
-    });
-  }
-
-  // Atalho Ctrl+Shift+C para copiar
-  document.addEventListener('keydown', (e: KeyboardEvent): void => {
-    if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key === 'C') {
-      e.preventDefault();
-      btnCopyMd?.click();
-    }
-  });
 }
 
 // Boot
