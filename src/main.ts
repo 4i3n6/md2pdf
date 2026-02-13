@@ -17,6 +17,11 @@ import { setupAppEvents } from './services/appEventsService'
 import { createMarkdownDiagnosticsService } from './services/markdownDiagnosticsService'
 import { carregadoresLinguagem } from './services/editorLanguageLoaders'
 import {
+  documentoEhMarkdownPorNome,
+  obterExtensaoDocumentoArquivo,
+  obterModoEditorPorNome
+} from './services/documentLanguageService'
+import {
   loadDocPreferences,
   setupPreviewControls
 } from './services/previewPreferencesService'
@@ -157,8 +162,6 @@ const compartimentoLinguagem = new Compartment();
 let requisicaoLinguagemEditor = 0;
 let modoEditorAtual = '';
 
-const extensoesMarkdown = new Set(['', 'md', 'markdown', 'txt']);
-
 // ============================================
 // UTILITY FUNCTIONS
 // ============================================
@@ -235,24 +238,15 @@ function saveDocs(): void {
 }
 
 function obterExtensaoDocumento(nome?: string): string {
-    const origem = (nome ?? getCurrentDoc()?.name ?? '').trim()
-    const partes = origem.split('.')
-    if (partes.length < 2) {
-        return ''
-    }
-    return (partes.pop() || '').toLowerCase().trim()
+    return obterExtensaoDocumentoArquivo(nome ?? getCurrentDoc()?.name ?? '')
 }
 
 function documentoEhMarkdown(nome?: string): boolean {
-    return extensoesMarkdown.has(obterExtensaoDocumento(nome))
+    return documentoEhMarkdownPorNome(nome ?? getCurrentDoc()?.name ?? '')
 }
 
 function obterModoEditor(nome?: string): string {
-    if (documentoEhMarkdown(nome)) {
-        return 'markdown'
-    }
-    const ext = obterExtensaoDocumento(nome)
-    return ext || 'plaintext'
+    return obterModoEditorPorNome(nome ?? getCurrentDoc()?.name ?? '')
 }
 
 async function carregarLinguagemEditor(nome?: string): Promise<Extension> {
