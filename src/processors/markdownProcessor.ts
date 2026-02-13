@@ -92,7 +92,49 @@ function obterAtributoAlinhamento(align?: string | null): string {
     if (valor !== 'left' && valor !== 'center' && valor !== 'right') {
         return ''
     }
-    return ` style="text-align: ${valor}"`
+    return ` align="${valor}" style="text-align: ${valor}"`
+}
+
+function inferirAlinhamentoPorPadrao(padrao: string): string | null {
+  const valor = padrao.trim()
+  if (!valor) return null
+
+  const temDoisPontosInicio = valor.startsWith(':')
+  const temDoisPontosFim = valor.endsWith(':')
+
+  if (temDoisPontosInicio && temDoisPontosFim) return 'center'
+  if (temDoisPontosFim) return 'right'
+  if (temDoisPontosInicio) return 'left'
+  return null
+}
+
+function inferirAlinhamentosPorRaw(raw: string | undefined, quantidadeColunas: number): Array<string | null> {
+  if (!raw || quantidadeColunas <= 0) return []
+
+  const linhas = raw.split('\n').map((linha) => linha.trim()).filter(Boolean)
+  if (linhas.length < 2) return []
+
+  const linhaSeparadora = linhas[1] || ''
+  const partes = linhaSeparadora
+    .split('|')
+    .map((parte) => parte.trim())
+    .filter((parte) => parte.length > 0)
+
+  const alinhamentos = partes.map((parte) => inferirAlinhamentoPorPadrao(parte))
+  while (alinhamentos.length < quantidadeColunas) {
+    alinhamentos.push(null)
+  }
+  return alinhamentos.slice(0, quantidadeColunas)
+}
+
+function obterAlinhamentoCelula(
+  alinhamentos: Array<string | null>,
+  alinhamentosFallback: Array<string | null>,
+  idx: number,
+  cell: Tokens.TableCell
+): string | null {
+  const cellComAlinhamento = cell as Tokens.TableCell & { align?: string | null }
+  return alinhamentos[idx] || cellComAlinhamento.align || alinhamentosFallback[idx] || null
 }
 
 /**
@@ -150,13 +192,16 @@ class PrintRenderer extends Renderer {
     const alinhamentos = Array.isArray(tokenComAlinhamento.align)
       ? tokenComAlinhamento.align
       : []
+    const alinhamentosFallback = inferirAlinhamentosPorRaw(token.raw, token.header?.length || 0)
 
     // Header row
     let headerRow = ''
     if (token.header && token.header.length > 0) {
       const headerCells = token.header
         .map((cell: Tokens.TableCell, idx: number) => {
-          const alignAttr = obterAtributoAlinhamento(alinhamentos[idx] || null)
+          const alignAttr = obterAtributoAlinhamento(
+            obterAlinhamentoCelula(alinhamentos, alinhamentosFallback, idx, cell)
+          )
           return `<th${alignAttr}>${this.parser.parseInline(cell.tokens)}</th>`
         })
         .join('')
@@ -170,7 +215,9 @@ class PrintRenderer extends Renderer {
         .map((row: Tokens.TableCell[]) => {
           const cells = row
             .map((cell: Tokens.TableCell, idx: number) => {
-              const alignAttr = obterAtributoAlinhamento(alinhamentos[idx] || null)
+              const alignAttr = obterAtributoAlinhamento(
+                obterAlinhamentoCelula(alinhamentos, alinhamentosFallback, idx, cell)
+              )
               return `<td${alignAttr}>${this.parser.parseInline(cell.tokens)}</td>`
             })
             .join('')
@@ -474,7 +521,7 @@ const DOMPURIFY_CONFIG = {
     'input',
     'mark'
   ],
-  ALLOWED_ATTR: ['href', 'src', 'alt', 'title', 'id', 'class', 'data-lang', 'data-mermaid-source', 'data-yaml-source', 'data-yaml-type', 'data-print-image', 'loading', 'style', 'role', 'aria-label', 'aria-hidden', 'type', 'checked', 'disabled'],
+  ALLOWED_ATTR: ['href', 'src', 'alt', 'title', 'id', 'class', 'data-lang', 'data-mermaid-source', 'data-yaml-source', 'data-yaml-type', 'data-print-image', 'loading', 'style', 'align', 'role', 'aria-label', 'aria-hidden', 'type', 'checked', 'disabled'],
   ALLOW_DATA_ATTR: false,
   FORCE_BODY: false
 } as const

@@ -446,6 +446,12 @@ body.splitter-dragging iframe {
 .markdown-body table { width: 100%; border-collapse: collapse; border: 1px solid var(--border); }
 .markdown-body th, .markdown-body td { border: 1px solid var(--border); padding: 8px; }
 .markdown-body th { background: var(--bg-panel); color: var(--text-main); font-weight: 700; text-align: left; }
+.markdown-body th[align="left"],
+.markdown-body td[align="left"] { text-align: left; }
+.markdown-body th[align="center"],
+.markdown-body td[align="center"] { text-align: center; }
+.markdown-body th[align="right"],
+.markdown-body td[align="right"] { text-align: right; }
 
 /* Horizontal Rule - Visual line only */
 .markdown-body hr,

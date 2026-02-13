@@ -395,6 +395,21 @@
         print-color-adjust: exact !important;
     }
 
+    .markdown-body th[align="left"],
+    .markdown-body td[align="left"] {
+        text-align: left;
+    }
+
+    .markdown-body th[align="center"],
+    .markdown-body td[align="center"] {
+        text-align: center;
+    }
+
+    .markdown-body th[align="right"],
+    .markdown-body td[align="right"] {
+        text-align: right;
+    }
+
     /* Repetir header de tabela em cada página */
     .markdown-body thead {
         display: table-header-group;
@@ -610,6 +625,21 @@ body.print-mode .markdown-body td {
     word-break: break-word;
     overflow-wrap: anywhere;
     vertical-align: top;
+}
+
+body.print-mode .markdown-body th[align="left"],
+body.print-mode .markdown-body td[align="left"] {
+    text-align: left;
+}
+
+body.print-mode .markdown-body th[align="center"],
+body.print-mode .markdown-body td[align="center"] {
+    text-align: center;
+}
+
+body.print-mode .markdown-body th[align="right"],
+body.print-mode .markdown-body td[align="right"] {
+    text-align: right;
 }
 
 body.print-mode .markdown-body .markdown-table {

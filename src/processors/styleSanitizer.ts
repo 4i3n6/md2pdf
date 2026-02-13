@@ -1,12 +1,14 @@
 import DOMPurify from 'dompurify'
 
-const tagsComStylePermitido = new Set(['span', 'div', 'mark', 'figure', 'blockquote'])
+const tagsComStylePermitido = new Set(['span', 'div', 'mark', 'figure', 'blockquote', 'th', 'td'])
 const propriedadesStylePermitidasPorTag: Record<string, Set<string>> = {
     span: new Set(['font-family', 'color']),
     div: new Set(['text-align', 'page-break-inside', 'break-inside']),
     mark: new Set(['background', 'background-color', 'color']),
     figure: new Set(['page-break-inside', 'break-inside']),
-    blockquote: new Set(['page-break-inside', 'break-inside'])
+    blockquote: new Set(['page-break-inside', 'break-inside']),
+    th: new Set(['text-align']),
+    td: new Set(['text-align'])
 }
 
 const regexCorCss = /^(#[0-9a-f]{3,8}|rgb(a)?\([^)]{1,40}\)|hsl(a)?\([^)]{1,40}\)|transparent|black|white)$/i
