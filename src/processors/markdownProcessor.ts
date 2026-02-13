@@ -22,6 +22,7 @@ import rust from 'highlight.js/lib/languages/rust'
 import sql from 'highlight.js/lib/languages/sql'
 import typescript from 'highlight.js/lib/languages/typescript'
 import yaml from 'highlight.js/lib/languages/yaml'
+import { normalizarLinguagemCodigo } from '@/services/documentLanguageService'
 import { logErro } from '@/utils/logger'
 import { registrarHooksSanitizacaoStyle } from './styleSanitizer'
 
@@ -50,41 +51,6 @@ const linguagensHighlight: Array<[string, LanguageFn]> = [
 
 for (const [nome, definicao] of linguagensHighlight) {
     hljs.registerLanguage(nome, definicao)
-}
-
-const mapaAliasLinguagens: Record<string, string> = {
-    js: 'javascript',
-    jsx: 'javascript',
-    ts: 'typescript',
-    tsx: 'typescript',
-    sh: 'bash',
-    shell: 'bash',
-    yml: 'yaml',
-    md: 'markdown',
-    text: 'plaintext',
-    txt: 'plaintext',
-    'c++': 'cpp',
-    'c#': 'csharp',
-    cs: 'csharp',
-    ddl: 'sql',
-    postgres: 'sql',
-    postgresql: 'sql',
-    psql: 'sql',
-    htm: 'html',
-    xhtml: 'xml'
-}
-
-function normalizarLinguagem(lang?: string): string {
-    const partes = (lang || 'plaintext')
-        .toLowerCase()
-        .trim()
-        .split(/\s+/)
-    const bruto = partes[0] || 'plaintext'
-    const limpo = bruto.replace(/[^a-z0-9#+.-]/g, '')
-
-    if (!limpo) return 'plaintext'
-
-    return mapaAliasLinguagens[limpo] ?? limpo
 }
 
 function obterAtributoAlinhamento(align?: string | null): string {
@@ -248,7 +214,7 @@ class PrintRenderer extends Renderer {
    */
   override code(token: Tokens.Code): string {
     const linguagemBruta = typeof token.lang === 'string' ? token.lang.trim() : ''
-    const lang = normalizarLinguagem(linguagemBruta)
+    const lang = normalizarLinguagemCodigo(linguagemBruta)
     const temLinguagem = linguagemBruta.length > 0
     let highlightedCode = token.text
 

@@ -31,6 +31,28 @@ const fencesPreviewPorExtensao: Record<string, string> = {
     ruby: 'ruby'
 }
 
+const aliasesLinguagemCodigo: Record<string, string> = {
+    js: 'javascript',
+    jsx: 'javascript',
+    ts: 'typescript',
+    tsx: 'typescript',
+    sh: 'bash',
+    shell: 'bash',
+    yml: 'yaml',
+    md: 'markdown',
+    text: 'plaintext',
+    txt: 'plaintext',
+    'c++': 'cpp',
+    'c#': 'csharp',
+    cs: 'csharp',
+    ddl: 'sql',
+    postgres: 'sql',
+    postgresql: 'sql',
+    psql: 'sql',
+    htm: 'html',
+    xhtml: 'xml'
+}
+
 export function obterExtensaoDocumentoArquivo(nome?: string): string {
     const origem = (nome || '').trim()
     const partes = origem.split('.')
@@ -51,4 +73,17 @@ export function obterModoEditorPorNome(nome?: string): string {
 export function obterFencePreviewPorNome(nome?: string): string | null {
     const ext = obterExtensaoDocumentoArquivo(nome)
     return fencesPreviewPorExtensao[ext] || null
+}
+
+export function normalizarLinguagemCodigo(nomeBruto?: string): string {
+    const partes = (nomeBruto || 'plaintext')
+        .toLowerCase()
+        .trim()
+        .split(/\s+/)
+    const bruto = partes[0] || 'plaintext'
+    const limpo = bruto.replace(/[^a-z0-9#+.-]/g, '')
+
+    if (!limpo) return 'plaintext'
+
+    return aliasesLinguagemCodigo[limpo] || limpo
 }
