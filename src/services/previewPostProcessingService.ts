@@ -2,11 +2,17 @@ import { processImagesInPreview } from '@/processors/markdownProcessor'
 import { processMermaidDiagrams } from '@/processors/mermaidProcessor'
 import { processYamlBlocks } from '@/processors/yamlProcessor'
 import type { LoggerInterface } from '@/types/index'
+import { runPipeline, type PipelineStage } from '@/utils/pipeline'
 
 type PreviewPosProcessador = {
     executar: (container: HTMLElement) => Promise<number>
     mensagemSucesso: (quantidade: number) => string
     mensagemErro: string
+}
+
+type PreviewPosProcessamentoContexto = {
+    container: HTMLElement
+    logger: LoggerInterface | undefined
 }
 
 const processadores: PreviewPosProcessador[] = [
@@ -27,18 +33,24 @@ const processadores: PreviewPosProcessador[] = [
     }
 ]
 
+const etapasPosProcessamento: PipelineStage<PreviewPosProcessamentoContexto>[] = processadores.map(
+    (processador, idx) => ({
+        id: `preview-pos-processador-${idx + 1}`,
+        run: async (contexto): Promise<void> => {
+            const processados = await processador.executar(contexto.container)
+            if (processados > 0) {
+                contexto.logger?.log?.(processador.mensagemSucesso(processados), 'success')
+            }
+        },
+        onError: (erro, contexto): void => {
+            contexto.logger?.error?.(`${processador.mensagemErro}: ${String(erro)}`)
+        }
+    })
+)
+
 export async function executarPosProcessamentoPreview(
     container: HTMLElement,
     logger?: LoggerInterface
 ): Promise<void> {
-    for (const processador of processadores) {
-        try {
-            const processados = await processador.executar(container)
-            if (processados > 0) {
-                logger?.log?.(processador.mensagemSucesso(processados), 'success')
-            }
-        } catch (e) {
-            logger?.error?.(`${processador.mensagemErro}: ${String(e)}`)
-        }
-    }
+    await runPipeline({ container, logger }, etapasPosProcessamento)
 }

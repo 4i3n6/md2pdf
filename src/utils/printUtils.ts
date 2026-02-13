@@ -5,6 +5,7 @@
 
 import { ImpressaoLimites } from '@/constants'
 import { logAviso, logErro, logInfo } from '@/utils/logger'
+import { runPipeline, type PipelineStage } from '@/utils/pipeline'
 
 /**
  * Resultado de validação de conteúdo para impressão
@@ -32,6 +33,13 @@ type PrintContentTarget = string | HTMLElement;
 export interface PrintDocumentOptions {
   previewElement?: HTMLElement | null;
   validation?: ValidationResult;
+}
+
+type ValidationPipelineContext = {
+  container: HTMLElement;
+  htmlContent: string;
+  isLive: boolean;
+  issues: string[];
 }
 
 const PrintTimings = {
@@ -137,6 +145,33 @@ function validarUrlsLongasNoHtml(htmlContent: string, issues: string[]): void {
     }
 }
 
+const validadoresConteudoImpressao: PipelineStage<ValidationPipelineContext>[] = [
+    {
+        id: 'validar-imagens-print',
+        enabled: (contexto) => contexto.isLive,
+        run: async (contexto): Promise<void> => {
+            const images = Array.from(contexto.container.querySelectorAll('img'));
+            if (images.length > 0) {
+                await aguardarImagensCarregadas(images);
+            }
+            validarImagensNoContainer(contexto.container, contexto.issues);
+        }
+    },
+    {
+        id: 'validar-tabelas-print',
+        enabled: (contexto) => contexto.isLive,
+        run: (contexto): void => {
+            validarTabelasNoContainer(contexto.container, contexto.issues);
+        }
+    },
+    {
+        id: 'validar-urls-longas-print',
+        run: (contexto): void => {
+            validarUrlsLongasNoHtml(contexto.htmlContent, contexto.issues);
+        }
+    }
+]
+
 function obterPreviewElement(options?: PrintDocumentOptions): HTMLElement | null {
   if (options && 'previewElement' in options) {
     return options.previewElement ?? null;
@@ -210,20 +245,13 @@ export async function validatePrintContent(content: PrintContentTarget): Promise
   }
 
   const container = typeof content === 'string' ? criarContainerTemporario(content) : content;
-  const isLive = container.isConnected;
-
-  if (isLive) {
-    const images = Array.from(container.querySelectorAll('img'));
-    if (images.length > 0) {
-        await aguardarImagensCarregadas(images);
-    }
-    validarImagensNoContainer(container, issues);
-    validarTabelasNoContainer(container, issues);
+  const contexto: ValidationPipelineContext = {
+    container,
+    htmlContent: typeof content === 'string' ? content : container.innerHTML,
+    isLive: container.isConnected,
+    issues
   }
-
-  // Validar linhas muito longas (URLs)
-  const htmlContent = typeof content === 'string' ? content : container.innerHTML;
-  validarUrlsLongasNoHtml(htmlContent, issues);
+  await runPipeline(contexto, validadoresConteudoImpressao)
 
   return {
     isValid: issues.length === 0,
@@ -231,11 +259,6 @@ export async function validatePrintContent(content: PrintContentTarget): Promise
   };
 }
 
-/**
- * Armazena estado original dos elementos antes de modificar para print
- * Chave: seletor CSS, Valor: array com dados do estado original
- */
-const elementStates = new Map<string, Array<{ el: HTMLElement; originalStyle: string }>>();
 let printPreviewEscapeHandler: ((e: KeyboardEvent) => void) | null = null;
 
 function removerHandlerEscapePrintPreview(): void {
@@ -256,6 +279,17 @@ function registrarHandlerEscapePrintPreview(): void {
   document.addEventListener('keydown', printPreviewEscapeHandler);
 }
 
+function definirPrintPreviewAtivo(ativo: boolean): void {
+  if (ativo) {
+    document.body.classList.add('print-mode');
+    registrarHandlerEscapePrintPreview();
+    return;
+  }
+
+  document.body.classList.remove('print-mode');
+  removerHandlerEscapePrintPreview();
+}
+
 /**
  * Otimiza página para impressão (esconde elementos desnecessários)
  * NOTA: Não modificamos mais o DOM - deixamos o CSS @media print cuidar disso
@@ -263,9 +297,6 @@ function registrarHandlerEscapePrintPreview(): void {
  */
 export function optimizeForPrint(): boolean {
   try {
-    // Limpar estados anteriores
-    elementStates.clear();
-    
     // Não precisamos mais esconder elementos manualmente
     // O CSS @media print em styles-print.css já cuida disso
     // Isso evita problemas de restauração do DOM
@@ -285,11 +316,7 @@ export function optimizeForPrint(): boolean {
 export function restoreAfterPrint(): boolean {
   try {
     // Limpar classe de preview e handlers temporários
-    document.body.classList.remove('print-mode');
-    removerHandlerEscapePrintPreview();
-
-    // Limpar mapa de estados
-    elementStates.clear();
+    definirPrintPreviewAtivo(false);
 
     return true;
   } catch (error) {
@@ -353,14 +380,8 @@ export function printDocument(
  * Pressione ESC para sair
  */
 export function togglePrintPreview(): void {
-  const isEntering = !document.body.classList.contains('print-mode');
-  document.body.classList.toggle('print-mode');
-
-  if (isEntering) {
-    registrarHandlerEscapePrintPreview();
-  } else {
-    removerHandlerEscapePrintPreview();
-  }
+  const ativo = document.body.classList.contains('print-mode');
+  definirPrintPreviewAtivo(!ativo);
 }
 
 /**
@@ -368,11 +389,9 @@ export function togglePrintPreview(): void {
  * @returns Se entrou ou já estava
  */
 export function enterPrintPreview(): boolean {
-  if (!document.body.classList.contains('print-mode')) {
-    togglePrintPreview();
-    return true;
-  }
-  return false;
+  if (document.body.classList.contains('print-mode')) return false;
+  definirPrintPreviewAtivo(true);
+  return true;
 }
 
 /**
@@ -380,12 +399,9 @@ export function enterPrintPreview(): boolean {
  * @returns Se saiu ou já estava fora
  */
 export function exitPrintPreview(): boolean {
-  if (document.body.classList.contains('print-mode')) {
-    document.body.classList.remove('print-mode');
-    removerHandlerEscapePrintPreview();
-    return true;
-  }
-  return false;
+  if (!document.body.classList.contains('print-mode')) return false;
+  definirPrintPreviewAtivo(false);
+  return true;
 }
 
 /**
