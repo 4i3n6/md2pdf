@@ -50,6 +50,7 @@
     "vite": "^7.2.6"
   },
   "devDependencies": {
+    "@playwright/test": "^1.58.2",
     "@types/js-yaml": "^4.0.9",
     "@types/node": "^24.10.1",
     "terser": "^5.44.1",
