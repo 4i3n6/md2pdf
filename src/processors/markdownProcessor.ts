@@ -86,6 +86,14 @@ function normalizarLinguagem(lang?: string): string {
     return mapaAliasLinguagens[limpo] ?? limpo
 }
 
+function obterAtributoAlinhamento(align?: string | null): string {
+    const valor = (align || '').toLowerCase().trim()
+    if (valor !== 'left' && valor !== 'center' && valor !== 'right') {
+        return ''
+    }
+    return ` style="text-align: ${valor}"`
+}
+
 /**
  * PrintRenderer - Renderer customizado otimizado para impressão em A4
  * 
@@ -137,11 +145,19 @@ class PrintRenderer extends Renderer {
    * Renderiza tabelas com suporte a header e body
    */
   override table(token: Tokens.Table): string {
+    const tokenComAlinhamento = token as Tokens.Table & { align?: Array<string | null> }
+    const alinhamentos = Array.isArray(tokenComAlinhamento.align)
+      ? tokenComAlinhamento.align
+      : []
+
     // Header row
     let headerRow = ''
     if (token.header && token.header.length > 0) {
       const headerCells = token.header
-        .map((cell: Tokens.TableCell) => `<th>${this.parser.parseInline(cell.tokens)}</th>`)
+        .map((cell: Tokens.TableCell, idx: number) => {
+          const alignAttr = obterAtributoAlinhamento(alinhamentos[idx] || null)
+          return `<th${alignAttr}>${this.parser.parseInline(cell.tokens)}</th>`
+        })
         .join('')
       headerRow = `<thead><tr>${headerCells}</tr></thead>`
     }
@@ -152,7 +168,10 @@ class PrintRenderer extends Renderer {
       const rows = token.rows
         .map((row: Tokens.TableCell[]) => {
           const cells = row
-            .map((cell: Tokens.TableCell) => `<td>${this.parser.parseInline(cell.tokens)}</td>`)
+            .map((cell: Tokens.TableCell, idx: number) => {
+              const alignAttr = obterAtributoAlinhamento(alinhamentos[idx] || null)
+              return `<td${alignAttr}>${this.parser.parseInline(cell.tokens)}</td>`
+            })
             .join('')
           return `<tr>${cells}</tr>`
         })
@@ -160,7 +179,7 @@ class PrintRenderer extends Renderer {
       bodyRows = `<tbody>${rows}</tbody>`
     }
 
-    return `<figure class="markdown-table" style="page-break-inside: avoid;">
+    return `<figure class="markdown-table">
       <table class="markdown-table-content">
         ${headerRow}
         ${bodyRows}

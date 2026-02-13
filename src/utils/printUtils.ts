@@ -73,6 +73,60 @@ function obterLarguraTabela(table: HTMLTableElement): number {
     return rect.width || table.scrollWidth || table.offsetWidth || 0;
 }
 
+function obterLarguraContainer(container: HTMLElement): number {
+    const rect = container.getBoundingClientRect();
+    return rect.width || container.clientWidth || container.scrollWidth || 0;
+}
+
+function validarImagensNoContainer(container: HTMLElement, issues: string[]): void {
+    const images = Array.from(container.querySelectorAll('img'));
+
+    images.forEach((img, idx) => {
+        const dims = obterDimensoesImagem(img);
+        if (dims.widthPx <= 0 || dims.heightPx <= 0) return;
+
+        const maxWidthMm = ImpressaoLimites.maxLarguraMm;
+        const maxHeightMm = ImpressaoLimites.maxAlturaMm;
+        const pxPorMm = ImpressaoLimites.pxPorMm;
+        const imgWidthMm = dims.widthPx / pxPorMm;
+        const imgHeightMm = dims.heightPx / pxPorMm;
+
+        if (imgWidthMm > maxWidthMm || imgHeightMm > maxHeightMm) {
+            issues.push(`⚠️ Imagem ${idx + 1}: ${Math.round(dims.widthPx)}x${Math.round(dims.heightPx)}px pode não caber na página A4`);
+        }
+    });
+}
+
+function validarTabelasNoContainer(container: HTMLElement, issues: string[]): void {
+    const tables = Array.from(container.querySelectorAll('table'));
+
+    tables.forEach((table, idx) => {
+        const tableWidthPx = obterLarguraTabela(table);
+        const containerWidthPx = obterLarguraContainer(container);
+        if (tableWidthPx <= 0 || containerWidthPx <= 0) return;
+
+        // Tolerancia para evitar falso positivo por bordas, arredondamento e scrollbar.
+        // Avisa apenas quando o excesso é realmente perceptível no print.
+        const toleranciaPx = Math.max(12, containerWidthPx * 0.02);
+        const excessoNoContainer = Math.max(0, tableWidthPx - containerWidthPx);
+        const excessoInterno = Math.max(0, table.scrollWidth - table.clientWidth);
+        const excessoDetectado = Math.max(excessoNoContainer, excessoInterno);
+
+        if (excessoDetectado > toleranciaPx) {
+            issues.push(
+                `⚠️ Tabela ${idx + 1}: ${Math.round(tableWidthPx)}px (área útil ${Math.round(containerWidthPx)}px, excesso ${Math.round(excessoDetectado)}px) pode transbordar na impressão`
+            );
+        }
+    });
+}
+
+function validarUrlsLongasNoHtml(htmlContent: string, issues: string[]): void {
+    const longLines = htmlContent.match(/https?:\/\/[^\s<>"]{80,}/g);
+    if (longLines && longLines.length > 0) {
+        issues.push(`⚠️ ${longLines.length} URL(s) muito longa(s) podem transbordar em impressão`);
+    }
+}
+
 /**
  * Valida conteúdo renderizado para possíveis problemas de impressão
  * @param htmlContent - Conteúdo HTML renderizado
@@ -93,40 +147,13 @@ export async function validatePrintContent(content: PrintContentTarget): Promise
     if (images.length > 0) {
         await aguardarImagensCarregadas(images);
     }
-
-    images.forEach((img, idx) => {
-        const dims = obterDimensoesImagem(img);
-        if (dims.widthPx <= 0 || dims.heightPx <= 0) return;
-
-        const maxWidthMm = ImpressaoLimites.maxLarguraMm
-        const maxHeightMm = ImpressaoLimites.maxAlturaMm
-        const pxPorMm = ImpressaoLimites.pxPorMm
-        const imgWidthMm = dims.widthPx / pxPorMm
-        const imgHeightMm = dims.heightPx / pxPorMm
-
-        if (imgWidthMm > maxWidthMm || imgHeightMm > maxHeightMm) {
-            issues.push(`⚠️ Imagem ${idx + 1}: ${Math.round(dims.widthPx)}x${Math.round(dims.heightPx)}px pode não caber na página A4`);
-        }
-    });
-
-    const tables = Array.from(container.querySelectorAll('table'));
-    tables.forEach((table, idx) => {
-        const tableWidthPx = obterLarguraTabela(table);
-        if (tableWidthPx <= 0) return;
-
-        const tableWidthMm = tableWidthPx / ImpressaoLimites.pxPorMm;
-        if (tableWidthMm > ImpressaoLimites.maxLarguraMm) {
-            issues.push(`⚠️ Tabela ${idx + 1}: ${Math.round(tableWidthMm)}mm de largura pode não caber na página A4 (máx ${ImpressaoLimites.maxLarguraMm}mm)`);
-        }
-    });
+    validarImagensNoContainer(container, issues);
+    validarTabelasNoContainer(container, issues);
   }
 
   // Validar linhas muito longas (URLs)
   const htmlContent = typeof content === 'string' ? content : container.innerHTML;
-  const longLines = htmlContent.match(/https?:\/\/[^\s<>"]{80,}/g);
-  if (longLines && longLines.length > 0) {
-    issues.push(`⚠️ ${longLines.length} URL(s) muito longa(s) podem transbordar em impressão`);
-  }
+  validarUrlsLongasNoHtml(htmlContent, issues);
 
   return {
     isValid: issues.length === 0,
@@ -139,6 +166,25 @@ export async function validatePrintContent(content: PrintContentTarget): Promise
  * Chave: seletor CSS, Valor: array com dados do estado original
  */
 const elementStates = new Map<string, Array<{ el: HTMLElement; originalStyle: string }>>();
+let printPreviewEscapeHandler: ((e: KeyboardEvent) => void) | null = null;
+
+function removerHandlerEscapePrintPreview(): void {
+  if (!printPreviewEscapeHandler) return;
+  document.removeEventListener('keydown', printPreviewEscapeHandler);
+  printPreviewEscapeHandler = null;
+}
+
+function registrarHandlerEscapePrintPreview(): void {
+  if (printPreviewEscapeHandler) return;
+
+  printPreviewEscapeHandler = (e: KeyboardEvent): void => {
+    if (e.key === 'Escape' && document.body.classList.contains('print-mode')) {
+      exitPrintPreview();
+    }
+  };
+
+  document.addEventListener('keydown', printPreviewEscapeHandler);
+}
 
 /**
  * Otimiza página para impressão (esconde elementos desnecessários)
@@ -168,18 +214,9 @@ export function optimizeForPrint(): boolean {
  */
 export function restoreAfterPrint(): boolean {
   try {
-    // Limpar qualquer classe ou estilo residual que possa ter sido adicionado
+    // Limpar classe de preview e handlers temporários
     document.body.classList.remove('print-mode');
-    
-    // Forçar re-render removendo e re-adicionando estilos inline
-    const allElements = document.querySelectorAll('.sidebar, .top-bar, .pane-header, .editor-frame, #console-log, .app-grid, .workspace, .pane-container');
-    allElements.forEach((el) => {
-      const htmlEl = el as HTMLElement;
-      // Limpar qualquer estilo inline que possa ter sido adicionado
-      htmlEl.style.display = '';
-      htmlEl.style.width = '';
-      htmlEl.style.visibility = '';
-    });
+    removerHandlerEscapePrintPreview();
 
     // Limpar mapa de estados
     elementStates.clear();
@@ -286,14 +323,9 @@ export function togglePrintPreview(): void {
   document.body.classList.toggle('print-mode');
 
   if (isEntering) {
-    // Adicionar listener para ESC quando entrar no modo
-    const escapeHandler = (e: KeyboardEvent): void => {
-      if (e.key === 'Escape' && document.body.classList.contains('print-mode')) {
-        document.body.classList.remove('print-mode');
-        document.removeEventListener('keydown', escapeHandler);
-      }
-    };
-    document.addEventListener('keydown', escapeHandler);
+    registrarHandlerEscapePrintPreview();
+  } else {
+    removerHandlerEscapePrintPreview();
   }
 }
 
@@ -316,6 +348,7 @@ export function enterPrintPreview(): boolean {
 export function exitPrintPreview(): boolean {
   if (document.body.classList.contains('print-mode')) {
     document.body.classList.remove('print-mode');
+    removerHandlerEscapePrintPreview();
     return true;
   }
   return false;

@@ -178,7 +178,7 @@
 
     .markdown-body p {
         margin: 0 0 1em 0;
-        text-align: left;
+        text-align: inherit;
         /* Permitir quebra em parágrafos longos */
         page-break-inside: auto;
         font-size: inherit;
@@ -365,14 +365,14 @@
 
     .markdown-body table,
     .markdown-body .markdown-table-content {
-        width: auto;
+        width: 100%;
         max-width: 100%;
         border-collapse: collapse;
         margin: 16px 0;
-        page-break-inside: avoid;
+        page-break-inside: auto;
         border: 1px solid #d1d5db;
         font-size: inherit;
-        table-layout: auto;
+        table-layout: fixed;
     }
 
     .markdown-body th,
@@ -380,7 +380,10 @@
         border: 1px solid #d1d5db;
         padding: 8px;
         text-align: left;
-        white-space: nowrap;
+        white-space: normal;
+        word-break: break-word;
+        overflow-wrap: anywhere;
+        vertical-align: top;
     }
 
     .markdown-body th {
@@ -402,11 +405,16 @@
        ============================================================ */
 
     .markdown-body figure,
-    .markdown-body .markdown-image,
-    .markdown-body .markdown-table {
+    .markdown-body .markdown-image {
         page-break-inside: avoid;
         margin: 0.1em 0;
         text-align: center;
+    }
+
+    .markdown-body .markdown-table {
+        page-break-inside: auto;
+        margin: 0.1em 0;
+        text-align: inherit;
     }
 
     .markdown-body img,
@@ -459,7 +467,7 @@
 
     @page {
         size: A4;
-        margin: 15mm 15mm 15mm 15mm;
+        margin: 20mm 20mm 20mm 20mm;
     }
 
     /* ============================================================
@@ -516,18 +524,23 @@ body.print-mode {
 
 body.print-mode * {
     /* Remover alguns estilos de screen para emular print */
-    page-break-inside: avoid;
+    page-break-inside: auto;
     orphans: 3;
     widows: 3;
 }
 
-body.print-mode .app-grid,
 body.print-mode .sidebar,
 body.print-mode .top-bar,
 body.print-mode .pane-header,
 body.print-mode .editor-frame,
 body.print-mode #console-log {
     display: none !important;
+}
+
+body.print-mode .app-grid {
+    display: block !important;
+    width: 100vw !important;
+    height: 100vh !important;
 }
 
 body.print-mode .workspace {
@@ -575,6 +588,33 @@ body.print-mode .markdown-body {
     margin: 0 auto;
     padding: 20mm;
     border-radius: 4px;
+}
+
+/* Alinhar comportamento de tabela/texto com @media print para reduzir divergencias visuais */
+body.print-mode .markdown-body p {
+    text-align: inherit;
+}
+
+body.print-mode .markdown-body table,
+body.print-mode .markdown-body .markdown-table-content {
+    width: 100%;
+    max-width: 100%;
+    border-collapse: collapse;
+    table-layout: fixed;
+    page-break-inside: auto;
+}
+
+body.print-mode .markdown-body th,
+body.print-mode .markdown-body td {
+    white-space: normal;
+    word-break: break-word;
+    overflow-wrap: anywhere;
+    vertical-align: top;
+}
+
+body.print-mode .markdown-body .markdown-table {
+    page-break-inside: auto;
+    text-align: inherit;
 }
 
 /* Adicionar barra de ferramentas flutuante em print-mode */
