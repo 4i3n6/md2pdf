@@ -41,6 +41,8 @@ function obterFencePorExtensao(ext: string): string | null {
 export class PreviewService {
     private renderEmExecucao: boolean = false
     private ultimoPedido: RenderRequest | null = null
+    private ultimaEstimativaPaginas: number | null = null
+    private ultimoLogEstimativaTs: number = 0
 
     constructor(
         private renderer: PreviewRenderer,
@@ -86,7 +88,20 @@ export class PreviewService {
         await this.renderer.renderPreview(pedido.container, html)
 
         const estimatedPages = estimatePageCount(html)
+        this.logarEstimativaPaginas(estimatedPages)
+    }
+
+    private logarEstimativaPaginas(estimatedPages: number): void {
+        const agora = Date.now()
+        const mudouEstimativa = this.ultimaEstimativaPaginas !== estimatedPages
+        const passouJanelaLog = agora - this.ultimoLogEstimativaTs >= 2000
+
+        if (!mudouEstimativa && !passouJanelaLog) {
+            return
+        }
+
+        this.ultimaEstimativaPaginas = estimatedPages
+        this.ultimoLogEstimativaTs = agora
         this.logger.log(`Renderizado em ~${estimatedPages} pagina(s) A4`, 'info')
     }
 }
-

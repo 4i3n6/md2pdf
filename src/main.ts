@@ -46,6 +46,9 @@ initI18n()
 
 // Logger do Sistema (uses i18n locale for time formatting)
 const APP_VERSION = __APP_VERSION__ || '0.0.0'
+const LimitesLogger = {
+  maxLinhasConsole: 400
+}
 
 const Logger: LoggerInterface = {
   log: (msg: string, type: 'info' | 'error' | 'success' | 'warning' = 'info'): void => {
@@ -58,6 +61,12 @@ const Logger: LoggerInterface = {
     line.textContent = `[${time}] ${msg}`;
 
     consoleEl.appendChild(line);
+    while (consoleEl.childElementCount > LimitesLogger.maxLinhasConsole) {
+      if (!consoleEl.firstElementChild) {
+        break;
+      }
+      consoleEl.removeChild(consoleEl.firstElementChild);
+    }
     consoleEl.scrollTop = consoleEl.scrollHeight;
   },
   error: (msg: string): void => Logger.log(msg, 'error'),
