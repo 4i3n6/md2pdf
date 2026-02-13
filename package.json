@@ -1,6 +1,6 @@
 {
   "name": "md2pdf",
-  "version": "1.1.47",
+  "version": "1.1.48",
   "description": "",
   "main": "index.js",
   "scripts": {
