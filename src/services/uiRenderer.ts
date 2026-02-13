@@ -6,9 +6,7 @@
  */
 
 import type { Document, LoggerInterface } from '@/types/index'
-import { processImagesInPreview } from '@/processors/markdownProcessor'
-import { processMermaidDiagrams } from '@/processors/mermaidProcessor'
-import { processYamlBlocks } from '@/processors/yamlProcessor'
+import { executarPosProcessamentoPreview } from '@/services/previewPostProcessingService'
 
 /**
  * Callback para evento de selecao de documento
@@ -145,35 +143,7 @@ export class UIRenderer {
     // O HTML ja foi sanitizado pelo DOMPurify em processMarkdown()
     container.insertAdjacentHTML('afterbegin', html)
 
-    // Processar imagens com cache
-    try {
-      const imagesProcessed = await processImagesInPreview(container, true)
-      if (imagesProcessed > 0) {
-        this.logger?.log?.(`${imagesProcessed} imagem(ns) otimizada(s) para A4`, 'success')
-      }
-    } catch (e) {
-      this.logger?.error?.(`Erro ao processar imagens: ${String(e)}`)
-    }
-
-    // Processar diagramas Mermaid (lazy loaded)
-    try {
-      const diagramsProcessed = await processMermaidDiagrams(container)
-      if (diagramsProcessed > 0) {
-        this.logger?.log?.(`${diagramsProcessed} diagrama(s) Mermaid renderizado(s)`, 'success')
-      }
-    } catch (e) {
-      this.logger?.error?.(`Erro ao processar diagramas Mermaid: ${String(e)}`)
-    }
-
-    // Processar blocos YAML (lazy loaded)
-    try {
-      const yamlProcessed = await processYamlBlocks(container)
-      if (yamlProcessed > 0) {
-        this.logger?.log?.(`${yamlProcessed} bloco(s) YAML renderizado(s)`, 'success')
-      }
-    } catch (e) {
-      this.logger?.error?.(`Erro ao processar blocos YAML: ${String(e)}`)
-    }
+    await executarPosProcessamentoPreview(container, this.logger)
   }
 
   /**
