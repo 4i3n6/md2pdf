@@ -7,6 +7,7 @@
  */
 
 import type { load as YamlLoad } from 'js-yaml'
+import { decodeBase64Utf8 } from '@/utils/base64'
 import { logErro } from '@/utils/logger'
 
 let yamlInstance: { load: typeof YamlLoad } | null = null
@@ -35,13 +36,10 @@ async function ensureYamlLoaded(): Promise<{ load: typeof YamlLoad }> {
  * Required because source is stored as base64 to survive DOMPurify
  */
 function decodeBase64Source(base64: string): string {
-  try {
-    return decodeURIComponent(escape(atob(base64)))
-  } catch (e) {
-    const errorMsg = e instanceof Error ? e.message : String(e)
-    logErro(`[YAML] Falha ao decodificar base64: ${errorMsg}`)
-    return ''
-  }
+  return decodeBase64Utf8(base64, {
+    onError: logErro,
+    errorPrefix: '[YAML] Falha ao decodificar base64: '
+  })
 }
 
 /**

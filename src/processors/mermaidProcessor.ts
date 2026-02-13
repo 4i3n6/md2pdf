@@ -6,6 +6,7 @@
  */
 
 import { MermaidConfig } from '@/constants'
+import { decodeBase64Utf8 } from '@/utils/base64'
 import { logErro } from '@/utils/logger'
 
 let mermaidInstance: typeof import('mermaid').default | null = null
@@ -66,13 +67,10 @@ function generateMermaidId(): string {
  * Required because source is stored as base64 to survive DOMPurify
  */
 function decodeBase64Source(base64: string): string {
-  try {
-    return decodeURIComponent(escape(atob(base64)))
-  } catch (e) {
-    const errorMsg = e instanceof Error ? e.message : String(e)
-    logErro(`[Mermaid] Falha ao decodificar base64: ${errorMsg}`)
-    return ''
-  }
+  return decodeBase64Utf8(base64, {
+    onError: logErro,
+    errorPrefix: '[Mermaid] Falha ao decodificar base64: '
+  })
 }
 
 /**
