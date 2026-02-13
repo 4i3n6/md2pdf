@@ -56,8 +56,19 @@ npm run typecheck
 # Smoke test (requer build)
 npm run smoke
 
+# Visual regression (Playwright)
+npm run visual:test
+npm run visual:test:update
+
 # Preview da build de produção
 npm run preview
+```
+
+### Requisitos para visual regression
+
+```bash
+npm install -D @playwright/test
+npx playwright install chromium
 ```
 
 ## 📚 Documentacao

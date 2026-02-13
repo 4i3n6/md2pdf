@@ -10,6 +10,8 @@
     "build:manual": "node scripts/build-manual.mjs",
     "build:vite": "node scripts/build-vite.mjs",
     "smoke": "node scripts/smoke-test.mjs",
+    "visual:test": "node scripts/run-playwright.mjs",
+    "visual:test:update": "node scripts/run-playwright.mjs --update-snapshots",
     "typecheck": "tsc --noEmit",
     "version:patch": "node scripts/bump-version.mjs patch",
     "version:minor": "node scripts/bump-version.mjs minor",
