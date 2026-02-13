@@ -9,9 +9,9 @@ export type DocumentPreferences = {
 }
 
 const DEFAULT_PREFS: DocumentPreferences = {
-    font: "'JetBrains Mono', monospace",
+    font: "'Open Sans', sans-serif",
     align: 'left',
-    fontSize: '9pt'
+    fontSize: '8pt'
 }
 
 export function getDocPreferences(
@@ -188,4 +188,3 @@ export function setupPreviewControls(state: AppState, logger: LoggerInterface): 
 
     logger.success('Controles do preview ativados')
 }
-

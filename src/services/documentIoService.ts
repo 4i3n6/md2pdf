@@ -146,7 +146,7 @@ export function createDocumentIoService(deps: DocumentIoDeps) {
             if (!valor || typeof valor !== 'object') return
             const pref = valor as Partial<DocumentPreferences>
             if (typeof pref.font !== 'string' || typeof pref.align !== 'string') return
-            const fontSize = typeof pref.fontSize === 'string' ? pref.fontSize : '9pt'
+            const fontSize = typeof pref.fontSize === 'string' ? pref.fontSize : '8pt'
             prefs[docId] = { font: pref.font, align: pref.align, fontSize }
         })
 
@@ -272,4 +272,3 @@ export function createDocumentIoService(deps: DocumentIoDeps) {
         importarBackupDocumentos
     }
 }
-
