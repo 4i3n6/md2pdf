@@ -12,11 +12,17 @@ type RenderRequest = {
     docName: string
 }
 
+function pedidosIguais(a: RenderRequest, b: RenderRequest): boolean {
+    return a.container === b.container && a.markdown === b.markdown && a.docName === b.docName
+}
+
 export class PreviewService {
     private renderEmExecucao: boolean = false
     private ultimoPedido: RenderRequest | null = null
     private ultimaEstimativaPaginas: number | null = null
     private ultimoLogEstimativaTs: number = 0
+    private ultimoMarkdownProcessado: string | null = null
+    private ultimoHtmlProcessado: string = ''
 
     constructor(
         private renderer: PreviewRenderer,
@@ -28,7 +34,12 @@ export class PreviewService {
         markdown: string,
         docName: string = ''
     ): void {
-        this.ultimoPedido = { container, markdown, docName }
+        const proximoPedido: RenderRequest = { container, markdown, docName }
+        if (this.ultimoPedido && pedidosIguais(this.ultimoPedido, proximoPedido)) {
+            return
+        }
+
+        this.ultimoPedido = proximoPedido
         if (this.renderEmExecucao) return
         void this.processarFila()
     }
@@ -47,15 +58,26 @@ export class PreviewService {
     }
 
     private async renderizar(pedido: RenderRequest): Promise<void> {
-        if (!pedido.container) return
+        if (!pedido.container || !pedido.container.isConnected) return
 
         const content = preprocessarMarkdownParaPreview(pedido.markdown, pedido.docName)
-        const html = processMarkdown(content)
+        const html = this.obterHtmlRenderizado(content)
 
         await this.renderer.renderPreview(pedido.container, html)
 
         const estimatedPages = estimatePageCount(html)
         this.logarEstimativaPaginas(estimatedPages)
+    }
+
+    private obterHtmlRenderizado(markdownPreprocessado: string): string {
+        if (this.ultimoMarkdownProcessado === markdownPreprocessado) {
+            return this.ultimoHtmlProcessado
+        }
+
+        const html = processMarkdown(markdownPreprocessado)
+        this.ultimoMarkdownProcessado = markdownPreprocessado
+        this.ultimoHtmlProcessado = html
+        return html
     }
 
     private logarEstimativaPaginas(estimatedPages: number): void {
