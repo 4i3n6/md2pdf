@@ -14,7 +14,7 @@ export const pt: Translations = {
   // App Header
   header: {
     brand: 'MD2PDF',
-    version: 'v1.1.28',
+    version: 'v1.1.47',
     manualLink: 'Manual',
     manualTitle: 'Abrir manual de uso',
   },
