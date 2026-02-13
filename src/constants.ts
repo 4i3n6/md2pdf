@@ -4,7 +4,7 @@
 
 const a4LarguraMm = 210
 const a4AlturaMm = 297
-const margemMm = 20
+const margemMm = 10
 
 export const ChavesStorage = {
     documentos: 'md2pdf-docs-v3',

@@ -467,7 +467,7 @@
 
     @page {
         size: A4;
-        margin: 20mm 20mm 20mm 20mm;
+        margin: 10mm 10mm 10mm 10mm;
     }
 
     /* ============================================================
@@ -499,7 +499,7 @@
        ============================================================ */
 
     .markdown-body {
-        min-width: 170mm; /* A4 width - 20mm margins * 2 */
+        min-width: 190mm; /* A4 width - 10mm margins * 2 */
     }
 
     /* ============================================================
@@ -586,7 +586,7 @@ body.print-mode .markdown-body {
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
     max-width: 210mm;
     margin: 0 auto;
-    padding: 20mm;
+    padding: 10mm;
     border-radius: 4px;
 }
 
@@ -774,14 +774,14 @@ body.print-mode #preview-wrapper {
     break-inside: avoid !important;
     justify-content: center !important;
     align-items: center !important;
-    min-height: 257mm !important; /* A4 height - margins */
+    min-height: 277mm !important; /* A4 height - 10mm margins */
     width: 100% !important;
 }
 
 .mermaid-figure.mermaid-landscape .mermaid-diagram {
     transform: rotate(90deg) !important;
     transform-origin: center center !important;
-    max-height: 170mm !important;
+    max-height: 190mm !important;
 }
 
 /* Hide loading state in print */

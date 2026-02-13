@@ -70,7 +70,7 @@ export function getImageDimensions(src: string): Promise<ImageDimensions | null>
  * Calcular dimensões proporcionais para impressão A4
  * 
  * Mantém aspect ratio e garante que cabe em A4 (210x297mm).
- * Margem padrão: 20mm em cada lado.
+ * Margem padrão: 10mm em cada lado.
  * Conversão: 1 inch = 25.4mm, 96 DPI = 3.779 px/mm
  * 
  * @param {number} width - Largura em pixels

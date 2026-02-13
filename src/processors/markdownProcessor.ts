@@ -557,8 +557,8 @@ export function validateMarkdown(markdown: string): { isValid: boolean; warnings
  * Estima número de páginas A4 baseado no conteúdo
  * 
  * Fórmula: 
- * - A4 tem ~80 caracteres de largura (210mm - 40mm margens)
- * - A4 tem ~45 linhas de altura (297mm - 40mm margens)
+ * - A4 tem ~90 caracteres de largura (210mm - 20mm margens)
+ * - A4 tem ~50 linhas de altura (297mm - 20mm margens)
  * - Portanto: ~3500 caracteres por página
  * 
  * @param {string} html - Conteúdo HTML renderizado
