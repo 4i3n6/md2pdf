@@ -9,7 +9,7 @@ import { logAviso, logErro, logInfo } from '@/utils/logger'
 /**
  * Resultado de validação de conteúdo para impressão
  */
-interface ValidationResult {
+export interface ValidationResult {
   isValid: boolean;
   issues: string[];
 }
@@ -28,6 +28,16 @@ interface PrintStatistics {
 }
 
 type PrintContentTarget = string | HTMLElement;
+
+export interface PrintDocumentOptions {
+  previewElement?: HTMLElement | null;
+  validation?: ValidationResult;
+}
+
+const PrintTimings = {
+  afterPrintRestoreDelayMs: 100,
+  fallbackRestoreTimeoutMs: 5000
+} as const;
 
 function criarContainerTemporario(htmlContent: string): HTMLElement {
     const container = document.createElement('div');
@@ -125,6 +135,66 @@ function validarUrlsLongasNoHtml(htmlContent: string, issues: string[]): void {
     if (longLines && longLines.length > 0) {
         issues.push(`⚠️ ${longLines.length} URL(s) muito longa(s) podem transbordar em impressão`);
     }
+}
+
+function obterPreviewElement(options?: PrintDocumentOptions): HTMLElement | null {
+  if (options && 'previewElement' in options) {
+    return options.previewElement ?? null;
+  }
+  return document.getElementById('preview') as HTMLElement | null;
+}
+
+async function obterValidacaoParaImpressao(
+  preview: HTMLElement,
+  options?: PrintDocumentOptions
+): Promise<ValidationResult> {
+  if (options?.validation) {
+    return options.validation;
+  }
+  return await validatePrintContent(preview);
+}
+
+function confirmarImpressaoComAvisos(
+  validation: ValidationResult,
+  logger: (message: string) => void
+): boolean {
+  if (validation.issues.length === 0) return true;
+
+  validation.issues.forEach((issue) => logger(issue));
+  return confirm(`${validation.issues.length} aviso(s) de impressão.\nContinuar mesmo assim?`);
+}
+
+function aplicarTituloPdfTemporario(docName: string): () => void {
+  const originalTitle = document.title;
+  const pdfName = docName.replace(/\.md$/i, '');
+  document.title = pdfName;
+  return (): void => {
+    document.title = originalTitle;
+  };
+}
+
+function abrirDialogoComRestauracao(onRestore: () => void): void {
+  let hasRestored = false;
+
+  const doRestore = (): void => {
+    if (hasRestored) return;
+    hasRestored = true;
+    onRestore();
+  };
+
+  const afterPrintHandler = (): void => {
+    setTimeout(doRestore, PrintTimings.afterPrintRestoreDelayMs);
+  };
+
+  window.addEventListener('afterprint', afterPrintHandler, { once: true });
+  window.print();
+
+  setTimeout(() => {
+    if (!hasRestored) {
+      logAviso('[Print] Fallback: restaurando apos timeout');
+      doRestore();
+    }
+  }, PrintTimings.fallbackRestoreTimeoutMs);
 }
 
 /**
@@ -237,73 +307,37 @@ export function restoreAfterPrint(): boolean {
  */
 export function printDocument(
   docName: string = 'document',
-  logger: (message: string) => void = logInfo
+  logger: (message: string) => void = logInfo,
+  options?: PrintDocumentOptions
 ): Promise<boolean> {
   return new Promise((resolve) => {
     const executar = async (): Promise<void> => {
+      let restaurarTitulo: (() => void) | null = null;
+
       try {
-        // Validar conteúdo antes de imprimir
-        const preview = document.getElementById('preview') as HTMLElement | null;
+        const preview = obterPreviewElement(options);
         if (!preview) {
           logger('Erro: elemento preview não encontrado');
           resolve(false);
           return;
         }
 
-        const validation = await validatePrintContent(preview);
-        if (validation.issues.length > 0) {
-          validation.issues.forEach((issue) => logger(issue));
-
-          // Perguntar ao usuário se deseja continuar
-          if (!confirm(`${validation.issues.length} aviso(s) de impressão.\nContinuar mesmo assim?`)) {
-            resolve(false);
-            return;
-          }
+        const validation = await obterValidacaoParaImpressao(preview, options);
+        if (!confirmarImpressaoComAvisos(validation, logger)) {
+          resolve(false);
+          return;
         }
 
-        // Guardar título original e definir nome do documento como título
-        // Navegadores usam o título da página como nome padrão do PDF
-        const originalTitle = document.title;
-        const pdfName = docName.replace(/\.md$/i, ''); // Remove extensão .md
-        document.title = pdfName;
-
-        // Flag para evitar múltiplas restaurações
-        let hasRestored = false;
-        
-        const doRestore = (): void => {
-          if (hasRestored) return;
-          hasRestored = true;
-          // Restaurar título original
-          document.title = originalTitle;
+        restaurarTitulo = aplicarTituloPdfTemporario(docName);
+        abrirDialogoComRestauracao(() => {
+          restaurarTitulo?.();
           restoreAfterPrint();
           resolve(true);
-        };
-
-        // Aguardar fechamento do diálogo de impressão
-        const afterPrintHandler = (): void => {
-          // Pequeno delay para garantir que o navegador terminou o processo
-          setTimeout(doRestore, 100);
-        };
-
-        // Registrar handler ANTES de chamar print()
-        window.addEventListener('afterprint', afterPrintHandler, { once: true });
-
-        // Abrir diálogo de impressão
-        // O CSS @media print cuida de esconder/mostrar elementos automaticamente
-        window.print();
-
-        // Fallback: se afterprint não disparar em 5 segundos, restaurar mesmo assim
-        // Alguns navegadores (especialmente ao salvar como PDF) podem não disparar afterprint
-        setTimeout(() => {
-          if (!hasRestored) {
-            logAviso('[Print] Fallback: restaurando apos timeout');
-            doRestore();
-          }
-        }, 5000);
-
+        });
       } catch (error) {
         const errorMsg = error instanceof Error ? error.message : String(error);
         logErro(`Erro ao imprimir: ${errorMsg}`);
+        restaurarTitulo?.();
         restoreAfterPrint();
         resolve(false);
       }
