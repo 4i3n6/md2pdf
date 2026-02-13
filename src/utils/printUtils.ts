@@ -117,15 +117,16 @@ function validarImagensNoContainer(container: HTMLElement, issues: string[]): vo
 
 function validarTabelasNoContainer(container: HTMLElement, issues: string[]): void {
     const tables = Array.from(container.querySelectorAll('table'));
+    const containerWidthPx = obterLarguraContainer(container);
+    if (containerWidthPx <= 0) return;
+
+    // Tolerancia para evitar falso positivo por bordas, arredondamento e scrollbar.
+    // Avisa apenas quando o excesso é realmente perceptível no print.
+    const toleranciaPx = Math.max(12, containerWidthPx * 0.02);
 
     tables.forEach((table, idx) => {
         const tableWidthPx = obterLarguraTabela(table);
-        const containerWidthPx = obterLarguraContainer(container);
-        if (tableWidthPx <= 0 || containerWidthPx <= 0) return;
-
-        // Tolerancia para evitar falso positivo por bordas, arredondamento e scrollbar.
-        // Avisa apenas quando o excesso é realmente perceptível no print.
-        const toleranciaPx = Math.max(12, containerWidthPx * 0.02);
+        if (tableWidthPx <= 0) return;
         const excessoNoContainer = Math.max(0, tableWidthPx - containerWidthPx);
         const excessoInterno = Math.max(0, table.scrollWidth - table.clientWidth);
         const excessoDetectado = Math.max(excessoNoContainer, excessoInterno);
