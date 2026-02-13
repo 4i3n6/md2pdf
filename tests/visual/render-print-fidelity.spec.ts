@@ -20,13 +20,13 @@ test.describe('Fidelidade Render e Print', () => {
         await expect(preview.locator('pre code.language-javascript')).toHaveCount(1)
         await expect(preview.locator('input[type="checkbox"][disabled]')).toHaveCount(2)
 
-        const alinhamentos = await preview.locator('thead th').evaluateAll((ths) =>
-            ths.map((th) => th.getAttribute('style') || '')
+        const alinhamentosComputados = await preview.locator('thead th').evaluateAll((ths) =>
+            ths.map((th) => window.getComputedStyle(th).textAlign)
         )
 
-        expect(alinhamentos[0]).toContain('text-align: left')
-        expect(alinhamentos[1]).toContain('text-align: center')
-        expect(alinhamentos[2]).toContain('text-align: right')
+        expect(alinhamentosComputados[0]).toBe('left')
+        expect(alinhamentosComputados[1]).toBe('center')
+        expect(alinhamentosComputados[2]).toBe('right')
 
         await expect(page.locator('#preview-wrapper')).toHaveScreenshot(
             'input-stream-to-render-output.png',

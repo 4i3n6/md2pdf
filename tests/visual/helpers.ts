@@ -10,7 +10,7 @@ export async function abrirAplicacao(page: Page): Promise<void> {
         localStorage.removeItem('md2pdf-docs-v2')
     })
 
-    await page.goto('/app', { waitUntil: 'networkidle' })
+    await page.goto('/app.html', { waitUntil: 'networkidle' })
     await expect(page.locator(seletorEditorConteudo)).toBeVisible()
     await expect(page.locator(seletorPreview)).toBeVisible()
 
