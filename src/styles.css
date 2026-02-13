@@ -355,6 +355,26 @@ body.splitter-dragging iframe {
     letter-spacing: 0.5px;
 }
 
+.markdown-body h3 {
+    margin-top: 16px;
+    margin-bottom: 12px;
+}
+
+.markdown-body h4 {
+    margin-top: 16px;
+    margin-bottom: 12px;
+}
+
+.markdown-body h5 {
+    margin-top: 14px;
+    margin-bottom: 10px;
+}
+
+.markdown-body h6 {
+    margin-top: 12px;
+    margin-bottom: 8px;
+}
+
 /* Paragrafos e quebras de linha */
 .markdown-body p {
     margin: 0 0 1em 0;
