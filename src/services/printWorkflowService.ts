@@ -1,6 +1,15 @@
-import { validatePrintContent, printDocument } from '@/utils/printUtils'
+import { validatePrintContent, printDocument, type ValidationResult } from '@/utils/printUtils'
 import { createReporter } from '@/utils/printReporter'
 import type { Document, LoggerInterface } from '@/types/index'
+import { runPipeline, type PipelineStage } from '@/utils/pipeline'
+
+type PrintWorkflowContext = {
+    preview: HTMLElement | null
+    validation: ValidationResult | null
+    docName: string
+    sucesso: boolean
+    abortar: boolean
+}
 
 type PrintWorkflowDeps = {
     logger: LoggerInterface
@@ -26,36 +35,79 @@ export function createPrintWorkflowService(deps: PrintWorkflowDeps) {
         )
     }
 
-    async function imprimirDocumentoAtual(): Promise<void> {
-        try {
-            deps.logger.log('Validando conteudo para impressao...')
-
-            const preview = obterPreview()
-            if (!preview) {
-                deps.logger.error('Preview nao encontrado')
-                return
+    const etapasImpressao: PipelineStage<PrintWorkflowContext>[] = [
+        {
+            id: 'validacao-inicial',
+            run: (contexto): void => {
+                deps.logger.log('Validando conteudo para impressao...')
+                contexto.preview = obterPreview()
+                if (!contexto.preview) {
+                    deps.logger.error('Preview nao encontrado')
+                    contexto.abortar = true
+                }
             }
+        },
+        {
+            id: 'validar-preview',
+            enabled: (contexto) => !contexto.abortar && !!contexto.preview,
+            run: async (contexto): Promise<void> => {
+                const validation = await validatePrintContent(contexto.preview as HTMLElement)
+                contexto.validation = validation
 
-            const validation = await validatePrintContent(preview)
-
-            if (validation.issues.length > 0) {
-                validation.issues.forEach((issue): void => deps.logger.log(issue, 'warning'))
+                if (validation.issues.length > 0) {
+                    validation.issues.forEach((issue): void => deps.logger.log(issue, 'warning'))
+                }
             }
-
-            const doc = deps.getCurrentDoc()
-            const docName = doc?.name || 'document'
-            logarPreImpressao(preview.innerHTML, docName)
-
-            deps.logger.log('Abrindo dialogo de impressao...')
-            const success = await printDocument(
-                docName,
-                (msg: string): void => deps.logger.log(msg),
-                { previewElement: preview, validation }
-            )
-
-            if (success) {
+        },
+        {
+            id: 'gerar-relatorio-pre-impressao',
+            enabled: (contexto) => !contexto.abortar && !!contexto.preview,
+            run: (contexto): void => {
+                const doc = deps.getCurrentDoc()
+                contexto.docName = doc?.name || 'document'
+                logarPreImpressao((contexto.preview as HTMLElement).innerHTML, contexto.docName)
+            }
+        },
+        {
+            id: 'abrir-dialogo-impressao',
+            enabled: (contexto) =>
+                !contexto.abortar && !!contexto.preview && !!contexto.validation,
+            run: async (contexto): Promise<void> => {
+                deps.logger.log('Abrindo dialogo de impressao...')
+                const options = contexto.validation
+                    ? {
+                          previewElement: contexto.preview as HTMLElement,
+                          validation: contexto.validation
+                      }
+                    : {
+                          previewElement: contexto.preview as HTMLElement
+                      }
+                contexto.sucesso = await printDocument(
+                    contexto.docName,
+                    (msg: string): void => deps.logger.log(msg),
+                    options
+                )
+            }
+        },
+        {
+            id: 'log-final',
+            enabled: (contexto) => !contexto.abortar && contexto.sucesso,
+            run: (): void => {
                 deps.logger.success('Impressao finalizada com sucesso')
             }
+        }
+    ]
+
+    async function imprimirDocumentoAtual(): Promise<void> {
+        try {
+            const contexto: PrintWorkflowContext = {
+                preview: null,
+                validation: null,
+                docName: 'document',
+                sucesso: false,
+                abortar: false
+            }
+            await runPipeline(contexto, etapasImpressao)
         } catch (e) {
             const errorMessage = e instanceof Error ? e.message : String(e)
             deps.logger.error('Falha no fluxo de impressao: ' + errorMessage)
