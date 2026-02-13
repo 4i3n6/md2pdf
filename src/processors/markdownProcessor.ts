@@ -23,6 +23,7 @@ import sql from 'highlight.js/lib/languages/sql'
 import typescript from 'highlight.js/lib/languages/typescript'
 import yaml from 'highlight.js/lib/languages/yaml'
 import { logErro } from '@/utils/logger'
+import { registrarHooksSanitizacaoStyle } from './styleSanitizer'
 
 // Registro explicito para manter o bundle de highlight.js enxuto.
 const linguagensHighlight: Array<[string, LanguageFn]> = [
@@ -509,6 +510,7 @@ export function processMarkdown(markdown: string): string {
     )
 
     const dirty = marked(preprocessed) as string
+    registrarHooksSanitizacaoStyle()
     const clean = DOMPurify.sanitize(dirty, DOMPURIFY_CONFIG as any) as unknown as string
 
     return clean
