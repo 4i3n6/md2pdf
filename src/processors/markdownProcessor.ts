@@ -155,6 +155,38 @@ function encontrarBlocoCodigoFenced(src: string, linguagem: string): { raw: stri
  * Usar objeto literal NÃO funciona porque this.parser seria undefined.
  */
 class PrintRenderer extends Renderer {
+  private mapearTokensComAbreviacao(tokens: Array<unknown> = []): Array<unknown> {
+    return tokens.map((token) => {
+      if (!token || typeof token !== 'object') {
+        return token
+      }
+
+      const tokenObj = token as { type?: string; text?: string; tokens?: Array<unknown> }
+      const tokenTipo = tokenObj.type
+
+      if (tokenTipo === 'text' || tokenTipo === 'escape') {
+        return {
+          ...tokenObj,
+          text: abreviarTextoCriptoNoConteudo(tokenObj.text || '')
+        }
+      }
+
+      if (!Array.isArray(tokenObj.tokens) || tokenObj.tokens.length === 0) {
+        return tokenObj
+      }
+
+      return {
+        ...tokenObj,
+        tokens: this.mapearTokensComAbreviacao(tokenObj.tokens)
+      }
+    })
+  }
+
+  private renderizarCelulaTabelaComAbreviacao(tokens: Array<unknown> = []): string {
+    const tokensNormalizados = this.mapearTokensComAbreviacao(tokens)
+    return this.parser.parseInline(tokensNormalizados as any[])
+  }
+
   /**
    * Renderiza headings (h1-h6) com ID para navegação e classes para styling
    */
@@ -211,7 +243,7 @@ class PrintRenderer extends Renderer {
           const alignAttr = obterAtributoAlinhamento(
             obterAlinhamentoCelula(alinhamentos, alinhamentosFallback, idx, cell)
           )
-          return `<th${alignAttr}>${this.parser.parseInline(cell.tokens)}</th>`
+          return `<th${alignAttr}>${this.renderizarCelulaTabelaComAbreviacao(cell.tokens)}</th>`
         })
         .join('')
       headerRow = `<thead><tr>${headerCells}</tr></thead>`
@@ -227,7 +259,7 @@ class PrintRenderer extends Renderer {
               const alignAttr = obterAtributoAlinhamento(
                 obterAlinhamentoCelula(alinhamentos, alinhamentosFallback, idx, cell)
               )
-              return `<td${alignAttr}>${this.parser.parseInline(cell.tokens)}</td>`
+              return `<td${alignAttr}>${this.renderizarCelulaTabelaComAbreviacao(cell.tokens)}</td>`
             })
             .join('')
           return `<tr>${cells}</tr>`
