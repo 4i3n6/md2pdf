@@ -1,6 +1,6 @@
 {
   "name": "md2pdf",
-  "version": "1.1.49",
+  "version": "1.1.50",
   "description": "",
   "main": "index.js",
   "scripts": {
@@ -17,6 +17,7 @@
     "version:minor": "node scripts/bump-version.mjs minor",
     "version:major": "node scripts/bump-version.mjs major",
     "version:sync": "node scripts/bump-version.mjs sync",
+    "version:verify": "node scripts/verify-version.mjs",
     "postinstall": "node scripts/install-hooks.mjs",
     "preview": "vite preview"
   },
