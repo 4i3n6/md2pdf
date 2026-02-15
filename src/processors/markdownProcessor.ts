@@ -184,7 +184,39 @@ class PrintRenderer extends Renderer {
 
   private renderizarCelulaTabelaComAbreviacao(tokens: Array<unknown> = []): string {
     const tokensNormalizados = this.mapearTokensComAbreviacao(tokens)
-    return this.parser.parseInline(tokensNormalizados as any[])
+    const html = this.parser.parseInline(tokensNormalizados as any[])
+    return this.truncarTextoCriptoEmHtml(html)
+  }
+
+  private truncarTextoCriptoEmHtml(html: string): string {
+    if (typeof document === 'undefined') {
+      return abreviarTextoCriptoNoConteudo(html)
+    }
+
+    const template = document.createElement('template')
+    template.innerHTML = html
+
+    const processarTextoEmNos = (nodo: ChildNode): void => {
+      if (nodo.nodeType === Node.TEXT_NODE) {
+        const texto = nodo.textContent || ''
+        nodo.textContent = abreviarTextoCriptoNoConteudo(texto)
+        return
+      }
+
+      if (nodo.nodeType !== Node.ELEMENT_NODE) {
+        return
+      }
+
+      const elemento = nodo as Element
+      if (elemento.tagName === 'SCRIPT' || elemento.tagName === 'STYLE') {
+        return
+      }
+
+      Array.from(elemento.childNodes).forEach((filho) => processarTextoEmNos(filho))
+    }
+
+    Array.from(template.content.childNodes).forEach((nodo) => processarTextoEmNos(nodo))
+    return template.innerHTML
   }
 
   /**
@@ -280,7 +312,7 @@ class PrintRenderer extends Renderer {
    * Renderiza código inline com sanitização
    */
   override codespan(token: Tokens.Codespan): string {
-    const sanitized = DOMPurify.sanitize(token.text)
+    const sanitized = abreviarTextoCriptoNoConteudo(DOMPurify.sanitize(token.text))
     return `<code class="markdown-code-inline">${sanitized}</code>`
   }
 
@@ -334,7 +366,10 @@ class PrintRenderer extends Renderer {
    * Renderiza links com suporte a formatação no texto do link
    */
   override link(token: Tokens.Link): string {
-    const content = abreviarTextoCriptoNoConteudo(this.parser.parseInline(token.tokens))
+    const conteudoLink = token.tokens && token.tokens.length > 0
+      ? this.parser.parseInline(token.tokens)
+      : token.text || ''
+    const content = abreviarTextoCriptoNoConteudo(conteudoLink)
     return `<a href="${token.href}" title="${token.title || ''}" class="markdown-link">${content}</a>`
   }
 
