@@ -24,8 +24,9 @@ const preCommitHook = `#!/bin/sh
 # This ensures version is always updated when code changes
 #
 
-# Get list of staged files (excluding package.json to avoid loops)
-STAGED_FILES=$(git diff --cached --name-only --diff-filter=ACM | grep -v "package.json" | grep -v "bump-version")
+# Get list of staged files excluding files touched by automatic version sync.
+# If only these files are staged, skip bump to avoid recursive commits.
+STAGED_FILES=$(git diff --cached --name-only --diff-filter=ACM | grep -Ev "^(package.json|package-lock.json|src/i18n/en.ts|src/i18n/pt.ts|app.html|pt/app.html|scripts/bump-version.mjs)$")
 
 # Only bump version if there are actual code changes
 if [ -n "$STAGED_FILES" ]; then
@@ -36,6 +37,7 @@ if [ -n "$STAGED_FILES" ]; then
   
   # Stage the updated version files
   git add package.json
+  git add package-lock.json
   git add src/i18n/en.ts
   git add src/i18n/pt.ts
   git add app.html
