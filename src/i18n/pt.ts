@@ -14,7 +14,7 @@ export const pt: Translations = {
   // App Header
   header: {
     brand: 'MD2PDF',
-    version: 'v1.1.48',
+    version: 'v1.1.49',
     manualLink: 'Manual',
     manualTitle: 'Abrir manual de uso',
   },
@@ -89,6 +89,10 @@ export const pt: Translations = {
     fontLabel: 'Fonte do documento',
     fontSizeLabel: 'Tamanho da fonte',
     alignLabel: 'Alinhamento do texto',
+    mermaidLoading: 'Carregando diagrama...',
+    mermaidAriaLabel: 'Diagrama Mermaid',
+    mermaidErrorLabel: 'Erro no diagrama:',
+    mermaidDecodeError: 'Não foi possível decodificar a fonte do Mermaid.'
   },
 
   // Save Status

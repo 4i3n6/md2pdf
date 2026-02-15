@@ -3,6 +3,23 @@ type DecodeBase64Options = {
     errorPrefix?: string
 }
 
+function encodeViaTextEncoder(input: string): string {
+    const textoCodificado = new TextEncoder().encode(input)
+    let bruto = ''
+    for (let i = 0; i < textoCodificado.length; i += 1) {
+        bruto += String.fromCharCode(textoCodificado[i])
+    }
+    return btoa(bruto)
+}
+
+function encodeViaLegacyUnicode(input: string): string {
+    const raw = encodeURIComponent(input).replace(
+        /%([0-9A-F]{2})/gi,
+        (_match: string, hex: string) => String.fromCharCode(parseInt(hex, 16))
+    )
+    return btoa(raw)
+}
+
 function decodeViaTextDecoder(base64: string): string {
     const raw = atob(base64)
     const bytes = Uint8Array.from(raw, (char) => char.charCodeAt(0))
@@ -30,5 +47,13 @@ export function decodeBase64Utf8(base64: string, options: DecodeBase64Options = 
             options.onError?.(`${prefix}${errorMsg}`)
             return ''
         }
+    }
+}
+
+export function encodeBase64Utf8(input: string): string {
+    try {
+        return encodeViaTextEncoder(input)
+    } catch {
+        return encodeViaLegacyUnicode(input)
     }
 }

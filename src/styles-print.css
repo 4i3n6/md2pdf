@@ -211,7 +211,7 @@
     .markdown-body a {
         color: black;
         text-decoration: underline;
-        word-break: break-word;
+        word-break: break-all;
     }
 
     /* URLs não são exibidas após links para manter fidelidade com preview */
@@ -373,15 +373,18 @@
         border: 1px solid #d1d5db;
         font-size: inherit;
         table-layout: fixed;
+        min-width: 0;
+        overflow-x: visible;
     }
 
     .markdown-body th,
     .markdown-body td {
+        max-width: 0;
         border: 1px solid #d1d5db;
-        padding: 8px;
+        padding: 6px 4px;
         text-align: left;
         white-space: normal;
-        word-break: break-word;
+        word-break: break-all;
         overflow-wrap: anywhere;
         vertical-align: top;
     }
@@ -616,13 +619,15 @@ body.print-mode .markdown-body .markdown-table-content {
     max-width: 100%;
     border-collapse: collapse;
     table-layout: fixed;
+        min-width: 0;
+        overflow-x: visible;
     page-break-inside: auto;
 }
 
 body.print-mode .markdown-body th,
 body.print-mode .markdown-body td {
     white-space: normal;
-    word-break: break-word;
+    word-break: break-all;
     overflow-wrap: anywhere;
     vertical-align: top;
 }
@@ -692,8 +697,8 @@ body.print-mode #preview-wrapper {
     border: none !important;
     padding: 0 !important;
     margin: 0 !important;
-    page-break-inside: avoid !important;
-    break-inside: avoid !important;
+    page-break-inside: auto !important;
+    break-inside: auto !important;
 }
 
 .mermaid.mermaid-rendered {
@@ -702,10 +707,12 @@ body.print-mode #preview-wrapper {
     border: none !important;
     padding: 0 !important;
     margin: 16pt 0 !important;
-    page-break-inside: avoid !important;
-    break-inside: avoid !important;
+    page-break-inside: auto !important;
+    break-inside: auto !important;
     page-break-before: auto !important;
     break-before: auto !important;
+    page-break-after: auto !important;
+    break-after: auto !important;
 }
 
 /* Figure container */
@@ -716,8 +723,8 @@ body.print-mode #preview-wrapper {
     align-items: center !important;
     margin: 0 !important;
     padding: 0 !important;
-    page-break-inside: avoid !important;
-    break-inside: avoid !important;
+    page-break-inside: auto !important;
+    break-inside: auto !important;
 }
 
 /* Diagram type indicator (top label) */
@@ -746,14 +753,18 @@ body.print-mode #preview-wrapper {
     padding: 12pt !important;
     -webkit-print-color-adjust: exact !important;
     print-color-adjust: exact !important;
-    page-break-inside: avoid !important;
-    break-inside: avoid !important;
+    page-break-inside: auto !important;
+    break-inside: auto !important;
+    max-height: none !important;
 }
 
 /* SVG inside diagram */
 .mermaid-figure .mermaid-diagram svg {
     display: block !important;
     margin: 0 auto !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    height: auto !important;
 }
 
 /* Caption - academic/technical documentation style */
@@ -785,32 +796,36 @@ body.print-mode #preview-wrapper {
    LANDSCAPE MODE - For wide diagrams that exceed page width
    ============================================================ */
 
-/* Landscape diagram gets dedicated page */
-.mermaid:has(.mermaid-landscape) {
-    page-break-before: always !important;
-    page-break-after: always !important;
-    break-before: page !important;
-    break-after: page !important;
+/* Landscape diagram does not force page break; keeps flow with automatic pagination */
+.mermaid.mermaid-landscape {
+    page-break-before: auto !important;
+    page-break-after: auto !important;
+    break-before: auto !important;
+    break-after: auto !important;
     margin: 0 !important;
     padding: 0 !important;
 }
 
 .mermaid-figure.mermaid-landscape {
-    page-break-before: always !important;
-    page-break-after: always !important;
-    page-break-inside: avoid !important;
-    break-before: page !important;
-    break-after: page !important;
-    break-inside: avoid !important;
+    page-break-before: auto !important;
+    page-break-after: auto !important;
+    page-break-inside: auto !important;
+    break-before: auto !important;
+    break-after: auto !important;
+    break-inside: auto !important;
     justify-content: center !important;
     align-items: center !important;
-    min-height: 277mm !important; /* A4 height - 10mm margins */
+    min-height: auto !important;
     width: 100% !important;
+    overflow-x: auto !important;
+    overflow-y: visible !important;
 }
 
 .mermaid-figure.mermaid-landscape .mermaid-diagram {
-    transform: rotate(90deg) !important;
+    transform: none !important;
     transform-origin: center center !important;
+    width: 100% !important;
+    max-width: 100% !important;
     max-height: 190mm !important;
 }
 

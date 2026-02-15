@@ -47,7 +47,7 @@ export const SalvamentoConfig = {
 }
 
 export const MermaidConfig = {
-    maxLarguraPaginaPx: 480
+    maxLarguraPaginaPx: 760
 }
 
 export const BackupConfig = {

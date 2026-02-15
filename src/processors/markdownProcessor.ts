@@ -22,6 +22,8 @@ import rust from 'highlight.js/lib/languages/rust'
 import sql from 'highlight.js/lib/languages/sql'
 import typescript from 'highlight.js/lib/languages/typescript'
 import yaml from 'highlight.js/lib/languages/yaml'
+import { t } from '@/i18n'
+import { encodeBase64Utf8 } from '@/utils/base64'
 import { normalizarLinguagemCodigo } from '@/services/documentLanguageService'
 import { logErro } from '@/utils/logger'
 import { registrarHooksSanitizacaoStyle } from './styleSanitizer'
@@ -101,6 +103,47 @@ function obterAlinhamentoCelula(
 ): string | null {
   const cellComAlinhamento = cell as Tokens.TableCell & { align?: string | null }
   return alinhamentos[idx] || cellComAlinhamento.align || alinhamentosFallback[idx] || null
+}
+
+function escaparRegex(valor: string): string {
+  return valor.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+}
+
+function abreviarEnderecoCriptografico(valor: string): string {
+  if (valor.length < 28) {
+    return valor
+  }
+
+  const tamanhoInicio = 10
+  const tamanhoFim = 8
+  return `${valor.slice(0, tamanhoInicio)}...${valor.slice(-tamanhoFim)}`
+}
+
+function abreviarTextoCriptoNoConteudo(conteudo: string): string {
+  const regexEnderecoEvm = /\b0x[a-fA-F0-9]{24,}\b/g
+  const regexEnderecoBtc = /\b(?:bc1|[13])[a-zA-HJ-NP-Z0-9]{25,62}\b/g
+
+  return conteudo
+    .replace(regexEnderecoEvm, abreviarEnderecoCriptografico)
+    .replace(regexEnderecoBtc, abreviarEnderecoCriptografico)
+}
+
+function encontrarBlocoCodigoFenced(src: string, linguagem: string): { raw: string, text: string } | null {
+  const linguagemEscapada = escaparRegex(linguagem)
+  const regex = new RegExp(
+    '^[ \\t]*(?:`{3,}|~{3,})[ \\t]*' + linguagemEscapada + '\\b[^\\n]*\\n([\\s\\S]*?)\\n[ \\t]*(?:`{3,}|~{3,})[ \\t]*(?:\\n|$)',
+    'i'
+  )
+  const match = regex.exec(src)
+
+  if (!match || !match[1]) {
+    return null
+  }
+
+  return {
+    raw: match[0],
+    text: match[1].trim()
+  }
 }
 
 /**
@@ -259,7 +302,7 @@ class PrintRenderer extends Renderer {
    * Renderiza links com suporte a formatação no texto do link
    */
   override link(token: Tokens.Link): string {
-    const content = this.parser.parseInline(token.tokens)
+    const content = abreviarTextoCriptoNoConteudo(this.parser.parseInline(token.tokens))
     return `<a href="${token.href}" title="${token.title || ''}" class="markdown-link">${content}</a>`
   }
 
@@ -311,7 +354,7 @@ class PrintRenderer extends Renderer {
     if ('tokens' in token && token.tokens && token.tokens.length > 0) {
       return this.parser.parseInline(token.tokens)
     }
-    return token.text
+    return abreviarTextoCriptoNoConteudo(token.text)
   }
 
   /**
@@ -375,15 +418,15 @@ marked.use({
       name: 'mermaidCodeBlock',
       level: 'block',
       start(src: string) {
-        return src.match(/^```mermaid/m)?.index
+        return src.match(/^[ \t]*(?:`{3,}|~{3,})[ \t]*mermaid\b/i)?.index
       },
       tokenizer(src: string) {
-        const match = /^```mermaid\n([\s\S]*?)```/.exec(src)
-        if (match && match[1]) {
+        const match = encontrarBlocoCodigoFenced(src, 'mermaid')
+        if (match) {
           return {
             type: 'mermaidCodeBlock',
-            raw: match[0],
-            text: match[1].trim()
+            raw: match.raw,
+            text: match.text
           }
         }
         return undefined
@@ -391,9 +434,9 @@ marked.use({
       renderer(token: Tokens.Generic) {
         const tokenData = token as { text?: string }
         const tokenText: string = typeof tokenData.text === 'string' ? tokenData.text : ''
-        const base64Source = btoa(unescape(encodeURIComponent(tokenText)))
-        return `<div class="mermaid" data-mermaid-source="${base64Source}" aria-label="Mermaid Diagram">
-          <pre class="mermaid-loading">Loading diagram...</pre>
+        const base64Source = encodeBase64Utf8(tokenText)
+        return `<div class="mermaid" data-mermaid-source="${base64Source}" aria-label="${t('preview.mermaidAriaLabel')}">
+          <pre class="mermaid-loading">${t('preview.mermaidLoading')}</pre>
         </div>\n`
       }
     },
@@ -402,15 +445,15 @@ marked.use({
       name: 'yamlCodeBlock',
       level: 'block',
       start(src: string) {
-        return src.match(/^```ya?ml\n/m)?.index
+        return src.match(/^[ \t]*(?:`{3,}|~{3,})[ \t]*ya?ml\b/i)?.index
       },
       tokenizer(src: string) {
-        const match = /^```ya?ml\n([\s\S]*?)```/.exec(src)
-        if (match && match[1]) {
+        const match = encontrarBlocoCodigoFenced(src, 'ya?ml')
+        if (match) {
           return {
             type: 'yamlCodeBlock',
-            raw: match[0],
-            text: match[1].trim()
+            raw: match.raw,
+            text: match.text
           }
         }
         return undefined
@@ -418,7 +461,7 @@ marked.use({
       renderer(token: Tokens.Generic) {
         const tokenData = token as { text?: string }
         const tokenText: string = typeof tokenData.text === 'string' ? tokenData.text : ''
-        const base64Source = btoa(unescape(encodeURIComponent(tokenText)))
+        const base64Source = encodeBase64Utf8(tokenText)
         return `<div class="yaml-block" data-yaml-source="${base64Source}" data-yaml-type="codeblock" aria-label="YAML Code Block">
           <pre class="yaml-loading">Loading YAML...</pre>
         </div>\n`

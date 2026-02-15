@@ -12,7 +12,7 @@ export const en = {
   // App Header
   header: {
     brand: 'MD2PDF',
-    version: 'v1.1.48',
+    version: 'v1.1.49',
     manualLink: 'Manual',
     manualTitle: 'Open user manual',
   },
@@ -87,6 +87,10 @@ export const en = {
     fontLabel: 'Document font',
     fontSizeLabel: 'Font size',
     alignLabel: 'Text alignment',
+    mermaidLoading: 'Loading diagram...',
+    mermaidAriaLabel: 'Mermaid Diagram',
+    mermaidErrorLabel: 'Diagram error:',
+    mermaidDecodeError: 'Unable to decode Mermaid source.'
   },
 
   // Save Status

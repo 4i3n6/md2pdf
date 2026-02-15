@@ -7,14 +7,19 @@
 
 import { MermaidConfig } from '@/constants'
 import { decodeBase64Utf8 } from '@/utils/base64'
+import { t } from '@/i18n'
 import { logErro } from '@/utils/logger'
 
 let mermaidInstance: typeof import('mermaid').default | null = null
 let initPromise: Promise<void> | null = null
+const mermaidCache = new Map<string, string>()
+const mermaidRenderPromises = new Map<string, Promise<string>>()
+const MAX_CACHE_ENTRIES = 80
+const LANDSCAPE_MULTIPLIER = 2
 
 /**
- * Ensures Mermaid library is loaded and initialized (singleton pattern)
- * Only loads on first use - subsequent calls return cached instance
+ * Ensure Mermaid library is loaded and initialized (singleton pattern).
+ * Only loads on first use - subsequent calls return cached instance.
  */
 async function ensureMermaidLoaded(): Promise<typeof import('mermaid').default> {
   if (mermaidInstance) return mermaidInstance
@@ -51,21 +56,24 @@ async function ensureMermaidLoaded(): Promise<typeof import('mermaid').default> 
     })()
   }
 
-  await initPromise
+  try {
+    await initPromise
+  } catch (erro) {
+    initPromise = null
+    throw erro
+  }
+
   return mermaidInstance!
 }
 
-/**
- * Generates a unique ID for Mermaid diagram rendering
- */
-function generateMermaidId(): string {
+function normalizarMermaidSource(source: string): string {
+  return source.trim()
+}
+
+function gerarMermaidId(): string {
   return `mermaid-${Date.now()}-${Math.random().toString(36).slice(2, 9)}`
 }
 
-/**
- * Decodes base64 encoded Mermaid source code
- * Required because source is stored as base64 to survive DOMPurify
- */
 function decodeBase64Source(base64: string): string {
   return decodeBase64Utf8(base64, {
     onError: logErro,
@@ -73,10 +81,57 @@ function decodeBase64Source(base64: string): string {
   })
 }
 
-/**
- * Detects the type of Mermaid diagram from source code
- * Used for labeling and styling purposes
- */
+function setTextoSeguro(elemento: HTMLElement, texto: string): void {
+  elemento.textContent = texto
+}
+
+function parseDimension(value: string | null): number {
+  if (!value) return 0
+  const match = value.trim().match(/^(\d+(?:\.\d+)?)(px)?$/i)
+  if (!match) return 0
+  const parsed = Number.parseFloat(match[1])
+  return Number.isFinite(parsed) ? parsed : 0
+}
+
+function extrairDimensoesSvg(svgElement: SVGSVGElement | null): { width: number, height: number } {
+  if (!svgElement) {
+    return { width: 0, height: 0 }
+  }
+
+  const widthFromAttr = parseDimension(svgElement.getAttribute('width'))
+  const heightFromAttr = parseDimension(svgElement.getAttribute('height'))
+  if (widthFromAttr > 0 && heightFromAttr > 0) {
+    return { width: widthFromAttr, height: heightFromAttr }
+  }
+
+  const viewBox = svgElement.getAttribute('viewBox') || ''
+  const viewBoxParts = viewBox
+    .trim()
+    .split(/[\s,]+/)
+    .map((value) => Number.parseFloat(value))
+    .filter((value) => Number.isFinite(value))
+
+  if (viewBoxParts.length >= 4 && viewBoxParts[2] > 0 && viewBoxParts[3] > 0) {
+    return { width: viewBoxParts[2], height: viewBoxParts[3] }
+  }
+
+  if (typeof svgElement.getBoundingClientRect === 'function') {
+    const bounds = svgElement.getBoundingClientRect()
+    if (bounds.width > 0 && bounds.height > 0) {
+      return { width: bounds.width, height: bounds.height }
+    }
+  }
+
+  return { width: 0, height: 0 }
+}
+
+function isWideDiagramForPrint(svgElement: SVGSVGElement | null): boolean {
+  const { width, height } = extrairDimensoesSvg(svgElement)
+  const maxWidth = MermaidConfig.maxLarguraPaginaPx
+  const landscapeTrigger = maxWidth * LANDSCAPE_MULTIPLIER
+  return width > maxWidth && width > landscapeTrigger && width > height
+}
+
 function detectDiagramType(source: string): string {
   const firstLine = (source.trim().split('\n')[0] || '').toLowerCase()
   
@@ -102,16 +157,12 @@ function detectDiagramType(source: string): string {
   return 'diagram'
 }
 
-/**
- * Extracts diagram title from source code
- * Supports YAML frontmatter (title:) and Mermaid comments (%%)
- */
 function extractDiagramTitle(source: string): string | null {
-  // Try YAML frontmatter: ---\ntitle: My Title\n---
   const yamlMatch = source.match(/^---\s*\n[\s\S]*?title:\s*["']?(.+?)["']?\s*\n[\s\S]*?---/m)
-  if (yamlMatch && yamlMatch[1]) return yamlMatch[1].trim()
-  
-  // Try Mermaid comment: %% My Title
+  if (yamlMatch && yamlMatch[1]) {
+    return yamlMatch[1].trim()
+  }
+
   const lines = source.trim().split('\n')
   for (const line of lines) {
     const commentMatch = line.match(/^%%\s*(.+)$/)
@@ -119,8 +170,68 @@ function extractDiagramTitle(source: string): string | null {
       return commentMatch[1].trim()
     }
   }
-  
+
   return null
+}
+
+function limitarCache(): void {
+  while (mermaidCache.size > MAX_CACHE_ENTRIES) {
+    const firstKey = mermaidCache.keys().next().value
+    if (typeof firstKey === 'string') {
+      mermaidCache.delete(firstKey)
+    } else {
+      break
+    }
+  }
+}
+
+async function renderMermaidSvg(source: string): Promise<string> {
+  const normalizedSource = normalizarMermaidSource(source)
+  const cacheKey = normalizedSource
+  const cachedSvg = mermaidCache.get(cacheKey)
+  if (cachedSvg) {
+    return cachedSvg
+  }
+
+  const inFlight = mermaidRenderPromises.get(cacheKey)
+  if (inFlight) {
+    return inFlight
+  }
+
+  const renderPromise = (async () => {
+    const mermaid = await ensureMermaidLoaded()
+    const id = gerarMermaidId()
+    const { svg } = await mermaid.render(id, normalizedSource)
+    mermaidCache.set(cacheKey, svg)
+    limitarCache()
+    return svg
+  })()
+
+  mermaidRenderPromises.set(cacheKey, renderPromise)
+  try {
+    return await renderPromise
+  } finally {
+    if (mermaidRenderPromises.get(cacheKey) === renderPromise) {
+      mermaidRenderPromises.delete(cacheKey)
+    }
+  }
+}
+
+function renderMermaidError(block: HTMLElement, mensagem: string): void {
+  block.innerHTML = ''
+  const errorContainer = document.createElement('div')
+  errorContainer.className = 'mermaid-error'
+
+  const title = document.createElement('strong')
+  title.textContent = `${t('preview.mermaidErrorLabel')} `
+  const details = document.createElement('pre')
+  setTextoSeguro(details, mensagem)
+
+  errorContainer.appendChild(title)
+  errorContainer.appendChild(details)
+  block.appendChild(errorContainer)
+  block.classList.add('mermaid-error-container')
+  block.removeAttribute('data-mermaid-source')
 }
 
 /**
@@ -135,73 +246,67 @@ export async function processMermaidDiagrams(container: HTMLElement | null): Pro
   const mermaidBlocks = container.querySelectorAll<HTMLElement>('.mermaid[data-mermaid-source]')
   if (mermaidBlocks.length === 0) return 0
 
-  const mermaid = await ensureMermaidLoaded()
   let processedCount = 0
 
   for (const block of mermaidBlocks) {
     const encodedSource = block.getAttribute('data-mermaid-source')
-    if (!encodedSource) continue
+    if (!encodedSource) {
+      continue
+    }
 
     const source = decodeBase64Source(encodedSource)
+    if (!source) {
+      renderMermaidError(block, t('preview.mermaidDecodeError'))
+      continue
+    }
 
     try {
-      const id = generateMermaidId()
-      const { svg } = await mermaid.render(id, source)
-      
-      // Detect diagram type and extract title
+      const svg = await renderMermaidSvg(source)
       const diagramType = detectDiagramType(source)
       const diagramTitle = extractDiagramTitle(source)
-      
-      // Create figure structure for professional documentation
+
       const figure = document.createElement('figure')
       figure.className = 'mermaid-figure'
       figure.setAttribute('data-diagram-type', diagramType)
-      
-      // Create diagram container
+
       const diagramContainer = document.createElement('div')
       diagramContainer.className = 'mermaid-diagram'
       diagramContainer.innerHTML = svg
       figure.appendChild(diagramContainer)
-      
-      // Check if diagram needs landscape rotation
-      // Only rotate WIDE diagrams (width > height) that exceed page width
-      // Tall diagrams should flow naturally across pages
+
       const svgElement = diagramContainer.querySelector('svg')
-      if (svgElement) {
-        const svgWidth = parseFloat(svgElement.getAttribute('width') || '0')
-        const svgHeight = parseFloat(svgElement.getAttribute('height') || '0')
-        const MAX_PAGE_WIDTH = MermaidConfig.maxLarguraPaginaPx // ~170mm at 72dpi
-        
-        // Rotate only if: exceeds page width AND is wider than tall
-        if (svgWidth > MAX_PAGE_WIDTH && svgWidth > svgHeight) {
-          figure.classList.add('mermaid-landscape')
-        }
+      if (isWideDiagramForPrint(svgElement as SVGSVGElement | null)) {
+        figure.classList.add('mermaid-landscape')
+        block.classList.add('mermaid-landscape')
       }
-      
-      // Add figcaption if title exists
+
       if (diagramTitle) {
         const caption = document.createElement('figcaption')
         caption.className = 'mermaid-caption'
-        caption.innerHTML = `<span class="diagram-number"></span><span class="diagram-title">${diagramTitle}</span>`
+
+        const numberSpan = document.createElement('span')
+        numberSpan.className = 'diagram-number'
+        setTextoSeguro(numberSpan, '')
+
+        const titleSpan = document.createElement('span')
+        titleSpan.className = 'diagram-title'
+        setTextoSeguro(titleSpan, diagramTitle)
+
+        caption.appendChild(numberSpan)
+        caption.appendChild(titleSpan)
         figure.appendChild(caption)
       }
-      
-      // Replace block content with figure
+
       block.innerHTML = ''
       block.appendChild(figure)
       block.removeAttribute('data-mermaid-source')
       block.classList.add('mermaid-rendered')
-      
-      processedCount++
+
+      processedCount += 1
     } catch (e) {
       const errorMessage = e instanceof Error ? e.message : 'Unknown error'
       logErro(`Erro ao renderizar Mermaid: ${errorMessage}`)
-      
-      block.innerHTML = `<div class="mermaid-error">
-        <strong>Diagram error:</strong>
-        <pre>${errorMessage}</pre>
-      </div>`
-      block.classList.add('mermaid-error-container')
+      renderMermaidError(block, errorMessage)
     }
   }
 
