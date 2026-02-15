@@ -105,6 +105,29 @@ function updateFileVersion(filePath, newVersion) {
   }
 }
 
+function updatePackageLockVersion(newVersion) {
+  const packageLockPath = join(rootDir, 'package-lock.json')
+  if (!existsSync(packageLockPath)) {
+    console.log('  Skipped: package-lock.json')
+    return
+  }
+
+  try {
+    const lock = JSON.parse(readFileSync(packageLockPath, 'utf-8'))
+    lock.version = newVersion
+
+    if (lock.packages && lock.packages['']) {
+      lock.packages[''].version = newVersion
+    }
+
+    writeFileSync(packageLockPath, JSON.stringify(lock, null, 2) + '\n', 'utf-8')
+    console.log('  Updated: package-lock.json')
+  } catch (err) {
+    const errorMsg = err instanceof Error ? err.message : String(err)
+    console.error(`  Error updating package-lock.json: ${errorMsg}`)
+  }
+}
+
 // Main execution
 const bumpType = process.argv[2] || 'patch'
 const isSync = bumpType === 'sync'
@@ -132,5 +155,6 @@ if (isSync) {
 for (const file of VERSION_FILES) {
   updateFileVersion(file, newVersion)
 }
+updatePackageLockVersion(newVersion)
 
 console.log(`\nVersion ${isSync ? 'synced' : 'bumped'} to ${newVersion}\n`)
