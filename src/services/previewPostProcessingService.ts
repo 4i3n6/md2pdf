@@ -1,6 +1,7 @@
 import { processImagesInPreview } from '@/processors/markdownProcessor'
 import { processMermaidDiagrams } from '@/processors/mermaidProcessor'
 import { processYamlBlocks } from '@/processors/yamlProcessor'
+import { processCryptoTruncationInTables } from '@/processors/cryptoTableTruncationProcessor'
 import type { LoggerInterface } from '@/types/index'
 import { runPipeline, type PipelineStage } from '@/utils/pipeline'
 
@@ -30,6 +31,11 @@ const processadores: PreviewPosProcessador[] = [
         executar: processYamlBlocks,
         mensagemSucesso: (quantidade) => `${quantidade} bloco(s) YAML renderizado(s)`,
         mensagemErro: 'Erro ao processar blocos YAML'
+    },
+    {
+        executar: processCryptoTruncationInTables,
+        mensagemSucesso: (quantidade) => `${quantidade} valor(es) cripto truncado(s) em tabela(s)`,
+        mensagemErro: 'Erro ao truncar valores cripto em tabelas'
     }
 ]
 
