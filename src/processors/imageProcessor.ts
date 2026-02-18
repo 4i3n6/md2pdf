@@ -21,7 +21,7 @@ interface PrintDimensions {
   calculatedHeightMm?: number
 }
 
-interface ValidationResult {
+interface ImageValidationResult {
   fits: boolean
   message: string
 }
@@ -227,7 +227,7 @@ export async function processImagesForPrint(
  * @param {number} height - Altura em pixels
  * @returns {ValidationResult} Objeto com fits (boolean) e message
  */
-export function validateImageForA4(width: number, height: number): ValidationResult {
+export function validateImageForA4(width: number, height: number): ImageValidationResult {
   const maxWidthMm = ImpressaoLimites.maxLarguraMm
   const maxHeightMm = ImpressaoLimites.maxAlturaMm
   const pxPorMm = ImpressaoLimites.pxPorMm

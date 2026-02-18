@@ -89,7 +89,7 @@ function parseDimension(value: string | null): number {
   if (!value) return 0
   const match = value.trim().match(/^(\d+(?:\.\d+)?)(px)?$/i)
   if (!match) return 0
-  const parsed = Number.parseFloat(match[1])
+  const parsed = Number.parseFloat(match[1] ?? '')
   return Number.isFinite(parsed) ? parsed : 0
 }
 
@@ -111,8 +111,10 @@ function extrairDimensoesSvg(svgElement: SVGSVGElement | null): { width: number,
     .map((value) => Number.parseFloat(value))
     .filter((value) => Number.isFinite(value))
 
-  if (viewBoxParts.length >= 4 && viewBoxParts[2] > 0 && viewBoxParts[3] > 0) {
-    return { width: viewBoxParts[2], height: viewBoxParts[3] }
+  const vbW = viewBoxParts[2]
+  const vbH = viewBoxParts[3]
+  if (viewBoxParts.length >= 4 && vbW !== undefined && vbH !== undefined && vbW > 0 && vbH > 0) {
+    return { width: vbW, height: vbH }
   }
 
   if (typeof svgElement.getBoundingClientRect === 'function') {
@@ -134,7 +136,7 @@ function isWideDiagramForPrint(svgElement: SVGSVGElement | null): boolean {
 
 function detectDiagramType(source: string): string {
   const firstLine = (source.trim().split('\n')[0] || '').toLowerCase()
-  
+
   if (firstLine.startsWith('flowchart') || firstLine.startsWith('graph')) return 'flowchart'
   if (firstLine.startsWith('sequencediagram') || firstLine.startsWith('sequence')) return 'sequence'
   if (firstLine.startsWith('classdiagram') || firstLine.startsWith('class')) return 'class'
@@ -153,7 +155,7 @@ function detectDiagramType(source: string): string {
   if (firstLine.startsWith('requirement')) return 'requirement'
   if (firstLine.startsWith('c4')) return 'c4'
   if (firstLine.startsWith('architecture')) return 'architecture'
-  
+
   return 'diagram'
 }
 

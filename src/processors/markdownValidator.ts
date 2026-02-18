@@ -22,9 +22,9 @@ export interface MarkdownError {
 }
 
 /**
- * Resultado da validação
+ * Resultado da validação de sintaxe Markdown
  */
-export interface ValidationResult {
+export interface MarkdownValidationResult {
   isValid: boolean;
   errors: MarkdownError[];
   warnings: MarkdownError[];
@@ -36,10 +36,10 @@ export interface ValidationResult {
  * @param markdown - Conteúdo Markdown a validar
  * @returns Resultado da validação com lista de erros/avisos
  */
-export function validateMarkdown(markdown: string): ValidationResult {
+export function validateMarkdown(markdown: string): MarkdownValidationResult {
   const errors: MarkdownError[] = [];
   const warnings: MarkdownError[] = [];
-  
+
   if (!markdown || markdown.length === 0) {
     return { isValid: true, errors, warnings };
   }

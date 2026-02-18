@@ -33,11 +33,6 @@ export interface LogLine {
   type: 'info' | 'error' | 'success' | 'warning' | 'system'
 }
 
-export interface ValidationResult {
-  isValid: boolean
-  issues: string[]
-  warnings: string[]
-}
 
 export interface PrintStats {
   estimatedPages: number

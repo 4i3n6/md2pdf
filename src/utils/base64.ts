@@ -7,7 +7,7 @@ function encodeViaTextEncoder(input: string): string {
     const textoCodificado = new TextEncoder().encode(input)
     let bruto = ''
     for (let i = 0; i < textoCodificado.length; i += 1) {
-        bruto += String.fromCharCode(textoCodificado[i])
+        bruto += String.fromCharCode(textoCodificado[i] ?? 0)
     }
     return btoa(bruto)
 }
