@@ -24,7 +24,8 @@ npm run preview  # Preview da build de produção
 - **Espaçamento**: 4 espaços de indentação
 
 ### Tipos & Validação
-- **Tipagem**: JavaScript vanilla, sem TypeScript
+- **Tipagem**: TypeScript estrito — todos os arquivos são `.ts`, com `tsconfig.json` configurado
+- **Typecheck**: `npm run typecheck` executa `tsc --noEmit` (deve passar sem erros antes de qualquer commit)
 - **Validação**: Validação simples com try/catch; log de erros obrigatório
 
 ### Tratamento de Erros
