@@ -1,6 +1,7 @@
 import { BackupConfig } from '@/constants'
 import { getDocPreferences, loadDocPreferences, saveDocPreferences, type DocumentPreferences } from '@/services/previewPreferencesService'
 import type { AppState, Document as AppDocument, LoggerInterface } from '@/types/index'
+import { confirmar } from '@/services/modalService'
 
 type BackupPayload = {
     version: number
@@ -228,8 +229,14 @@ export function createDocumentIoService(deps: DocumentIoDeps) {
                 return
             }
 
-            if (!confirm('Esta acao substitui todos os documentos atuais. Deseja continuar?')) {
-                deps.logger.log('Restauracao cancelada pelo usuario', 'warning')
+            const confirmado = await confirmar({
+                titulo: 'Restaurar backup',
+                mensagem: 'Esta ação substitui todos os documentos atuais.\nDeseja continuar?',
+                textoBotaoConfirmar: 'Restaurar',
+                variante: 'warning'
+            })
+            if (!confirmado) {
+                deps.logger.log('Restauração cancelada pelo usuário', 'warning')
                 return
             }
 

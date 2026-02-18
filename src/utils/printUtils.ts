@@ -6,6 +6,7 @@
 import { ImpressaoLimites } from '@/constants'
 import { logAviso, logErro, logInfo } from '@/utils/logger'
 import { runPipeline, type PipelineStage } from '@/utils/pipeline'
+import { confirmar } from '@/services/modalService'
 
 /**
  * Resultado de validação de conteúdo para impressão
@@ -48,129 +49,129 @@ const PrintTimings = {
 } as const;
 
 function criarContainerTemporario(htmlContent: string): HTMLElement {
-    const container = document.createElement('div');
-    container.innerHTML = htmlContent;
-    return container;
+  const container = document.createElement('div');
+  container.innerHTML = htmlContent;
+  return container;
 }
 
 async function aguardarImagensCarregadas(
-    images: HTMLImageElement[],
-    timeoutMs: number = 2000
+  images: HTMLImageElement[],
+  timeoutMs: number = 2000
 ): Promise<void> {
-    const pendentes = images.filter((img) => !img.complete);
-    if (pendentes.length === 0) return;
+  const pendentes = images.filter((img) => !img.complete);
+  if (pendentes.length === 0) return;
 
-    await Promise.race([
-        Promise.all(
-            pendentes.map(
-                (img) =>
-                    new Promise<void>((resolve) => {
-                        const onDone = (): void => resolve();
-                        img.addEventListener('load', onDone, { once: true });
-                        img.addEventListener('error', onDone, { once: true });
-                    })
-            )
-        ),
-        new Promise<void>((resolve) => setTimeout(resolve, timeoutMs))
-    ]);
+  await Promise.race([
+    Promise.all(
+      pendentes.map(
+        (img) =>
+          new Promise<void>((resolve) => {
+            const onDone = (): void => resolve();
+            img.addEventListener('load', onDone, { once: true });
+            img.addEventListener('error', onDone, { once: true });
+          })
+      )
+    ),
+    new Promise<void>((resolve) => setTimeout(resolve, timeoutMs))
+  ]);
 }
 
 function obterDimensoesImagem(img: HTMLImageElement): { widthPx: number; heightPx: number } {
-    const rect = img.getBoundingClientRect();
-    const datasetWidth = Number(img.dataset['originalWidth'] || 0);
-    const datasetHeight = Number(img.dataset['originalHeight'] || 0);
+  const rect = img.getBoundingClientRect();
+  const datasetWidth = Number(img.dataset['originalWidth'] || 0);
+  const datasetHeight = Number(img.dataset['originalHeight'] || 0);
 
-    return {
-        widthPx: rect.width || datasetWidth || img.naturalWidth || 0,
-        heightPx: rect.height || datasetHeight || img.naturalHeight || 0
-    };
+  return {
+    widthPx: rect.width || datasetWidth || img.naturalWidth || 0,
+    heightPx: rect.height || datasetHeight || img.naturalHeight || 0
+  };
 }
 
 function obterLarguraTabela(table: HTMLTableElement): number {
-    const rect = table.getBoundingClientRect();
-    return rect.width || table.scrollWidth || table.offsetWidth || 0;
+  const rect = table.getBoundingClientRect();
+  return rect.width || table.scrollWidth || table.offsetWidth || 0;
 }
 
 function obterLarguraContainer(container: HTMLElement): number {
-    const rect = container.getBoundingClientRect();
-    return rect.width || container.clientWidth || container.scrollWidth || 0;
+  const rect = container.getBoundingClientRect();
+  return rect.width || container.clientWidth || container.scrollWidth || 0;
 }
 
 function validarImagensNoContainer(container: HTMLElement, issues: string[]): void {
-    const images = Array.from(container.querySelectorAll('img'));
+  const images = Array.from(container.querySelectorAll('img'));
 
-    images.forEach((img, idx) => {
-        const dims = obterDimensoesImagem(img);
-        if (dims.widthPx <= 0 || dims.heightPx <= 0) return;
+  images.forEach((img, idx) => {
+    const dims = obterDimensoesImagem(img);
+    if (dims.widthPx <= 0 || dims.heightPx <= 0) return;
 
-        const maxWidthMm = ImpressaoLimites.maxLarguraMm;
-        const maxHeightMm = ImpressaoLimites.maxAlturaMm;
-        const pxPorMm = ImpressaoLimites.pxPorMm;
-        const imgWidthMm = dims.widthPx / pxPorMm;
-        const imgHeightMm = dims.heightPx / pxPorMm;
+    const maxWidthMm = ImpressaoLimites.maxLarguraMm;
+    const maxHeightMm = ImpressaoLimites.maxAlturaMm;
+    const pxPorMm = ImpressaoLimites.pxPorMm;
+    const imgWidthMm = dims.widthPx / pxPorMm;
+    const imgHeightMm = dims.heightPx / pxPorMm;
 
-        if (imgWidthMm > maxWidthMm || imgHeightMm > maxHeightMm) {
-            issues.push(`⚠️ Imagem ${idx + 1}: ${Math.round(dims.widthPx)}x${Math.round(dims.heightPx)}px pode não caber na página A4`);
-        }
-    });
+    if (imgWidthMm > maxWidthMm || imgHeightMm > maxHeightMm) {
+      issues.push(`⚠️ Imagem ${idx + 1}: ${Math.round(dims.widthPx)}x${Math.round(dims.heightPx)}px pode não caber na página A4`);
+    }
+  });
 }
 
 function validarTabelasNoContainer(container: HTMLElement, issues: string[]): void {
-    const tables = Array.from(container.querySelectorAll('table'));
-    const containerWidthPx = obterLarguraContainer(container);
-    if (containerWidthPx <= 0) return;
+  const tables = Array.from(container.querySelectorAll('table'));
+  const containerWidthPx = obterLarguraContainer(container);
+  if (containerWidthPx <= 0) return;
 
-    // Tolerancia para evitar falso positivo por bordas, arredondamento e scrollbar.
-    // Avisa apenas quando o excesso é realmente perceptível no print.
-    const toleranciaPx = Math.max(12, containerWidthPx * 0.02);
+  // Tolerancia para evitar falso positivo por bordas, arredondamento e scrollbar.
+  // Avisa apenas quando o excesso é realmente perceptível no print.
+  const toleranciaPx = Math.max(12, containerWidthPx * 0.02);
 
-    tables.forEach((table, idx) => {
-        const tableWidthPx = obterLarguraTabela(table);
-        if (tableWidthPx <= 0) return;
-        const excessoNoContainer = Math.max(0, tableWidthPx - containerWidthPx);
-        const excessoInterno = Math.max(0, table.scrollWidth - table.clientWidth);
-        const excessoDetectado = Math.max(excessoNoContainer, excessoInterno);
+  tables.forEach((table, idx) => {
+    const tableWidthPx = obterLarguraTabela(table);
+    if (tableWidthPx <= 0) return;
+    const excessoNoContainer = Math.max(0, tableWidthPx - containerWidthPx);
+    const excessoInterno = Math.max(0, table.scrollWidth - table.clientWidth);
+    const excessoDetectado = Math.max(excessoNoContainer, excessoInterno);
 
-        if (excessoDetectado > toleranciaPx) {
-            issues.push(
-                `⚠️ Tabela ${idx + 1}: ${Math.round(tableWidthPx)}px (área útil ${Math.round(containerWidthPx)}px, excesso ${Math.round(excessoDetectado)}px) pode transbordar na impressão`
-            );
-        }
-    });
+    if (excessoDetectado > toleranciaPx) {
+      issues.push(
+        `⚠️ Tabela ${idx + 1}: ${Math.round(tableWidthPx)}px (área útil ${Math.round(containerWidthPx)}px, excesso ${Math.round(excessoDetectado)}px) pode transbordar na impressão`
+      );
+    }
+  });
 }
 
 function validarUrlsLongasNoHtml(htmlContent: string, issues: string[]): void {
-    const longLines = htmlContent.match(/https?:\/\/[^\s<>"]{80,}/g);
-    if (longLines && longLines.length > 0) {
-        issues.push(`⚠️ ${longLines.length} URL(s) muito longa(s) podem transbordar em impressão`);
-    }
+  const longLines = htmlContent.match(/https?:\/\/[^\s<>"]{80,}/g);
+  if (longLines && longLines.length > 0) {
+    issues.push(`⚠️ ${longLines.length} URL(s) muito longa(s) podem transbordar em impressão`);
+  }
 }
 
 const validadoresConteudoImpressao: PipelineStage<ValidationPipelineContext>[] = [
-    {
-        id: 'validar-imagens-print',
-        enabled: (contexto) => contexto.isLive,
-        run: async (contexto): Promise<void> => {
-            const images = Array.from(contexto.container.querySelectorAll('img'));
-            if (images.length > 0) {
-                await aguardarImagensCarregadas(images);
-            }
-            validarImagensNoContainer(contexto.container, contexto.issues);
-        }
-    },
-    {
-        id: 'validar-tabelas-print',
-        enabled: (contexto) => contexto.isLive,
-        run: (contexto): void => {
-            validarTabelasNoContainer(contexto.container, contexto.issues);
-        }
-    },
-    {
-        id: 'validar-urls-longas-print',
-        run: (contexto): void => {
-            validarUrlsLongasNoHtml(contexto.htmlContent, contexto.issues);
-        }
+  {
+    id: 'validar-imagens-print',
+    enabled: (contexto) => contexto.isLive,
+    run: async (contexto): Promise<void> => {
+      const images = Array.from(contexto.container.querySelectorAll('img'));
+      if (images.length > 0) {
+        await aguardarImagensCarregadas(images);
+      }
+      validarImagensNoContainer(contexto.container, contexto.issues);
     }
+  },
+  {
+    id: 'validar-tabelas-print',
+    enabled: (contexto) => contexto.isLive,
+    run: (contexto): void => {
+      validarTabelasNoContainer(contexto.container, contexto.issues);
+    }
+  },
+  {
+    id: 'validar-urls-longas-print',
+    run: (contexto): void => {
+      validarUrlsLongasNoHtml(contexto.htmlContent, contexto.issues);
+    }
+  }
 ]
 
 function obterPreviewElement(options?: PrintDocumentOptions): HTMLElement | null {
@@ -190,14 +191,19 @@ async function obterValidacaoParaImpressao(
   return await validatePrintContent(preview);
 }
 
-function confirmarImpressaoComAvisos(
+async function confirmarImpressaoComAvisos(
   validation: ValidationResult,
   logger: (message: string) => void
-): boolean {
+): Promise<boolean> {
   if (validation.issues.length === 0) return true;
 
   validation.issues.forEach((issue) => logger(issue));
-  return confirm(`${validation.issues.length} aviso(s) de impressão.\nContinuar mesmo assim?`);
+  return confirmar({
+    titulo: 'Avisos de impressão',
+    mensagem: `${validation.issues.length} aviso(s) detectado(s).\nContinuar mesmo assim?`,
+    textoBotaoConfirmar: 'Imprimir assim mesmo',
+    variante: 'warning'
+  });
 }
 
 function aplicarTituloPdfTemporario(docName: string): () => void {
@@ -301,7 +307,7 @@ export function optimizeForPrint(): boolean {
     // Não precisamos mais esconder elementos manualmente
     // O CSS @media print em styles-print.css já cuida disso
     // Isso evita problemas de restauração do DOM
-    
+
     return true;
   } catch (error) {
     const errorMsg = error instanceof Error ? error.message : String(error);

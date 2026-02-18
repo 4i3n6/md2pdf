@@ -32,6 +32,7 @@ import { BreakpointsLayout, SalvamentoConfig } from '@/constants'
 import type { AppState, LoggerInterface, Document as AppDocument } from '@/types/index'
 import { debounce } from '@/utils/debounce'
 import { editorTheme } from './editorTheme'
+import { confirmar } from './services/modalService'
 import './pwaRegister'
 import './styles.css'
 import './styles-print.css'
@@ -436,7 +437,13 @@ function createDoc(): void {
 function deleteDoc(id: number): void {
   const doc = state.docs.find((d) => d.id === id)
   const nome = doc?.name || 'documento'
-  if (confirm(`Tem certeza que deseja deletar "${nome}"?`)) {
+  void confirmar({
+    titulo: 'Deletar documento',
+    mensagem: `Tem certeza que deseja deletar "${nome}"?`,
+    textoBotaoConfirmar: 'Deletar',
+    variante: 'danger'
+  }).then((confirmado) => {
+    if (!confirmado) return
     const success = documentManager.delete(id)
     if (success) {
       if (state.currentId === id) {
@@ -449,7 +456,7 @@ function deleteDoc(id: number): void {
       renderList()
       Logger.log(`Documento ${id} removido.`)
     }
-  }
+  })
 }
 
 function flashStatus(): void {
