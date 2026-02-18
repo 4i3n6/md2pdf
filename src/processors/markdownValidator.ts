@@ -45,7 +45,7 @@ export function validateMarkdown(markdown: string): MarkdownValidationResult {
   }
 
   const lines = markdown.split('\n');
-  
+
   // Detectar linhas que estao dentro de blocos de codigo para ignorar validacao
   const linesInCodeBlock = new Set<number>();
   let inCodeBlock = false;
@@ -62,7 +62,7 @@ export function validateMarkdown(markdown: string): MarkdownValidationResult {
   lines.forEach((line, lineIndex) => {
     const lineNum = lineIndex + 1;
     const trimmed = line.trim();
-    
+
     // IMPORTANTE: Ignorar linhas dentro de blocos de codigo
     if (linesInCodeBlock.has(lineIndex)) {
       return;
@@ -74,7 +74,7 @@ export function validateMarkdown(markdown: string): MarkdownValidationResult {
       const hashes = headingMatch[1] || '';
       const hashCount = hashes.length;
       const rest = headingMatch[2] || '';
-      
+
       if (hashCount > 6) {
         errors.push({
           line: lineNum,
@@ -86,7 +86,7 @@ export function validateMarkdown(markdown: string): MarkdownValidationResult {
           suggestionRange: { from: 1, to: line.length + 1 }
         });
       }
-      
+
       // Aviso: heading sem espaço após #
       if (rest && !rest.startsWith(' ')) {
         const fixedLine = hashes + ' ' + rest.trimStart();
@@ -106,6 +106,10 @@ export function validateMarkdown(markdown: string): MarkdownValidationResult {
     const linkRegex = /\[([^\]]*)\]\(([^)]*)\)/g;
     let linkMatch;
     while ((linkMatch = linkRegex.exec(line)) !== null) {
+      // Ignorar imagens ![alt](url)
+      if (linkMatch.index > 0 && line[linkMatch.index - 1] === '!') {
+        continue;
+      }
       const text = linkMatch[1];
       const url = linkMatch[2];
 
@@ -189,11 +193,11 @@ export function validateMarkdown(markdown: string): MarkdownValidationResult {
     // 5. Validar bold/italic (** ou *)
     // Ignorar linhas que são bullet points (começam com * seguido de espaço)
     const isBulletPoint = /^\s*\*\s/.test(line);
-    
+
     if (!isBulletPoint) {
       const boldCount = (line.match(/\*\*/g) || []).length;
       const italicCount = (line.match(/\*/g) || []).length - boldCount * 2;
-      
+
       if (italicCount % 2 !== 0) {
         warnings.push({
           line: lineNum,
@@ -232,11 +236,11 @@ export function validateMarkdown(markdown: string): MarkdownValidationResult {
   const codeBlockRegex = /```([a-z0-9#+-]*)\n([\s\S]*?)```/g;
   let codeBlockMatch;
   let codeBlockCount = 0;
-  
+
   while ((codeBlockMatch = codeBlockRegex.exec(markdown)) !== null) {
     codeBlockCount++;
     const language = codeBlockMatch[1];
-    
+
     // Validar se é linguagem conhecida (apenas aviso)
     const knownLanguages = [
       'bash',
@@ -279,7 +283,7 @@ export function validateMarkdown(markdown: string): MarkdownValidationResult {
       'yml',
       'mermaid'
     ];
-    
+
     if (language && !knownLanguages.includes(language.toLowerCase())) {
       const lineNum = markdown.substring(0, codeBlockMatch.index).split('\n').length;
       warnings.push({
@@ -310,12 +314,12 @@ export function validateMarkdown(markdown: string): MarkdownValidationResult {
   // 10. Validar tabelas simples (pipes)
   const tableRegex = /^\|(.+)\|$/gm;
   const tableLines = markdown.match(tableRegex) || [];
-  
+
   if (tableLines.length > 0) {
     tableLines.forEach((tableLine) => {
       const lineNum = markdown.substring(0, markdown.indexOf(tableLine)).split('\n').length;
       const cells = tableLine.split('|').filter((c) => c.trim());
-      
+
       if (cells.length < 2) {
         warnings.push({
           line: lineNum,
