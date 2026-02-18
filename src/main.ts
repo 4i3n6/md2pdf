@@ -31,6 +31,7 @@ import { initI18n, t, getLocale } from './i18n/index'
 import { BreakpointsLayout, SalvamentoConfig } from '@/constants'
 import type { AppState, LoggerInterface, Document as AppDocument } from '@/types/index'
 import { debounce } from '@/utils/debounce'
+import { editorTheme } from './editorTheme'
 import './pwaRegister'
 import './styles.css'
 import './styles-print.css'
@@ -104,13 +105,13 @@ documentManager.setLogger(Logger);
 uiRenderer.setLogger(Logger);
 
 window.addEventListener('error', (event: ErrorEvent): void => {
-    const message = event.message || 'Erro inesperado';
-    Logger.error(`Erro inesperado: ${message}`);
+  const message = event.message || 'Erro inesperado';
+  Logger.error(`Erro inesperado: ${message}`);
 });
 
 window.addEventListener('unhandledrejection', (event: PromiseRejectionEvent): void => {
-    const reason = event.reason instanceof Error ? event.reason.message : String(event.reason);
-    Logger.error(`Promise rejeitada: ${reason}`);
+  const reason = event.reason instanceof Error ? event.reason.message : String(event.reason);
+  Logger.error(`Promise rejeitada: ${reason}`);
 });
 
 /**
@@ -238,65 +239,65 @@ function saveDocs(): void {
 }
 
 function obterExtensaoDocumento(nome?: string): string {
-    return obterExtensaoDocumentoArquivo(nome ?? getCurrentDoc()?.name ?? '')
+  return obterExtensaoDocumentoArquivo(nome ?? getCurrentDoc()?.name ?? '')
 }
 
 function documentoEhMarkdown(nome?: string): boolean {
-    return documentoEhMarkdownPorNome(nome ?? getCurrentDoc()?.name ?? '')
+  return documentoEhMarkdownPorNome(nome ?? getCurrentDoc()?.name ?? '')
 }
 
 function obterModoEditor(nome?: string): string {
-    return obterModoEditorPorNome(nome ?? getCurrentDoc()?.name ?? '')
+  return obterModoEditorPorNome(nome ?? getCurrentDoc()?.name ?? '')
 }
 
 async function carregarLinguagemEditor(nome?: string): Promise<Extension> {
-    if (documentoEhMarkdown(nome)) {
-        return markdown()
-    }
+  if (documentoEhMarkdown(nome)) {
+    return markdown()
+  }
 
-    const ext = obterExtensaoDocumento(nome)
-    const carregador = carregadoresLinguagem[ext]
-    if (!carregador) {
-        return []
-    }
-    return await carregador()
+  const ext = obterExtensaoDocumento(nome)
+  const carregador = carregadoresLinguagem[ext]
+  if (!carregador) {
+    return []
+  }
+  return await carregador()
 }
 
 async function atualizarLinguagemEditor(nome?: string): Promise<void> {
-    if (!state.editor) return
+  if (!state.editor) return
 
-    const modo = obterModoEditor(nome)
-    if (modo === modoEditorAtual) {
-        return
-    }
+  const modo = obterModoEditor(nome)
+  if (modo === modoEditorAtual) {
+    return
+  }
 
-    if (modo !== 'markdown') {
-        markdownDiagnosticsService.clearDiagnostics()
-    }
+  if (modo !== 'markdown') {
+    markdownDiagnosticsService.clearDiagnostics()
+  }
 
-    const requisicaoAtual = ++requisicaoLinguagemEditor
-    try {
-        const extensao = await carregarLinguagemEditor(nome)
-        if (!state.editor || requisicaoAtual !== requisicaoLinguagemEditor) {
-            return
-        }
-        state.editor.dispatch({
-            effects: compartimentoLinguagem.reconfigure(extensao)
-        })
-        modoEditorAtual = modo
-        const linguagemAtiva = state.editor.state.facet(language)
-        const nomeLinguagem = linguagemAtiva?.name || 'nenhuma'
-        Logger.log(`Editor ajustado para ${modo} (${nomeLinguagem})`)
-    } catch (e) {
-        const errorMsg = e instanceof Error ? e.message : String(e)
-        Logger.error(`Falha ao carregar linguagem do editor: ${errorMsg}`)
-        if (state.editor && requisicaoAtual === requisicaoLinguagemEditor) {
-            state.editor.dispatch({
-                effects: compartimentoLinguagem.reconfigure(markdown())
-            })
-            modoEditorAtual = 'markdown'
-        }
+  const requisicaoAtual = ++requisicaoLinguagemEditor
+  try {
+    const extensao = await carregarLinguagemEditor(nome)
+    if (!state.editor || requisicaoAtual !== requisicaoLinguagemEditor) {
+      return
     }
+    state.editor.dispatch({
+      effects: compartimentoLinguagem.reconfigure(extensao)
+    })
+    modoEditorAtual = modo
+    const linguagemAtiva = state.editor.state.facet(language)
+    const nomeLinguagem = linguagemAtiva?.name || 'nenhuma'
+    Logger.log(`Editor ajustado para ${modo} (${nomeLinguagem})`)
+  } catch (e) {
+    const errorMsg = e instanceof Error ? e.message : String(e)
+    Logger.error(`Falha ao carregar linguagem do editor: ${errorMsg}`)
+    if (state.editor && requisicaoAtual === requisicaoLinguagemEditor) {
+      state.editor.dispatch({
+        effects: compartimentoLinguagem.reconfigure(markdown())
+      })
+      modoEditorAtual = 'markdown'
+    }
+  }
 }
 
 function initEditor(): void {
@@ -320,31 +321,7 @@ function initEditor(): void {
       EditorView.lineWrapping,
       markdownDiagnosticsService.decorationsField,
       markdownDiagnosticsService.hoverTooltipExtension,
-      EditorView.theme({
-        '&': { color: '#111827', backgroundColor: '#ffffff' },
-        '.cm-content': { caretColor: '#0052cc' },
-        '.cm-gutters': {
-          backgroundColor: '#f3f4f6',
-          color: '#4b5563',
-          borderRight: '1px solid #d1d5db'
-        },
-        '.cm-activeLine': { backgroundColor: '#f0f4ff' },
-        '.cm-activeLineGutter': { color: '#0052cc', backgroundColor: '#f0f4ff', fontWeight: '600' },
-        '.cm-cursor': { borderLeftColor: '#0052cc' },
-        '.cm-selectionBackground': { backgroundColor: '#3b82f6 !important' },
-        '&.cm-focused .cm-selectionBackground': { backgroundColor: '#3b82f6 !important' },
-        '.cm-selectionMatch': { backgroundColor: '#fef08a' },
-        '.cm-heading': { color: '#111827', fontWeight: '700' },
-        '.cm-heading1': { fontSize: '130%' },
-        '.cm-heading2': { fontSize: '120%' },
-        '.cm-heading3': { fontSize: '110%' },
-        '.cm-emphasis': { fontStyle: 'italic', color: '#059669' },
-        '.cm-strong': { fontWeight: 'bold', color: '#dc2626' },
-        '.cm-link': { color: '#0052cc', textDecoration: 'underline' },
-        '.cm-atom': { color: '#ae0a04' },
-        '.cm-quote': { color: '#4b5563', fontStyle: 'italic' },
-        '.cm-strikethrough': { textDecoration: 'line-through', color: '#6b7280' }
-      }),
+      editorTheme,
       EditorView.updateListener.of((u): void => {
         if (u.docChanged) {
           const start = performance.now();
@@ -373,13 +350,13 @@ function initEditor(): void {
     parent: el
   });
 
-	  if (doc) {
-	    renderPreview(doc.content);
-	    if (state.currentId) {
-	      loadDocPreferences(state, Logger, state.currentId);
-	    }
-	    void atualizarLinguagemEditor(doc.name);
-	  }
+  if (doc) {
+    renderPreview(doc.content);
+    if (state.currentId) {
+      loadDocPreferences(state, Logger, state.currentId);
+    }
+    void atualizarLinguagemEditor(doc.name);
+  }
 }
 
 function getCurrentDoc(): AppDocument | undefined {
