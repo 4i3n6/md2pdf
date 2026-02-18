@@ -1,6 +1,6 @@
 {
   "name": "md2pdf",
-  "version": "1.1.61",
+  "version": "1.1.62",
   "description": "",
   "main": "index.js",
   "scripts": {
@@ -12,6 +12,9 @@
     "smoke": "node scripts/smoke-test.mjs",
     "visual:test": "node scripts/run-playwright.mjs",
     "visual:test:update": "node scripts/run-playwright.mjs --update-snapshots",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage",
     "typecheck": "tsc --noEmit",
     "version:patch": "node scripts/bump-version.mjs patch",
     "version:minor": "node scripts/bump-version.mjs minor",
@@ -54,10 +57,13 @@
     "@playwright/test": "^1.58.2",
     "@types/js-yaml": "^4.0.9",
     "@types/node": "^24.10.1",
+    "@vitest/coverage-v8": "^4.0.18",
+    "jsdom": "^28.1.0",
     "terser": "^5.44.1",
     "typescript": "^5.9.3",
     "vite-plugin-dts": "^4.5.4",
     "vite-plugin-pwa": "^1.2.0",
+    "vitest": "^4.0.18",
     "workbox-window": "^7.4.0"
   }
 }
