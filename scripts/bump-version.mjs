@@ -31,7 +31,8 @@ const VERSION_FILES = [
   'pt/manual/index.html',
   'manual/content.json',
   'pt/manual/content.json',
-  'README.md'
+  'README.md',
+  'CHANGELOG.md'
 ]
 
 /**
@@ -75,6 +76,9 @@ function replaceVersionInContent(content, newVersion) {
 
   // Replace SISTEMA DE CONVERSÃO vX.X.X pattern (README.md)
   result = result.replace(/(SISTEMA DE CONVERSÃO v)\d+\.\d+\.\d+/g, `$1${newVersion}`)
+
+  // Replace [X.X.X] pattern (CHANGELOG.md)
+  result = result.replace(/(\[)\d+\.\d+\.\d+(\])/g, `$1${newVersion}$2`)
 
   return result
 }
