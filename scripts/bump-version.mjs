@@ -26,7 +26,11 @@ const VERSION_FILES = [
   'app.html',
   'pt/app.html',
   'index.html',
-  'pt/index.html'
+  'pt/index.html',
+  'manual/index.html',
+  'pt/manual/index.html',
+  'manual/content.json',
+  'pt/manual/content.json'
 ]
 
 /**
@@ -57,17 +61,6 @@ function incrementVersion(version, type = 'patch') {
  * @returns {string} Updated content
  */
 function replaceVersionInContent(content, newVersion) {
-  // Pattern matches semantic versions: 1.2.3 or v1.2.3
-  // Only matches versions that look like our app version (not dependencies)
-  const patterns = [
-    // version: 'v1.2.3' or version: "v1.2.3" in TS/JS
-    /(version:\s*['"])v?\d+\.\d+\.\d+(['"])/g,
-    // >v1.2.3< in HTML (between tags)
-    /(>)v?\d+\.\d+\.\d+(<)/g,
-    // "version": "1.2.3" in JSON
-    /("version":\s*")(\d+\.\d+\.\d+)(")/g
-  ]
-
   let result = content
 
   // Replace version: 'vX.X.X' pattern (i18n files)
@@ -75,6 +68,9 @@ function replaceVersionInContent(content, newVersion) {
 
   // Replace >vX.X.X< pattern (HTML files)
   result = result.replace(/(>)v?\d+\.\d+\.\d+(<)/g, `$1v${newVersion}$2`)
+
+  // Replace "version": "X.X.X" pattern (JSON files)
+  result = result.replace(/("version":\s*")\d+\.\d+\.\d+(")/g, `$1${newVersion}$2`)
 
   return result
 }
