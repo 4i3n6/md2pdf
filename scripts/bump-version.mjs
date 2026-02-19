@@ -24,7 +24,9 @@ const VERSION_FILES = [
   'src/i18n/en.ts',
   'src/i18n/pt.ts',
   'app.html',
-  'pt/app.html'
+  'pt/app.html',
+  'index.html',
+  'pt/index.html'
 ]
 
 /**
@@ -35,7 +37,7 @@ const VERSION_FILES = [
  */
 function incrementVersion(version, type = 'patch') {
   const [major, minor, patch] = version.split('.').map(Number)
-  
+
   switch (type) {
     case 'major':
       return `${major + 1}.0.0`
@@ -65,15 +67,15 @@ function replaceVersionInContent(content, newVersion) {
     // "version": "1.2.3" in JSON
     /("version":\s*")(\d+\.\d+\.\d+)(")/g
   ]
-  
+
   let result = content
-  
+
   // Replace version: 'vX.X.X' pattern (i18n files)
   result = result.replace(/(version:\s*['"])v?\d+\.\d+\.\d+(['"])/g, `$1v${newVersion}$2`)
-  
+
   // Replace >vX.X.X< pattern (HTML files)
   result = result.replace(/(>)v?\d+\.\d+\.\d+(<)/g, `$1v${newVersion}$2`)
-  
+
   return result
 }
 
@@ -84,16 +86,16 @@ function replaceVersionInContent(content, newVersion) {
  */
 function updateFileVersion(filePath, newVersion) {
   const fullPath = join(rootDir, filePath)
-  
+
   if (!existsSync(fullPath)) {
     console.log(`  Skipped (not found): ${filePath}`)
     return
   }
-  
+
   try {
     const content = readFileSync(fullPath, 'utf-8')
     const updated = replaceVersionInContent(content, newVersion)
-    
+
     if (content !== updated) {
       writeFileSync(fullPath, updated, 'utf-8')
       console.log(`  Updated: ${filePath}`)
@@ -144,7 +146,7 @@ if (isSync) {
   console.log(`\nSyncing version ${newVersion} to all files\n`)
 } else {
   console.log(`\nBumping version: ${currentVersion} -> ${newVersion} (${bumpType})\n`)
-  
+
   // Update package.json
   packageJson.version = newVersion
   writeFileSync(packageJsonPath, JSON.stringify(packageJson, null, 2) + '\n', 'utf-8')

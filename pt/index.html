@@ -1,48 +1,54 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    
+
     <!-- SEO Meta Tags -->
     <title>MD2PDF - Converter Markdown para PDF | Grátis e Privado</title>
-    <meta name="description" content="Converta Markdown para PDF instantaneamente. Transforme respostas do ChatGPT, Claude e IAs em PDFs bonitos. Diagramas Mermaid e suporte YAML. 100% gratis, sem cadastro, funciona offline. Seus dados nunca saem do seu navegador.">
-    <meta name="keywords" content="markdown para pdf, converter markdown para pdf, md para pdf, conversor markdown grátis, chatgpt para pdf, resposta ia para pdf, markdown pdf online, md2pdf">
+    <meta name="description"
+        content="Converta Markdown para PDF instantaneamente. Transforme respostas do ChatGPT, Claude e IAs em PDFs bonitos. Diagramas Mermaid e suporte YAML. 100% gratis, sem cadastro, funciona offline. Seus dados nunca saem do seu navegador.">
+    <meta name="keywords"
+        content="markdown para pdf, converter markdown para pdf, md para pdf, conversor markdown grátis, chatgpt para pdf, resposta ia para pdf, markdown pdf online, md2pdf">
     <meta name="robots" content="index, follow">
     <meta name="author" content="MD2PDF">
     <link rel="canonical" href="https://md2pdf.xyz/pt/">
-    
+
     <!-- Hreflang Tags -->
     <link rel="alternate" hreflang="en" href="https://md2pdf.xyz/">
     <link rel="alternate" hreflang="pt" href="https://md2pdf.xyz/pt/">
     <link rel="alternate" hreflang="x-default" href="https://md2pdf.xyz/">
-    
+
     <!-- Open Graph Tags -->
     <meta property="og:type" content="website">
     <meta property="og:title" content="MD2PDF - Converter Markdown para PDF">
-    <meta property="og:description" content="Converta Markdown para PDFs bonitos. Transforme respostas de IA do ChatGPT, Claude em documentos profissionais. Grátis, privado, funciona offline.">
+    <meta property="og:description"
+        content="Converta Markdown para PDFs bonitos. Transforme respostas de IA do ChatGPT, Claude em documentos profissionais. Grátis, privado, funciona offline.">
     <meta property="og:url" content="https://md2pdf.xyz/pt/">
     <meta property="og:site_name" content="MD2PDF">
     <meta property="og:locale" content="pt_BR">
     <meta property="og:locale:alternate" content="en_US">
-    
+
     <!-- Twitter Card -->
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="MD2PDF - Converter Markdown para PDF">
-    <meta name="twitter:description" content="Converta Markdown para PDFs bonitos. Transforme respostas de IA em documentos profissionais. Grátis, privado, funciona offline.">
-    
+    <meta name="twitter:description"
+        content="Converta Markdown para PDFs bonitos. Transforme respostas de IA em documentos profissionais. Grátis, privado, funciona offline.">
+
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700;800&display=swap"
+        rel="stylesheet">
+
     <!-- Favicon -->
     <link rel="icon" href="/favicon.ico" type="image/x-icon">
     <link rel="apple-touch-icon" href="/icon-192.png">
-    
+
     <!-- Theme -->
     <meta name="theme-color" content="#FFFFFF">
-    
+
     <!-- Schema.org WebApplication -->
     <script type="application/ld+json">
     {
@@ -71,7 +77,7 @@
         "browserRequirements": "Requer JavaScript. Funciona em navegadores modernos."
     }
     </script>
-    
+
     <style>
         /* CSS Variables */
         :root {
@@ -85,19 +91,21 @@
             --border: #E5E5E5;
             --font-mono: 'JetBrains Mono', monospace;
         }
-        
+
         /* Reset */
-        *, *::before, *::after {
+        *,
+        *::before,
+        *::after {
             box-sizing: border-box;
             margin: 0;
             padding: 0;
         }
-        
+
         /* Base */
         html {
             scroll-behavior: smooth;
         }
-        
+
         body {
             font-family: var(--font-mono);
             background: var(--white);
@@ -106,12 +114,12 @@
             line-height: 1.6;
             -webkit-font-smoothing: antialiased;
         }
-        
+
         a {
             color: inherit;
             text-decoration: none;
         }
-        
+
         /* Skip Link - Accessibility */
         .skip-link {
             position: absolute;
@@ -123,20 +131,20 @@
             z-index: 1000;
             font-weight: 600;
         }
-        
+
         .skip-link:focus {
             top: 0;
             outline: 3px solid var(--orange);
             outline-offset: 2px;
         }
-        
+
         /* Container */
         .container {
             max-width: 1000px;
             margin: 0 auto;
             padding: 0 24px;
         }
-        
+
         /* Navigation */
         .nav {
             position: fixed;
@@ -148,42 +156,42 @@
             z-index: 100;
             padding: 16px 0;
         }
-        
+
         .nav-content {
             display: flex;
             justify-content: space-between;
             align-items: center;
         }
-        
+
         .logo {
             font-size: 18px;
             font-weight: 800;
             letter-spacing: 1px;
         }
-        
+
         .nav-links {
             display: flex;
             align-items: center;
             gap: 24px;
         }
-        
+
         .nav-link {
             color: var(--gray);
             font-size: 13px;
             font-weight: 500;
             transition: color 0.2s;
         }
-        
+
         .nav-link:hover,
         .nav-link:focus {
             color: var(--black);
         }
-        
+
         .nav-link:focus-visible {
             outline: 2px solid var(--orange);
             outline-offset: 4px;
         }
-        
+
         /* CTA Button */
         .cta-btn {
             display: inline-flex;
@@ -199,31 +207,31 @@
             cursor: pointer;
             transition: background 0.2s, transform 0.1s;
         }
-        
+
         .cta-btn:hover {
             background: var(--orange-hover);
         }
-        
+
         .cta-btn:active {
             transform: scale(0.98);
         }
-        
+
         .cta-btn:focus-visible {
             outline: 3px solid var(--black);
             outline-offset: 2px;
         }
-        
+
         .cta-btn--small {
             padding: 8px 16px;
             font-size: 12px;
         }
-        
+
         /* Hero Section */
         .hero {
             padding: 140px 0 80px;
             text-align: center;
         }
-        
+
         .hero-badge {
             display: inline-block;
             background: var(--bg-alt);
@@ -233,7 +241,7 @@
             color: var(--gray);
             margin-bottom: 32px;
         }
-        
+
         .hero-headline {
             font-size: clamp(26px, 5vw, 40px);
             font-weight: 700;
@@ -243,11 +251,11 @@
             margin-left: auto;
             margin-right: auto;
         }
-        
+
         .hero-headline .highlight {
             color: var(--orange);
         }
-        
+
         .hero-subheadline {
             font-size: 16px;
             color: var(--gray);
@@ -255,30 +263,30 @@
             margin: 0 auto 40px;
             line-height: 1.7;
         }
-        
+
         .hero-cta {
             display: flex;
             flex-direction: column;
             align-items: center;
             gap: 16px;
         }
-        
+
         .hero-note {
             font-size: 12px;
             color: var(--gray-light);
         }
-        
+
         /* Section */
         .section {
             padding: 80px 0;
         }
-        
+
         .section--alt {
             background: var(--bg-alt);
             border-top: 1px solid var(--border);
             border-bottom: 1px solid var(--border);
         }
-        
+
         .section-label {
             font-size: 11px;
             font-weight: 700;
@@ -287,29 +295,29 @@
             color: var(--orange);
             margin-bottom: 16px;
         }
-        
+
         .section-title {
             font-size: clamp(22px, 4vw, 32px);
             font-weight: 700;
             margin-bottom: 20px;
             line-height: 1.3;
         }
-        
+
         .section-text {
             color: var(--gray);
             max-width: 600px;
             line-height: 1.7;
             font-size: 15px;
         }
-        
+
         .section-center {
             text-align: center;
         }
-        
+
         .section-center .section-text {
             margin: 0 auto;
         }
-        
+
         /* Problem Section */
         .problem-grid {
             display: grid;
@@ -317,7 +325,7 @@
             gap: 48px;
             margin-top: 48px;
         }
-        
+
         @media (min-width: 768px) {
             .problem-grid {
                 grid-template-columns: 1fr 1fr;
@@ -325,13 +333,13 @@
                 align-items: center;
             }
         }
-        
+
         .problem-visual {
             background: var(--white);
             border: 1px solid var(--border);
             overflow: hidden;
         }
-        
+
         .problem-header {
             background: #1a1a1a;
             color: #888;
@@ -341,11 +349,11 @@
             align-items: center;
             gap: 8px;
         }
-        
+
         .problem-header span {
             color: #fff;
         }
-        
+
         .problem-content {
             padding: 24px;
             font-size: 13px;
@@ -353,18 +361,18 @@
             color: var(--gray);
             background: #fafafa;
         }
-        
+
         .problem-content .symbols {
             color: #dc2626;
             font-weight: 600;
         }
-        
+
         /* Solution Visual */
         .solution-visual {
             background: var(--white);
             border: 1px solid var(--border);
         }
-        
+
         .solution-header {
             background: var(--orange);
             color: var(--white);
@@ -372,46 +380,46 @@
             font-size: 11px;
             font-weight: 600;
         }
-        
+
         .solution-content {
             padding: 24px;
             font-size: 13px;
             line-height: 1.8;
         }
-        
+
         .solution-content h4 {
             font-size: 18px;
             margin-bottom: 12px;
         }
-        
+
         .solution-content ul {
             padding-left: 20px;
             margin: 12px 0;
         }
-        
+
         .solution-content li {
             margin-bottom: 6px;
         }
-        
+
         /* AI Badges */
         .ai-section {
             margin-top: 48px;
             padding-top: 48px;
             border-top: 1px solid var(--border);
         }
-        
+
         .ai-text {
             font-size: 13px;
             color: var(--gray);
             margin-bottom: 20px;
         }
-        
+
         .ai-badges {
             display: flex;
             flex-wrap: wrap;
             gap: 10px;
         }
-        
+
         .ai-badge {
             background: var(--white);
             border: 1px solid var(--border);
@@ -420,7 +428,7 @@
             font-weight: 600;
             color: var(--black);
         }
-        
+
         /* Features Grid */
         .features-grid {
             display: grid;
@@ -428,19 +436,19 @@
             gap: 24px;
             margin-top: 48px;
         }
-        
+
         @media (min-width: 768px) {
             .features-grid {
                 grid-template-columns: repeat(3, 1fr);
             }
         }
-        
+
         .feature-card {
             background: var(--white);
             border: 1px solid var(--border);
             padding: 32px 24px;
         }
-        
+
         .feature-icon {
             font-size: 11px;
             font-weight: 700;
@@ -448,19 +456,19 @@
             color: var(--orange);
             margin-bottom: 16px;
         }
-        
+
         .feature-title {
             font-size: 16px;
             font-weight: 700;
             margin-bottom: 12px;
         }
-        
+
         .feature-text {
             color: var(--gray);
             font-size: 13px;
             line-height: 1.7;
         }
-        
+
         /* Steps */
         .steps-container {
             display: grid;
@@ -468,17 +476,17 @@
             gap: 32px;
             margin-top: 48px;
         }
-        
+
         @media (min-width: 768px) {
             .steps-container {
                 grid-template-columns: repeat(3, 1fr);
             }
         }
-        
+
         .step {
             text-align: center;
         }
-        
+
         .step-number {
             display: inline-flex;
             align-items: center;
@@ -491,25 +499,25 @@
             font-weight: 700;
             margin-bottom: 20px;
         }
-        
+
         .step-title {
             font-size: 15px;
             font-weight: 600;
             margin-bottom: 8px;
         }
-        
+
         .step-text {
             color: var(--gray);
             font-size: 13px;
             line-height: 1.6;
         }
-        
+
         /* Footer */
         .footer {
             padding: 80px 0 40px;
             text-align: center;
         }
-        
+
         .footer-box {
             background: var(--bg-alt);
             border: 1px solid var(--border);
@@ -519,25 +527,25 @@
             margin-left: auto;
             margin-right: auto;
         }
-        
+
         .footer-box p {
             font-size: 14px;
             color: var(--gray);
             margin-bottom: 24px;
         }
-        
+
         .footer-box p:last-of-type {
             margin-bottom: 0;
         }
-        
+
         .footer-box strong {
             color: var(--black);
         }
-        
+
         .footer-cta {
             margin-top: 24px;
         }
-        
+
         .footer-links {
             display: flex;
             flex-wrap: wrap;
@@ -547,48 +555,49 @@
             color: var(--gray);
             margin-top: 40px;
         }
-        
+
         .footer-link {
             transition: color 0.2s;
         }
-        
+
         .footer-link:hover {
             color: var(--black);
         }
-        
+
         .footer-link:focus-visible {
             outline: 2px solid var(--orange);
             outline-offset: 4px;
         }
-        
+
         .footer-separator {
             color: var(--border);
         }
-        
+
         /* Responsive */
         @media (max-width: 640px) {
             .nav-links {
                 gap: 16px;
             }
-            
+
             .nav-link--desktop {
                 display: none;
             }
-            
+
             .hero {
                 padding: 120px 0 60px;
             }
-            
+
             .section {
                 padding: 60px 0;
             }
         }
     </style>
 </head>
+
 <body>
     <!-- Skip to main content -->
     <a href="#main" class="skip-link">Pular para o conteúdo principal</a>
-    
+
     <!-- Navigation -->
     <nav class="nav" role="navigation" aria-label="Navegação principal">
         <div class="container nav-content">
@@ -599,21 +608,21 @@
             </div>
         </div>
     </nav>
-    
+
     <main id="main">
         <!-- Hero Section -->
         <section class="hero" aria-labelledby="hero-title">
             <div class="container">
                 <div class="hero-badge">Para sempre grátis. Sem cadastro.</div>
-                
+
                 <h1 id="hero-title" class="hero-headline">
                     Transforme Markdown em <span class="highlight">PDFs Bonitos</span>
                 </h1>
-                
+
                 <p class="hero-subheadline">
                     A forma mais simples de transformar .md em .pdf — com diagramas Mermaid e suporte YAML.
                 </p>
-                
+
                 <div class="hero-cta">
                     <a href="/pt/app" class="cta-btn">
                         Começar Agora <span aria-hidden="true">-></span>
@@ -622,32 +631,36 @@
                 </div>
             </div>
         </section>
-        
+
         <!-- Problem Section -->
         <section class="section section--alt" aria-labelledby="problem-title">
             <div class="container">
                 <p class="section-label">O problema</p>
                 <h2 class="section-title" id="problem-title">Você ja tentou copiar uma resposta de IA?</h2>
                 <p class="section-text">
-                    Quando você copia texto do ChatGPT ou Claude, vem junto uma formatação estranha cheia de símbolos. 
+                    Quando você copia texto do ChatGPT ou Claude, vem junto uma formatação estranha cheia de símbolos.
                     Colar no Word ou Google Docs vira uma bagunça.
                 </p>
-                
+
                 <div class="problem-grid">
-                    <div class="problem-visual" role="figure" aria-label="Exemplo de texto copiado de IA com símbolos de formatação">
+                    <div class="problem-visual" role="figure"
+                        aria-label="Exemplo de texto copiado de IA com símbolos de formatação">
                         <div class="problem-header">
                             <span>Texto copiado da IA</span>
                         </div>
                         <div class="problem-content">
                             <span class="symbols">#</span> Guia de Produtividade<br><br>
-                            Aqui estão <span class="symbols">**</span>três dicas<span class="symbols">**</span> para melhorar seu dia:<br><br>
-                            <span class="symbols">-</span> Comece pelas tarefas <span class="symbols">_</span>mais importantes<span class="symbols">_</span><br>
+                            Aqui estão <span class="symbols">**</span>três dicas<span class="symbols">**</span> para
+                            melhorar seu dia:<br><br>
+                            <span class="symbols">-</span> Comece pelas tarefas <span class="symbols">_</span>mais
+                            importantes<span class="symbols">_</span><br>
                             <span class="symbols">-</span> Faça pausas a cada 45 minutos<br>
                             <span class="symbols">-</span> Elimine distrações do celular
                         </div>
                     </div>
-                    
-                    <div class="solution-visual" role="figure" aria-label="Mesmo texto formatado corretamente pelo MD2PDF">
+
+                    <div class="solution-visual" role="figure"
+                        aria-label="Mesmo texto formatado corretamente pelo MD2PDF">
                         <div class="solution-header">
                             PDF gerado pelo MD2PDF
                         </div>
@@ -662,7 +675,7 @@
                         </div>
                     </div>
                 </div>
-                
+
                 <div class="ai-section">
                     <p class="ai-text">Funciona com qualquer IA que você usa:</p>
                     <div class="ai-badges" aria-label="IAs compatíveis">
@@ -676,76 +689,78 @@
                 </div>
             </div>
         </section>
-        
+
         <!-- Features Section -->
         <section class="section" aria-labelledby="features-title">
             <div class="container">
                 <p class="section-label">Por que o MD2PDF?</p>
                 <h2 class="section-title" id="features-title">Simples, privado e sem pegadinhas</h2>
                 <p class="section-text">
-                    Ferramentas online geralmente pedem login, mostram anúncios ou enviam seus dados para servidores. 
+                    Ferramentas online geralmente pedem login, mostram anúncios ou enviam seus dados para servidores.
                     O MD2PDF não faz nada disso.
                 </p>
-                
+
                 <div class="features-grid">
                     <article class="feature-card">
                         <p class="feature-icon">[PRIVADO]</p>
                         <h3 class="feature-title">100% no navegador</h3>
                         <p class="feature-text">
-                            Seus dados nunca saem do seu dispositivo. Nenhum servidor recebe suas informações. 
+                            Seus dados nunca saem do seu dispositivo. Nenhum servidor recebe suas informações.
                             Zero rastreamento. Privacidade total.
                         </p>
                     </article>
-                    
+
                     <article class="feature-card">
                         <p class="feature-icon">[OFFLINE]</p>
                         <h3 class="feature-title">Funciona sem internet</h3>
                         <p class="feature-text">
-                            Instale como app e use offline. Perfeito para aviões, cafés sem wifi 
+                            Instale como app e use offline. Perfeito para aviões, cafés sem wifi
                             ou qualquer lugar sem conexão.
                         </p>
                     </article>
-                    
+
                     <article class="feature-card">
                         <p class="feature-icon">[GRATIS]</p>
                         <h3 class="feature-title">Sem limites, para sempre</h3>
                         <p class="feature-text">
-                            Sem login, sem ads, sem limite de conversões. Grátis hoje, amanhã 
+                            Sem login, sem ads, sem limite de conversões. Grátis hoje, amanhã
                             e sempre. Sem asteriscos ou letras miúdas.
                         </p>
                     </article>
                 </div>
             </div>
         </section>
-        
+
         <!-- How it Works Section -->
         <section class="section section--alt section-center" aria-labelledby="steps-title">
             <div class="container">
                 <p class="section-label">Como funciona</p>
                 <h2 class="section-title" id="steps-title">Três passos. Dez segundos.</h2>
-                
+
                 <div class="steps-container">
                     <div class="step">
                         <div class="step-number" aria-hidden="true">1</div>
                         <h3 class="step-title">Cole o texto</h3>
                         <p class="step-text">Copie a resposta da sua IA favorita e cole no editor do MD2PDF.</p>
                     </div>
-                    
+
                     <div class="step">
                         <div class="step-number" aria-hidden="true">2</div>
                         <h3 class="step-title">Veja formatado</h3>
-                        <p class="step-text">Instantaneamente veja como seu documento vai ficar, com toda a formatação aplicada.</p>
+                        <p class="step-text">Instantaneamente veja como seu documento vai ficar, com toda a formatação
+                            aplicada.</p>
                     </div>
-                    
+
                     <div class="step">
                         <div class="step-number" aria-hidden="true">3</div>
                         <h3 class="step-title">Exporte o PDF</h3>
-                        <p class="step-text">Um clique e pronto. PDF profissional pronto para imprimir ou compartilhar.</p>
+                        <p class="step-text">Um clique e pronto. PDF profissional pronto para imprimir ou compartilhar.
+                        </p>
                     </div>
                 </div>
             </div>
         </section>
-        
+
         <!-- Footer Section -->
         <footer class="footer" role="contentinfo">
             <div class="container">
@@ -754,7 +769,7 @@
                         <strong>Seus documentos ficam armazenados apenas no seu navegador.</strong>
                     </p>
                     <p>
-                        O MD2PDF não tem acesso aos seus dados. Nada e enviado para servidores. 
+                        O MD2PDF não tem acesso aos seus dados. Nada e enviado para servidores.
                         Você tem controle total sobre suas informações.
                     </p>
                     <div class="footer-cta">
@@ -763,9 +778,9 @@
                         </a>
                     </div>
                 </div>
-                
+
                 <div class="footer-links">
-                    <span>MD2PDF v1.1.21</span>
+                    <span>MD2PDF <span>v1.1.64</span></span>
                     <span class="footer-separator" aria-hidden="true">|</span>
                     <a href="/pt/manual/" class="footer-link">Manual</a>
                     <span class="footer-separator" aria-hidden="true">|</span>
@@ -777,4 +792,5 @@
         </footer>
     </main>
 </body>
+
 </html>
