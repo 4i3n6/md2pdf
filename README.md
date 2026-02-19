@@ -2,9 +2,9 @@
 
 ![CI](https://github.com/zzkteam/md2pdf/actions/workflows/ci.yml/badge.svg)
 ![License](https://img.shields.io/github/license/zzkteam/md2pdf)
-![Version](https://img.shields.io/github/package-json/v/zzkteam/md2pdf)
+![Version](https://img.shields.io/github/v/tag/zzkteam/md2pdf?label=version)
 
-> **SISTEMA DE CONVERSÃO v1.1.67 | STATUS: PRONTO PARA PRODUÇÃO**
+> **SISTEMA DE CONVERSÃO v1.1.68 | STATUS: PRONTO PARA PRODUÇÃO**
 
 Clone ultrapolido e otimizado do markdowntopdf.com com interface moderna estilo **painel financeiro hacker**. Conversor de Markdown para PDF gratuito, sem limites e sem necessidade de autenticação.
 

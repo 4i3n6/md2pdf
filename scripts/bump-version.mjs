@@ -15,6 +15,7 @@
 import { readFileSync, writeFileSync, existsSync } from 'fs'
 import { join, dirname } from 'path'
 import { fileURLToPath } from 'url'
+import { execSync } from 'child_process'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
 const rootDir = join(__dirname, '..')
@@ -162,5 +163,17 @@ for (const file of VERSION_FILES) {
   updateFileVersion(file, newVersion)
 }
 updatePackageLockVersion(newVersion)
+
+// Create Git Tag if --tag is present
+if (process.argv.includes('--tag') \u0026\u0026!isSync) {
+  try {
+    const tagName = `v${newVersion}`
+    console.log(`\nCreating git tag: ${tagName}...`)
+    execSync(`git tag -a ${tagName} -m "Release ${tagName}"`, { stdio: 'inherit' })
+    console.log(`Tag created successfully.`)
+  } catch (err) {
+    console.error(`  Error creating git tag:`, err.message)
+  }
+}
 
 console.log(`\nVersion ${isSync ? 'synced' : 'bumped'} to ${newVersion}\n`)

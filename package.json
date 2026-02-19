@@ -22,6 +22,7 @@
     "version:sync": "node scripts/bump-version.mjs sync",
     "version:verify": "node scripts/verify-version.mjs",
     "postinstall": "node scripts/install-hooks.mjs",
+    "release": "node scripts/bump-version.mjs patch --tag && git push origin main --tags",
     "preview": "vite preview"
   },
   "keywords": [],
