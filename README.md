@@ -1,6 +1,10 @@
 # MD2PDF - Conversor Markdown para PDF
 
-> **SISTEMA DE CONVERSÃO v1.1.21 | STATUS: PRONTO PARA PRODUÇÃO**
+![CI](https://github.com/zzkteam/md2pdf/actions/workflows/ci.yml/badge.svg)
+![License](https://img.shields.io/github/license/zzkteam/md2pdf)
+![Version](https://img.shields.io/github/package-json/v/zzkteam/md2pdf)
+
+> **SISTEMA DE CONVERSÃO v1.1.66 | STATUS: PRONTO PARA PRODUÇÃO**
 
 Clone ultrapolido e otimizado do markdowntopdf.com com interface moderna estilo **painel financeiro hacker**. Conversor de Markdown para PDF gratuito, sem limites e sem necessidade de autenticação.
 
@@ -153,7 +157,7 @@ npm run build
 
 ## 📄 Licença
 
-Projeto de código aberto - use como quiser!
+Este projeto está licenciado sob a [Licença MIT](LICENSE). - use como quiser!
 
 ## 🤝 Contribuições
 

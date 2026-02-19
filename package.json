@@ -1,6 +1,6 @@
 {
   "name": "md2pdf",
-  "version": "1.1.66",
+  "version": "1.1.67",
   "description": "",
   "main": "index.js",
   "scripts": {
@@ -26,7 +26,7 @@
   },
   "keywords": [],
   "author": "",
-  "license": "ISC",
+  "license": "MIT",
   "type": "commonjs",
   "dependencies": {
     "@codemirror/lang-cpp": "^6.0.3",

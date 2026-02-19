@@ -24,3 +24,6 @@ dist-ssr
 *.sw?
 playwright-report
 test-results
+.serena
+.crush
+.wrangler
