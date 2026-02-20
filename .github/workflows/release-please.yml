@@ -32,8 +32,8 @@ jobs:
             --json number \
             --jq '.[0].number // empty')
           if [ -n "$PR" ]; then
-            gh pr merge "$PR" --merge --repo 4i3n6/md2pdf
-            echo "Merged release PR #$PR"
+            gh pr merge "$PR" --merge --auto --repo 4i3n6/md2pdf
+            echo "Queued auto-merge for release PR #$PR"
           else
             echo "No pending release PR — skipping"
           fi
