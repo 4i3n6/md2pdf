@@ -42,12 +42,6 @@ function isMobileViewport(): boolean {
   return window.innerWidth < LayoutBreakpoints.mobilePx;
 }
 
-// If mobile, don't initialize the app - CSS will show the overlay
-if (isMobileViewport()) {
-  // Prevent any further initialization
-  throw new Error('Mobile viewport detected - app initialization blocked');
-}
-
 // Initialize i18n based on URL path
 initI18n()
 
@@ -169,6 +163,15 @@ let currentEditorMode = '';
 // ============================================
 
 function initSystem(): void {
+  if (isMobileViewport()) {
+    const overlay = document.getElementById('mobile-block');
+    if (overlay) overlay.style.display = 'flex';
+    const appGrid = document.querySelector('.app-grid') as HTMLElement | null;
+    if (appGrid) appGrid.style.display = 'none';
+    Logger.log('Mobile viewport detected - app initialization blocked', 'warning');
+    return;
+  }
+
   updateVersionUI();
   Logger.log('Initializing core...');
   Logger.log(`Version ${APP_VERSION}`);
