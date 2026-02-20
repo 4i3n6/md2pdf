@@ -1,0 +1,17 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "lib": ["ES2020"],
+    "outDir": "./dist-cli",
+    "rootDir": "./src",
+    "paths": {}
+  },
+  "include": ["src/cli/**/*.ts"],
+  "exclude": [
+    "node_modules",
+    "dist",
+    "dist-cli",
+    "**/*.test.ts",
+    "**/*.spec.ts"
+  ]
+}
