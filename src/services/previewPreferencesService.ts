@@ -1,4 +1,4 @@
-import { obterChavePreferenciasDocumento } from '@/constants'
+import { getDocPreferencesKey } from '@/constants'
 import type { AppState, LoggerInterface } from '@/types/index'
 import { storageGetItem, storageSetJson } from '@/utils/storage'
 
@@ -18,7 +18,7 @@ export function getDocPreferences(
     docId: number,
     logger: LoggerInterface
 ): DocumentPreferences {
-    const key = obterChavePreferenciasDocumento(docId)
+    const key = getDocPreferencesKey(docId)
     const saved = storageGetItem(key, (msg) => logger.log(msg, 'warning'))
     if (!saved) return { ...DEFAULT_PREFS }
 
@@ -39,7 +39,7 @@ export function saveDocPreferences(
     prefs: DocumentPreferences,
     logger: LoggerInterface
 ): void {
-    const key = obterChavePreferenciasDocumento(docId)
+    const key = getDocPreferencesKey(docId)
     storageSetJson(key, prefs, (msg) => logger.error(msg))
 }
 

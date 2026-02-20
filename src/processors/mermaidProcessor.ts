@@ -129,7 +129,7 @@ function extrairDimensoesSvg(svgElement: SVGSVGElement | null): { width: number,
 
 function isWideDiagramForPrint(svgElement: SVGSVGElement | null): boolean {
   const { width, height } = extrairDimensoesSvg(svgElement)
-  const maxWidth = MermaidConfig.maxLarguraPaginaPx
+  const maxWidth = MermaidConfig.maxPageWidthPx
   const landscapeTrigger = maxWidth * LANDSCAPE_MULTIPLIER
   return width > maxWidth && width > landscapeTrigger && width > height
 }

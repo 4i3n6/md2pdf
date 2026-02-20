@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest'
 import { DocumentManager } from './documentManager'
-import { ChavesStorage } from '@/constants'
+import { StorageKeys } from '@/constants'
 import type { LoggerInterface, Document } from '@/types/index'
 
 // Mock para o Logger
@@ -85,7 +85,7 @@ describe('DocumentManager', () => {
         expect(updatedDoc?.content).toBe('# Novo Conteudo')
 
         // Verificar persistencia
-        const storedDocs = JSON.parse(store[ChavesStorage.documentos] || '[]')
+        const storedDocs = JSON.parse(store[StorageKeys.documents] || '[]')
         const storedDoc = storedDocs.find((d: Document) => d.id === doc.id)
         expect(storedDoc.content).toBe('# Novo Conteudo')
     })

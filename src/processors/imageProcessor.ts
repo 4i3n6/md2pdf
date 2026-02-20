@@ -3,7 +3,7 @@
  * Redimensionamento automático e cache para imagens em A4
  */
 
-import { ImpressaoLimites } from '@/constants'
+import { PrintLimits } from '@/constants'
 import { imageCache } from '@/utils/imageCache'
 import { logAviso } from '@/utils/logger'
 
@@ -90,9 +90,9 @@ export function calculatePrintDimensions(width: number, height: number): PrintDi
     }
   }
 
-  const maxWidthMm = ImpressaoLimites.maxLarguraMm
-  const maxHeightMm = ImpressaoLimites.maxAlturaMm
-  const pxPorMm = ImpressaoLimites.pxPorMm
+  const maxWidthMm = PrintLimits.maxWidthMm
+  const maxHeightMm = PrintLimits.maxHeightMm
+  const pxPorMm = PrintLimits.pxPerMm
 
   const widthMm = width / pxPorMm
   const heightMm = height / pxPorMm
@@ -228,9 +228,9 @@ export async function processImagesForPrint(
  * @returns {ValidationResult} Objeto com fits (boolean) e message
  */
 export function validateImageForA4(width: number, height: number): ImageValidationResult {
-  const maxWidthMm = ImpressaoLimites.maxLarguraMm
-  const maxHeightMm = ImpressaoLimites.maxAlturaMm
-  const pxPorMm = ImpressaoLimites.pxPorMm
+  const maxWidthMm = PrintLimits.maxWidthMm
+  const maxHeightMm = PrintLimits.maxHeightMm
+  const pxPorMm = PrintLimits.pxPerMm
 
   const widthMm = width / pxPorMm
   const heightMm = height / pxPorMm

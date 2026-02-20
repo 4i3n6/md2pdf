@@ -1,59 +1,59 @@
 /**
- * Constantes centrais da aplicacao
+ * Central application constants
  */
 
-const a4LarguraMm = 210
-const a4AlturaMm = 297
-const margemMm = 10
+const a4WidthMm = 210
+const a4HeightMm = 297
+const marginMm = 10
 
-export const ChavesStorage = {
-    documentos: 'md2pdf-docs-v3',
-    documentosLegado: 'md2pdf-docs-v2',
-    preferenciasDocumentoPrefixo: 'md2pdf-doc-prefs-',
+export const StorageKeys = {
+    documents: 'md2pdf-docs-v3',
+    legacyDocuments: 'md2pdf-docs-v2',
+    docPreferencesPrefix: 'md2pdf-doc-prefs-',
     splitterRatio: 'md2pdf-splitter-ratio',
-    filaSync: 'md2pdf-sync-queue',
-    cacheImagens: 'md2pdf-image-cache-v1'
+    syncQueue: 'md2pdf-sync-queue',
+    imageCache: 'md2pdf-image-cache-v1'
 }
 
-export const ImpressaoLimites = {
-    a4LarguraMm,
-    a4AlturaMm,
-    margemMm,
-    maxLarguraMm: a4LarguraMm - margemMm * 2,
-    maxAlturaMm: a4AlturaMm - margemMm * 2,
-    pxPorMm: 3.779
+export const PrintLimits = {
+    a4WidthMm,
+    a4HeightMm,
+    marginMm,
+    maxWidthMm: a4WidthMm - marginMm * 2,
+    maxHeightMm: a4HeightMm - marginMm * 2,
+    pxPerMm: 3.779
 }
 
-export const CacheImagensConfig = {
-    expiracaoMs: 30 * 24 * 60 * 60 * 1000,
-    maxTamanhoBytes: 50 * 1024,
-    versao: 1,
-    storageKey: ChavesStorage.cacheImagens
+export const ImageCacheConfig = {
+    expirationMs: 30 * 24 * 60 * 60 * 1000,
+    maxSizeBytes: 50 * 1024,
+    version: 1,
+    storageKey: StorageKeys.imageCache
 }
 
-export const BreakpointsLayout = {
+export const LayoutBreakpoints = {
     mobilePx: 768
 }
 
 export const SplitterConfig = {
-    storageKey: ChavesStorage.splitterRatio,
+    storageKey: StorageKeys.splitterRatio,
     minRatio: 0.30,
     maxRatio: 0.70,
     defaultRatio: 0.50
 }
 
-export const SalvamentoConfig = {
+export const SaveConfig = {
     debounceMs: 800
 }
 
 export const MermaidConfig = {
-    maxLarguraPaginaPx: 760
+    maxPageWidthPx: 760
 }
 
 export const BackupConfig = {
-    versao: 1
+    version: 1
 }
 
-export function obterChavePreferenciasDocumento(docId: number): string {
-    return `${ChavesStorage.preferenciasDocumentoPrefixo}${docId}`
+export function getDocPreferencesKey(docId: number): string {
+    return `${StorageKeys.docPreferencesPrefix}${docId}`
 }

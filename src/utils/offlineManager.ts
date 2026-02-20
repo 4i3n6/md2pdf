@@ -3,7 +3,7 @@
  * Detecta conectividade e gerencia operações offline/online
  */
 
-import { ChavesStorage } from '@/constants'
+import { StorageKeys } from '@/constants'
 import type { SyncQueueItem, ConnectivityStatus } from '@/types/index'
 import { logErro, logInfo, logSucesso } from '@/utils/logger'
 import { storageGetJson, storageSetJson } from '@/utils/storage'
@@ -128,7 +128,7 @@ class OfflineManager {
    */
   private persistSyncQueue(): void {
     storageSetJson(
-      ChavesStorage.filaSync,
+      StorageKeys.syncQueue,
       this.syncQueue,
       (msg) => logErro(msg)
     )
@@ -139,7 +139,7 @@ class OfflineManager {
    */
   loadSyncQueue(): void {
     const stored = storageGetJson<SyncQueueItem[]>(
-      ChavesStorage.filaSync,
+      StorageKeys.syncQueue,
       (msg) => logErro(msg)
     )
     if (stored && Array.isArray(stored)) {

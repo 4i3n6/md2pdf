@@ -3,11 +3,11 @@
  * Gera relatórios detalhados e estatísticas do documento
  */
 
-import { ImpressaoLimites } from '@/constants'
+import { PrintLimits } from '@/constants'
 import { logInfo } from '@/utils/logger'
 
-const formatoA4 = `${ImpressaoLimites.a4LarguraMm}mm × ${ImpressaoLimites.a4AlturaMm}mm`
-const margemA4 = `${ImpressaoLimites.margemMm}mm`
+const formatoA4 = `${PrintLimits.a4WidthMm}mm × ${PrintLimits.a4HeightMm}mm`
+const margemA4 = `${PrintLimits.marginMm}mm`
 
 /**
  * Interface para contagem de headings por nível

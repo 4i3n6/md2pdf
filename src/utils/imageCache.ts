@@ -3,7 +3,7 @@
  * Cache persistente em localStorage para dimensões de imagens
  */
 
-import { CacheImagensConfig } from '@/constants'
+import { ImageCacheConfig } from '@/constants'
 import { logAviso } from '@/utils/logger'
 
 interface Dimensions {
@@ -28,9 +28,9 @@ interface CacheStats {
   storageAvailable: boolean
 }
 
-const CACHE_KEY = CacheImagensConfig.storageKey
-const CACHE_EXPIRATION = CacheImagensConfig.expiracaoMs
-const MAX_CACHE_SIZE = CacheImagensConfig.maxTamanhoBytes
+const CACHE_KEY = ImageCacheConfig.storageKey
+const CACHE_EXPIRATION = ImageCacheConfig.expirationMs
+const MAX_CACHE_SIZE = ImageCacheConfig.maxSizeBytes
 
 class ImageCacheManager {
   private memory: Map<string, CacheEntry> = new Map()
@@ -123,7 +123,7 @@ class ImageCacheManager {
     if (this.localStorage) {
       try {
         let data: CacheData = {
-          version: CacheImagensConfig.versao,
+          version: ImageCacheConfig.version,
           lastUpdated: Date.now(),
           cache: {}
         }

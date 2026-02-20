@@ -114,7 +114,7 @@ export function createDocumentIoService(deps: DocumentIoDeps) {
         })
 
         return {
-            version: BackupConfig.versao,
+            version: BackupConfig.version,
             appVersion: deps.appVersion,
             exportedAt: new Date().toISOString(),
             docs,
@@ -240,7 +240,7 @@ export function createDocumentIoService(deps: DocumentIoDeps) {
                 return
             }
 
-            if (payload.version > BackupConfig.versao) {
+            if (payload.version > BackupConfig.version) {
                 deps.logger.log('Backup gerado por versao mais nova. Alguns dados podem ser ignorados.', 'warning')
             }
 

@@ -1,317 +1,116 @@
-# Melhorias Futuras
+# Roadmap
 
-Este documento lista possíveis melhorias e funcionalidades adicionais para o projeto.
+This document tracks the future direction of MD2PDF. It reflects the current state of the project (v1.1.70) and what comes next.
 
-## 🎨 Interface e UX
+## Already shipped
 
-### Já Implementado ✅
-- [x] Editor CodeMirror com syntax highlighting
-- [x] Preview em tempo real
-- [x] Alternância entre modos de visualização
-- [x] Drag & Drop de arquivos
-- [x] Gerenciamento de múltiplos documentos
-- [x] Armazenamento local (localStorage)
+The following capabilities are fully implemented and stable:
 
-### Sugestões de Melhoria 🚀
+**Editor**
+- CodeMirror 6 with live syntax highlighting in 16 languages
+- Real-time Markdown validation with inline decorations and auto-fix
+- Quick-tag toolbar for headings, bold, italic, code blocks, tables, SQL, YAML, Mermaid, page breaks
+- Resizable split pane with persisted position
+- Drag and drop of `.md`, `.sql`, `.yaml`, and other text files
 
-#### 1. Themes para Code Blocks ✅ IMPLEMENTADO
-- [x] GitHub Light Theme para syntax highlighting
-- [x] Conjunto curado de linguagens comuns
-- [x] Auto-detect de linguagem
-- [ ] Theme Dark (One Dark)
-- [ ] Seletor de tema na UI
+**Documents**
+- Multi-document workspace with full keyboard navigation
+- Import `.md` files from disk; export as `.md` without triggering print
+- Full workspace backup and restore (JSON)
+- localStorage persistence under `md2pdf-docs-v3`
 
-#### 2. Temas do Editor
-```javascript
-// Adicionar suporte a múltiplos temas
-import { oneDark } from '@codemirror/theme-one-dark';
-import { githubLight } from '@uiw/codemirror-theme-github';
+**Rendering**
+- GitHub Flavored Markdown via marked.js
+- Syntax highlighting in preview via highlight.js (30+ languages)
+- Mermaid diagrams (all types) with lazy loading
+- YAML rendering via js-yaml with lazy loading
+- Page breaks via `<!-- pagebreak -->` with visual indicator
 
-// Permitir o usuário alternar entre temas claro/escuro
-```
+**Print and PDF**
+- Dedicated A4 stylesheet independent from screen styles
+- Liberation Mono for code blocks in print
+- Per-document font size control (6pt–12pt), persisted
+- Wide Mermaid diagrams auto-rotated to landscape in print
+- Pre-flight validation before triggering the print dialog
+- WYSIWYG parity between preview and print output
 
-#### 2. Export em Múltiplos Formatos
-- Adicionar export para HTML
-- Adicionar export para DOCX (via docx.js)
-- Adicionar export para TXT
-
-#### 3. Syntax Highlighting em Blocos de Código ✅ IMPLEMENTADO
-- [x] highlight.js integrado
-- [x] Linguagens comuns registradas (bundle otimizado)
-- [x] GitHub Light Theme
-- [x] Sanitização com DOMPurify
-- [ ] Números de linha automáticos
-- [ ] Copy button para blocos
-
-#### 4. Markdown Advanced Features
-- Suporte a diagramas (Mermaid)
-- Suporte a equações matemáticas (KaTeX)
-- Suporte a emojis (:smile:)
-
-## 🔧 Funcionalidades Técnicas
-
-### 1. PWA (Progressive Web App)
-Transformar a aplicação em PWA para uso offline:
-
-```javascript
-// vite.config.ts
-import { VitePWA } from 'vite-plugin-pwa';
-
-export default {
-  plugins: [
-    VitePWA({
-      registerType: 'autoUpdate',
-      manifest: {
-        name: 'Markdown to PDF',
-        short_name: 'MD2PDF',
-        description: 'Conversor de Markdown para PDF',
-        theme_color: '#10b981',
-      }
-    })
-  ]
-}
-```
-
-### 2. Sincronização com Cloud
-- Implementar sync com Google Drive
-- Implementar sync com Dropbox
-- Implementar sync com GitHub Gists
-
-### 3. Colaboração em Tempo Real
-- WebRTC para edição colaborativa
-- WebSocket para sincronização
-
-### 4. Histórico de Versões
-```javascript
-// Implementar undo/redo com histórico
-const history = {
-  past: [],
-  present: currentContent,
-  future: []
-};
-```
-
-## 📊 Analytics e Métricas
-
-### 1. Analytics Privacy-First
-```bash
-npm install plausible-tracker
-```
-
-### 2. Contadores
-- Número de conversões
-- Número de documentos criados
-- Tempo médio de uso
-
-## 🎯 Otimizações
-
-### 1. Performance
-- Lazy loading de componentes
-- Virtual scrolling para lista de documentos
-- Debounce no preview update
-
-```javascript
-import { debounce } from 'lodash-es';
-
-const debouncedUpdate = debounce(updatePreview, 300);
-```
-
-### 2. Bundle Size
-- Code splitting
-- Tree shaking
-- Minificação agressiva
-
-```javascript
-// vite.config.ts
-build: {
-  rollupOptions: {
-    output: {
-      manualChunks: {
-        'codemirror': ['codemirror', '@codemirror/lang-markdown'],
-        'markdown': ['marked']
-      }
-    }
-  }
-}
-```
-
-## 🔒 Segurança
-
-### 1. Sanitização de HTML
-```bash
-npm install dompurify
-```
-
-```javascript
-import DOMPurify from 'dompurify';
-
-const cleanHTML = DOMPurify.sanitize(marked(markdown));
-```
-
-### 2. CSP (Content Security Policy)
-```html
-<meta http-equiv="Content-Security-Policy" 
-      content="default-src 'self'; script-src 'self'">
-```
-
-## 🌐 Internacionalização
-
-### 1. Suporte a Múltiplos Idiomas
-```bash
-npm install i18next
-```
-
-### 2. Idiomas Sugeridos
-- Português (BR)
-- Inglês (US)
-- Espanhol (ES)
-
-## 📱 Mobile
-
-### 1. Responsividade Aprimorada
-- Melhor UX em tablets
-- Gestos touch para navegação
-- Teclado otimizado para mobile
-
-### 2. App Nativo (Opcional)
-- React Native
-- Capacitor
-- Electron (desktop)
-
-## 🧪 Testes
-
-### 1. Testes Unitários
-```bash
-npm install -D vitest @testing-library/dom
-```
-
-### 2. Testes E2E
-```bash
-npm install -D playwright
-```
-
-### 3. Cobertura de Código
-```bash
-npm install -D @vitest/coverage-c8
-```
-
-## 📦 Deploy Automático
-
-### 1. GitHub Actions
-```yaml
-# .github/workflows/deploy.yml
-name: Deploy
-on:
-  push:
-    branches: [main]
-jobs:
-  deploy:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-      - run: npm install
-      - run: npm run build
-      - uses: peaceiris/actions-gh-pages@v3
-```
-
-### 2. Cloudflare Pages
-- Automatic deployment via GitHub integration
-
-## 🎨 Customização Avançada
-
-### 1. Temas Personalizados
-- Permitir usuário criar seu próprio tema
-- Salvar preferências de tema
-
-### 2. Templates
-- Templates pré-definidos (Blog, Documentação, etc)
-- Sistema de import/export de templates
-
-### 3. Extensões
-- Sistema de plugins
-- API para extensões de terceiros
-
-## 📈 SEO e Marketing
-
-### 1. Landing Page
-- Criar página inicial atrativa
-- Demonstrações interativas
-- Comparativos com outras ferramentas
-
-### 2. Blog
-- Tutoriais de Markdown
-- Casos de uso
-- Dicas e truques
-
-## 🔧 DevOps
-
-### 1. Docker
-```dockerfile
-FROM node:18-alpine
-WORKDIR /app
-COPY package*.json ./
-RUN npm install
-COPY . .
-RUN npm run build
-CMD ["npm", "run", "preview"]
-```
-
-### 2. CI/CD
-- Testes automáticos
-- Deploy automático
-- Versionamento semântico
-
-## 💡 Features Inovadoras
-
-### 1. IA Integration
-- Sugestões de formatação
-- Correção ortográfica
-- Geração de conteúdo
-
-### 2. Voice Input
-- Ditado de texto
-- Comandos por voz
-
-### 3. Integração com API
-- API para conversão em lote
-- Webhooks para automação
-
-## 📊 Implementação Prioritária
-
-### Alta Prioridade
-1. PWA Support
-2. Syntax highlighting em código
-3. Temas claro/escuro
-4. Export para HTML
-
-### Média Prioridade
-1. Histórico de versões
-2. Suporte a Mermaid
-3. Sanitização de HTML
-4. Testes unitários
-
-### Baixa Prioridade
-1. Colaboração em tempo real
-2. Sincronização cloud
-3. App nativo
-4. IA Integration
+**Infrastructure**
+- Offline-first service worker (PWA)
+- Desktop and home screen installable
+- WCAG 2.1 AA accessibility
+- Bilingual UI (English / Portuguese)
+- CI via GitHub Actions (typecheck, build, Playwright)
+- Fully automated release pipeline via release-please
 
 ---
 
-## 🚀 Como Contribuir
+## Planned
 
-Para implementar qualquer uma dessas melhorias:
+### High priority
 
-1. Crie uma branch: `git checkout -b feature/nome-da-feature`
-2. Implemente a funcionalidade
-3. Adicione testes se aplicável
-4. Faça commit: `git commit -m 'feat: adiciona nome-da-feature'`
-5. Push: `git push origin feature/nome-da-feature`
-6. Abra um Pull Request
+**Line numbers in code blocks**
+Code blocks in the preview show no line numbers. Useful for longer snippets and SQL queries. Implementation: highlight.js line numbers plugin, CSS counter fallback.
 
-## 📝 Notas
+**Copy button on code blocks**
+Single-click to copy block content. Client-side only — no server involved.
 
-- Mantenha o foco em simplicidade e performance
-- Toda nova feature deve ter documentação
-- Priorize a experiência do usuário
-- Mantenha o bundle size sob controle
+**Dark editor theme**
+Add a One Dark or similar dark theme to the CodeMirror editor. The current theme is GitHub Light. Requires a theme toggle in the toolbar and a localStorage preference.
+
+**Export to HTML**
+Export the rendered preview as a self-contained `.html` file with inlined CSS and highlighted code. No dependency on the print dialog.
+
+---
+
+### Medium priority
+
+**Document version history**
+Track a rolling buffer of the last N saves per document in localStorage. Allow reverting to a previous snapshot from a document-level history panel.
+
+**KaTeX math rendering**
+Render `$...$` and `$$...$$` blocks as typeset math. Lazy-load KaTeX to avoid bundle impact.
+
+**Virtual scrolling for document list**
+The current list renders all documents in the DOM. Virtualize for workspaces with hundreds of documents.
+
+**Spanish UI translation**
+Add `es/` alongside the existing `en/` and `pt/` UI translations.
+
+---
+
+### Low priority
+
+**Custom theme editor**
+Allow users to edit CSS custom properties (accent color, font family, background) directly in the UI, with export and import of theme presets.
+
+**Document templates**
+Pre-defined document starters (meeting notes, technical spec, blog post). Selectable from the new document dialog.
+
+**Batch PDF export**
+Export all documents as PDFs in a single operation. Requires headless print sequencing — likely via Playwright in a local CLI companion, keeping the browser app stateless.
+
+**Cloud sync (GitHub Gists)**
+Optional sync of the document workspace to a private GitHub Gist. Opt-in only, no analytics, no server.
+
+---
+
+## Out of scope
+
+These will not be implemented in the current architecture:
+
+- **Real-time collaboration** — MD2PDF is intentionally local-first; WebRTC/WebSocket would break the privacy model
+- **Native app** — Electron/Capacitor adds packaging complexity with no gain over the PWA
+- **Analytics or telemetry** — No tracking of any kind, ever
+- **Server-side rendering** — The entire pipeline runs in the browser; no server means no data leaves the device
+
+---
+
+## Contributing
+
+To implement any item in this roadmap:
+
+1. Open an issue to discuss the approach before writing code
+2. Create a branch: `git checkout -b feature/your-feature-name`
+3. Implement with tests where applicable
+4. Run `npm run typecheck && npm run build` — both must pass
+5. Open a pull request with a clear description of what changed and why

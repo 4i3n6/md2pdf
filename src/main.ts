@@ -28,7 +28,7 @@ import {
 import { documentManager } from './services/documentManager'
 import { uiRenderer } from './services/uiRenderer'
 import { initI18n, t, getLocale } from './i18n/index'
-import { BreakpointsLayout, SalvamentoConfig } from '@/constants'
+import { LayoutBreakpoints, SaveConfig } from '@/constants'
 import type { AppState, LoggerInterface, Document as AppDocument } from '@/types/index'
 import { debounce } from '@/utils/debounce'
 import { editorTheme } from './editorTheme'
@@ -39,7 +39,7 @@ import './styles-print.css'
 
 // Mobile detection - block app initialization on small screens
 function isMobileViewport(): boolean {
-  return window.innerWidth < BreakpointsLayout.mobilePx;
+  return window.innerWidth < LayoutBreakpoints.mobilePx;
 }
 
 // If mobile, don't initialize the app - CSS will show the overlay
@@ -138,7 +138,7 @@ const saveStatusService = createSaveStatusService({
   persistDocs: () => documentManager.persistir(),
   updateMetrics,
   t,
-  debounceMs: SalvamentoConfig.debounceMs
+  debounceMs: SaveConfig.debounceMs
 })
 
 const printWorkflowService = createPrintWorkflowService({

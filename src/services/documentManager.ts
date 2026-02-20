@@ -8,7 +8,7 @@
  * - Type-safe document management
  */
 
-import { ChavesStorage } from '@/constants'
+import { StorageKeys } from '@/constants'
 import type { Document, LoggerInterface } from '@/types/index'
 
 /**
@@ -59,13 +59,13 @@ export class DocumentManager {
    * @returns {void}
    */
   private load(): void {
-    const currentDocs = this.carregarDoStorage(ChavesStorage.documentos)
-    if (currentDocs && currentDocs.length > 0) {
-        this.docs = currentDocs
-        return
-    }
+    const currentDocs = this.carregarDoStorage(StorageKeys.documents)
+        if (currentDocs && currentDocs.length > 0) {
+            this.docs = currentDocs
+            return
+        }
 
-    const legacyDocs = this.carregarDoStorage(ChavesStorage.documentosLegado)
+        const legacyDocs = this.carregarDoStorage(StorageKeys.legacyDocuments)
     if (legacyDocs && legacyDocs.length > 0) {
         this.docs = legacyDocs
         this.persistir()
@@ -144,7 +144,7 @@ export class DocumentManager {
    */
   private save(): void {
     try {
-      localStorage.setItem(ChavesStorage.documentos, JSON.stringify(this.docs))
+      localStorage.setItem(StorageKeys.documents, JSON.stringify(this.docs))
       this.notifyObservers()
     } catch (e) {
       const errorMessage = e instanceof Error ? e.message : String(e)

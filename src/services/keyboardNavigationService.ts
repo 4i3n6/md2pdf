@@ -9,13 +9,13 @@ type KeyboardNavigationDeps = {
 
 export function setupKeyboardNavigation(deps: KeyboardNavigationDeps): void {
     document.addEventListener('keydown', (e: KeyboardEvent): void => {
-        // Ctrl+N - Novo documento
+        // Ctrl+N - New document
         if ((e.ctrlKey || e.metaKey) && e.key === 'n') {
             e.preventDefault()
             deps.createDoc()
         }
 
-        // Ctrl+Shift+E - Exportar PDF
+        // Ctrl+Shift+E - Export PDF
         if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key === 'E') {
             e.preventDefault()
             const btnDown = document.getElementById('download-btn') as HTMLButtonElement | null
@@ -24,17 +24,17 @@ export function setupKeyboardNavigation(deps: KeyboardNavigationDeps): void {
             }
         }
 
-        // Escape - Limpar print preview
+        // Escape - Exit print preview
         if (e.key === 'Escape') {
             if (document.body.classList.contains('print-mode')) {
                 e.preventDefault()
                 deps.togglePrintPreview()
-                deps.logger.log('Preview de Impressao desativado')
+                deps.logger.log('Print preview deactivated')
             }
         }
     })
 
-    // Keyboard navigation em lista de documentos
+    // Keyboard navigation in document list
     const documentsList = document.getElementById('documents-list') as HTMLElement | null
     if (documentsList) {
         documentsList.addEventListener('keydown', (e: KeyboardEvent): void => {
@@ -107,6 +107,6 @@ export function setupKeyboardNavigation(deps: KeyboardNavigationDeps): void {
         })
     }
 
-    deps.logger.success('Navegacao por teclado ativada')
-    deps.logger.log('Atalhos: Ctrl+N=Novo | Ctrl+Shift+E=PDF | Arrow Keys=Navegar Docs')
+    deps.logger.success('Keyboard navigation active')
+    deps.logger.log('Shortcuts: Ctrl+N=New | Ctrl+Shift+E=PDF | Arrow Keys=Navigate Docs')
 }

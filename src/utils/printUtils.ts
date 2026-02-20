@@ -3,7 +3,7 @@
  * Funções de validação, otimização e controle de impressão
  */
 
-import { ImpressaoLimites } from '@/constants'
+import { PrintLimits } from '@/constants'
 import { logAviso, logErro, logInfo } from '@/utils/logger'
 import { runPipeline, type PipelineStage } from '@/utils/pipeline'
 import { confirmar } from '@/services/modalService'
@@ -104,9 +104,9 @@ function validarImagensNoContainer(container: HTMLElement, issues: string[]): vo
     const dims = obterDimensoesImagem(img);
     if (dims.widthPx <= 0 || dims.heightPx <= 0) return;
 
-    const maxWidthMm = ImpressaoLimites.maxLarguraMm;
-    const maxHeightMm = ImpressaoLimites.maxAlturaMm;
-    const pxPorMm = ImpressaoLimites.pxPorMm;
+    const maxWidthMm = PrintLimits.maxWidthMm;
+    const maxHeightMm = PrintLimits.maxHeightMm;
+    const pxPorMm = PrintLimits.pxPerMm;
     const imgWidthMm = dims.widthPx / pxPorMm;
     const imgHeightMm = dims.heightPx / pxPorMm;
 
