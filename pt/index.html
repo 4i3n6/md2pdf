@@ -573,6 +573,101 @@
             color: var(--border);
         }
 
+        /* Open Source Section */
+        .oss-section {
+            background: var(--black);
+            color: var(--white);
+        }
+
+        .oss-section .section-label {
+            color: var(--orange);
+        }
+
+        .oss-section .section-title {
+            color: var(--white);
+        }
+
+        .oss-section .section-text {
+            color: #a3a3a3;
+        }
+
+        .oss-inner {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 48px;
+            margin-top: 48px;
+        }
+
+        @media (min-width: 768px) {
+            .oss-inner {
+                grid-template-columns: 1fr 1fr;
+                align-items: center;
+                gap: 64px;
+            }
+        }
+
+        .oss-actions {
+            margin-top: 32px;
+            display: flex;
+            gap: 16px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .oss-license {
+            font-size: 12px;
+            color: #555;
+        }
+
+        .oss-terminal {
+            background: #0d0d0d;
+            border: 1px solid #2a2a2a;
+            overflow: hidden;
+        }
+
+        .terminal-header {
+            background: #1a1a1a;
+            padding: 10px 16px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            border-bottom: 1px solid #2a2a2a;
+        }
+
+        .terminal-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: #333;
+        }
+
+        .terminal-title {
+            margin-left: 8px;
+            font-size: 11px;
+            color: #444;
+        }
+
+        .terminal-body {
+            padding: 24px;
+            font-size: 13px;
+            line-height: 2.2;
+        }
+
+        .terminal-line {
+            color: #e5e5e5;
+            display: block;
+        }
+
+        .terminal-prompt {
+            color: var(--orange);
+            margin-right: 10px;
+            user-select: none;
+        }
+
+        .terminal-comment {
+            color: #444;
+        }
+
         /* Responsive */
         @media (max-width: 640px) {
             .nav-links {
@@ -614,7 +709,7 @@
         <!-- Hero Section -->
         <section class="hero" aria-labelledby="hero-title">
             <div class="container">
-                <div class="hero-badge">Para sempre grátis. Sem cadastro.</div>
+                <div class="hero-badge">Open Source &middot; Grátis para sempre &middot; Sem cadastro</div>
 
                 <h1 id="hero-title" class="hero-headline">
                     Transforme Markdown em <span class="highlight">PDFs Bonitos</span>
@@ -757,6 +852,45 @@
                         <h3 class="step-title">Exporte o PDF</h3>
                         <p class="step-text">Um clique e pronto. PDF profissional pronto para imprimir ou compartilhar.
                         </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Open Source Section -->
+        <section class="section oss-section" aria-labelledby="oss-title">
+            <div class="container">
+                <p class="section-label">Open Source</p>
+                <h2 class="section-title" id="oss-title">Construído em público. Licença MIT.</h2>
+                <p class="section-text">
+                    O MD2PDF é totalmente open source. Leia o código, faça um fork, hospede sua própria
+                    instância ou contribua — sem pedir permissão. Tudo que você vê em md2pdf.xyz roda
+                    diretamente deste repositório.
+                </p>
+
+                <div class="oss-inner">
+                    <div>
+                        <div class="oss-actions">
+                            <a href="https://github.com/4i3n6/md2pdf" class="cta-btn" target="_blank" rel="noopener noreferrer">
+                                Ver no GitHub <span aria-hidden="true">-></span>
+                            </a>
+                            <span class="oss-license">Licença MIT</span>
+                        </div>
+                    </div>
+
+                    <div class="oss-terminal" role="region" aria-label="Rode localmente em 3 comandos">
+                        <div class="terminal-header">
+                            <span class="terminal-dot" aria-hidden="true"></span>
+                            <span class="terminal-dot" aria-hidden="true"></span>
+                            <span class="terminal-dot" aria-hidden="true"></span>
+                            <span class="terminal-title">rode localmente em 3 comandos</span>
+                        </div>
+                        <div class="terminal-body">
+                            <span class="terminal-line"><span class="terminal-prompt" aria-hidden="true">$</span> git clone https://github.com/4i3n6/md2pdf.git</span>
+                            <span class="terminal-line"><span class="terminal-prompt" aria-hidden="true">$</span> cd md2pdf &amp;&amp; npm install</span>
+                            <span class="terminal-line"><span class="terminal-prompt" aria-hidden="true">$</span> npm run dev</span>
+                            <span class="terminal-line terminal-comment"><span aria-hidden="true">&nbsp;&nbsp;</span># http://localhost:3000</span>
+                        </div>
                     </div>
                 </div>
             </div>
