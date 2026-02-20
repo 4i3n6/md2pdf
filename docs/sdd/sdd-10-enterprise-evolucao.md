@@ -19,7 +19,7 @@ Fora de escopo:
 - `src/utils/printUtils.ts`: validacao de impressao com DOM real.
 - `src/main.ts`: logger global, captura de erros e status do save.
 - `src/utils/*`: substituicao de `console.*` por `Logger`.
-- `vite.config.ts`, `_headers`, `netlify.toml`, `vercel.json`: alinhamento de headers.
+- `vite.config.ts`, `_headers`: security header alignment.
 - `scripts/*`: injecao de metadata de versao (se necessario).
 
 ## 4. Fluxo principal (pos-melhoria)

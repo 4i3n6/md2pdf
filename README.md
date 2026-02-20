@@ -1,183 +1,114 @@
-# MD2PDF - Conversor Markdown para PDF
+# md2pdf
 
-![CI](https://github.com/zzkteam/md2pdf/actions/workflows/ci.yml/badge.svg)
-![License](https://img.shields.io/github/license/zzkteam/md2pdf)
-![Version](https://img.shields.io/github/v/tag/zzkteam/md2pdf?label=version)
+A fast, privacy-first Markdown editor and PDF exporter that runs entirely in your browser.
 
-> **SISTEMA DE CONVERSÃO v1.1.68 | STATUS: PRONTO PARA PRODUÇÃO**
+No servers. No accounts. No data leaves your machine.
 
-Clone ultrapolido e otimizado do markdowntopdf.com com interface moderna estilo **painel financeiro hacker**. Conversor de Markdown para PDF gratuito, sem limites e sem necessidade de autenticação.
+[![CI](https://github.com/4i3n6/md2pdf/actions/workflows/ci.yml/badge.svg)](https://github.com/4i3n6/md2pdf/actions/workflows/ci.yml)
+[![License](https://img.shields.io/github/license/4i3n6/md2pdf)](LICENSE)
+[![Version](https://img.shields.io/github/v/tag/4i3n6/md2pdf?label=version)](https://github.com/4i3n6/md2pdf/releases)
 
-## ⚡ RECURSOS DO SISTEMA
+## What it does
 
-### Core Features
-- ✓ **Interface Hacker** - Tema claro estilo painel financeiro/terminal
-- ✓ **Sem autenticação** - Use imediatamente sem cadastro
-- ✓ **Sem rate limiting** - Conversões ilimitadas
-- ✓ **100% Client-Side** - Zero dependência de servidor
+md2pdf is a Markdown editor with live preview and native PDF export, built entirely as a client-side application. Documents are stored in localStorage, the editor runs on CodeMirror 6, and PDF generation uses the browser's built-in print dialog — no backend, no external services, no account required.
 
-### Editor & Preview
-- ✓ **CodeMirror 6** - Editor profissional monospace
-- ✓ **Preview em tempo real** - Renderização instantânea
-- ✓ **GitHub Flavored Markdown** - Suporte completo a GFM
-- ✓ **Syntax Highlighting** - Código destacado no preview
+## Features
 
-### Funcionalidades
-- ✓ **Armazenamento local** - Múltiplos documentos via localStorage
-- ✓ **Drag & Drop** - Arraste arquivos .md para o editor
-- ✓ **Atalhos de teclado** - Ctrl/Cmd+S para salvar, Ctrl/Cmd+P para PDF
-- ✓ **Modos de visualização** - Split, Editor-only ou Preview-only
-- ✓ **Backup completo** - Exportação e restauração de todos os documentos
-- ✓ **Export PDF nativo** - Window.print() do navegador
-- ✓ **PWA Ready** - Instalável como app
+- **100% client-side** — no server, no tracking, no signup
+- **Multi-document workspace** — manage multiple files with full backup and restore
+- **Live split-pane preview** — real-time rendering as you type
+- **GitHub Flavored Markdown** — full GFM support including tables, task lists, and strikethrough
+- **Syntax highlighting** — powered by highlight.js across 30+ languages
+- **Mermaid diagrams** — flowcharts, sequence diagrams, Gantt, ER and more rendered inline
+- **YAML processor** — structured rendering of YAML frontmatter and code blocks
+- **Print fidelity** — pixel-accurate A4 layout with configurable margins and font size
+- **Resizable panels** — draggable splitter, persisted across sessions
+- **Drag and drop** — drop `.md` files directly into the editor
+- **Keyboard-first** — `Ctrl/Cmd+S` to save, `Ctrl/Cmd+P` to export PDF
+- **PWA-ready** — install and use offline as a standalone app
+- **Bilingual UI** — English and Portuguese interfaces
 
-## 📦 Instalação
+## Getting started
 
 ```bash
-# Clone o repositório
-git clone <seu-repo>
+git clone https://github.com/4i3n6/md2pdf.git
 cd md2pdf
-
-# Instale as dependências
 npm install
-
-# Inicie o servidor de desenvolvimento
 npm run dev
 ```
 
-## 🛠️ Comandos Disponíveis
+Open [http://localhost:3000](http://localhost:3000).
+
+## Commands
+
+| Command | Description |
+|---|---|
+| `npm run dev` | Start development server (port 3000) |
+| `npm run build` | Production build to `./dist` |
+| `npm run preview` | Preview the production build locally |
+| `npm run typecheck` | TypeScript strict mode check |
+| `npm run smoke` | Smoke test against production build |
+| `npm run visual:test` | Playwright render/print fidelity suite |
+
+## Tech stack
+
+| Layer | Technology |
+|---|---|
+| Build | [Vite](https://vitejs.dev) |
+| Editor | [CodeMirror 6](https://codemirror.net) |
+| Markdown | [marked.js](https://marked.js.org) |
+| Diagrams | [Mermaid](https://mermaid.js.org) |
+| Highlighting | [highlight.js](https://highlightjs.org) |
+| Language | TypeScript (strict mode) |
+| Storage | localStorage |
+| PDF export | `window.print()` |
+
+## Keyboard shortcuts
+
+| Shortcut | Action |
+|---|---|
+| `Ctrl/Cmd + S` | Save document |
+| `Ctrl/Cmd + P` | Export as PDF |
+
+## Deployment
+
+The build output in `./dist` is a static site. Deploy to any static host:
 
 ```bash
-# Desenvolvimento
-npm run dev
-
-# Build para produção
 npm run build
-
-# Typecheck
-npm run typecheck
-
-# Smoke test (requer build)
-npm run smoke
-
-# Visual regression (Playwright)
-npm run visual:test
-npm run visual:test:update
-
-# Preview da build de produção
-npm run preview
+# serve ./dist
 ```
 
-### Requisitos para visual regression
+Route `/app` must rewrite to `app.html`. A `_redirects` file compatible with Cloudflare Pages is included in the repo root.
 
-```bash
-npm install -D @playwright/test
-npx playwright install chromium
-```
+## Customization
 
-## 📚 Documentacao
+### Theme colors
 
-- `docs/README.md` (indice geral)
-- `docs/sdd/README.md` (SDD por funcionalidade)
-
-## 🎯 Como Usar
-
-1. **Abra a aplicação** - Acesse http://localhost:3000 após executar `npm run dev`
-2. **Digite ou cole seu Markdown** no editor à esquerda
-3. **Veja o preview em tempo real** à direita
-4. **Clique em "Download PDF"** para gerar o PDF (abre a caixa de diálogo de impressão)
-5. **Salve como PDF** na caixa de diálogo de impressão do navegador
-
-## ⌨️ Atalhos de Teclado
-
-- `Ctrl/Cmd + S` - Salvar documento
-- `Ctrl/Cmd + P` - Baixar/Imprimir como PDF
-
-## 🔧 Tecnologias Utilizadas
-
-- **Vite** - Build tool e dev server
-- **CodeMirror 6** - Editor de código
-- **Marked.js** - Parser de Markdown para HTML
-- **LocalStorage API** - Armazenamento local de documentos
-- **Window.print()** - Geração nativa de PDFs
-
-## 📝 Recursos do Markdown Suportados
-
-- Cabeçalhos (H1-H6)
-- Negrito, itálico, tachado
-- Listas ordenadas e não ordenadas
-- Links e imagens
-- Código inline e blocos de código
-- Tabelas
-- Citações (blockquotes)
-- Linhas horizontais
-- HTML inline (quando permitido)
-
-## 🎨 Personalização
-
-### Alterar cores do tema
-
-Edite as variáveis CSS em `src/styles.css`:
+Edit CSS variables in `src/styles.css`:
 
 ```css
 :root {
-    --primary: #10b981;       /* Cor primária */
-    --primary-dark: #059669;  /* Cor primária escura */
-    --sidebar-bg: #1f2937;    /* Fundo da sidebar */
-    /* ... */
+    --primary: #10b981;
+    --primary-dark: #059669;
+    --sidebar-bg: #1f2937;
 }
 ```
 
-### Modificar conteúdo padrão
+### Default document content
 
-Edite o `defaultDoc` em `src/services/documentManager.ts`
+Edit `defaultDoc` in `src/services/documentManager.ts`.
 
-## 🚀 Deploy
+## Privacy
 
-### Vercel
+All data is stored exclusively in your browser's localStorage. Nothing is transmitted to any external service.
 
-```bash
-npm run build
-# Faça deploy da pasta 'dist'
-```
+## Contributing
 
-### Netlify
+Pull requests are welcome. For significant changes, open an issue first to discuss the approach.
 
-```bash
-npm run build
-# Faça deploy da pasta 'dist'
-```
+See [CONTRIBUTING.md](CONTRIBUTING.md) and [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md).
 
-### GitHub Pages
+## License
 
-```bash
-npm run build
-# Faça commit e push da pasta 'dist'
-```
-
-## 📄 Licença
-
-Este projeto está licenciado sob a [Licença MIT](LICENSE). - use como quiser!
-
-## 🤝 Contribuições
-
-Contribuições são bem-vindas! Sinta-se livre para:
-
-- Reportar bugs
-- Sugerir novos recursos
-- Enviar pull requests
-- Melhorar a documentação
-
-## 🎯 Diferenças do Original
-
-- ❌ Removida autenticação
-- ❌ Removido rate limiting
-- ❌ Removido backend
-- ✅ Adicionado armazenamento local
-- ✅ Interface simplificada
-- ✅ Código mais limpo e manutenível
-- ✅ 100% client-side
-
-## 🔒 Privacidade
-
-Todos os dados são armazenados **apenas no seu navegador** (localStorage). Nenhum dado é enviado para servidores externos.
+[MIT](LICENSE)

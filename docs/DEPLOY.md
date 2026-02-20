@@ -1,43 +1,51 @@
-# Deploy - MD2PDF
+# Deployment
 
-## Visao geral
-Projeto estatico gerado via Vite. O build produz arquivos em `dist/` prontos para qualquer host estatico.
+md2pdf produces a fully static output. Any host that can serve static files works.
 
 ## Build
+
 ```bash
 npm install
 npm run build
 ```
 
-- Build script inclui `scripts/build-manual.mjs`.
-- Saida em `dist/`.
-- Recomendado: Node 18+.
+Output: `./dist`. Requires Node 18+. Build script includes `scripts/build-manual.mjs` for manual page generation.
 
-## Provedores suportados
+## Cloudflare Pages
 
-### Netlify
-- Config: `netlify.toml`.
-- Redirects: `_redirects`.
-- Headers: `_headers`.
-- Deploy: publicar `dist/`.
-- Headers de seguranca: `X-Frame-Options`, `X-Content-Type-Options`, `X-XSS-Protection`, `Referrer-Policy`, `Permissions-Policy`.
+Connect the repository and set:
 
-### Vercel
-- Config: `vercel.json`.
-- Deploy: publicar `dist/`.
-- Headers de seguranca: `X-Frame-Options`, `X-Content-Type-Options`, `X-XSS-Protection`, `Referrer-Policy`, `Permissions-Policy`.
+- **Build command:** `npm run build`
+- **Output directory:** `dist`
 
-### Qualquer host estatico
-- Publique `dist/`.
-- Garanta rewrite de `/app` para `/app.html`.
+The `_redirects` and `_headers` files in the repo root are picked up automatically by Cloudflare Pages. They handle route rewrites and security headers.
 
-## Rotas importantes
-- `/` -> `index.html`
-- `/app` -> `app.html`
-- `/manual/*` -> paginas do manual
-- `/pt/*` -> versao PT
+## Generic static host
 
-## Checklist pre-deploy
-- `npm run build` sem erros.
-- `npm run preview` funcionando.
-- Verificar `/app` e `/pt/app`.
+Serve `./dist`. The host must rewrite `/app` to `/app.html`. All other routes are file-based.
+
+## Routes
+
+| Path | File |
+|---|---|
+| `/` | `index.html` |
+| `/app` | `app.html` (rewrite required) |
+| `/manual/*` | `manual/*/index.html` |
+| `/pt/*` | `pt/*/index.html` |
+
+## Security headers
+
+Configured in `_headers`:
+
+- `X-Frame-Options: DENY`
+- `X-Content-Type-Options: nosniff`
+- `X-XSS-Protection: 1; mode=block`
+- `Referrer-Policy: no-referrer`
+- `Permissions-Policy: interest-cohort=()`
+- Long-lived cache on `/assets/*`, `/sw.js` no-cache
+
+## Pre-deploy checklist
+
+- `npm run build` exits with code 0
+- `npm run preview` loads `/`, `/app`, `/pt/app`
+- `npm run typecheck` reports zero errors

@@ -95,8 +95,6 @@ const history = {
 
 ### 1. Analytics Privacy-First
 ```bash
-npm install @vercel/analytics
-# ou
 npm install plausible-tracker
 ```
 
@@ -216,8 +214,8 @@ jobs:
       - uses: peaceiris/actions-gh-pages@v3
 ```
 
-### 2. Vercel/Netlify
-- Configuração automática via GitHub
+### 2. Cloudflare Pages
+- Automatic deployment via GitHub integration
 
 ## 🎨 Customização Avançada
 
