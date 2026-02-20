@@ -7,6 +7,19 @@ New releases are prepended automatically by [release-please](https://github.com/
 
 ---
 
+## [2.1.1](https://github.com/4i3n6/md2pdf/compare/md2pdf-v2.1.0...md2pdf-v2.1.1) (2026-02-20)
+
+
+### ### Changed
+
+* translate all PT-BR identifiers to EN-US ([c929a76](https://github.com/4i3n6/md2pdf/commit/c929a769b5e45c052494dc748e043c8a7862b855))
+
+
+### ### Documentation
+
+* **agents:** add contributing guidelines, security policy, and gitignore AI config files ([7a71efb](https://github.com/4i3n6/md2pdf/commit/7a71efb557d51f6e0bc81bca9e686da82ecf6740))
+* **agents:** allow each contributor to commit with their own identity ([258bbac](https://github.com/4i3n6/md2pdf/commit/258bbaca0d3bf2c8afec058f00668bb7ddba427e))
+
 ## [2.1.0](https://github.com/4i3n6/md2pdf/compare/md2pdf-v2.0.0...md2pdf-v2.1.0) (2026-02-20)
 
 
