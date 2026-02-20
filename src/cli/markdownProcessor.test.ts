@@ -106,3 +106,44 @@ describe('processMarkdown', () => {
         expect(result).toContain('class="markdown-hr"')
     })
 })
+
+describe('--no-* flags', () => {
+    it('--no-highlight renders code without syntax classes', () => {
+        const md = '```javascript\nconst x = 1;\n```'
+        const result = processMarkdown(md, { highlight: false, mermaid: true, yaml: true })
+        expect(result).toContain('data-lang="javascript"')
+        // Should contain escaped text, not hljs span wrappers
+        expect(result).not.toContain('hljs-keyword')
+        expect(result).toContain('const x = 1;')
+    })
+
+    it('--no-mermaid renders mermaid as a plain code block', () => {
+        const md = '```mermaid\ngraph TD\n  A-->B\n```'
+        const result = processMarkdown(md, { highlight: true, mermaid: false, yaml: true })
+        expect(result).toContain('data-lang="mermaid"')
+        expect(result).toContain('language-mermaid')
+        expect(result).toContain('graph TD')
+        // Should NOT produce the mermaid placeholder div
+        expect(result).not.toContain('data-mermaid-source')
+        expect(result).not.toContain('class="mermaid"')
+    })
+
+    it('--no-yaml renders yaml as a plain code block', () => {
+        const md = '```yaml\nname: test\nvalue: 42\n```'
+        const result = processMarkdown(md, { highlight: true, mermaid: true, yaml: false })
+        expect(result).toContain('data-lang="yaml"')
+        expect(result).toContain('language-yaml')
+        expect(result).toContain('name: test')
+        // Should NOT produce the yaml placeholder div
+        expect(result).not.toContain('data-yaml-source')
+        expect(result).not.toContain('class="yaml-block"')
+    })
+
+    it('all flags disabled together', () => {
+        const md = '```javascript\nconst x = 1;\n```\n\n```mermaid\ngraph TD\n```\n\n```yaml\nk: v\n```'
+        const result = processMarkdown(md, { highlight: false, mermaid: false, yaml: false })
+        expect(result).not.toContain('hljs-keyword')
+        expect(result).not.toContain('data-mermaid-source')
+        expect(result).not.toContain('data-yaml-source')
+    })
+})

@@ -1,0 +1,65 @@
+/**
+ * Print Essentials — structural rules only (no visual styling).
+ * Extracted from styles-print.css for use alongside themes.
+ * Element-level selectors only — no .markdown-body overrides.
+ */
+
+*, *::before, *::after {
+    box-sizing: border-box;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+}
+
+* {
+    page-break-inside: auto;
+}
+
+p, li {
+    orphans: 2;
+    widows: 2;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    page-break-after: avoid;
+    page-break-before: auto;
+}
+
+pre, .markdown-code-block {
+    page-break-inside: avoid;
+}
+
+blockquote {
+    page-break-inside: avoid;
+}
+
+table {
+    page-break-inside: auto;
+}
+
+thead {
+    display: table-header-group;
+}
+
+figure {
+    page-break-inside: avoid;
+}
+
+img {
+    max-width: 100%;
+    height: auto;
+}
+
+.page-break {
+    visibility: hidden;
+    display: block;
+    height: 0;
+    margin: 0;
+    padding: 0;
+    border: none;
+    page-break-after: always;
+}
+
+@page {
+    size: A4;
+    margin: 10mm;
+}

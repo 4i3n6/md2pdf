@@ -22,6 +22,17 @@ import sql from 'highlight.js/lib/languages/sql'
 import typescript from 'highlight.js/lib/languages/typescript'
 import yamlLang from 'highlight.js/lib/languages/yaml'
 import { escapeHtml, encodeBase64, normalizeCodeLanguage } from './utils'
+import {
+    getAlignAttribute,
+    inferAlignmentsFromRaw,
+    getCellAlignment,
+    abbreviateCryptoInContent,
+    renderTableCell
+} from '../shared/markdownHelpers'
+import {
+    createMermaidExtension,
+    createYamlExtension
+} from '../shared/markdownExtensions'
 
 // Explicit registration to keep the highlight.js bundle lean.
 const highlightLanguages: Array<[string, LanguageFn]> = [
@@ -50,98 +61,17 @@ for (const [name, definition] of highlightLanguages) {
     hljs.registerLanguage(name, definition)
 }
 
-function getAlignAttribute(align?: string | null): string {
-    const value = (align || '').toLowerCase().trim()
-    if (value !== 'left' && value !== 'center' && value !== 'right') {
-        return ''
-    }
-    return ` align="${value}" style="text-align: ${value}"`
-}
-
-function inferAlignFromPattern(pattern: string): string | null {
-    const value = pattern.trim()
-    if (!value) return null
-
-    const hasLeadingColon = value.startsWith(':')
-    const hasTrailingColon = value.endsWith(':')
-
-    if (hasLeadingColon && hasTrailingColon) return 'center'
-    if (hasTrailingColon) return 'right'
-    if (hasLeadingColon) return 'left'
-    return null
-}
-
-function inferAlignmentsFromRaw(
-    raw: string | undefined,
-    columnCount: number
-): Array<string | null> {
-    if (!raw || columnCount <= 0) return []
-
-    const lines = raw.split('\n').map((l) => l.trim()).filter(Boolean)
-    if (lines.length < 2) return []
-
-    const separatorLine = lines[1] || ''
-    const parts = separatorLine
-        .split('|')
-        .map((p) => p.trim())
-        .filter((p) => p.length > 0)
-
-    const alignments = parts.map((p) => inferAlignFromPattern(p))
-    while (alignments.length < columnCount) {
-        alignments.push(null)
-    }
-    return alignments.slice(0, columnCount)
-}
-
-function getCellAlignment(
-    alignments: Array<string | null>,
-    fallbackAlignments: Array<string | null>,
-    idx: number,
-    cell: Tokens.TableCell
-): string | null {
-    const cellWithAlign = cell as Tokens.TableCell & { align?: string | null }
-    return alignments[idx] || cellWithAlign.align || fallbackAlignments[idx] || null
-}
-
-function escapeRegex(value: string): string {
-    return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
-}
-
-function abbreviateCryptoAddress(value: string): string {
-    if (value.length < 28) return value
-    return `${value.slice(0, 10)}...${value.slice(-8)}`
-}
-
-function abbreviateCryptoInContent(content: string): string {
-    const evmAddressRegex = /\b0x[a-fA-F0-9]{24,}\b/g
-    const btcAddressRegex = /\b(?:bc1|[13])[a-zA-HJ-NP-Z0-9]{25,62}\b/g
-
-    return content
-        .replace(evmAddressRegex, abbreviateCryptoAddress)
-        .replace(btcAddressRegex, abbreviateCryptoAddress)
-}
-
-function findFencedCodeBlock(
-    src: string,
-    language: string,
-    isPattern: boolean = false
-): { raw: string; text: string } | null {
-    const langPattern = isPattern ? language : escapeRegex(language)
-    const regex = new RegExp(
-        '^[ \\t]*(?:`{3,}|~{3,})[ \\t]*' +
-            langPattern +
-            '\\b[^\\n]*\\n([\\s\\S]*?)\\n[ \\t]*(?:`{3,}|~{3,})[ \\t]*(?:\\n|$)',
-        'i'
-    )
-    const match = regex.exec(src)
-    if (!match?.[1]) return null
-    return { raw: match[0], text: match[1].trim() }
-}
-
 export interface CliProcessorOptions {
     highlight: boolean
     mermaid: boolean
     yaml: boolean
+}
+
+// Module-level options read by renderers during marked() execution.
+let activeOptions: CliProcessorOptions = {
+    highlight: true,
+    mermaid: true,
+    yaml: true
 }
 
 // Type for renderer context — marked v17 injects `this.parser` on plain objects
@@ -152,35 +82,40 @@ interface RendererThis {
     }
 }
 
-function abbreviateTokens(tokens: Array<unknown> = []): Array<unknown> {
-    return tokens.map((token) => {
-        if (!token || typeof token !== 'object') return token
+function highlightCode(text: string, lang: string, hasLang: boolean): string {
+    if (!activeOptions.highlight) return escapeHtml(text)
 
-        const t = token as {
-            type?: string
-            text?: string
-            tokens?: Array<unknown>
-        }
+    if (lang === 'plaintext' && hasLang) return escapeHtml(text)
 
-        if (t.type === 'text' || t.type === 'escape') {
-            return { ...t, text: abbreviateCryptoInContent(t.text || '') }
-        }
+    if (lang !== 'plaintext' && hljs.getLanguage(lang)) {
+        return hljs.highlight(text, { language: lang, ignoreIllegals: true }).value
+    }
 
-        if (!Array.isArray(t.tokens) || t.tokens.length === 0) {
-            return t
-        }
-
-        return { ...t, tokens: abbreviateTokens(t.tokens) }
-    })
+    try {
+        return hljs.highlightAuto(text).value
+    } catch {
+        return escapeHtml(text)
+    }
 }
 
-function renderTableCell(
-    parser: RendererThis['parser'],
-    tokens: Array<unknown> = []
-): string {
-    const normalized = abbreviateTokens(tokens)
-    const html = parser.parseInline(normalized as Token[])
-    return abbreviateCryptoInContent(html)
+function renderMermaidPlaceholder(b64: string): string {
+    if (!activeOptions.mermaid) {
+        const source = Buffer.from(b64, 'base64').toString('utf-8')
+        return `<pre class="markdown-code-block hljs" data-lang="mermaid"><code class="language-mermaid">${escapeHtml(source)}</code></pre>\n`
+    }
+    return `<div class="mermaid" data-mermaid-source="${b64}" aria-label="Mermaid Diagram">
+          <pre class="mermaid-loading">Loading diagram...</pre>
+        </div>\n`
+}
+
+function renderYamlPlaceholder(b64: string): string {
+    if (!activeOptions.yaml) {
+        const source = Buffer.from(b64, 'base64').toString('utf-8')
+        return `<pre class="markdown-code-block hljs" data-lang="yaml"><code class="language-yaml">${escapeHtml(source)}</code></pre>\n`
+    }
+    return `<div class="yaml-block" data-yaml-source="${b64}" data-yaml-type="codeblock" aria-label="YAML Code Block">
+          <pre class="yaml-loading">Loading YAML...</pre>
+        </div>\n`
 }
 
 /**
@@ -188,7 +123,6 @@ function renderTableCell(
  *
  * marked v17 requires renderer methods as a plain object (not a class instance)
  * so that `this.parser` is properly injected at runtime.
- * Node.js-safe: uses escapeHtml() instead of DOMPurify.
  */
 const cliRenderer = {
     heading(this: RendererThis, token: Tokens.Heading): string {
@@ -224,46 +158,17 @@ const cliRenderer = {
         const alignments = Array.isArray(tokenWithAlign.align)
             ? tokenWithAlign.align
             : []
-        const fallbackAlignments = inferAlignmentsFromRaw(
+        const fallback = inferAlignmentsFromRaw(
             token.raw,
             token.header?.length || 0
         )
 
-        let headerRow = ''
-        if (token.header && token.header.length > 0) {
-            const headerCells = token.header
-                .map((cell: Tokens.TableCell, idx: number) => {
-                    const alignAttr = getAlignAttribute(
-                        getCellAlignment(alignments, fallbackAlignments, idx, cell)
-                    )
-                    return `<th${alignAttr}>${renderTableCell(this.parser, cell.tokens)}</th>`
-                })
-                .join('')
-            headerRow = `<thead><tr>${headerCells}</tr></thead>`
-        }
-
-        let bodyRows = ''
-        if (token.rows && token.rows.length > 0) {
-            const rows = token.rows
-                .map((row: Tokens.TableCell[]) => {
-                    const cells = row
-                        .map((cell: Tokens.TableCell, idx: number) => {
-                            const alignAttr = getAlignAttribute(
-                                getCellAlignment(
-                                    alignments,
-                                    fallbackAlignments,
-                                    idx,
-                                    cell
-                                )
-                            )
-                            return `<td${alignAttr}>${renderTableCell(this.parser, cell.tokens)}</td>`
-                        })
-                        .join('')
-                    return `<tr>${cells}</tr>`
-                })
-                .join('')
-            bodyRows = `<tbody>${rows}</tbody>`
-        }
+        const headerRow = renderTableHeader(
+            this.parser, token.header, alignments, fallback
+        )
+        const bodyRows = renderTableBody(
+            this.parser, token.rows, alignments, fallback
+        )
 
         return `<figure class="markdown-table">
       <table class="markdown-table-content">
@@ -279,34 +184,10 @@ const cliRenderer = {
     },
 
     code(_token: Tokens.Code): string {
-        const rawLanguage =
-            typeof _token.lang === 'string' ? _token.lang.trim() : ''
-        const lang = normalizeCodeLanguage(rawLanguage)
-        const hasLanguage = rawLanguage.length > 0
-        let highlightedCode = escapeHtml(_token.text)
-
-        try {
-            if (lang === 'plaintext' && hasLanguage) {
-                highlightedCode = escapeHtml(_token.text)
-            } else if (lang !== 'plaintext' && hljs.getLanguage(lang)) {
-                const result = hljs.highlight(_token.text, {
-                    language: lang,
-                    ignoreIllegals: true
-                })
-                highlightedCode = result.value
-            } else {
-                try {
-                    const result = hljs.highlightAuto(_token.text)
-                    highlightedCode = result.value
-                } catch {
-                    highlightedCode = escapeHtml(_token.text)
-                }
-            }
-        } catch {
-            highlightedCode = escapeHtml(_token.text)
-        }
-
-        return `<pre class="markdown-code-block hljs" data-lang="${lang}"><code class="language-${lang}">${highlightedCode}</code></pre>\n`
+        const rawLang = typeof _token.lang === 'string' ? _token.lang.trim() : ''
+        const lang = normalizeCodeLanguage(rawLang)
+        const highlighted = highlightCode(_token.text, lang, rawLang.length > 0)
+        return `<pre class="markdown-code-block hljs" data-lang="${lang}"><code class="language-${lang}">${highlighted}</code></pre>\n`
     },
 
     blockquote(this: RendererThis, token: Tokens.Blockquote): string {
@@ -377,6 +258,49 @@ const cliRenderer = {
     }
 }
 
+function renderTableHeader(
+    parser: RendererThis['parser'],
+    header: Tokens.TableCell[] | undefined,
+    alignments: Array<string | null>,
+    fallback: Array<string | null>
+): string {
+    if (!header || header.length === 0) return ''
+
+    const cells = header
+        .map((cell: Tokens.TableCell, idx: number) => {
+            const alignAttr = getAlignAttribute(
+                getCellAlignment(alignments, fallback, idx, cell)
+            )
+            return `<th${alignAttr}>${renderTableCell(parser, cell.tokens)}</th>`
+        })
+        .join('')
+    return `<thead><tr>${cells}</tr></thead>`
+}
+
+function renderTableBody(
+    parser: RendererThis['parser'],
+    rows: Tokens.TableCell[][] | undefined,
+    alignments: Array<string | null>,
+    fallback: Array<string | null>
+): string {
+    if (!rows || rows.length === 0) return ''
+
+    const rowsHtml = rows
+        .map((row: Tokens.TableCell[]) => {
+            const cells = row
+                .map((cell: Tokens.TableCell, idx: number) => {
+                    const alignAttr = getAlignAttribute(
+                        getCellAlignment(alignments, fallback, idx, cell)
+                    )
+                    return `<td${alignAttr}>${renderTableCell(parser, cell.tokens)}</td>`
+                })
+                .join('')
+            return `<tr>${cells}</tr>`
+        })
+        .join('')
+    return `<tbody>${rowsHtml}</tbody>`
+}
+
 // Configure marked once at module level (marked is a global singleton).
 marked.setOptions({
     gfm: true,
@@ -385,71 +309,29 @@ marked.setOptions({
     async: false
 })
 
+const extensionCallbacks = {
+    encodeBase64,
+    renderMermaid: renderMermaidPlaceholder,
+    renderYaml: renderYamlPlaceholder
+}
+
 marked.use({
     renderer: cliRenderer,
     extensions: [
-        {
-            name: 'mermaidCodeBlock',
-            level: 'block' as const,
-            start(src: string) {
-                return src.match(/^[ \t]*(?:`{3,}|~{3,})[ \t]*mermaid\b/i)?.index
-            },
-            tokenizer(src: string) {
-                const match = findFencedCodeBlock(src, 'mermaid')
-                if (match) {
-                    return {
-                        type: 'mermaidCodeBlock',
-                        raw: match.raw,
-                        text: match.text
-                    }
-                }
-                return undefined
-            },
-            renderer(token: Tokens.Generic) {
-                const data = token as { text?: string }
-                const text: string = typeof data.text === 'string' ? data.text : ''
-                const b64 = encodeBase64(text)
-                return `<div class="mermaid" data-mermaid-source="${b64}" aria-label="Mermaid Diagram">
-          <pre class="mermaid-loading">Loading diagram...</pre>
-        </div>\n`
-            }
-        },
-        {
-            name: 'yamlCodeBlock',
-            level: 'block' as const,
-            start(src: string) {
-                return src.match(/^[ \t]*(?:`{3,}|~{3,})[ \t]*ya?ml\b/i)?.index
-            },
-            tokenizer(src: string) {
-                const match = findFencedCodeBlock(src, 'ya?ml', true)
-                if (match) {
-                    return {
-                        type: 'yamlCodeBlock',
-                        raw: match.raw,
-                        text: match.text
-                    }
-                }
-                return undefined
-            },
-            renderer(token: Tokens.Generic) {
-                const data = token as { text?: string }
-                const text: string = typeof data.text === 'string' ? data.text : ''
-                const b64 = encodeBase64(text)
-                return `<div class="yaml-block" data-yaml-source="${b64}" data-yaml-type="codeblock" aria-label="YAML Code Block">
-          <pre class="yaml-loading">Loading YAML...</pre>
-        </div>\n`
-            }
-        }
+        createMermaidExtension(extensionCallbacks),
+        createYamlExtension(extensionCallbacks)
     ]
 })
 
 export function processMarkdown(
     markdown: string,
-    _options: CliProcessorOptions
+    options: CliProcessorOptions
 ): string {
     if (!markdown || typeof markdown !== 'string') {
         return ''
     }
+
+    activeOptions = options
 
     const preprocessed = markdown.replace(
         /<!--\s*pagebreak\s*-->/gi,

@@ -39,18 +39,18 @@ const CHROME_PATHS: Record<string, string[]> = {
     ],
 }
 
-function findChrome(): string {
-    const candidates = CHROME_PATHS[process.platform] ?? []
+export function findChrome(): string {
+    // Explicit user override takes priority
+    const envPath = process.env['CHROME_PATH']
+    if (envPath && fs.existsSync(envPath)) {
+        return envPath
+    }
 
+    const candidates = CHROME_PATHS[process.platform] ?? []
     for (const candidate of candidates) {
         if (candidate && fs.existsSync(candidate)) {
             return candidate
         }
-    }
-
-    const envPath = process.env['CHROME_PATH']
-    if (envPath && fs.existsSync(envPath)) {
-        return envPath
     }
 
     const lines = [
@@ -79,21 +79,10 @@ export async function generatePdf(
     try {
         fs.writeFileSync(tempHtmlPath, htmlContent, 'utf-8')
 
-        const executablePath = findChrome()
-        browser = await puppeteer.launch({
-            headless: true,
-            executablePath,
-            args: ['--no-sandbox', '--disable-setuid-sandbox']
-        })
-
+        browser = await launchBrowser()
         const page = await browser.newPage()
 
-        const fileUrl = `file://${tempHtmlPath}`
-        await page.goto(fileUrl, {
-            waitUntil: 'networkidle0',
-            timeout: options.timeout
-        })
-
+        await navigateToFile(page, tempHtmlPath, options.timeout)
         await page.emulateMediaType('print')
 
         if (options.mermaid) {
@@ -101,76 +90,90 @@ export async function generatePdf(
         }
 
         await waitForImages(page, options.timeout)
-
-        await page.pdf({
-            path: outputPath,
-            format: options.pageSize as 'A4' | 'Letter' | 'Legal',
-            landscape: options.landscape,
-            margin: options.margin,
-            printBackground: true,
-            preferCSSPageSize: true
-        })
+        await writePdf(page, outputPath, options)
     } finally {
-        if (browser) {
-            await browser.close()
-        }
-
-        if (!options.debug && fs.existsSync(tempHtmlPath)) {
-            fs.unlinkSync(tempHtmlPath)
-        }
-
-        if (options.debug) {
-            const debugPath = tempHtmlPath.replace(
-                '.html',
-                '.debug.html'
-            )
-            if (tempHtmlPath !== debugPath && fs.existsSync(tempHtmlPath)) {
-                fs.renameSync(tempHtmlPath, debugPath)
-            }
-            process.stderr.write(`Debug HTML saved: ${debugPath}\n`)
-        }
+        if (browser) await browser.close()
+        handleTempFile(tempHtmlPath, options.debug)
     }
 }
 
-async function renderMermaidDiagrams(
+async function launchBrowser(): Promise<Browser> {
+    const executablePath = findChrome()
+    return puppeteer.launch({
+        headless: true,
+        executablePath,
+        args: ['--no-sandbox', '--disable-setuid-sandbox']
+    })
+}
+
+async function navigateToFile(
     page: Page,
+    htmlPath: string,
     timeout: number
 ): Promise<void> {
-    const hasMermaid = await page.evaluate(() => {
-        return document.querySelectorAll('[data-mermaid-source]').length > 0
+    await page.goto(`file://${htmlPath}`, {
+        waitUntil: 'networkidle0',
+        timeout
     })
+}
 
-    if (!hasMermaid) return
+async function writePdf(
+    page: Page,
+    outputPath: string,
+    options: PdfOptions
+): Promise<void> {
+    await page.pdf({
+        path: outputPath,
+        format: options.pageSize as 'A4' | 'Letter' | 'Legal',
+        landscape: options.landscape,
+        margin: options.margin,
+        printBackground: true,
+        preferCSSPageSize: true
+    })
+}
 
-    let loaded = false
+function handleTempFile(tempHtmlPath: string, debug: boolean): void {
+    if (!debug && fs.existsSync(tempHtmlPath)) {
+        fs.unlinkSync(tempHtmlPath)
+        return
+    }
 
+    if (debug) {
+        const debugPath = tempHtmlPath.replace('.html', '.debug.html')
+        if (tempHtmlPath !== debugPath && fs.existsSync(tempHtmlPath)) {
+            fs.renameSync(tempHtmlPath, debugPath)
+        }
+        process.stderr.write(`Debug HTML saved: ${debugPath}\n`)
+    }
+}
+
+async function loadMermaidScript(page: Page): Promise<boolean> {
     // Try local mermaid package first (available in dev / npm install)
     for (const entry of ['mermaid/dist/mermaid.min.js', 'mermaid/dist/mermaid.js']) {
         try {
             const resolved = require.resolve(entry)
             await page.addScriptTag({ path: resolved })
-            loaded = true
-            break
+            return true
         } catch {
             // not found, try next
         }
     }
 
     // Fallback: load from CDN (standalone binary / SEA)
-    if (!loaded) {
-        try {
-            await page.addScriptTag({
-                url: 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js'
-            })
-            loaded = true
-        } catch {
-            process.stderr.write(
-                'Warning: mermaid not available (install locally or check internet), skipping diagrams\n'
-            )
-            return
-        }
+    try {
+        await page.addScriptTag({
+            url: 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js'
+        })
+        return true
+    } catch {
+        process.stderr.write(
+            'Warning: mermaid not available (install locally or check internet), skipping diagrams\n'
+        )
+        return false
     }
+}
 
+async function initAndRunMermaid(page: Page): Promise<void> {
     await page.evaluate(async () => {
         const mermaidGlobal = (window as unknown as { mermaid: {
             initialize: (config: Record<string, unknown>) => void
@@ -180,18 +183,16 @@ async function renderMermaidDiagrams(
         mermaidGlobal.initialize({
             startOnLoad: false,
             theme: 'default',
-            securityLevel: 'loose'
+            securityLevel: 'strict'
         })
 
         const blocks = document.querySelectorAll('[data-mermaid-source]')
         for (const block of blocks) {
             const b64 = block.getAttribute('data-mermaid-source')
             if (!b64) continue
-
             try {
-                const source = atob(b64)
                 block.removeAttribute('data-mermaid-source')
-                block.textContent = source
+                block.textContent = atob(b64)
             } catch {
                 // Skip blocks with invalid base64
             }
@@ -202,6 +203,21 @@ async function renderMermaidDiagrams(
             await mermaidGlobal.run({ nodes: mermaidBlocks })
         }
     })
+}
+
+async function renderMermaidDiagrams(
+    page: Page,
+    timeout: number
+): Promise<void> {
+    const hasMermaid = await page.evaluate(() => {
+        return document.querySelectorAll('[data-mermaid-source]').length > 0
+    })
+    if (!hasMermaid) return
+
+    const loaded = await loadMermaidScript(page)
+    if (!loaded) return
+
+    await initAndRunMermaid(page)
 
     await page.waitForFunction(
         () => {

@@ -6,15 +6,18 @@ import { processYamlBlocksInHtml } from './yamlProcessor'
 import { buildHtmlDocument } from './htmlTemplate'
 import { generatePdf } from './pdfGenerator'
 import { parseMargins } from './utils'
+import { getThemeCss, THEME_NAMES } from './themes'
+import { sanitizeFragment } from './sanitizer'
 
-const VERSION = '2.1.0'
+// Injected by tsup's `define` from package.json at build time.
+declare const CLI_VERSION: string
 
 const program = new Command()
 
 program
     .name('md2pdf')
     .description('Convert Markdown files to PDF')
-    .version(VERSION, '-v, --version')
+    .version(CLI_VERSION, '-v, --version')
     .argument('<input>', 'Markdown file to convert')
     .argument('[output]', 'Output PDF path (default: <input-name>.pdf)')
     .option('--page-size <size>', 'Paper size: A4, Letter, Legal', 'A4')
@@ -23,6 +26,7 @@ program
     .option('--no-mermaid', 'Skip Mermaid diagram rendering')
     .option('--no-highlight', 'Skip syntax highlighting')
     .option('--no-yaml', 'Skip YAML block rendering')
+    .option('--theme <name|path>', `Visual theme (${THEME_NAMES.join(', ')}) or path to custom CSS`)
     .option('--timeout <ms>', 'Puppeteer timeout in ms', '30000')
     .option('--debug', 'Keep intermediate .debug.html file', false)
     .action(async (input: string, output: string | undefined, opts: {
@@ -32,6 +36,7 @@ program
         mermaid: boolean
         highlight: boolean
         yaml: boolean
+        theme: string | undefined
         timeout: string
         debug: boolean
     }) => {
@@ -51,16 +56,12 @@ interface CliOptions {
     mermaid: boolean
     highlight: boolean
     yaml: boolean
+    theme: string | undefined
     timeout: string
     debug: boolean
 }
 
-async function run(
-    input: string,
-    output: string | undefined,
-    opts: CliOptions
-): Promise<void> {
-    // Validate input
+function resolvePaths(input: string, output: string | undefined) {
     const inputPath = path.resolve(input)
     if (!fs.existsSync(inputPath)) {
         process.stderr.write(`Error: Input file not found: ${inputPath}\n`)
@@ -73,31 +74,44 @@ async function run(
         ? path.resolve(output)
         : path.join(inputDir, `${inputName}.pdf`)
 
-    const timeout = parseInt(opts.timeout, 10) || 30000
+    return { inputPath, inputDir, outputPath }
+}
 
-    process.stderr.write(`Converting: ${path.basename(inputPath)}\n`)
-
-    // Read markdown
-    const markdown = fs.readFileSync(inputPath, 'utf-8')
-
-    // Process markdown to HTML fragment
+function markdownToHtml(markdown: string, opts: CliOptions): string {
     process.stderr.write('Processing markdown...\n')
-    let htmlFragment = processMarkdown(markdown, {
+    let fragment = processMarkdown(markdown, {
         highlight: opts.highlight,
         mermaid: opts.mermaid,
         yaml: opts.yaml
     })
 
-    // Process YAML blocks in the HTML
     if (opts.yaml) {
         process.stderr.write('Processing YAML blocks...\n')
-        htmlFragment = processYamlBlocksInHtml(htmlFragment)
+        fragment = processYamlBlocksInHtml(fragment)
     }
 
-    // Build full HTML document
-    const htmlDocument = buildHtmlDocument(htmlFragment)
+    fragment = sanitizeFragment(fragment)
 
-    // Generate PDF
+    const theme = opts.theme
+        ? { themeCss: getThemeCss(opts.theme) }
+        : undefined
+
+    return buildHtmlDocument(fragment, theme)
+}
+
+async function run(
+    input: string,
+    output: string | undefined,
+    opts: CliOptions
+): Promise<void> {
+    const { inputPath, inputDir, outputPath } = resolvePaths(input, output)
+    const timeout = parseInt(opts.timeout, 10) || 30000
+
+    process.stderr.write(`Converting: ${path.basename(inputPath)}\n`)
+
+    const markdown = fs.readFileSync(inputPath, 'utf-8')
+    const htmlDocument = markdownToHtml(markdown, opts)
+
     process.stderr.write('Generating PDF...\n')
     await generatePdf(htmlDocument, outputPath, inputDir, {
         pageSize: opts.pageSize,

@@ -38,4 +38,45 @@ describe('buildHtmlDocument', () => {
         const result = buildHtmlDocument('')
         expect(result).toContain('charset="UTF-8"')
     })
+
+    describe('with theme', () => {
+        const theme = { themeCss: '/* test-theme */ body { color: red; }' }
+
+        it('produces valid HTML5 document', () => {
+            const result = buildHtmlDocument('<p>Hello</p>', theme)
+            expect(result).toContain('<!DOCTYPE html>')
+            expect(result).toContain('<html lang="en">')
+            expect(result).toContain('</html>')
+        })
+
+        it('includes theme CSS', () => {
+            const result = buildHtmlDocument('<p>Test</p>', theme)
+            expect(result).toContain('/* test-theme */')
+        })
+
+        it('has 5 style tags (hljs + theme + essentials + components + overrides)', () => {
+            const result = buildHtmlDocument('<p>Test</p>', theme)
+            const styleCount = (result.match(/<style>/g) || []).length
+            expect(styleCount).toBe(5)
+        })
+
+        it('does not include full print CSS', () => {
+            const result = buildHtmlDocument('<p>Test</p>', theme)
+            // The default path includes the monospace font-family override
+            expect(result).not.toContain("font-family: 'Liberation Mono'")
+        })
+
+        it('includes themed overrides without visual styling', () => {
+            const result = buildHtmlDocument('<p>Test</p>', theme)
+            expect(result).toContain('max-width: none')
+            // Should not force background/color in themed mode
+            expect(result).not.toContain('background: white')
+        })
+
+        it('wraps content in markdown-body div', () => {
+            const result = buildHtmlDocument('<p>Content</p>', theme)
+            expect(result).toContain('<div class="markdown-body">')
+            expect(result).toContain('<p>Content</p>')
+        })
+    })
 })

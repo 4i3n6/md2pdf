@@ -27,6 +27,14 @@ import { encodeBase64Utf8 } from '@/utils/base64'
 import { normalizarLinguagemCodigo } from '@/services/documentLanguageService'
 import { logErro } from '@/utils/logger'
 import { registrarHooksSanitizacaoStyle } from './styleSanitizer'
+import {
+    getAlignAttribute,
+    inferAlignmentsFromRaw,
+    getCellAlignment,
+    abbreviateCryptoInContent,
+    abbreviateTokens,
+    findFencedCodeBlock
+} from '../shared/markdownHelpers'
 
 // Explicit registration to keep the highlight.js bundle lean.
 const highlightLanguages: Array<[string, LanguageFn]> = [
@@ -55,96 +63,7 @@ for (const [name, definition] of highlightLanguages) {
     hljs.registerLanguage(name, definition)
 }
 
-function getAlignAttribute(align?: string | null): string {
-    const value = (align || '').toLowerCase().trim()
-    if (value !== 'left' && value !== 'center' && value !== 'right') {
-        return ''
-    }
-    return ` align="${value}" style="text-align: ${value}"`
-}
-
-function inferAlignFromPattern(pattern: string): string | null {
-  const value = pattern.trim()
-  if (!value) return null
-
-  const hasLeadingColon = value.startsWith(':')
-  const hasTrailingColon = value.endsWith(':')
-
-  if (hasLeadingColon && hasTrailingColon) return 'center'
-  if (hasTrailingColon) return 'right'
-  if (hasLeadingColon) return 'left'
-  return null
-}
-
-function inferAlignmentsFromRaw(raw: string | undefined, columnCount: number): Array<string | null> {
-  if (!raw || columnCount <= 0) return []
-
-  const lines = raw.split('\n').map((line) => line.trim()).filter(Boolean)
-  if (lines.length < 2) return []
-
-  const separatorLine = lines[1] || ''
-  const parts = separatorLine
-    .split('|')
-    .map((part) => part.trim())
-    .filter((part) => part.length > 0)
-
-  const alignments = parts.map((part) => inferAlignFromPattern(part))
-  while (alignments.length < columnCount) {
-    alignments.push(null)
-  }
-  return alignments.slice(0, columnCount)
-}
-
-function getCellAlignment(
-  alignments: Array<string | null>,
-  fallbackAlignments: Array<string | null>,
-  idx: number,
-  cell: Tokens.TableCell
-): string | null {
-  const cellWithAlign = cell as Tokens.TableCell & { align?: string | null }
-  return alignments[idx] || cellWithAlign.align || fallbackAlignments[idx] || null
-}
-
-function escapeRegex(value: string): string {
-  return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
-}
-
-function abbreviateCryptoAddress(value: string): string {
-  if (value.length < 28) {
-    return value
-  }
-
-  const startLen = 10
-  const endLen = 8
-  return `${value.slice(0, startLen)}...${value.slice(-endLen)}`
-}
-
-function abbreviateCryptoInContent(content: string): string {
-  const evmAddressRegex = /\b0x[a-fA-F0-9]{24,}\b/g
-  const btcAddressRegex = /\b(?:bc1|[13])[a-zA-HJ-NP-Z0-9]{25,62}\b/g
-
-  return content
-    .replace(evmAddressRegex, abbreviateCryptoAddress)
-    .replace(btcAddressRegex, abbreviateCryptoAddress)
-}
-
-function findFencedCodeBlock(src: string, language: string): { raw: string, text: string } | null {
-  const escapedLanguage = escapeRegex(language)
-  const regex = new RegExp(
-    '^[ \\t]*(?:`{3,}|~{3,})[ \\t]*' + escapedLanguage + '\\b[^\\n]*\\n([\\s\\S]*?)\\n[ \\t]*(?:`{3,}|~{3,})[ \\t]*(?:\\n|$)',
-    'i'
-  )
-  const match = regex.exec(src)
-
-  if (!match || !match[1]) {
-    return null
-  }
-
-  return {
-    raw: match[0],
-    text: match[1].trim()
-  }
-}
+// Shared helper functions are imported from src/shared/markdownHelpers.ts
 
 /**
  * PrintRenderer - Custom renderer optimized for A4 print output.
@@ -155,35 +74,8 @@ function findFencedCodeBlock(src: string, language: string): { raw: string, text
  * A plain object literal does NOT work because this.parser would be undefined.
  */
 class PrintRenderer extends Renderer {
-  private abbreviateTokens(tokens: Array<unknown> = []): Array<unknown> {
-    return tokens.map((token) => {
-      if (!token || typeof token !== 'object') {
-        return token
-      }
-
-      const tokenObj = token as { type?: string; text?: string; tokens?: Array<unknown> }
-      const tokenType = tokenObj.type
-
-      if (tokenType === 'text' || tokenType === 'escape') {
-        return {
-          ...tokenObj,
-          text: abbreviateCryptoInContent(tokenObj.text || '')
-        }
-      }
-
-      if (!Array.isArray(tokenObj.tokens) || tokenObj.tokens.length === 0) {
-        return tokenObj
-      }
-
-      return {
-        ...tokenObj,
-        tokens: this.abbreviateTokens(tokenObj.tokens)
-      }
-    })
-  }
-
-  private renderTableCell(tokens: Array<unknown> = []): string {
-    const normalizedTokens = this.abbreviateTokens(tokens)
+  private renderCellContent(tokens: Array<unknown> = []): string {
+    const normalizedTokens = abbreviateTokens(tokens)
     const html = this.parser.parseInline(normalizedTokens as any[])
     return this.abbreviateCryptoInHtml(html)
   }
@@ -262,7 +154,7 @@ class PrintRenderer extends Renderer {
           const alignAttr = getAlignAttribute(
             getCellAlignment(alignments, fallbackAlignments, idx, cell)
           )
-          return `<th${alignAttr}>${this.renderTableCell(cell.tokens)}</th>`
+          return `<th${alignAttr}>${this.renderCellContent(cell.tokens)}</th>`
         })
         .join('')
       headerRow = `<thead><tr>${headerCells}</tr></thead>`
@@ -278,7 +170,7 @@ class PrintRenderer extends Renderer {
               const alignAttr = getAlignAttribute(
                 getCellAlignment(alignments, fallbackAlignments, idx, cell)
               )
-              return `<td${alignAttr}>${this.renderTableCell(cell.tokens)}</td>`
+              return `<td${alignAttr}>${this.renderCellContent(cell.tokens)}</td>`
             })
             .join('')
           return `<tr>${cells}</tr>`
@@ -444,7 +336,7 @@ marked.use({
         return src.match(/^[ \t]*(?:`{3,}|~{3,})[ \t]*ya?ml\b/i)?.index
       },
       tokenizer(src: string) {
-        const match = findFencedCodeBlock(src, 'ya?ml')
+        const match = findFencedCodeBlock(src, 'ya?ml', true)
         if (match) {
           return {
             type: 'yamlCodeBlock',

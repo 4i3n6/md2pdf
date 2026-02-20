@@ -1,0 +1,295 @@
+/**
+ * Component styles — Mermaid diagrams, YAML blocks, SQL code blocks.
+ * Extracted from styles-print.css for use alongside themes.
+ * Uses own class selectors (.mermaid-figure, .yaml-block, etc.) — no conflict with classless themes.
+ */
+
+/* ============================================================
+   MERMAID DIAGRAMS - Professional Documentation Style
+   ============================================================ */
+
+.markdown-body {
+    counter-reset: diagram-counter;
+}
+
+.mermaid {
+    display: block !important;
+    background: transparent !important;
+    border: none !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    page-break-inside: auto !important;
+    break-inside: auto !important;
+}
+
+.mermaid.mermaid-rendered {
+    display: block !important;
+    background: transparent !important;
+    border: none !important;
+    padding: 0 !important;
+    margin: 16pt 0 !important;
+    page-break-inside: auto !important;
+    break-inside: auto !important;
+    page-break-before: auto !important;
+    break-before: auto !important;
+    page-break-after: auto !important;
+    break-after: auto !important;
+}
+
+.mermaid-figure {
+    counter-increment: diagram-counter;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    page-break-inside: auto !important;
+    break-inside: auto !important;
+}
+
+.mermaid-figure::before {
+    content: attr(data-diagram-type);
+    display: inline-block !important;
+    font-size: 7pt !important;
+    font-weight: 600 !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.5pt !important;
+    color: #57606a !important;
+    background: #eef1f4 !important;
+    padding: 2pt 8pt !important;
+    border-radius: 2pt !important;
+    margin-bottom: 8pt !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+}
+
+.mermaid-figure .mermaid-diagram {
+    display: block !important;
+    background: #fafbfc !important;
+    border: 1pt solid #d0d7de !important;
+    border-radius: 4pt !important;
+    padding: 12pt !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+    page-break-inside: auto !important;
+    break-inside: auto !important;
+    max-height: none !important;
+}
+
+.mermaid-figure .mermaid-diagram svg {
+    display: block !important;
+    margin: 0 auto !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    height: auto !important;
+}
+
+.mermaid-figure .mermaid-caption {
+    display: block !important;
+    font-size: 8pt !important;
+    color: #57606a !important;
+    text-align: center !important;
+    margin-top: 8pt !important;
+    line-height: 1.4 !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+}
+
+.mermaid-figure .diagram-number::before {
+    content: "Diagrama " counter(diagram-counter) ": ";
+    font-weight: 700 !important;
+    font-style: normal !important;
+    color: #24292f !important;
+}
+
+.mermaid-figure .diagram-title {
+    font-style: italic !important;
+}
+
+/* ============================================================
+   LANDSCAPE MODE - For wide diagrams
+   ============================================================ */
+
+.mermaid.mermaid-landscape {
+    page-break-before: auto !important;
+    page-break-after: auto !important;
+    break-before: auto !important;
+    break-after: auto !important;
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+.mermaid-figure.mermaid-landscape {
+    page-break-before: auto !important;
+    page-break-after: auto !important;
+    page-break-inside: auto !important;
+    break-before: auto !important;
+    break-after: auto !important;
+    break-inside: auto !important;
+    justify-content: center !important;
+    align-items: center !important;
+    min-height: auto !important;
+    width: 100% !important;
+    overflow-x: auto !important;
+    overflow-y: visible !important;
+}
+
+.mermaid-figure.mermaid-landscape .mermaid-diagram {
+    transform: none !important;
+    transform-origin: center center !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    max-height: 190mm !important;
+}
+
+.mermaid-loading {
+    display: none !important;
+}
+
+.mermaid-error {
+    color: #ae0a04 !important;
+    font-size: 9pt !important;
+    text-align: left !important;
+    background: #fff5f5 !important;
+    border: 1pt solid #ae0a04 !important;
+    padding: 8pt !important;
+    border-radius: 3pt !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+}
+
+.mermaid-error pre {
+    background: #f5f5f5 !important;
+    border: 1pt solid #ccc !important;
+    padding: 6pt !important;
+    margin-top: 6pt !important;
+    font-size: 8pt !important;
+}
+
+/* ============================================================
+   YAML BLOCKS - Structured YAML content
+   ============================================================ */
+
+.yaml-block {
+    display: block !important;
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+    background: transparent !important;
+    border: none !important;
+    padding: 0 !important;
+    margin: 12pt 0 !important;
+    font-family: 'JetBrains Mono', 'Fira Code', monospace !important;
+    font-size: 9pt !important;
+    line-height: 1.5 !important;
+}
+
+.yaml-block::before {
+    display: none !important;
+}
+
+.yaml-content {
+    display: block !important;
+}
+
+.yaml-entry {
+    display: block !important;
+    padding-left: calc(var(--yaml-indent, 0) * 12pt) !important;
+    margin: 1pt 0 !important;
+}
+
+.yaml-key {
+    font-weight: 700 !important;
+    color: #24292f !important;
+}
+
+.yaml-value {
+    color: #57606a !important;
+    margin-left: 3pt !important;
+}
+
+.yaml-value.yaml-null {
+    color: #7c7c7c !important;
+    font-style: italic !important;
+}
+
+.yaml-value.yaml-boolean {
+    color: #0052cc !important;
+}
+
+.yaml-value.yaml-number {
+    color: #007328 !important;
+}
+
+.yaml-value.yaml-empty {
+    color: #7c7c7c !important;
+    font-style: italic !important;
+}
+
+.yaml-value.yaml-multiline {
+    color: #57606a !important;
+    display: block !important;
+    margin-left: 12pt !important;
+    white-space: pre-wrap !important;
+}
+
+.yaml-array-item {
+    display: block !important;
+    padding-left: calc(var(--yaml-indent, 0) * 12pt) !important;
+    margin: 1pt 0 !important;
+}
+
+.yaml-array-item::before {
+    content: "\2022  " !important;
+    color: #57606a !important;
+}
+
+.yaml-loading {
+    display: none !important;
+}
+
+.yaml-block.yaml-error-container {
+    background: #fff5f5 !important;
+    border-color: #ae0a04 !important;
+}
+
+.yaml-error {
+    color: #ae0a04 !important;
+    font-size: 8pt !important;
+    margin-bottom: 6pt !important;
+}
+
+.yaml-fallback-code {
+    background: #f5f5f5 !important;
+    border: 1pt solid #ccc !important;
+    padding: 6pt !important;
+    border-radius: 2pt !important;
+    font-size: 8pt !important;
+    white-space: pre-wrap !important;
+}
+
+/* ============================================================
+   SQL CODE BLOCKS
+   ============================================================ */
+
+pre:has(code.language-sql),
+pre:has(code.language-ddl) {
+    position: relative !important;
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+}
+
+pre:has(code.language-sql)::before,
+pre:has(code.language-ddl)::before {
+    content: 'SQL' !important;
+    position: absolute !important;
+    top: 4pt !important;
+    right: 4pt !important;
+    font-size: 6pt !important;
+    font-weight: 600 !important;
+    color: #666 !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.05em !important;
+    background: #f0f0f0 !important;
+    padding: 1pt 4pt !important;
+    border-radius: 2pt !important;
+}
