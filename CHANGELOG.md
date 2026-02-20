@@ -7,6 +7,19 @@ New releases are prepended automatically by [release-please](https://github.com/
 
 ---
 
+## [2.1.0](https://github.com/4i3n6/md2pdf/compare/md2pdf-v2.0.0...md2pdf-v2.1.0) (2026-02-20)
+
+
+### ### Added
+
+* add open source highlight section with terminal and GitHub CTA to landing page ([f8ff2f4](https://github.com/4i3n6/md2pdf/commit/f8ff2f40a40358a9c0e41f79895ac9b8e2d95e30))
+
+
+### ### Documentation
+
+* credit OpenCode in tech stack and acknowledgments ([5e204be](https://github.com/4i3n6/md2pdf/commit/5e204befa26e4a58f997c5226f983f9d4966badd))
+* reframe README around LLM-to-PDF concept and add GitHub links to site nav and footer ([023a860](https://github.com/4i3n6/md2pdf/commit/023a8601c6375842229caf036cb83967b01b0d4f))
+
 ## [2.0.0](https://github.com/4i3n6/md2pdf/compare/md2pdf-v1.1.70...md2pdf-v2.0.0) (2026-02-20)
 
 
