@@ -28,8 +28,8 @@ import { normalizarLinguagemCodigo } from '@/services/documentLanguageService'
 import { logErro } from '@/utils/logger'
 import { registrarHooksSanitizacaoStyle } from './styleSanitizer'
 
-// Registro explicito para manter o bundle de highlight.js enxuto.
-const linguagensHighlight: Array<[string, LanguageFn]> = [
+// Explicit registration to keep the highlight.js bundle lean.
+const highlightLanguages: Array<[string, LanguageFn]> = [
     ['bash', bash],
     ['c', c],
     ['cpp', cpp],
@@ -51,87 +51,87 @@ const linguagensHighlight: Array<[string, LanguageFn]> = [
     ['xml', xml]
 ]
 
-for (const [nome, definicao] of linguagensHighlight) {
-    hljs.registerLanguage(nome, definicao)
+for (const [name, definition] of highlightLanguages) {
+    hljs.registerLanguage(name, definition)
 }
 
-function obterAtributoAlinhamento(align?: string | null): string {
-    const valor = (align || '').toLowerCase().trim()
-    if (valor !== 'left' && valor !== 'center' && valor !== 'right') {
+function getAlignAttribute(align?: string | null): string {
+    const value = (align || '').toLowerCase().trim()
+    if (value !== 'left' && value !== 'center' && value !== 'right') {
         return ''
     }
-    return ` align="${valor}" style="text-align: ${valor}"`
+    return ` align="${value}" style="text-align: ${value}"`
 }
 
-function inferirAlinhamentoPorPadrao(padrao: string): string | null {
-  const valor = padrao.trim()
-  if (!valor) return null
+function inferAlignFromPattern(pattern: string): string | null {
+  const value = pattern.trim()
+  if (!value) return null
 
-  const temDoisPontosInicio = valor.startsWith(':')
-  const temDoisPontosFim = valor.endsWith(':')
+  const hasLeadingColon = value.startsWith(':')
+  const hasTrailingColon = value.endsWith(':')
 
-  if (temDoisPontosInicio && temDoisPontosFim) return 'center'
-  if (temDoisPontosFim) return 'right'
-  if (temDoisPontosInicio) return 'left'
+  if (hasLeadingColon && hasTrailingColon) return 'center'
+  if (hasTrailingColon) return 'right'
+  if (hasLeadingColon) return 'left'
   return null
 }
 
-function inferirAlinhamentosPorRaw(raw: string | undefined, quantidadeColunas: number): Array<string | null> {
-  if (!raw || quantidadeColunas <= 0) return []
+function inferAlignmentsFromRaw(raw: string | undefined, columnCount: number): Array<string | null> {
+  if (!raw || columnCount <= 0) return []
 
-  const linhas = raw.split('\n').map((linha) => linha.trim()).filter(Boolean)
-  if (linhas.length < 2) return []
+  const lines = raw.split('\n').map((line) => line.trim()).filter(Boolean)
+  if (lines.length < 2) return []
 
-  const linhaSeparadora = linhas[1] || ''
-  const partes = linhaSeparadora
+  const separatorLine = lines[1] || ''
+  const parts = separatorLine
     .split('|')
-    .map((parte) => parte.trim())
-    .filter((parte) => parte.length > 0)
+    .map((part) => part.trim())
+    .filter((part) => part.length > 0)
 
-  const alinhamentos = partes.map((parte) => inferirAlinhamentoPorPadrao(parte))
-  while (alinhamentos.length < quantidadeColunas) {
-    alinhamentos.push(null)
+  const alignments = parts.map((part) => inferAlignFromPattern(part))
+  while (alignments.length < columnCount) {
+    alignments.push(null)
   }
-  return alinhamentos.slice(0, quantidadeColunas)
+  return alignments.slice(0, columnCount)
 }
 
-function obterAlinhamentoCelula(
-  alinhamentos: Array<string | null>,
-  alinhamentosFallback: Array<string | null>,
+function getCellAlignment(
+  alignments: Array<string | null>,
+  fallbackAlignments: Array<string | null>,
   idx: number,
   cell: Tokens.TableCell
 ): string | null {
-  const cellComAlinhamento = cell as Tokens.TableCell & { align?: string | null }
-  return alinhamentos[idx] || cellComAlinhamento.align || alinhamentosFallback[idx] || null
+  const cellWithAlign = cell as Tokens.TableCell & { align?: string | null }
+  return alignments[idx] || cellWithAlign.align || fallbackAlignments[idx] || null
 }
 
-function escaparRegex(valor: string): string {
-  return valor.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+function escapeRegex(value: string): string {
+  return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
 }
 
-function abreviarEnderecoCriptografico(valor: string): string {
-  if (valor.length < 28) {
-    return valor
+function abbreviateCryptoAddress(value: string): string {
+  if (value.length < 28) {
+    return value
   }
 
-  const tamanhoInicio = 10
-  const tamanhoFim = 8
-  return `${valor.slice(0, tamanhoInicio)}...${valor.slice(-tamanhoFim)}`
+  const startLen = 10
+  const endLen = 8
+  return `${value.slice(0, startLen)}...${value.slice(-endLen)}`
 }
 
-function abreviarTextoCriptoNoConteudo(conteudo: string): string {
-  const regexEnderecoEvm = /\b0x[a-fA-F0-9]{24,}\b/g
-  const regexEnderecoBtc = /\b(?:bc1|[13])[a-zA-HJ-NP-Z0-9]{25,62}\b/g
+function abbreviateCryptoInContent(content: string): string {
+  const evmAddressRegex = /\b0x[a-fA-F0-9]{24,}\b/g
+  const btcAddressRegex = /\b(?:bc1|[13])[a-zA-HJ-NP-Z0-9]{25,62}\b/g
 
-  return conteudo
-    .replace(regexEnderecoEvm, abreviarEnderecoCriptografico)
-    .replace(regexEnderecoBtc, abreviarEnderecoCriptografico)
+  return content
+    .replace(evmAddressRegex, abbreviateCryptoAddress)
+    .replace(btcAddressRegex, abbreviateCryptoAddress)
 }
 
-function encontrarBlocoCodigoFenced(src: string, linguagem: string): { raw: string, text: string } | null {
-  const linguagemEscapada = escaparRegex(linguagem)
+function findFencedCodeBlock(src: string, language: string): { raw: string, text: string } | null {
+  const escapedLanguage = escapeRegex(language)
   const regex = new RegExp(
-    '^[ \\t]*(?:`{3,}|~{3,})[ \\t]*' + linguagemEscapada + '\\b[^\\n]*\\n([\\s\\S]*?)\\n[ \\t]*(?:`{3,}|~{3,})[ \\t]*(?:\\n|$)',
+    '^[ \\t]*(?:`{3,}|~{3,})[ \\t]*' + escapedLanguage + '\\b[^\\n]*\\n([\\s\\S]*?)\\n[ \\t]*(?:`{3,}|~{3,})[ \\t]*(?:\\n|$)',
     'i'
   )
   const match = regex.exec(src)
@@ -147,27 +147,27 @@ function encontrarBlocoCodigoFenced(src: string, linguagem: string): { raw: stri
 }
 
 /**
- * PrintRenderer - Renderer customizado otimizado para impressão em A4
- * 
- * IMPORTANTE: Estende a classe Renderer do marked para ter acesso a this.parser
- * que é necessário para processar tokens inline (**bold**, *italic*, etc.)
- * 
- * Usar objeto literal NÃO funciona porque this.parser seria undefined.
+ * PrintRenderer - Custom renderer optimized for A4 print output.
+ *
+ * IMPORTANT: Extends the marked Renderer class to have access to this.parser,
+ * which is required to process inline tokens (**bold**, *italic*, etc.).
+ *
+ * A plain object literal does NOT work because this.parser would be undefined.
  */
 class PrintRenderer extends Renderer {
-  private mapearTokensComAbreviacao(tokens: Array<unknown> = []): Array<unknown> {
+  private abbreviateTokens(tokens: Array<unknown> = []): Array<unknown> {
     return tokens.map((token) => {
       if (!token || typeof token !== 'object') {
         return token
       }
 
       const tokenObj = token as { type?: string; text?: string; tokens?: Array<unknown> }
-      const tokenTipo = tokenObj.type
+      const tokenType = tokenObj.type
 
-      if (tokenTipo === 'text' || tokenTipo === 'escape') {
+      if (tokenType === 'text' || tokenType === 'escape') {
         return {
           ...tokenObj,
-          text: abreviarTextoCriptoNoConteudo(tokenObj.text || '')
+          text: abbreviateCryptoInContent(tokenObj.text || '')
         }
       }
 
@@ -177,51 +177,48 @@ class PrintRenderer extends Renderer {
 
       return {
         ...tokenObj,
-        tokens: this.mapearTokensComAbreviacao(tokenObj.tokens)
+        tokens: this.abbreviateTokens(tokenObj.tokens)
       }
     })
   }
 
-  private renderizarCelulaTabelaComAbreviacao(tokens: Array<unknown> = []): string {
-    const tokensNormalizados = this.mapearTokensComAbreviacao(tokens)
-    const html = this.parser.parseInline(tokensNormalizados as any[])
-    return this.truncarTextoCriptoEmHtml(html)
+  private renderTableCell(tokens: Array<unknown> = []): string {
+    const normalizedTokens = this.abbreviateTokens(tokens)
+    const html = this.parser.parseInline(normalizedTokens as any[])
+    return this.abbreviateCryptoInHtml(html)
   }
 
-  private truncarTextoCriptoEmHtml(html: string): string {
+  private abbreviateCryptoInHtml(html: string): string {
     if (typeof document === 'undefined') {
-      return abreviarTextoCriptoNoConteudo(html)
+      return abbreviateCryptoInContent(html)
     }
 
     const template = document.createElement('template')
     template.innerHTML = html
 
-    const processarTextoEmNos = (nodo: ChildNode): void => {
-      if (nodo.nodeType === Node.TEXT_NODE) {
-        const texto = nodo.textContent || ''
-        nodo.textContent = abreviarTextoCriptoNoConteudo(texto)
+    const processTextNodes = (node: ChildNode): void => {
+      if (node.nodeType === Node.TEXT_NODE) {
+        const text = node.textContent || ''
+        node.textContent = abbreviateCryptoInContent(text)
         return
       }
 
-      if (nodo.nodeType !== Node.ELEMENT_NODE) {
+      if (node.nodeType !== Node.ELEMENT_NODE) {
         return
       }
 
-      const elemento = nodo as Element
-      if (elemento.tagName === 'SCRIPT' || elemento.tagName === 'STYLE') {
+      const element = node as Element
+      if (element.tagName === 'SCRIPT' || element.tagName === 'STYLE') {
         return
       }
 
-      Array.from(elemento.childNodes).forEach((filho) => processarTextoEmNos(filho))
+      Array.from(element.childNodes).forEach((child) => processTextNodes(child))
     }
 
-    Array.from(template.content.childNodes).forEach((nodo) => processarTextoEmNos(nodo))
+    Array.from(template.content.childNodes).forEach((node) => processTextNodes(node))
     return template.innerHTML
   }
 
-  /**
-   * Renderiza headings (h1-h6) com ID para navegação e classes para styling
-   */
   override heading(token: Tokens.Heading): string {
     const level = token.depth
     const id = token.text
@@ -229,23 +226,16 @@ class PrintRenderer extends Renderer {
       .replace(/\s+/g, '-')
       .replace(/[^\w-]/g, '')
     
-    // this.parser.parseInline processa **bold**, *italic*, etc. dentro do heading
     const content = this.parser.parseInline(token.tokens)
     
     return `<h${level} id="${id}" class="markdown-heading markdown-h${level}">${content}</h${level}>\n`
   }
 
-  /**
-   * Renderiza parágrafos com suporte a formatação inline
-   */
   override paragraph(token: Tokens.Paragraph): string {
     const content = this.parser.parseInline(token.tokens)
     return `<p class="markdown-paragraph">${content}</p>\n`
   }
 
-  /**
-   * Renderiza imagens com figure/figcaption para melhor semântica
-   */
   override image(token: Tokens.Image): string {
     return `<figure class="markdown-image" style="page-break-inside: avoid;">
       <img src="${token.href}" 
@@ -257,25 +247,22 @@ class PrintRenderer extends Renderer {
     </figure>\n`
   }
 
-  /**
-   * Renderiza tabelas com suporte a header e body
-   */
   override table(token: Tokens.Table): string {
-    const tokenComAlinhamento = token as Tokens.Table & { align?: Array<string | null> }
-    const alinhamentos = Array.isArray(tokenComAlinhamento.align)
-      ? tokenComAlinhamento.align
+    const tokenWithAlign = token as Tokens.Table & { align?: Array<string | null> }
+    const alignments = Array.isArray(tokenWithAlign.align)
+      ? tokenWithAlign.align
       : []
-    const alinhamentosFallback = inferirAlinhamentosPorRaw(token.raw, token.header?.length || 0)
+    const fallbackAlignments = inferAlignmentsFromRaw(token.raw, token.header?.length || 0)
 
     // Header row
     let headerRow = ''
     if (token.header && token.header.length > 0) {
       const headerCells = token.header
         .map((cell: Tokens.TableCell, idx: number) => {
-          const alignAttr = obterAtributoAlinhamento(
-            obterAlinhamentoCelula(alinhamentos, alinhamentosFallback, idx, cell)
+          const alignAttr = getAlignAttribute(
+            getCellAlignment(alignments, fallbackAlignments, idx, cell)
           )
-          return `<th${alignAttr}>${this.renderizarCelulaTabelaComAbreviacao(cell.tokens)}</th>`
+          return `<th${alignAttr}>${this.renderTableCell(cell.tokens)}</th>`
         })
         .join('')
       headerRow = `<thead><tr>${headerCells}</tr></thead>`
@@ -288,10 +275,10 @@ class PrintRenderer extends Renderer {
         .map((row: Tokens.TableCell[]) => {
           const cells = row
             .map((cell: Tokens.TableCell, idx: number) => {
-              const alignAttr = obterAtributoAlinhamento(
-                obterAlinhamentoCelula(alinhamentos, alinhamentosFallback, idx, cell)
+              const alignAttr = getAlignAttribute(
+                getCellAlignment(alignments, fallbackAlignments, idx, cell)
               )
-              return `<td${alignAttr}>${this.renderizarCelulaTabelaComAbreviacao(cell.tokens)}</td>`
+              return `<td${alignAttr}>${this.renderTableCell(cell.tokens)}</td>`
             })
             .join('')
           return `<tr>${cells}</tr>`
@@ -308,25 +295,19 @@ class PrintRenderer extends Renderer {
     </figure>\n`
   }
 
-  /**
-   * Renderiza código inline com sanitização
-   */
   override codespan(token: Tokens.Codespan): string {
-    const sanitized = abreviarTextoCriptoNoConteudo(DOMPurify.sanitize(token.text))
+    const sanitized = abbreviateCryptoInContent(DOMPurify.sanitize(token.text))
     return `<code class="markdown-code-inline">${sanitized}</code>`
   }
 
-  /**
-   * Renderiza blocos de código com syntax highlighting
-   */
   override code(token: Tokens.Code): string {
-    const linguagemBruta = typeof token.lang === 'string' ? token.lang.trim() : ''
-    const lang = normalizarLinguagemCodigo(linguagemBruta)
-    const temLinguagem = linguagemBruta.length > 0
+    const rawLanguage = typeof token.lang === 'string' ? token.lang.trim() : ''
+    const lang = normalizarLinguagemCodigo(rawLanguage)
+    const hasLanguage = rawLanguage.length > 0
     let highlightedCode = token.text
 
     try {
-      if (lang === 'plaintext' && temLinguagem) {
+      if (lang === 'plaintext' && hasLanguage) {
         highlightedCode = DOMPurify.sanitize(token.text)
       } else if (lang !== 'plaintext' && hljs.getLanguage(lang)) {
         const highlighted = hljs.highlight(token.text, { language: lang, ignoreIllegals: true })
@@ -351,116 +332,74 @@ class PrintRenderer extends Renderer {
     return `<pre class="markdown-code-block hljs" data-lang="${lang}"><code class="language-${lang}">${sanitized}</code></pre>\n`
   }
 
-  /**
-   * Renderiza blockquotes com suporte a conteúdo aninhado
-   */
   override blockquote(token: Tokens.Blockquote): string {
-    // Blockquote pode conter parágrafos, listas, etc. - usar parse() para blocos
     const content = this.parser.parse(token.tokens)
     return `<blockquote class="markdown-blockquote" style="page-break-inside: avoid;">
       ${content}
     </blockquote>\n`
   }
 
-  /**
-   * Renderiza links com suporte a formatação no texto do link
-   */
   override link(token: Tokens.Link): string {
-    const conteudoLink = token.tokens && token.tokens.length > 0
+    const rawContent = token.tokens && token.tokens.length > 0
       ? this.parser.parseInline(token.tokens)
       : token.text || ''
-    const content = abreviarTextoCriptoNoConteudo(conteudoLink)
+    const content = abbreviateCryptoInContent(rawContent)
     return `<a href="${token.href}" title="${token.title || ''}" class="markdown-link">${content}</a>`
   }
 
-  /**
-   * Renderiza listas (ordenadas e não-ordenadas)
-   */
   override list(token: Tokens.List): string {
     const tag = token.ordered ? 'ol' : 'ul'
     const className = token.ordered ? 'markdown-list-ordered' : 'markdown-list-unordered'
-    
+
     const items = token.items
       .map((item: Tokens.ListItem) => {
-        // List items podem conter parágrafos, sublistas, etc. - usar parse() para blocos
         const itemContent = this.parser.parse(item.tokens)
-        
-        // Suporte a task lists (checkboxes)
         if (item.task) {
           const checked = item.checked ? 'checked' : ''
           return `<li><input type="checkbox" ${checked} disabled> ${itemContent}</li>`
         }
-        
         return `<li>${itemContent}</li>`
       })
       .join('')
-    
+
     return `<${tag} class="${className}">${items}</${tag}>`
   }
 
-  /**
-   * Renderiza linha horizontal (visual apenas, não quebra página)
-   * Para quebra de página usar <!-- pagebreak -->
-   */
   override hr(): string {
     return `<hr class="markdown-hr">\n`
   }
 
-  /**
-   * Renderiza quebra de linha
-   */
   override br(): string {
     return '<br>\n'
   }
 
-  /**
-   * Renderiza texto simples
-   */
   override text(token: Tokens.Text | Tokens.Escape): string {
-    // Text tokens podem ter tokens internos (raro, mas possível)
     if ('tokens' in token && token.tokens && token.tokens.length > 0) {
       return this.parser.parseInline(token.tokens)
     }
-    return abreviarTextoCriptoNoConteudo(token.text)
+    return abbreviateCryptoInContent(token.text)
   }
 
-  /**
-   * Renderiza texto em negrito
-   */
   override strong(token: Tokens.Strong): string {
     const content = this.parser.parseInline(token.tokens)
     return `<strong>${content}</strong>`
   }
 
-  /**
-   * Renderiza texto em itálico
-   */
   override em(token: Tokens.Em): string {
     const content = this.parser.parseInline(token.tokens)
     return `<em>${content}</em>`
   }
 
-  /**
-   * Renderiza texto riscado (strikethrough - GFM)
-   */
   override del(token: Tokens.Del): string {
     const content = this.parser.parseInline(token.tokens)
     return `<del>${content}</del>`
   }
 
-  /**
-   * Renderiza HTML inline (passthrough seguro)
-   */
   override html(token: Tokens.HTML | Tokens.Tag): string {
-    // Sanitizar HTML inline para segurança
     return DOMPurify.sanitize(token.text)
   }
 }
 
-/**
- * Configuração do marked para GitHub Flavored Markdown
- * Otimizado para renderização profissional e print
- */
 marked.setOptions({
   gfm: true,
   breaks: true,
@@ -468,19 +407,10 @@ marked.setOptions({
   async: false
 })
 
-// Usar instância da classe PrintRenderer
-// A classe estende Renderer e tem acesso a this.parser para processar tokens inline
 marked.use({ renderer: new PrintRenderer() })
 
-/**
- * Extensões para interceptar blocos de código especiais (Mermaid, YAML)
- * 
- * NOTA: No marked v17, precisamos de extensões separadas para interceptar 
- * code blocks antes do renderer padrão processar.
- */
 marked.use({
   extensions: [
-    // Extensão Mermaid
     {
       name: 'mermaidCodeBlock',
       level: 'block',
@@ -488,7 +418,7 @@ marked.use({
         return src.match(/^[ \t]*(?:`{3,}|~{3,})[ \t]*mermaid\b/i)?.index
       },
       tokenizer(src: string) {
-        const match = encontrarBlocoCodigoFenced(src, 'mermaid')
+        const match = findFencedCodeBlock(src, 'mermaid')
         if (match) {
           return {
             type: 'mermaidCodeBlock',
@@ -507,7 +437,6 @@ marked.use({
         </div>\n`
       }
     },
-    // Extensão YAML
     {
       name: 'yamlCodeBlock',
       level: 'block',
@@ -515,7 +444,7 @@ marked.use({
         return src.match(/^[ \t]*(?:`{3,}|~{3,})[ \t]*ya?ml\b/i)?.index
       },
       tokenizer(src: string) {
-        const match = encontrarBlocoCodigoFenced(src, 'ya?ml')
+        const match = findFencedCodeBlock(src, 'ya?ml')
         if (match) {
           return {
             type: 'yamlCodeBlock',
@@ -540,20 +469,10 @@ marked.use({
 
 
 /**
- * Configuração segura do DOMPurify para sanitização de HTML
- * 
- * NÃO permite:
- * - Event handlers (onerror, onclick, etc) - XSS risk
- * - Data attributes customizadas - information leak
- * - Inline styles perigosos - CSS injection
- * 
- * PERMITE:
- * - Structural tags (h1-h6, p, div, etc)
- * - Links (a, href)
- * - Imagens (img, src, alt, loading)
- * - Tabelas estruturadas
- * - Code highlighting (class para highlight.js)
- * - Semantic markup (role, aria-label)
+ * DOMPurify allowlist configuration for sanitizing HTML.
+ *
+ * Blocked: event handlers (XSS), custom data attributes, unsafe inline styles.
+ * Allowed: structural tags, links, images, tables, code highlighting, semantic markup.
  */
 const DOMPURIFY_CONFIG = {
   ALLOWED_TAGS: [
@@ -602,31 +521,12 @@ const DOMPURIFY_CONFIG = {
   FORCE_BODY: false
 } as const
 
-/**
- * Processa markdown para HTML seguro e otimizado para print
- * 
- * Converte markdown para HTML com:
- * - GitHub Flavored Markdown (GFM)
- * - Sanitização via DOMPurify
- * - Otimizações para impressão A4
- * - Syntax highlighting para code blocks
- * 
- * @param {string} markdown - Conteúdo markdown a processar
- * @returns {string} HTML sanitizado e pronto para renderização
- * @throws Retorna HTML com mensagem de erro se processamento falhar
- * 
- * @example
- *   const html = processMarkdown('# Título\n\nParágrafo')
- *   // Retorna: '<h1>Título</h1>\n<p>Parágrafo</p>'
- */
 export function processMarkdown(markdown: string): string {
   try {
     if (!markdown || typeof markdown !== 'string') {
-      return '' // Conteúdo vazio não é erro
+      return ''
     }
 
-    // Preprocessar: converter <!-- pagebreak --> para marcador HTML
-    // Isso é feito ANTES do marked para preservar o comentário HTML
     const preprocessed = markdown.replace(
       /<!--\s*pagebreak\s*-->/gi,
       '\n<div class="page-break" aria-hidden="true"></div>\n'
@@ -638,26 +538,12 @@ export function processMarkdown(markdown: string): string {
 
     return clean
   } catch (e) {
-    const errorMsg = e instanceof Error ? e.message : 'Erro desconhecido'
-    logErro(`Erro ao processar markdown: ${errorMsg}`)
-    return `<p class="error">Erro ao processar markdown: ${DOMPurify.sanitize(errorMsg)}</p>`
+    const errorMsg = e instanceof Error ? e.message : 'Unknown error'
+    logErro(`Failed to process markdown: ${errorMsg}`)
+    return `<p class="error">Failed to process markdown: ${DOMPurify.sanitize(errorMsg)}</p>`
   }
 }
 
-/**
- * Valida markdown antes de processar
- * 
- * Detecta potenciais problemas:
- * - Tags perigosas (script, iframe, etc)
- * - URLs muito longas que podem transbordar em impressão
- * 
- * @param {string} markdown - Conteúdo markdown a validar
- * @returns {object} Objeto com isValid e array de warnings
- * 
- * @example
- *   const result = validateMarkdown('<script>alert(1)</script>')
- *   // Retorna: { isValid: false, warnings: ['Conteúdo contém tags potencialmente perigosas...'] }
- */
 export function validateMarkdown(markdown: string): { isValid: boolean; warnings: string[] } {
   const warnings: string[] = []
 
@@ -676,37 +562,14 @@ export function validateMarkdown(markdown: string): { isValid: boolean; warnings
   }
 }
 
-/**
- * Estima número de páginas A4 baseado no conteúdo
- * 
- * Fórmula: 
- * - A4 tem ~90 caracteres de largura (210mm - 20mm margens)
- * - A4 tem ~50 linhas de altura (297mm - 20mm margens)
- * - Portanto: ~3500 caracteres por página
- * 
- * @param {string} html - Conteúdo HTML renderizado
- * @returns {number} Número estimado de páginas A4 (mínimo 1)
- * 
- * @example
- *   estimatePageCount('<p>Hello</p>') // 1
- *   estimatePageCount('<p>'.repeat(500) + '</p>'.repeat(500)) // ~3
- */
 export function estimatePageCount(html: string): number {
   const wordsPerLine = 12
-  const charsPerPage = 45 * wordsPerLine * 5 // ~2700 caracteres (conservative)
+  // ~2700 chars per page: 45 lines × 12 words × 5 chars avg (conservative A4 estimate)
+  const charsPerPage = 45 * wordsPerLine * 5
   const totalChars = html.length
   return Math.ceil(totalChars / charsPerPage) || 1
 }
 
-/**
- * Integração com processador de imagens para redimensionar imagens em HTML
- * 
- * Carrega processador de imagens dinamicamente e aplica dimensões A4-otimizadas.
- * 
- * @param {HTMLElement | null} container - Elemento contendo imagens a processar
- * @param {boolean} useCache - Se deve usar cache de dimensões (padrão: true)
- * @returns {Promise<number>} Número de imagens processadas com sucesso
- */
 export async function processImagesInPreview(container: HTMLElement | null, useCache: boolean = true): Promise<number> {
   if (!container) return 0
 
@@ -715,7 +578,7 @@ export async function processImagesInPreview(container: HTMLElement | null, useC
     return await processImagesForPrint(container, useCache)
   } catch (e) {
     const errorMsg = e instanceof Error ? e.message : String(e)
-    logErro(`Erro ao processar imagens para print: ${errorMsg}`)
+    logErro(`Failed to process images for print: ${errorMsg}`)
     return 0
   }
 }

@@ -1,17 +1,9 @@
-/**
- * RELATÓRIO DE IMPRESSÃO AVANÇADO - MD2PDF
- * Gera relatórios detalhados e estatísticas do documento
- */
-
 import { PrintLimits } from '@/constants'
 import { logInfo } from '@/utils/logger'
 
-const formatoA4 = `${PrintLimits.a4WidthMm}mm × ${PrintLimits.a4HeightMm}mm`
-const margemA4 = `${PrintLimits.marginMm}mm`
+const a4Format = `${PrintLimits.a4WidthMm}mm × ${PrintLimits.a4HeightMm}mm`
+const a4Margin = `${PrintLimits.marginMm}mm`
 
-/**
- * Interface para contagem de headings por nível
- */
 export interface HeadingsCount {
   h1: number;
   h2: number;
@@ -21,35 +13,23 @@ export interface HeadingsCount {
   h6: number;
 }
 
-/**
- * Interface para estatísticas de listas
- */
 export interface ListStats {
   unordered: number;
   ordered: number;
   items: number;
 }
 
-/**
- * Interface para estatísticas de tabelas
- */
 export interface TableStats {
   count: number;
   rows: number;
   cells: number;
 }
 
-/**
- * Interface para estatísticas de código
- */
 export interface CodeStats {
   blocks: number;
   inline: number;
 }
 
-/**
- * Interface para estatísticas completas do documento
- */
 export interface DocumentStats {
   text: string;
   words: number;
@@ -69,9 +49,6 @@ export interface DocumentStats {
   estimatedPages: number;
 }
 
-/**
- * Interface para relatório em JSON
- */
 export interface JsonReport {
   document: {
     name: string;
@@ -101,18 +78,12 @@ export interface JsonReport {
   };
 }
 
-/**
- * Interface para checklist de impressão
- */
 export interface PrintChecklist {
   checks: string[];
   warnings: string[];
   ready: boolean;
 }
 
-/**
- * Classe para gerar relatórios de impressão
- */
 export class PrintReporter {
   private html: string;
   private docName: string;
@@ -124,9 +95,6 @@ export class PrintReporter {
     this.timestamp = new Date();
   }
 
-  /**
-   * Analisar conteúdo e gerar estatísticas detalhadas
-   */
   analyze(): DocumentStats {
     const tempDiv = document.createElement('div');
     tempDiv.innerHTML = this.html;
@@ -136,12 +104,9 @@ export class PrintReporter {
     const imageCount = tempDiv.querySelectorAll('img').length;
 
     const stats: DocumentStats = {
-      // Texto
       text: textContent,
       words: wordArray.length,
       characters: textContent.length,
-
-      // Estrutura
       headings: {
         h1: tempDiv.querySelectorAll('h1').length,
         h2: tempDiv.querySelectorAll('h2').length,
@@ -151,31 +116,19 @@ export class PrintReporter {
         h6: tempDiv.querySelectorAll('h6').length,
       },
       paragraphs: tempDiv.querySelectorAll('p').length,
-
-      // Listas
       lists: {
         unordered: tempDiv.querySelectorAll('ul').length,
         ordered: tempDiv.querySelectorAll('ol').length,
         items: tempDiv.querySelectorAll('li').length,
       },
-
-      // Mídia
       images: imageCount,
       links: tempDiv.querySelectorAll('a').length,
-
-      // Tabelas
       tables: tempDiv.querySelectorAll('table').length,
       tableRows: tempDiv.querySelectorAll('tr').length,
       tableCells: tempDiv.querySelectorAll('th, td').length,
-
-      // Código
       codeBlocks: tempDiv.querySelectorAll('pre').length,
       codeInline: tempDiv.querySelectorAll('code').length,
-
-      // Blockquotes
       blockquotes: tempDiv.querySelectorAll('blockquote').length,
-
-      // Computados
       readingTime: Math.ceil(wordArray.length / 200),
       estimatedPages: Math.ceil((textContent.length / 3500) + (imageCount * 0.5)),
     };
@@ -183,69 +136,63 @@ export class PrintReporter {
     return stats;
   }
 
-  /**
-   * Gerar relatório em formato texto estruturado
-   */
   generateTextReport(): string {
     const stats = this.analyze();
-    const now = new Date().toLocaleString('pt-BR');
+    const now = new Date().toLocaleString('en-US');
 
     return `
 ╔════════════════════════════════════════════════════════════════╗
-║                    RELATÓRIO DE IMPRESSÃO                      ║
+║                      PRINT REPORT                              ║
 ╚════════════════════════════════════════════════════════════════╝
 
-📄 DOCUMENTO
-  Nome:                    ${this.docName}
-  Data/Hora:               ${now}
-  Tamanho Total:           ${(this.html.length / 1024).toFixed(2)} KB
+DOCUMENT
+  Name:                    ${this.docName}
+  Date/Time:               ${now}
+  Total Size:              ${(this.html.length / 1024).toFixed(2)} KB
 
-📊 CONTEÚDO
-  Palavras:                ${stats.words}
-  Caracteres:              ${stats.characters}
-  Parágrafos:              ${stats.paragraphs}
-  Tempo de Leitura:        ~${stats.readingTime} minutos
+CONTENT
+  Words:                   ${stats.words}
+  Characters:              ${stats.characters}
+  Paragraphs:              ${stats.paragraphs}
+  Reading Time:            ~${stats.readingTime} min
 
-🏗️  ESTRUTURA
+STRUCTURE
   Headings H1:             ${stats.headings.h1}
   Headings H2:             ${stats.headings.h2}
   Headings H3:             ${stats.headings.h3}
-  Total de Headings:       ${Object.values(stats.headings).reduce((a: number, b: number) => a + b, 0)}
+  Total Headings:          ${Object.values(stats.headings).reduce((a: number, b: number) => a + b, 0)}
 
-📋 LISTAS
-  Listas Não-Ordenadas:    ${stats.lists.unordered}
-  Listas Ordenadas:        ${stats.lists.ordered}
-  Total de Itens:          ${stats.lists.items}
+LISTS
+  Unordered Lists:         ${stats.lists.unordered}
+  Ordered Lists:           ${stats.lists.ordered}
+  Total Items:             ${stats.lists.items}
 
-🖼️  MÍDIA & LINKS
-  Imagens:                 ${stats.images}
+MEDIA & LINKS
+  Images:                  ${stats.images}
   Links:                   ${stats.links}
 
-📊 TABELAS
-  Tabelas:                 ${stats.tables}
-  Linhas:                  ${stats.tableRows}
-  Células:                 ${stats.tableCells}
+TABLES
+  Tables:                  ${stats.tables}
+  Rows:                    ${stats.tableRows}
+  Cells:                   ${stats.tableCells}
 
-💻 CÓDIGO
-  Blocos de Código:        ${stats.codeBlocks}
-  Código Inline:           ${stats.codeInline}
+CODE
+  Code Blocks:             ${stats.codeBlocks}
+  Inline Code:             ${stats.codeInline}
 
-💬 CITAÇÕES
+BLOCKQUOTES
   Blockquotes:             ${stats.blockquotes}
 
-📄 IMPRESSÃO
-  Páginas Estimadas:       ${stats.estimatedPages}
-  Tempo de Leitura:        ~${stats.readingTime} min
-  Formato:                 A4 (${formatoA4})
-  Margens:                 ${margemA4}
+PRINT
+  Estimated Pages:         ${stats.estimatedPages}
+  Reading Time:            ~${stats.readingTime} min
+  Format:                  A4 (${a4Format})
+  Margins:                 ${a4Margin}
 
 ════════════════════════════════════════════════════════════════
 `;
   }
 
-  /**
-   * Gerar relatório em JSON (para integração com APIs)
-   */
   generateJsonReport(): JsonReport {
     const stats = this.analyze();
     const headingsTotal = Object.values(stats.headings).reduce(
@@ -285,56 +232,50 @@ export class PrintReporter {
         estimatedPages: stats.estimatedPages,
         readingTimeMinutes: stats.readingTime,
         format: 'A4',
-        margins: margemA4,
+        margins: a4Margin,
       },
     };
   }
 
-  /**
-   * Gerar HTML visual do relatório
-   */
   generateHtmlReport(): string {
     const stats = this.analyze();
-    const now = new Date().toLocaleString('pt-BR');
+    const now = new Date().toLocaleString('en-US');
 
     return `
 <div class="print-report" style="font-family: monospace; font-size: 11pt; line-height: 1.6; margin-top: 20px; padding: 20px; border: 1px solid #ddd; background: #f9f9f9;">
-    <h2 style="border-bottom: 2px solid #000; padding-bottom: 10px;">📋 Relatório de Impressão</h2>
-    
-    <h3 style="margin-top: 20px; color: #333;">Documento</h3>
-    <p><strong>Nome:</strong> ${this.docName}</p>
-    <p><strong>Data/Hora:</strong> ${now}</p>
-    <p><strong>Tamanho:</strong> ${(this.html.length / 1024).toFixed(2)} KB</p>
-    
-    <h3 style="margin-top: 20px; color: #333;">Conteúdo</h3>
+    <h2 style="border-bottom: 2px solid #000; padding-bottom: 10px;">Print Report</h2>
+
+    <h3 style="margin-top: 20px; color: #333;">Document</h3>
+    <p><strong>Name:</strong> ${this.docName}</p>
+    <p><strong>Date/Time:</strong> ${now}</p>
+    <p><strong>Size:</strong> ${(this.html.length / 1024).toFixed(2)} KB</p>
+
+    <h3 style="margin-top: 20px; color: #333;">Content</h3>
     <ul>
-        <li>Palavras: ${stats.words}</li>
-        <li>Caracteres: ${stats.characters}</li>
-        <li>Parágrafos: ${stats.paragraphs}</li>
-        <li>Tempo de Leitura: ~${stats.readingTime} minutos</li>
+        <li>Words: ${stats.words}</li>
+        <li>Characters: ${stats.characters}</li>
+        <li>Paragraphs: ${stats.paragraphs}</li>
+        <li>Reading Time: ~${stats.readingTime} min</li>
     </ul>
-    
-    <h3 style="margin-top: 20px; color: #333;">Mídia</h3>
+
+    <h3 style="margin-top: 20px; color: #333;">Media</h3>
     <ul>
-        <li>Imagens: ${stats.images}</li>
-        <li>Tabelas: ${stats.tables}</li>
+        <li>Images: ${stats.images}</li>
+        <li>Tables: ${stats.tables}</li>
         <li>Links: ${stats.links}</li>
-        <li>Blocos de Código: ${stats.codeBlocks}</li>
+        <li>Code Blocks: ${stats.codeBlocks}</li>
     </ul>
-    
-    <h3 style="margin-top: 20px; color: #333;">Impressão</h3>
+
+    <h3 style="margin-top: 20px; color: #333;">Print</h3>
     <ul>
-        <li>Páginas Estimadas: <strong>${stats.estimatedPages}</strong></li>
-        <li>Formato: A4 (${formatoA4})</li>
-        <li>Margens: ${margemA4}</li>
+        <li>Estimated Pages: <strong>${stats.estimatedPages}</strong></li>
+        <li>Format: A4 (${a4Format})</li>
+        <li>Margins: ${a4Margin}</li>
     </ul>
 </div>
     `;
   }
 
-  /**
-   * Gerar checklist de impressão
-   */
   generateChecklist(): PrintChecklist {
     const stats = this.analyze();
     const checks: string[] = [];
@@ -360,13 +301,6 @@ export class PrintReporter {
   }
 }
 
-/**
- * Helper functions
- */
-
-/**
- * Criar uma instância de PrintReporter
- */
 export function createReporter(
   htmlContent: string,
   docName: string = 'document'
@@ -374,9 +308,6 @@ export function createReporter(
   return new PrintReporter(htmlContent, docName);
 }
 
-/**
- * Gerar relatório de texto e registrar no console
- */
 export function reportToConsole(
   htmlContent: string,
   docName: string = 'document'
@@ -385,9 +316,6 @@ export function reportToConsole(
   logInfo(reporter.generateTextReport());
 }
 
-/**
- * Gerar relatório em HTML
- */
 export function reportToHtml(
   htmlContent: string,
   docName: string = 'document'
@@ -396,9 +324,6 @@ export function reportToHtml(
   return reporter.generateHtmlReport();
 }
 
-/**
- * Analisar conteúdo HTML e obter estatísticas
- */
 export function getAnalysis(htmlContent: string): DocumentStats {
   const reporter = new PrintReporter(htmlContent);
   return reporter.analyze();

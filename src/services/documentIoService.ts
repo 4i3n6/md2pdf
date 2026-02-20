@@ -97,15 +97,15 @@ export function createDocumentIoService(deps: DocumentIoDeps) {
         }
     }
 
-    function gerarNomeBackup(): string {
+    function generateBackupName(): string {
         const now = new Date()
         const pad = (value: number): string => String(value).padStart(2, '0')
-        const data = `${now.getFullYear()}${pad(now.getMonth() + 1)}${pad(now.getDate())}`
-        const hora = `${pad(now.getHours())}${pad(now.getMinutes())}`
-        return `md2pdf-backup-${data}-${hora}.json`
+        const date = `${now.getFullYear()}${pad(now.getMonth() + 1)}${pad(now.getDate())}`
+        const time = `${pad(now.getHours())}${pad(now.getMinutes())}`
+        return `md2pdf-backup-${date}-${time}.json`
     }
 
-    function montarBackupPayload(): BackupPayload {
+    function buildBackupPayload(): BackupPayload {
         const docs = deps.documentManager.getAll()
         const prefs: Record<string, DocumentPreferences> = {}
 
@@ -122,7 +122,7 @@ export function createDocumentIoService(deps: DocumentIoDeps) {
         }
     }
 
-    function normalizarBackupPayload(raw: unknown): BackupPayload | null {
+    function normalizeBackupPayload(raw: unknown): BackupPayload | null {
         if (Array.isArray(raw)) {
             return {
                 version: 0,
@@ -160,7 +160,7 @@ export function createDocumentIoService(deps: DocumentIoDeps) {
         }
     }
 
-    function aplicarBackup(payload: BackupPayload): void {
+    function applyBackup(payload: BackupPayload): void {
         deps.documentManager.replaceAll(payload.docs)
 
         Object.entries(payload.prefs).forEach(([docId, pref]) => {
@@ -196,67 +196,67 @@ export function createDocumentIoService(deps: DocumentIoDeps) {
         deps.updateSaveStatus()
     }
 
-    function exportarBackupDocumentos(): void {
+    function exportBackup(): void {
         try {
-            const payload = montarBackupPayload()
+            const payload = buildBackupPayload()
             const content = JSON.stringify(payload, null, 2)
             const blob = new Blob([content], { type: 'application/json;charset=utf-8' })
             const url = URL.createObjectURL(blob)
 
             const link = document.createElement('a')
             link.href = url
-            link.download = gerarNomeBackup()
+            link.download = generateBackupName()
             document.body.appendChild(link)
             link.click()
             document.body.removeChild(link)
 
             URL.revokeObjectURL(url)
-            deps.logger.success(`Backup gerado com ${payload.docs.length} documento(s)`)
+            deps.logger.success(`Backup created with ${payload.docs.length} document(s)`)
         } catch (e) {
             const errorMessage = e instanceof Error ? e.message : String(e)
-            deps.logger.error('Falha ao gerar backup: ' + errorMessage)
+            deps.logger.error('Failed to create backup: ' + errorMessage)
         }
     }
 
-    async function processarArquivoBackup(file: File): Promise<void> {
+    async function processBackupFile(file: File): Promise<void> {
         try {
             const text = await file.text()
             const parsed = JSON.parse(text) as unknown
-            const payload = normalizarBackupPayload(parsed)
+            const payload = normalizeBackupPayload(parsed)
 
             if (!payload) {
-                deps.logger.error('Backup invalido ou formato nao reconhecido')
+                deps.logger.error('Invalid backup or unrecognized format')
                 return
             }
 
-            const confirmado = await confirmar({
-                titulo: 'Restaurar backup',
-                mensagem: 'Esta ação substitui todos os documentos atuais.\nDeseja continuar?',
-                textoBotaoConfirmar: 'Restaurar',
-                variante: 'warning'
+            const confirmed = await confirmar({
+                title: 'Restore backup',
+                message: 'This action replaces all current documents.\nContinue?',
+                confirmLabel: 'Restore',
+                variant: 'warning'
             })
-            if (!confirmado) {
+            if (!confirmed) {
                 deps.logger.log('Restore cancelled by user', 'warning')
                 return
             }
 
             if (payload.version > BackupConfig.version) {
-                deps.logger.log('Backup gerado por versao mais nova. Alguns dados podem ser ignorados.', 'warning')
+                deps.logger.log('Backup was created by a newer version. Some data may be ignored.', 'warning')
             }
 
             if (payload.appVersion !== 'unknown' && payload.appVersion !== deps.appVersion) {
-                deps.logger.log(`Backup gerado na versao ${payload.appVersion}`, 'info')
+                deps.logger.log(`Backup was created with app version ${payload.appVersion}`, 'info')
             }
 
-            aplicarBackup(payload)
-            deps.logger.success(`Backup restaurado (${payload.docs.length} documento(s))`)
+            applyBackup(payload)
+            deps.logger.success(`Backup restored (${payload.docs.length} document(s))`)
         } catch (e) {
             const errorMessage = e instanceof Error ? e.message : String(e)
-            deps.logger.error('Falha ao restaurar backup: ' + errorMessage)
+            deps.logger.error('Failed to restore backup: ' + errorMessage)
         }
     }
 
-    function importarBackupDocumentos(): void {
+    function importBackup(): void {
         const input = document.createElement('input')
         input.type = 'file'
         input.accept = '.json,application/json'
@@ -266,7 +266,7 @@ export function createDocumentIoService(deps: DocumentIoDeps) {
             const file = target.files?.[0]
             if (!file) return
 
-            void processarArquivoBackup(file)
+            void processBackupFile(file)
         }
 
         input.click()
@@ -275,7 +275,7 @@ export function createDocumentIoService(deps: DocumentIoDeps) {
     return {
         importMarkdownFile,
         downloadMarkdownFile,
-        exportarBackupDocumentos,
-        importarBackupDocumentos
+        exportarBackupDocumentos: exportBackup,
+        importarBackupDocumentos: importBackup
     }
 }

@@ -1,8 +1,3 @@
-/**
- * Gerenciador de Estado Offline
- * Detecta conectividade e gerencia operações offline/online
- */
-
 import { StorageKeys } from '@/constants'
 import type { SyncQueueItem, ConnectivityStatus } from '@/types/index'
 import { logErro, logInfo, logSucesso } from '@/utils/logger'
@@ -16,9 +11,6 @@ class OfflineManager {
   private syncQueue: SyncQueueItem[] = []
   private initialized: boolean = false
 
-  /**
-   * Inicializa o gerenciador de conectividade
-   */
   init(): void {
     if (this.initialized) return
     this.initialized = true
@@ -26,51 +18,34 @@ class OfflineManager {
     window.addEventListener('online', () => this.handleOnline())
     window.addEventListener('offline', () => this.handleOffline())
 
-    // Verificação periódica de conectividade (fallback)
     setInterval(() => this.checkConnectivity(), 10000)
-
-    // Garantir que a UI reflita o status inicial (especialmente ao abrir offline)
     this.updateUI()
   }
 
-  /**
-   * Registra callback para mudanças de estado
-   */
   onStatusChange(callback: StatusChangeCallback): void {
     this.callbacks.push(callback)
   }
 
-  /**
-   * Notifica todos os listeners
-   */
   private notifyListeners(isOnline: boolean): void {
     this.callbacks.forEach((cb) => {
       try {
         cb(isOnline)
       } catch (e) {
         const errorMsg = e instanceof Error ? e.message : String(e)
-        logErro(`Erro em callback de conectividade: ${errorMsg}`)
+        logErro(`Error in connectivity callback: ${errorMsg}`)
       }
     })
   }
 
-  /**
-   * Handler quando volta online
-   */
   private handleOnline(): void {
     if (!this.isOnline) {
       this.isOnline = true
       this.updateUI()
       this.notifyListeners(true)
-
-      // Processa fila de sincronização
       this.processSyncQueue()
     }
   }
 
-  /**
-   * Handler quando fica offline
-   */
   private handleOffline(): void {
     if (this.isOnline) {
       this.isOnline = false
@@ -79,9 +54,6 @@ class OfflineManager {
     }
   }
 
-  /**
-   * Verifica conectividade fazendo requisição leve
-   */
   private checkConnectivity(): void {
     fetch('/', { method: 'HEAD', cache: 'no-store' })
       .then(() => {
@@ -92,9 +64,6 @@ class OfflineManager {
       })
   }
 
-  /**
-   * Atualiza UI com status de conectividade
-   */
   private updateUI(): void {
     const statusEl = document.querySelector('.system-status')
     if (!statusEl) return
@@ -108,9 +77,6 @@ class OfflineManager {
     }
   }
 
-  /**
-   * Adiciona operação à fila de sincronização
-   */
   addToSyncQueue(operation: Omit<SyncQueueItem, 'id' | 'timestamp'>): void {
     const queueItem: SyncQueueItem = {
       ...operation,
@@ -118,14 +84,9 @@ class OfflineManager {
       id: Math.random().toString(36).substr(2, 9)
     }
     this.syncQueue.push(queueItem)
-
-    // Persiste fila em localStorage
     this.persistSyncQueue()
   }
 
-  /**
-   * Persiste fila de sincronização em localStorage
-   */
   private persistSyncQueue(): void {
     storageSetJson(
       StorageKeys.syncQueue,
@@ -134,9 +95,6 @@ class OfflineManager {
     )
   }
 
-  /**
-   * Carrega fila de sincronização do localStorage
-   */
   loadSyncQueue(): void {
     const stored = storageGetJson<SyncQueueItem[]>(
       StorageKeys.syncQueue,
@@ -147,39 +105,31 @@ class OfflineManager {
     }
   }
 
-  /**
-   * Processa fila de sincronização quando volta online
-   */
   private processSyncQueue(): void {
     if (this.syncQueue.length === 0) return
 
-    logInfo(`Processando ${this.syncQueue.length} operacoes de sincronizacao...`)
+    logInfo(`Processing ${this.syncQueue.length} sync operation(s)...`)
 
     const processed: string[] = []
     this.syncQueue.forEach((op) => {
       try {
         if (op.type === 'save') {
-          // Operação já foi salva localmente, apenas remove da fila
           processed.push(op.id)
         }
       } catch (e) {
         const errorMsg = e instanceof Error ? e.message : String(e)
-        logErro(`Erro ao processar operacao de sync: ${errorMsg}`)
+        logErro(`Error processing sync operation: ${errorMsg}`)
       }
     })
 
-    // Remove operações processadas
     this.syncQueue = this.syncQueue.filter((op) => !processed.includes(op.id))
     this.persistSyncQueue()
 
     if (processed.length > 0) {
-      logSucesso(`${processed.length} operacoes sincronizadas`)
+      logSucesso(`${processed.length} operation(s) synced`)
     }
   }
 
-  /**
-   * Retorna status atual
-   */
   getStatus(): ConnectivityStatus {
     return {
       isOnline: this.isOnline,
@@ -188,9 +138,6 @@ class OfflineManager {
     }
   }
 
-  /**
-   * Retorna se está online
-   */
   getIsOnline(): boolean {
     return this.isOnline
   }

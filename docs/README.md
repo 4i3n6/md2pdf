@@ -1,16 +1,16 @@
-# Documentacao - MD2PDF
+# Documentation - MD2PDF
 
-Este diretorio contem a documentacao tecnica e operacional do projeto.
-A fonte de verdade para o design por funcionalidade e o conjunto SDD.
+This directory contains the technical and operational documentation for the project.
+The source of truth for feature-level design is the SDD suite.
 
 ## SDD (Software Design Document)
 - `docs/sdd/README.md`
 
-## Guias operacionais
+## Operational guides
 - `docs/DEPLOY.md`
 - `docs/TESTING.md`
 
-## Guias tecnicos complementares
+## Technical reference
 - `docs/ARCHITECTURE.md`
 - `docs/PRINT.md`
 - `docs/PWA.md`
@@ -19,6 +19,6 @@ A fonte de verdade para o design por funcionalidade e o conjunto SDD.
 ## Roadmap
 - `docs/ROADMAP.md`
 
-## Manuais do usuario
-- `manual/index.html`
-- `pt/manual/index.html`
+## User manuals
+- `manual/index.html` (EN)
+- `pt/manual/index.html` (PT-BR)

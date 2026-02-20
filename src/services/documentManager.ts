@@ -1,89 +1,49 @@
-/**
- * DOCUMENT MANAGER SERVICE
- * 
- * Gerencia estado de documentos com:
- * - CRUD operations
- * - Persistencia em localStorage
- * - Observer pattern para notificacoes
- * - Type-safe document management
- */
-
 import { StorageKeys } from '@/constants'
 import type { Document, LoggerInterface } from '@/types/index'
 
-/**
- * Tipo para callbacks de mudanca de documentos
- */
 type DocumentChangeCallback = (docs: Document[]) => void
-
-/**
- * Gerenciador centralizado de documentos
- */
 export class DocumentManager {
   private docs: Document[] = []
   private observers: DocumentChangeCallback[] = []
   private readonly defaultDoc: Document = {
     id: 1,
     name: 'README.md',
-    content: '# SISTEMA INICIADO\n\nPainel carregado com sucesso.\n\n- Editor Ativo\n- Renderizador Pronto\n- Memoria OK',
+    content: '# SYSTEM READY\n\nPanel loaded successfully.\n\n- Editor Active\n- Renderer Ready\n- Memory OK',
     updated: Date.now(),
     lastSaved: Date.now()
   }
 
   constructor(private logger?: LoggerInterface) {}
 
-  /**
-   * Define o logger apos a instancia criada
-   * 
-   * @param {LoggerInterface} logger - Logger global
-   * @returns {void}
-   */
   setLogger(logger: LoggerInterface): void {
     this.logger = logger
   }
 
-  /**
-   * Inicializa o gerenciador carregando documentos do localStorage
-   * 
-   * @returns {void}
-   */
   init(): void {
     this.load()
-    this.logger?.log?.(`Carregado ${this.docs.length} documentos`)
+    this.logger?.log?.(`Loaded ${this.docs.length} document(s)`)
   }
 
-  /**
-   * Carrega documentos do localStorage
-   * 
-   * @private
-   * @returns {void}
-   */
   private load(): void {
-    const currentDocs = this.carregarDoStorage(StorageKeys.documents)
-        if (currentDocs && currentDocs.length > 0) {
-            this.docs = currentDocs
-            return
-        }
+    const currentDocs = this.loadFromStorage(StorageKeys.documents)
+    if (currentDocs && currentDocs.length > 0) {
+        this.docs = currentDocs
+        return
+    }
 
-        const legacyDocs = this.carregarDoStorage(StorageKeys.legacyDocuments)
+    const legacyDocs = this.loadFromStorage(StorageKeys.legacyDocuments)
     if (legacyDocs && legacyDocs.length > 0) {
         this.docs = legacyDocs
         this.persistir()
-        this.logger?.success?.('Migracao concluida: md2pdf-docs-v2 -> md2pdf-docs-v3')
+        this.logger?.success?.('Migration complete: md2pdf-docs-v2 -> md2pdf-docs-v3')
         return
     }
 
     this.docs = [this.defaultDoc]
-    this.logger?.log?.('Nenhum dado encontrado. Criando documento padrao.')
+    this.logger?.log?.('No data found. Creating default document.')
   }
 
-  /**
-   * Carrega e normaliza documentos de uma chave especifica
-   * 
-   * @param {string} storageKey - Chave do localStorage
-   * @returns {Document[] | null} Documentos normalizados ou null
-   */
-  private carregarDoStorage(storageKey: string): Document[] | null {
+  private loadFromStorage(storageKey: string): Document[] | null {
     try {
         const raw = localStorage.getItem(storageKey)
         if (!raw) {
@@ -91,22 +51,15 @@ export class DocumentManager {
         }
 
         const parsed = JSON.parse(raw)
-        const docs = this.normalizarDocumentos(parsed)
-        return docs
+        return this.normalizeDocuments(parsed)
     } catch (e) {
         const errorMessage = e instanceof Error ? e.message : String(e)
-        this.logger?.error?.(`Falha ao ler ${storageKey}: ${errorMessage}`)
+        this.logger?.error?.(`Failed to read ${storageKey}: ${errorMessage}`)
         return null
     }
   }
 
-  /**
-   * Normaliza documentos para o schema atual
-   * 
-   * @param {unknown} rawDocs - Dados brutos do storage
-   * @returns {Document[]} Documentos normalizados
-   */
-  private normalizarDocumentos(rawDocs: unknown): Document[] {
+  private normalizeDocuments(rawDocs: unknown): Document[] {
     if (!Array.isArray(rawDocs)) {
         return []
     }
@@ -117,7 +70,7 @@ export class DocumentManager {
         const lastSaved = typeof doc.lastSaved === 'number' ? doc.lastSaved : updated
 
         return {
-            id: typeof doc.id === 'number' ? doc.id : this.gerarIdDocumento(index),
+            id: typeof doc.id === 'number' ? doc.id : this.generateDocumentId(index),
             name: typeof doc.name === 'string' && doc.name.length > 0 ? doc.name : 'Untitled.md',
             content: typeof doc.content === 'string' ? doc.content : '',
             updated,
@@ -126,90 +79,49 @@ export class DocumentManager {
     })
   }
 
-  /**
-   * Gera um ID simples para documentos sem ID
-   * 
-   * @param {number} index - Indice do documento
-   * @returns {number} ID gerado
-   */
-  private gerarIdDocumento(index: number = 0): number {
+  private generateDocumentId(index: number = 0): number {
     return Date.now() + index + Math.floor(Math.random() * 1000)
   }
 
-  /**
-   * Salva documentos no localStorage e notifica observers
-   * 
-   * @private
-   * @returns {void}
-   */
   private save(): void {
     try {
       localStorage.setItem(StorageKeys.documents, JSON.stringify(this.docs))
       this.notifyObservers()
     } catch (e) {
       const errorMessage = e instanceof Error ? e.message : String(e)
-      this.logger?.error?.(`Erro ao salvar documentos: ${errorMessage}`)
+      this.logger?.error?.(`Failed to save documents: ${errorMessage}`)
     }
   }
 
-  /**
-   * Persiste o estado atual no localStorage
-   * 
-   * @returns {void}
-   */
   persistir(): void {
     this.save()
   }
 
-  /**
-   * Notifica todos os observers sobre mudanca
-   * 
-   * @private
-   * @returns {void}
-   */
   private notifyObservers(): void {
     this.observers.forEach((callback) => {
       try {
         callback([...this.docs])
       } catch (e) {
-        this.logger?.error?.(`Erro em observer callback: ${String(e)}`)
+        this.logger?.error?.(`Error in observer callback: ${String(e)}`)
       }
     })
   }
 
-  /**
-   * Obtem todos os documentos
-   * 
-   * @returns {Document[]} Array de documentos (copia)
-   */
   getAll(): Document[] {
     return [...this.docs]
   }
 
-  /**
-   * Obtem um documento especifico por ID
-   * 
-   * @param {number} id - ID do documento
-   * @returns {Document | undefined} Documento encontrado ou undefined
-   */
   getById(id: number): Document | undefined {
     return this.docs.find((d) => d.id === id)
   }
 
-  /**
-   * Cria um novo documento vazio
-   * 
-   * @param {string} name - Nome do documento (padrao: 'Untitled_XXXX.md')
-   * @returns {Document} Novo documento criado
-   */
   create(name?: string): Document {
     let docName = name || `UNTITLED_${Math.floor(Math.random() * 1000)}`
-    
-    // Adicionar extensao .md se nao houver
+
     if (!docName.endsWith('.md')) {
       docName += '.md'
     }
-    
+
     const newDoc: Document = {
       id: Date.now(),
       name: docName,
@@ -219,17 +131,10 @@ export class DocumentManager {
     }
     this.docs.unshift(newDoc)
     this.save()
-    this.logger?.log?.(`Documento criado [ID: ${newDoc.id}]`)
+    this.logger?.log?.(`Document created [ID: ${newDoc.id}]`)
     return newDoc
   }
 
-  /**
-   * Cria um documento a partir de conteudo importado
-   * 
-   * @param {string} name - Nome do arquivo
-   * @param {string} content - Conteudo do arquivo
-   * @returns {Document} Documento criado
-   */
   createFromImport(name: string, content: string): Document {
     const newDoc: Document = {
       id: Date.now(),
@@ -240,21 +145,14 @@ export class DocumentManager {
     }
     this.docs.unshift(newDoc)
     this.save()
-    this.logger?.log?.(`Arquivo importado: ${name} [ID: ${newDoc.id}]`)
+    this.logger?.log?.(`File imported: ${name} [ID: ${newDoc.id}]`)
     return newDoc
   }
 
-  /**
-   * Atualiza um documento existente
-   * 
-   * @param {number} id - ID do documento
-   * @param {Partial<Omit<Document, 'id'>>} updates - Campos a atualizar
-   * @returns {Document | undefined} Documento atualizado ou undefined
-   */
   update(id: number, updates: Partial<Omit<Document, 'id'>>): Document | undefined {
     const doc = this.getById(id)
     if (!doc) {
-      this.logger?.error?.(`Documento ${id} nao encontrado`)
+      this.logger?.error?.(`Document ${id} not found`)
       return undefined
     }
 
@@ -263,17 +161,9 @@ export class DocumentManager {
     return doc
   }
 
-  /**
-   * Deleta um documento por ID
-   * 
-   * Requer minimo de 1 documento na lista.
-   * 
-   * @param {number} id - ID do documento
-   * @returns {boolean} true se deletado, false caso contrario
-   */
   delete(id: number): boolean {
     if (this.docs.length <= 1) {
-      this.logger?.error?.('Bloqueado: Minimo 1 documento requerido.')
+      this.logger?.error?.('Blocked: minimum 1 document required.')
       return false
     }
 
@@ -282,47 +172,27 @@ export class DocumentManager {
 
     if (this.docs.length < initialLength) {
       this.save()
-      this.logger?.log?.(`Documento ${id} removido.`)
+      this.logger?.log?.(`Document ${id} removed.`)
       return true
     }
 
     return false
   }
 
-  /**
-   * Renomeia um documento
-   * 
-   * @param {number} id - ID do documento
-   * @param {string} newName - Novo nome
-   * @returns {Document | undefined} Documento atualizado ou undefined
-   */
   rename(id: number, newName: string): Document | undefined {
     return this.update(id, { name: newName })
   }
 
-  /**
-   * Atualiza conteudo de um documento
-   * 
-   * @param {number} id - ID do documento
-   * @param {string} content - Novo conteudo
-   * @returns {Document | undefined} Documento atualizado ou undefined
-   */
   setContent(id: number, content: string): Document | undefined {
     return this.update(id, { content })
   }
 
-  /**
-   * Substitui todos os documentos com um novo conjunto
-   * 
-   * @param {Document[]} docs - Lista de documentos para restauracao
-   * @returns {void}
-   */
   replaceAll(docs: Document[]): void {
-    const normalized = this.normalizarDocumentos(docs)
+    const normalized = this.normalizeDocuments(docs)
     if (normalized.length === 0) {
       this.docs = [this.defaultDoc]
       this.save()
-      this.logger?.log?.('Backup vazio. Documento padrao restaurado.')
+      this.logger?.log?.('Empty backup. Default document restored.')
       return
     }
 
@@ -330,43 +200,23 @@ export class DocumentManager {
     this.save()
   }
 
-  /**
-   * Registra um observer para notificacoes de mudanca
-   * 
-   * @param {DocumentChangeCallback} callback - Funcao chamada quando documentos mudam
-   * @returns {() => void} Funcao para desinscrever o observer
-   */
   subscribe(callback: DocumentChangeCallback): () => void {
     this.observers.push(callback)
 
-    // Retorna funcao de desinscricao
     return () => {
       this.observers = this.observers.filter((cb) => cb !== callback)
     }
   }
 
-  /**
-   * Obtem tamanho total em bytes
-   * 
-   * @returns {number} Tamanho em bytes
-   */
   getSize(): number {
     return JSON.stringify(this.docs).length
   }
 
-  /**
-   * Limpa todos os dados (para debugging/testes)
-   * 
-   * @returns {void}
-   */
   clear(): void {
     this.docs = [this.defaultDoc]
     this.save()
-    this.logger?.log?.('Todos os documentos foram limpos')
+    this.logger?.log?.('All documents cleared')
   }
 }
 
-/**
- * Instancia singleton do DocumentManager
- */
 export const documentManager = new DocumentManager()

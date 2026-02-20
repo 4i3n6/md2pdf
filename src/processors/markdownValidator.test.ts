@@ -23,7 +23,7 @@ describe('Orquestrador de Validacao (Markdown Validator)', () => {
     it('deve identificar aviso em heading sem espaco', () => {
         const result = validateMarkdown('#SemEspaco')
         expect(result.warnings[0].code).toBe('HEADING_MISSING_SPACE')
-        expect(result.isValid).toBe(true) // Ainda é válido, só tem aviso
+        expect(result.isValid).toBe(true) // still valid — warnings do not affect isValid
     })
 
     it('deve validar links corretamente', () => {

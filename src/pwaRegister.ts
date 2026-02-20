@@ -1,66 +1,53 @@
-/**
- * PWA Service Worker Registration
- * 
- * NOTA: Em desenvolvimento, o VitePWA não gera Service Worker.
- * Este arquivo só registra o SW em produção.
- * O VitePWA já injeta o registro automaticamente via 'injectRegister: script-defer'.
- */
-
 import { logErro, logInfo, logSucesso } from '@/utils/logger'
 
 export function registerServiceWorker(): void {
-  // Não registrar SW em desenvolvimento - VitePWA não gera SW em dev mode
   if (import.meta.env.DEV) {
-    logInfo('[PWA] Service Worker desabilitado em desenvolvimento');
+    logInfo('[PWA] Service Worker disabled in development');
     if ('serviceWorker' in navigator) {
       navigator.serviceWorker.getRegistrations()
         .then((registrations) => {
           if (registrations.length === 0) return;
           return Promise.all(registrations.map((registration) => registration.unregister()))
             .then(() => {
-              logSucesso('[PWA] Service Worker removido em desenvolvimento');
+              logSucesso('[PWA] Service Worker removed in development');
             })
         })
         .catch((error) => {
           const errorMsg = error instanceof Error ? error.message : String(error);
-          logErro(`[PWA] Falha ao remover Service Worker em dev: ${errorMsg}`);
+          logErro(`[PWA] Failed to remove Service Worker in dev: ${errorMsg}`);
         });
     }
     if ('caches' in window) {
       caches.keys()
         .then((keys) => Promise.all(keys.map((key) => caches.delete(key))))
         .then(() => {
-          logSucesso('[PWA] Cache limpo em desenvolvimento');
+          logSucesso('[PWA] Cache cleared in development');
         })
         .catch((error) => {
           const errorMsg = error instanceof Error ? error.message : String(error);
-          logErro(`[PWA] Falha ao limpar cache em dev: ${errorMsg}`);
+          logErro(`[PWA] Failed to clear cache in dev: ${errorMsg}`);
         });
     }
     return;
   }
 
   if (!('serviceWorker' in navigator)) {
-    logInfo('[PWA] Service Worker nao suportado neste navegador');
+    logInfo('[PWA] Service Worker not supported in this browser');
     return;
   }
 
-  // Em produção, o VitePWA já injeta o registro via registerSW.js
-  // Este código é apenas um fallback de segurança
   window.addEventListener('load', async () => {
     try {
-      // Verificar se já existe um SW registrado (pelo VitePWA)
       const existingRegistration = await navigator.serviceWorker.getRegistration('/');
       if (existingRegistration) {
-        logInfo('[PWA] Service Worker ja registrado pelo VitePWA');
-        
-        // Listener para atualizações
+        logInfo('[PWA] Service Worker already registered by VitePWA');
+
         existingRegistration.addEventListener('updatefound', () => {
           const newWorker = existingRegistration.installing;
           if (newWorker) {
             newWorker.addEventListener('statechange', () => {
               if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
-                logInfo('[PWA] Nova versao disponivel - recarregue para atualizar');
+                logInfo('[PWA] New version available - reload to update');
               }
             });
           }
@@ -68,21 +55,18 @@ export function registerServiceWorker(): void {
         return;
       }
 
-      // Fallback: registrar manualmente se VitePWA não registrou
       const registration = await navigator.serviceWorker.register('/sw.js', {
         scope: '/'
       });
 
-      logInfo(`[PWA] Service Worker registrado (fallback): ${registration.scope}`);
+      logInfo(`[PWA] Service Worker registered (fallback): ${registration.scope}`);
     } catch (error) {
-      // Silenciar erro em dev, logar apenas em produção
       if (import.meta.env.PROD) {
         const errorMsg = error instanceof Error ? error.message : String(error);
-        logErro(`[PWA] Falha ao registrar Service Worker: ${errorMsg}`);
+        logErro(`[PWA] Failed to register Service Worker: ${errorMsg}`);
       }
     }
   });
 }
 
-// Registrar automaticamente na inicialização
 registerServiceWorker();

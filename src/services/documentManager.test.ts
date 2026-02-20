@@ -49,7 +49,7 @@ describe('DocumentManager', () => {
 
         expect(docs).toHaveLength(1)
         expect(docs[0].name).toBe('README.md')
-        expect(mockLogger.log).toHaveBeenCalledWith('Nenhum dado encontrado. Criando documento padrao.')
+        expect(mockLogger.log).toHaveBeenCalledWith('No data found. Creating default document.')
     })
 
     it('deve criar um novo documento', () => {
@@ -57,8 +57,8 @@ describe('DocumentManager', () => {
         const newDoc = docManager.create('Novo Doc')
 
         const docs = docManager.getAll()
-        expect(docs).toHaveLength(2) // 1 padrão + 1 novo
-        expect(docs[0]).toEqual(newDoc) // Novo documento deve ser o primeiro
+        expect(docs).toHaveLength(2) // 1 default + 1 new
+        expect(docs[0]).toEqual(newDoc) // new document is prepended to the list
         expect(newDoc.name).toBe('Novo Doc.md')
     })
 
@@ -66,7 +66,6 @@ describe('DocumentManager', () => {
         docManager.init()
         docManager.create('Teste Persistencia')
 
-        // Simular reinicializacao
         const newManager = new DocumentManager(mockLogger)
         newManager.init()
 
@@ -84,7 +83,6 @@ describe('DocumentManager', () => {
         expect(updatedDoc).toBeDefined()
         expect(updatedDoc?.content).toBe('# Novo Conteudo')
 
-        // Verificar persistencia
         const storedDocs = JSON.parse(store[StorageKeys.documents] || '[]')
         const storedDoc = storedDocs.find((d: Document) => d.id === doc.id)
         expect(storedDoc.content).toBe('# Novo Conteudo')
@@ -94,35 +92,29 @@ describe('DocumentManager', () => {
         vi.useFakeTimers()
         docManager.init()
 
-        // Garantir IDs diferentes alterando o tempo
         vi.setSystemTime(new Date(2024, 1, 1, 10, 0, 0))
         const doc1 = docManager.create('Doc 1')
 
         vi.setSystemTime(new Date(2024, 1, 1, 10, 0, 1))
         const doc2 = docManager.create('Doc 2')
 
-        // Verificar IDs diferentes
         expect(doc1.id).not.toBe(doc2.id)
 
-        // Deletar Doc 1
         const deleted = docManager.delete(doc1.id)
         expect(deleted).toBe(true)
 
         const currentDocs = docManager.getAll()
-        // Deve sobrar README + Doc 2
         expect(currentDocs).toHaveLength(2)
         expect(currentDocs.find(d => d.id === doc1.id)).toBeUndefined()
         expect(currentDocs.find(d => d.id === doc2.id)).toBeDefined()
 
-        // Agora deletar Doc 2
         docManager.delete(doc2.id)
-        expect(docManager.getAll()).toHaveLength(1) // Só README
+        expect(docManager.getAll()).toHaveLength(1) // README only
 
-        // Tentar deletar o ultimo restante
         const lastDoc = docManager.getAll()[0]
         const deletedLast = docManager.delete(lastDoc.id)
-        expect(deletedLast).toBe(false) // Deve falhar
+        expect(deletedLast).toBe(false)
         expect(docManager.getAll()).toHaveLength(1)
-        expect(mockLogger.error).toHaveBeenCalledWith('Bloqueado: Minimo 1 documento requerido.')
+        expect(mockLogger.error).toHaveBeenCalledWith('Blocked: minimum 1 document required.')
     })
 })

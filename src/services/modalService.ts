@@ -1,21 +1,11 @@
-/**
- * MODAL SERVICE
- *
- * Substitui confirm() nativo por modais customizados que:
- * - Respeitam o design system (variáveis CSS do projeto)
- * - Suportam navegação por teclado (Enter = confirmar, Escape = cancelar)
- * - São acessíveis (role=dialog, aria-modal, foco gerenciado)
- * - Retornam Promise<boolean> — mesma semântica do confirm()
- */
-
 export type ModalVariant = 'danger' | 'warning' | 'info'
 
 export interface ModalOptions {
-    titulo: string
-    mensagem: string
-    textoBotaoConfirmar?: string
-    textoBotaoCancelar?: string
-    variante?: ModalVariant
+    title: string
+    message: string
+    confirmLabel?: string
+    cancelLabel?: string
+    variant?: ModalVariant
 }
 
 const CSS_MODAL = `
@@ -156,130 +146,107 @@ const CSS_MODAL = `
 }
 `
 
-let estilosInjetados = false
+let stylesInjected = false
 
-function injetarEstilos(): void {
-    if (estilosInjetados) return
+function injectStyles(): void {
+    if (stylesInjected) return
     const style = document.createElement('style')
     style.id = 'md2pdf-modal-styles'
     style.textContent = CSS_MODAL
     document.head.appendChild(style)
-    estilosInjetados = true
+    stylesInjected = true
 }
 
-function obterIconeVariante(variante: ModalVariant): string {
-    if (variante === 'danger') return '!'
-    if (variante === 'warning') return '!'
+function getVariantIcon(variant: ModalVariant): string {
+    if (variant === 'danger') return '!'
+    if (variant === 'warning') return '!'
     return 'i'
 }
 
-/**
- * Exibe um modal de confirmação customizado.
- *
- * @param opcoes - Configuração do modal
- * @returns Promise<boolean> — true se confirmado, false se cancelado
- *
- * @example
- *   const ok = await confirmar({
- *     titulo: 'Deletar documento',
- *     mensagem: 'Tem certeza?',
- *     variante: 'danger'
- *   })
- *   if (ok) { ... }
- */
-export function confirmar(opcoes: ModalOptions): Promise<boolean> {
+export function confirmar(options: ModalOptions): Promise<boolean> {
     return new Promise((resolve) => {
-        injetarEstilos()
+        injectStyles()
 
-        const variante = opcoes.variante ?? 'info'
-        const textoBotaoConfirmar = opcoes.textoBotaoConfirmar ?? 'Confirmar'
-        const textoBotaoCancelar = opcoes.textoBotaoCancelar ?? 'Cancelar'
+        const variant = options.variant ?? 'info'
+        const confirmLabel = options.confirmLabel ?? 'Confirm'
+        const cancelLabel = options.cancelLabel ?? 'Cancel'
 
-        // ── Overlay ────────────────────────────────────────────────────────
         const overlay = document.createElement('div')
         overlay.className = 'md2pdf-modal-overlay'
         overlay.setAttribute('role', 'dialog')
         overlay.setAttribute('aria-modal', 'true')
         overlay.setAttribute('aria-labelledby', 'md2pdf-modal-titulo')
 
-        // ── Modal ──────────────────────────────────────────────────────────
         const modal = document.createElement('div')
         modal.className = 'md2pdf-modal'
 
-        // Header
         const header = document.createElement('div')
         header.className = 'md2pdf-modal-header'
 
-        const icone = document.createElement('div')
-        icone.className = `md2pdf-modal-icon ${variante}`
-        icone.textContent = obterIconeVariante(variante)
-        icone.setAttribute('aria-hidden', 'true')
+        const icon = document.createElement('div')
+        icon.className = `md2pdf-modal-icon ${variant}`
+        icon.textContent = getVariantIcon(variant)
+        icon.setAttribute('aria-hidden', 'true')
 
-        const titulo = document.createElement('span')
-        titulo.className = 'md2pdf-modal-titulo'
-        titulo.id = 'md2pdf-modal-titulo'
-        titulo.textContent = opcoes.titulo
+        const titleEl = document.createElement('span')
+        titleEl.className = 'md2pdf-modal-titulo'
+        titleEl.id = 'md2pdf-modal-titulo'
+        titleEl.textContent = options.title
 
-        header.appendChild(icone)
-        header.appendChild(titulo)
+        header.appendChild(icon)
+        header.appendChild(titleEl)
 
-        // Body
         const body = document.createElement('div')
         body.className = 'md2pdf-modal-body'
-        body.textContent = opcoes.mensagem
+        body.textContent = options.message
 
-        // Footer
         const footer = document.createElement('div')
         footer.className = 'md2pdf-modal-footer'
 
-        const btnCancelar = document.createElement('button')
-        btnCancelar.className = 'md2pdf-modal-btn cancelar'
-        btnCancelar.textContent = textoBotaoCancelar
-        btnCancelar.type = 'button'
+        const btnCancel = document.createElement('button')
+        btnCancel.className = 'md2pdf-modal-btn cancelar'
+        btnCancel.textContent = cancelLabel
+        btnCancel.type = 'button'
 
-        const btnConfirmar = document.createElement('button')
-        btnConfirmar.className = `md2pdf-modal-btn confirmar ${variante}`
-        btnConfirmar.textContent = textoBotaoConfirmar
-        btnConfirmar.type = 'button'
+        const btnConfirm = document.createElement('button')
+        btnConfirm.className = `md2pdf-modal-btn confirmar ${variant}`
+        btnConfirm.textContent = confirmLabel
+        btnConfirm.type = 'button'
 
-        footer.appendChild(btnCancelar)
-        footer.appendChild(btnConfirmar)
+        footer.appendChild(btnCancel)
+        footer.appendChild(btnConfirm)
 
         modal.appendChild(header)
         modal.appendChild(body)
         modal.appendChild(footer)
         overlay.appendChild(modal)
 
-        // ── Limpeza e resolução ────────────────────────────────────────────
-        const fechar = (resultado: boolean): void => {
+        const close = (result: boolean): void => {
             document.removeEventListener('keydown', onKeydown)
             overlay.remove()
-            resolve(resultado)
+            resolve(result)
         }
 
-        // ── Eventos ────────────────────────────────────────────────────────
-        btnCancelar.addEventListener('click', () => fechar(false))
-        btnConfirmar.addEventListener('click', () => fechar(true))
+        btnCancel.addEventListener('click', () => close(false))
+        btnConfirm.addEventListener('click', () => close(true))
 
-        // Clicar fora do modal cancela
         overlay.addEventListener('click', (e) => {
-            if (e.target === overlay) fechar(false)
+            if (e.target === overlay) close(false)
         })
 
         const onKeydown = (e: KeyboardEvent): void => {
             if (e.key === 'Escape') {
                 e.preventDefault()
-                fechar(false)
+                close(false)
             }
             if (e.key === 'Enter') {
                 e.preventDefault()
-                fechar(true)
+                close(true)
             }
         }
         document.addEventListener('keydown', onKeydown)
 
-        // ── Montar no DOM e focar ──────────────────────────────────────────
         document.body.appendChild(overlay)
-        btnConfirmar.focus()
+        btnConfirm.focus()
     })
 }

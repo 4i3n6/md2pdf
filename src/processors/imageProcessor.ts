@@ -1,8 +1,3 @@
-/**
- * PROCESSADOR DE IMAGENS - MD2PDF
- * Redimensionamento automático e cache para imagens em A4
- */
-
 import { PrintLimits } from '@/constants'
 import { imageCache } from '@/utils/imageCache'
 import { logAviso } from '@/utils/logger'
@@ -26,15 +21,6 @@ interface ImageValidationResult {
   message: string
 }
 
-/**
- * Obter dimensões de uma imagem de forma assíncrona
- * 
- * Carrega imagem e obtém naturalWidth/naturalHeight.
- * Timeout de 5s se imagem não carregar.
- * 
- * @param {string} src - URL da imagem
- * @returns {Promise<ImageDimensions | null>} Dimensões ou null se falhar
- */
 export function getImageDimensions(src: string): Promise<ImageDimensions | null> {
   return new Promise((resolve) => {
     if (!src) {
@@ -52,7 +38,7 @@ export function getImageDimensions(src: string): Promise<ImageDimensions | null>
     }
 
     img.onerror = () => {
-      logAviso(`Falha ao carregar imagem: ${src}`)
+      logAviso(`Failed to load image: ${src}`)
       resolve(null)
     }
 
@@ -66,21 +52,6 @@ export function getImageDimensions(src: string): Promise<ImageDimensions | null>
   })
 }
 
-/**
- * Calcular dimensões proporcionais para impressão A4
- * 
- * Mantém aspect ratio e garante que cabe em A4 (210x297mm).
- * Margem padrão: 10mm em cada lado.
- * Conversão: 1 inch = 25.4mm, 96 DPI = 3.779 px/mm
- * 
- * @param {number} width - Largura em pixels
- * @param {number} height - Altura em pixels
- * @returns {PrintDimensions} Dimensões ajustadas para print com metadados
- * 
- * @example
- *   calculatePrintDimensions(800, 600)
- *   // Retorna: { width: '211.5px', height: 'auto', maxWidth: '100%', scale: 0.887 }
- */
 export function calculatePrintDimensions(width: number, height: number): PrintDimensions {
   if (!width || !height || width <= 0 || height <= 0) {
     return {
@@ -92,10 +63,10 @@ export function calculatePrintDimensions(width: number, height: number): PrintDi
 
   const maxWidthMm = PrintLimits.maxWidthMm
   const maxHeightMm = PrintLimits.maxHeightMm
-  const pxPorMm = PrintLimits.pxPerMm
+  const pxPerMm = PrintLimits.pxPerMm
 
-  const widthMm = width / pxPorMm
-  const heightMm = height / pxPorMm
+  const widthMm = width / pxPerMm
+  const heightMm = height / pxPerMm
 
   let scale = 1
 
@@ -119,14 +90,6 @@ export function calculatePrintDimensions(width: number, height: number): PrintDi
   }
 }
 
-/**
- * Obter dimensões com cache (localStorage)
- * 
- * Tenta recuperar de cache primeiro, caso contrário carrega e cacheia.
- * 
- * @param {string} src - URL da imagem
- * @returns {Promise<ImageDimensions | null>} Dimensões ou null
- */
 export async function getCachedImageDimensions(src: string): Promise<ImageDimensions | null> {
   if (!src) return null
 
@@ -144,18 +107,6 @@ export async function getCachedImageDimensions(src: string): Promise<ImageDimens
   return dimensions
 }
 
-/**
- * Processar todas as imagens em um container HTML
- * 
- * Processa imagens com concorrência limitada (5 por lote) para melhor performance.
- * Obtém dimensões, aplica estilos de print e armazena metadados em data attributes.
- * Falhas em imagens individuais não impedem processamento das demais.
- * 
- * @param {HTMLElement | null} container - Container com imagens
- * @param {boolean} useCache - Se deve cachear dimensões (padrão: true)
- * @param {number} maxConcurrent - Máximo de imagens simultâneas (padrão: 5)
- * @returns {Promise<number>} Número de imagens processadas com sucesso
- */
 export async function processImagesForPrint(
   container: HTMLElement | null,
   useCache: boolean = true,
@@ -168,11 +119,9 @@ export async function processImagesForPrint(
 
   let processed = 0
 
-  // Criar lotes de imagens para processar em paralelo
   for (let i = 0; i < images.length; i += maxConcurrent) {
     const batch = images.slice(i, i + maxConcurrent)
 
-    // Processar lote com Promise.allSettled (não falha se uma imagem falhar)
     const results = await Promise.allSettled(
       batch.map(async (img) => {
         const src = img.src
@@ -183,33 +132,28 @@ export async function processImagesForPrint(
           : await getImageDimensions(src)
 
         if (!dimensions) {
-          // Fallback para responsive image
           img.style.maxWidth = '100%'
           img.style.height = 'auto'
           return
         }
 
-        // Aplicar dimensões de print
         const printDims = calculatePrintDimensions(dimensions.width, dimensions.height)
         img.style.width = printDims.width
         img.style.height = printDims.height
         img.style.maxWidth = printDims.maxWidth
 
-        // Armazenar metadados para debugging/análise
         img.dataset['originalWidth'] = String(dimensions.width)
         img.dataset['originalHeight'] = String(dimensions.height)
         img.dataset['printScale'] = String(printDims.scale ?? 1)
       })
     )
 
-    // Contar apenas sucesso (settled não lança exceção)
     results.forEach((result) => {
       if (result.status === 'fulfilled') {
         processed++
       } else {
-        // Log de erro sem quebrar o fluxo
         const errorMsg = result.reason instanceof Error ? result.reason.message : String(result.reason)
-        logAviso(`Falha ao processar imagem: ${errorMsg}`)
+        logAviso(`Failed to process image: ${errorMsg}`)
       }
     })
   }
@@ -217,33 +161,23 @@ export async function processImagesForPrint(
   return processed
 }
 
-/**
- * Validar se uma imagem cabe em A4
- * 
- * Verifica se dimensões (em pixels) cabem em A4 com margens.
- * Retorna true se cabe, false caso contrário.
- * 
- * @param {number} width - Largura em pixels
- * @param {number} height - Altura em pixels
- * @returns {ValidationResult} Objeto com fits (boolean) e message
- */
 export function validateImageForA4(width: number, height: number): ImageValidationResult {
   const maxWidthMm = PrintLimits.maxWidthMm
   const maxHeightMm = PrintLimits.maxHeightMm
-  const pxPorMm = PrintLimits.pxPerMm
+  const pxPerMm = PrintLimits.pxPerMm
 
-  const widthMm = width / pxPorMm
-  const heightMm = height / pxPorMm
+  const widthMm = width / pxPerMm
+  const heightMm = height / pxPerMm
 
   if (widthMm <= maxWidthMm && heightMm <= maxHeightMm) {
     return {
       fits: true,
-      message: `✓ Imagem (${widthMm.toFixed(1)}x${heightMm.toFixed(1)}mm) cabe em A4`
+      message: `Image (${widthMm.toFixed(1)}x${heightMm.toFixed(1)}mm) fits on A4`
     }
   }
 
   return {
     fits: false,
-    message: `✗ Image (${widthMm.toFixed(1)}x${heightMm.toFixed(1)}mm) does not fit on A4 (max ${maxWidthMm}x${maxHeightMm}mm) - will be resized`
+    message: `Image (${widthMm.toFixed(1)}x${heightMm.toFixed(1)}mm) does not fit on A4 (max ${maxWidthMm}x${maxHeightMm}mm) - will be resized`
   }
 }

@@ -1,84 +1,58 @@
-/**
- * TEMA DO EDITOR CODEMIRROR
- *
- * Define a aparência visual do editor para o estilo "painel financeiro hacker"
- * (fundo branco, acentos em azul #0052cc, tipografia monoespaçada).
- *
- * Centralizado aqui para facilitar customização sem tocar em main.ts.
- * Para alterar cores, edite as constantes abaixo.
- */
-
 import { EditorView } from 'codemirror'
 
-// ─── Paleta de cores ────────────────────────────────────────────────────────
-const cores = {
-    /** Texto principal */
-    texto: '#111827',
-    /** Fundo do editor */
-    fundo: '#ffffff',
-    /** Cor de acento primária (cursor, linha ativa, links) */
-    acento: '#0052cc',
-    /** Fundo suave da linha ativa */
-    linhaAtiva: '#f0f4ff',
-    /** Fundo das calhas (gutters) */
-    calha: '#f3f4f6',
-    /** Texto das calhas */
-    calhaTexto: '#4b5563',
-    /** Borda das calhas */
-    calhaBorda: '#d1d5db',
-    /** Seleção de texto */
-    selecao: '#3b82f6',
-    /** Destaque de correspondência de seleção */
-    correspondencia: '#fef08a',
-    /** Texto de citação (blockquote) e calha */
-    citacao: '#4b5563',
-    /** Texto secundário / riscado */
-    secundario: '#6b7280',
-    /** Ênfase (itálico) */
-    enfase: '#059669',
-    /** Negrito */
-    negrito: '#dc2626',
-    /** Átomos / valores especiais */
-    atomo: '#ae0a04',
+const colors = {
+    text: '#111827',
+    background: '#ffffff',
+    accent: '#0052cc',
+    activeLine: '#f0f4ff',
+    gutter: '#f3f4f6',
+    gutterText: '#4b5563',
+    gutterBorder: '#d1d5db',
+    selection: '#3b82f6',
+    selectionMatch: '#fef08a',
+    quote: '#4b5563',
+    muted: '#6b7280',
+    emphasis: '#059669',
+    strong: '#dc2626',
+    atom: '#ae0a04',
 } as const
 
-// ─── Extensão de tema ────────────────────────────────────────────────────────
 export const editorTheme = EditorView.theme({
     '&': {
-        color: cores.texto,
-        backgroundColor: cores.fundo,
+        color: colors.text,
+        backgroundColor: colors.background,
     },
     '.cm-content': {
-        caretColor: cores.acento,
+        caretColor: colors.accent,
     },
     '.cm-gutters': {
-        backgroundColor: cores.calha,
-        color: cores.calhaTexto,
-        borderRight: `1px solid ${cores.calhaBorda}`,
+        backgroundColor: colors.gutter,
+        color: colors.gutterText,
+        borderRight: `1px solid ${colors.gutterBorder}`,
     },
     '.cm-activeLine': {
-        backgroundColor: cores.linhaAtiva,
+        backgroundColor: colors.activeLine,
     },
     '.cm-activeLineGutter': {
-        color: cores.acento,
-        backgroundColor: cores.linhaAtiva,
+        color: colors.accent,
+        backgroundColor: colors.activeLine,
         fontWeight: '600',
     },
     '.cm-cursor': {
-        borderLeftColor: cores.acento,
+        borderLeftColor: colors.accent,
     },
     '.cm-selectionBackground': {
-        backgroundColor: `${cores.selecao} !important`,
+        backgroundColor: `${colors.selection} !important`,
     },
     '&.cm-focused .cm-selectionBackground': {
-        backgroundColor: `${cores.selecao} !important`,
+        backgroundColor: `${colors.selection} !important`,
     },
     '.cm-selectionMatch': {
-        backgroundColor: cores.correspondencia,
+        backgroundColor: colors.selectionMatch,
     },
     // ── Markdown-specific ──────────────────────────────────────────────────
     '.cm-heading': {
-        color: cores.texto,
+        color: colors.text,
         fontWeight: '700',
     },
     '.cm-heading1': { fontSize: '130%' },
@@ -86,25 +60,25 @@ export const editorTheme = EditorView.theme({
     '.cm-heading3': { fontSize: '110%' },
     '.cm-emphasis': {
         fontStyle: 'italic',
-        color: cores.enfase,
+        color: colors.emphasis,
     },
     '.cm-strong': {
         fontWeight: 'bold',
-        color: cores.negrito,
+        color: colors.strong,
     },
     '.cm-link': {
-        color: cores.acento,
+        color: colors.accent,
         textDecoration: 'underline',
     },
     '.cm-atom': {
-        color: cores.atomo,
+        color: colors.atom,
     },
     '.cm-quote': {
-        color: cores.citacao,
+        color: colors.quote,
         fontStyle: 'italic',
     },
     '.cm-strikethrough': {
         textDecoration: 'line-through',
-        color: cores.secundario,
+        color: colors.muted,
     },
 })

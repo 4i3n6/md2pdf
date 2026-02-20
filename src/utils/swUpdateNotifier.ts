@@ -1,29 +1,16 @@
-/**
- * Notificador de Atualizações do Service Worker
- * Detecta quando há nova versão do app e notifica o usuário
- */
-
 import { logErro } from '@/utils/logger'
 
 class SWUpdateNotifier {
-  /**
-   * Inicializa o notificador de updates
-   */
   init(): void {
     if (!('serviceWorker' in navigator)) return
 
-    // Monitora updates do service worker
     navigator.serviceWorker.addEventListener('controllerchange', () => {
       this.showUpdateNotification()
     })
 
-    // Verifica por updates periodicamente (a cada 30 minutos)
     setInterval(() => this.checkForUpdates(), 30 * 60 * 1000)
   }
 
-  /**
-   * Verifica por updates do service worker
-   */
   private async checkForUpdates(): Promise<void> {
     if (!navigator.serviceWorker.controller) return
 
@@ -34,13 +21,10 @@ class SWUpdateNotifier {
       }
     } catch (e) {
       const errorMsg = e instanceof Error ? e.message : String(e)
-      logErro(`Erro ao verificar updates: ${errorMsg}`)
+      logErro(`Failed to check for updates: ${errorMsg}`)
     }
   }
 
-  /**
-   * Mostra notificação de atualização disponível
-   */
   private showUpdateNotification(): void {
     const logger = window.Logger
 
@@ -49,15 +33,10 @@ class SWUpdateNotifier {
       logger.log('Please reload the page to use the latest version', 'warning')
     }
 
-    // Cria elemento de notificação visual
     this.createUpdateBanner()
   }
 
-  /**
-   * Cria banner de atualização visual
-   */
   private createUpdateBanner(): void {
-    // Remove banner anterior se existir
     const existing = document.getElementById('update-banner')
     if (existing) {
       existing.remove()
@@ -101,7 +80,6 @@ class SWUpdateNotifier {
     banner.appendChild(content)
     document.body.appendChild(banner)
 
-    // Evento de recarregamento
     const btn = document.getElementById('update-reload-btn')
     if (btn) {
       btn.addEventListener('click', () => {
@@ -109,7 +87,6 @@ class SWUpdateNotifier {
       })
     }
 
-    // Auto-remove após 15 segundos (clicável)
     setTimeout(() => {
       if (banner.parentNode) {
         banner.style.opacity = '0'

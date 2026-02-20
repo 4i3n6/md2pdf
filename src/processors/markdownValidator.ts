@@ -1,13 +1,3 @@
-/**
- * MARKDOWN SYNTAX VALIDATOR
- * 
- * Valida sintaxe Markdown e retorna lista de erros/avisos
- * para exibição no editor com CodeMirror diagnostics
- */
-
-/**
- * Tipo para representar um erro de sintaxe
- */
 export interface MarkdownError {
   line: number;
   column: number;
@@ -21,21 +11,12 @@ export interface MarkdownError {
   };
 }
 
-/**
- * Resultado da validação de sintaxe Markdown
- */
 export interface MarkdownValidationResult {
   isValid: boolean;
   errors: MarkdownError[];
   warnings: MarkdownError[];
 }
 
-/**
- * Valida conteúdo Markdown e retorna lista de erros
- * 
- * @param markdown - Conteúdo Markdown a validar
- * @returns Resultado da validação com lista de erros/avisos
- */
 export function validateMarkdown(markdown: string): MarkdownValidationResult {
   const errors: MarkdownError[] = [];
   const warnings: MarkdownError[] = [];
@@ -46,7 +27,6 @@ export function validateMarkdown(markdown: string): MarkdownValidationResult {
 
   const lines = markdown.split('\n');
 
-  // Detectar linhas que estao dentro de blocos de codigo para ignorar validacao
   const linesInCodeBlock = new Set<number>();
   let inCodeBlock = false;
   lines.forEach((line, index) => {
@@ -58,12 +38,10 @@ export function validateMarkdown(markdown: string): MarkdownValidationResult {
     }
   });
 
-  // Validações por linha
   lines.forEach((line, lineIndex) => {
     const lineNum = lineIndex + 1;
     const trimmed = line.trim();
 
-    // IMPORTANTE: Ignorar linhas dentro de blocos de codigo
     if (linesInCodeBlock.has(lineIndex)) {
       return;
     }
@@ -87,7 +65,6 @@ export function validateMarkdown(markdown: string): MarkdownValidationResult {
         });
       }
 
-      // Aviso: heading sem espaço após #
       if (rest && !rest.startsWith(' ')) {
         const fixedLine = hashes + ' ' + rest.trimStart();
         warnings.push({
@@ -106,14 +83,12 @@ export function validateMarkdown(markdown: string): MarkdownValidationResult {
     const linkRegex = /\[([^\]]*)\]\(([^)]*)\)/g;
     let linkMatch;
     while ((linkMatch = linkRegex.exec(line)) !== null) {
-      // Ignorar imagens ![alt](url)
       if (linkMatch.index > 0 && line[linkMatch.index - 1] === '!') {
         continue;
       }
       const text = linkMatch[1];
       const url = linkMatch[2];
 
-      // Se ambos estao vazios, reportar apenas um erro
       if (!text && !url) {
         errors.push({
           line: lineNum,
@@ -139,7 +114,6 @@ export function validateMarkdown(markdown: string): MarkdownValidationResult {
           code: 'EMPTY_LINK_URL'
         });
       } else if (!url.match(/^(https?:|#|\/|mailto:)/)) {
-        // Aviso: URL sem protocolo
         warnings.push({
           line: lineNum,
           column: linkMatch.index + 1,
@@ -190,8 +164,6 @@ export function validateMarkdown(markdown: string): MarkdownValidationResult {
       });
     }
 
-    // 5. Validar bold/italic (** ou *)
-    // Ignorar linhas que são bullet points (começam com * seguido de espaço)
     const isBulletPoint = /^\s*\*\s/.test(line);
 
     if (!isBulletPoint) {
@@ -209,12 +181,6 @@ export function validateMarkdown(markdown: string): MarkdownValidationResult {
       }
     }
 
-    // 6. Validar listas (-, *, +)
-    if (line.match(/^\s*([-*+])\s+\S/) && !trimmed.startsWith('---')) {
-      // Lista válida, apenas log
-    }
-
-    // 7. Validar blockquotes (>)
     if (trimmed.startsWith('>') && !trimmed.match(/^>\s/)) {
       const fixedLine = trimmed.replace(/^>([^\s])/, '> $1');
       warnings.push({
@@ -228,11 +194,8 @@ export function validateMarkdown(markdown: string): MarkdownValidationResult {
       });
     }
 
-    // 8. Validar código em bloco (```)
-    // Serão validados em conjunto
   });
 
-  // 9. Validar blocos de código em bloco (triplo backtick)
   const codeBlockRegex = /```([a-z0-9#+-]*)\n([\s\S]*?)```/g;
   let codeBlockMatch;
   let codeBlockCount = 0;
@@ -241,7 +204,6 @@ export function validateMarkdown(markdown: string): MarkdownValidationResult {
     codeBlockCount++;
     const language = codeBlockMatch[1];
 
-    // Validar se é linguagem conhecida (apenas aviso)
     const knownLanguages = [
       'bash',
       'c',
@@ -296,7 +258,6 @@ export function validateMarkdown(markdown: string): MarkdownValidationResult {
     }
   }
 
-  // Validar se todos blocos de código foram fechados
   const backtickTriples = (markdown.match(/```/g) || []).length;
   if (backtickTriples % 2 !== 0) {
     const lastLine = lines.length;
@@ -311,7 +272,6 @@ export function validateMarkdown(markdown: string): MarkdownValidationResult {
     });
   }
 
-  // 10. Validar tabelas simples (pipes)
   const tableRegex = /^\|(.+)\|$/gm;
   const tableLines = markdown.match(tableRegex) || [];
 
@@ -339,12 +299,6 @@ export function validateMarkdown(markdown: string): MarkdownValidationResult {
   };
 }
 
-/**
- * Obtém descrição legível de um código de erro
- * 
- * @param code - Código do erro
- * @returns Descrição do erro
- */
 export function getErrorDescription(code: string): string {
   const descriptions: Record<string, string> = {
     INVALID_HEADING_LEVEL: 'Invalid heading level',

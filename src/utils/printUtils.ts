@@ -1,24 +1,13 @@
-/**
- * UTILITÁRIOS PARA IMPRESSÃO - MD2PDF
- * Funções de validação, otimização e controle de impressão
- */
-
 import { PrintLimits } from '@/constants'
 import { logAviso, logErro, logInfo } from '@/utils/logger'
 import { runPipeline, type PipelineStage } from '@/utils/pipeline'
 import { confirmar } from '@/services/modalService'
 
-/**
- * Resultado de validação de conteúdo para impressão
- */
 export interface ValidationResult {
   isValid: boolean;
   issues: string[];
 }
 
-/**
- * Estatísticas do documento para impressão
- */
 interface PrintStatistics {
   words: number;
   paragraphs: number;
@@ -48,22 +37,22 @@ const PrintTimings = {
   fallbackRestoreTimeoutMs: 5000
 } as const;
 
-function criarContainerTemporario(htmlContent: string): HTMLElement {
+function createTempContainer(htmlContent: string): HTMLElement {
   const container = document.createElement('div');
   container.innerHTML = htmlContent;
   return container;
 }
 
-async function aguardarImagensCarregadas(
+async function waitForImages(
   images: HTMLImageElement[],
   timeoutMs: number = 2000
 ): Promise<void> {
-  const pendentes = images.filter((img) => !img.complete);
-  if (pendentes.length === 0) return;
+  const pending = images.filter((img) => !img.complete);
+  if (pending.length === 0) return;
 
   await Promise.race([
     Promise.all(
-      pendentes.map(
+      pending.map(
         (img) =>
           new Promise<void>((resolve) => {
             const onDone = (): void => resolve();
@@ -76,7 +65,7 @@ async function aguardarImagensCarregadas(
   ]);
 }
 
-function obterDimensoesImagem(img: HTMLImageElement): { widthPx: number; heightPx: number } {
+function getImageDimensions(img: HTMLImageElement): { widthPx: number; heightPx: number } {
   const rect = img.getBoundingClientRect();
   const datasetWidth = Number(img.dataset['originalWidth'] || 0);
   const datasetHeight = Number(img.dataset['originalHeight'] || 0);
@@ -87,21 +76,21 @@ function obterDimensoesImagem(img: HTMLImageElement): { widthPx: number; heightP
   };
 }
 
-function obterLarguraTabela(table: HTMLTableElement): number {
+function getTableWidth(table: HTMLTableElement): number {
   const rect = table.getBoundingClientRect();
   return rect.width || table.scrollWidth || table.offsetWidth || 0;
 }
 
-function obterLarguraContainer(container: HTMLElement): number {
+function getContainerWidth(container: HTMLElement): number {
   const rect = container.getBoundingClientRect();
   return rect.width || container.clientWidth || container.scrollWidth || 0;
 }
 
-function validarImagensNoContainer(container: HTMLElement, issues: string[]): void {
+function validateImages(container: HTMLElement, issues: string[]): void {
   const images = Array.from(container.querySelectorAll('img'));
 
   images.forEach((img, idx) => {
-    const dims = obterDimensoesImagem(img);
+    const dims = getImageDimensions(img);
     if (dims.widthPx <= 0 || dims.heightPx <= 0) return;
 
     const maxWidthMm = PrintLimits.maxWidthMm;
@@ -116,72 +105,72 @@ function validarImagensNoContainer(container: HTMLElement, issues: string[]): vo
   });
 }
 
-function validarTabelasNoContainer(container: HTMLElement, issues: string[]): void {
+function validateTables(container: HTMLElement, issues: string[]): void {
   const tables = Array.from(container.querySelectorAll('table'));
-  const containerWidthPx = obterLarguraContainer(container);
+  const containerWidthPx = getContainerWidth(container);
   if (containerWidthPx <= 0) return;
 
-  // Tolerancia para evitar falso positivo por bordas, arredondamento e scrollbar.
-  // Avisa apenas quando o excesso é realmente perceptível no print.
-  const toleranciaPx = Math.max(12, containerWidthPx * 0.02);
+  // Tolerance to avoid false positives from borders, rounding, and scrollbar.
+  // Only warn when the overflow is actually perceptible in print.
+  const tolerancePx = Math.max(12, containerWidthPx * 0.02);
 
   tables.forEach((table, idx) => {
-    const tableWidthPx = obterLarguraTabela(table);
+    const tableWidthPx = getTableWidth(table);
     if (tableWidthPx <= 0) return;
-    const excessoNoContainer = Math.max(0, tableWidthPx - containerWidthPx);
-    const excessoInterno = Math.max(0, table.scrollWidth - table.clientWidth);
-    const excessoDetectado = Math.max(excessoNoContainer, excessoInterno);
+    const overflowInContainer = Math.max(0, tableWidthPx - containerWidthPx);
+    const overflowInternal = Math.max(0, table.scrollWidth - table.clientWidth);
+    const overflowDetected = Math.max(overflowInContainer, overflowInternal);
 
-    if (excessoDetectado > toleranciaPx) {
+    if (overflowDetected > tolerancePx) {
       issues.push(
-        `⚠️ Table ${idx + 1}: ${Math.round(tableWidthPx)}px (usable area ${Math.round(containerWidthPx)}px, excess ${Math.round(excessoDetectado)}px) may overflow in print`
+        `⚠️ Table ${idx + 1}: ${Math.round(tableWidthPx)}px (usable area ${Math.round(containerWidthPx)}px, excess ${Math.round(overflowDetected)}px) may overflow in print`
       );
     }
   });
 }
 
-function validarUrlsLongasNoHtml(htmlContent: string, issues: string[]): void {
+function validateLongUrls(htmlContent: string, issues: string[]): void {
   const longLines = htmlContent.match(/https?:\/\/[^\s<>"]{80,}/g);
   if (longLines && longLines.length > 0) {
     issues.push(`⚠️ ${longLines.length} long URL(s) may overflow in print output`);
   }
 }
 
-const validadoresConteudoImpressao: PipelineStage<ValidationPipelineContext>[] = [
+const printValidationPipeline: PipelineStage<ValidationPipelineContext>[] = [
   {
-    id: 'validar-imagens-print',
-    enabled: (contexto) => contexto.isLive,
-    run: async (contexto): Promise<void> => {
-      const images = Array.from(contexto.container.querySelectorAll('img'));
+    id: 'validate-images-print',
+    enabled: (ctx) => ctx.isLive,
+    run: async (ctx): Promise<void> => {
+      const images = Array.from(ctx.container.querySelectorAll('img'));
       if (images.length > 0) {
-        await aguardarImagensCarregadas(images);
+        await waitForImages(images);
       }
-      validarImagensNoContainer(contexto.container, contexto.issues);
+      validateImages(ctx.container, ctx.issues);
     }
   },
   {
-    id: 'validar-tabelas-print',
-    enabled: (contexto) => contexto.isLive,
-    run: (contexto): void => {
-      validarTabelasNoContainer(contexto.container, contexto.issues);
+    id: 'validate-tables-print',
+    enabled: (ctx) => ctx.isLive,
+    run: (ctx): void => {
+      validateTables(ctx.container, ctx.issues);
     }
   },
   {
-    id: 'validar-urls-longas-print',
-    run: (contexto): void => {
-      validarUrlsLongasNoHtml(contexto.htmlContent, contexto.issues);
+    id: 'validate-long-urls-print',
+    run: (ctx): void => {
+      validateLongUrls(ctx.htmlContent, ctx.issues);
     }
   }
 ]
 
-function obterPreviewElement(options?: PrintDocumentOptions): HTMLElement | null {
+function getPreviewElement(options?: PrintDocumentOptions): HTMLElement | null {
   if (options && 'previewElement' in options) {
     return options.previewElement ?? null;
   }
   return document.getElementById('preview') as HTMLElement | null;
 }
 
-async function obterValidacaoParaImpressao(
+async function getValidationForPrint(
   preview: HTMLElement,
   options?: PrintDocumentOptions
 ): Promise<ValidationResult> {
@@ -191,7 +180,7 @@ async function obterValidacaoParaImpressao(
   return await validatePrintContent(preview);
 }
 
-async function confirmarImpressaoComAvisos(
+async function confirmPrintWithWarnings(
   validation: ValidationResult,
   logger: (message: string) => void
 ): Promise<boolean> {
@@ -199,14 +188,14 @@ async function confirmarImpressaoComAvisos(
 
   validation.issues.forEach((issue) => logger(issue));
   return confirmar({
-    titulo: 'Print warnings',
-    mensagem: `${validation.issues.length} warning(s) detected.\nContinue anyway?`,
-    textoBotaoConfirmar: 'Print anyway',
-    variante: 'warning'
+    title: 'Print warnings',
+    message: `${validation.issues.length} warning(s) detected.\nContinue anyway?`,
+    confirmLabel: 'Print anyway',
+    variant: 'warning'
   });
 }
 
-function aplicarTituloPdfTemporario(docName: string): () => void {
+function applyTemporaryPdfTitle(docName: string): () => void {
   const originalTitle = document.title;
   const pdfName = docName.replace(/\.md$/i, '');
   document.title = pdfName;
@@ -215,7 +204,7 @@ function aplicarTituloPdfTemporario(docName: string): () => void {
   };
 }
 
-function abrirDialogoComRestauracao(onRestore: () => void): void {
+function openPrintDialogWithRestore(onRestore: () => void): void {
   let hasRestored = false;
 
   const doRestore = (): void => {
@@ -233,17 +222,12 @@ function abrirDialogoComRestauracao(onRestore: () => void): void {
 
   setTimeout(() => {
     if (!hasRestored) {
-      logAviso('[Print] Fallback: restaurando apos timeout');
+      logAviso('[Print] Fallback: restoring after timeout');
       doRestore();
     }
   }, PrintTimings.fallbackRestoreTimeoutMs);
 }
 
-/**
- * Valida conteúdo renderizado para possíveis problemas de impressão
- * @param htmlContent - Conteúdo HTML renderizado
- * @returns Resultado da validação com lista de problemas encontrados
- */
 export async function validatePrintContent(content: PrintContentTarget): Promise<ValidationResult> {
   const issues: string[] = [];
 
@@ -251,14 +235,14 @@ export async function validatePrintContent(content: PrintContentTarget): Promise
     return { isValid: false, issues: ['No content to print'] };
   }
 
-  const container = typeof content === 'string' ? criarContainerTemporario(content) : content;
+  const container = typeof content === 'string' ? createTempContainer(content) : content;
   const contexto: ValidationPipelineContext = {
     container,
     htmlContent: typeof content === 'string' ? content : container.innerHTML,
     isLive: container.isConnected,
     issues
   }
-  await runPipeline(contexto, validadoresConteudoImpressao)
+  await runPipeline(contexto, printValidationPipeline)
 
   return {
     isValid: issues.length === 0,
@@ -268,13 +252,13 @@ export async function validatePrintContent(content: PrintContentTarget): Promise
 
 let printPreviewEscapeHandler: ((e: KeyboardEvent) => void) | null = null;
 
-function removerHandlerEscapePrintPreview(): void {
+function removeEscapePrintPreviewHandler(): void {
   if (!printPreviewEscapeHandler) return;
   document.removeEventListener('keydown', printPreviewEscapeHandler);
   printPreviewEscapeHandler = null;
 }
 
-function registrarHandlerEscapePrintPreview(): void {
+function registerEscapePrintPreviewHandler(): void {
   if (printPreviewEscapeHandler) return;
 
   printPreviewEscapeHandler = (e: KeyboardEvent): void => {
@@ -286,44 +270,30 @@ function registrarHandlerEscapePrintPreview(): void {
   document.addEventListener('keydown', printPreviewEscapeHandler);
 }
 
-function definirPrintPreviewAtivo(ativo: boolean): void {
-  if (ativo) {
+function setPrintPreviewActive(active: boolean): void {
+  if (active) {
     document.body.classList.add('print-mode');
-    registrarHandlerEscapePrintPreview();
+    registerEscapePrintPreviewHandler();
     return;
   }
 
   document.body.classList.remove('print-mode');
-  removerHandlerEscapePrintPreview();
+  removeEscapePrintPreviewHandler();
 }
 
-/**
- * Otimiza página para impressão (esconde elementos desnecessários)
- * NOTA: Não modificamos mais o DOM - deixamos o CSS @media print cuidar disso
- * @returns Sucesso da operação
- */
 export function optimizeForPrint(): boolean {
   try {
-    // Não precisamos mais esconder elementos manualmente
-    // O CSS @media print em styles-print.css já cuida disso
-    // Isso evita problemas de restauração do DOM
-
     return true;
   } catch (error) {
     const errorMsg = error instanceof Error ? error.message : String(error);
-    logErro(`Erro ao otimizar para print: ${errorMsg}`);
+    logErro(`Failed to optimize for print: ${errorMsg}`);
     return false;
   }
 }
 
-/**
- * Restaura estado da página após impressão
- * @returns Sucesso da operação
- */
 export function restoreAfterPrint(): boolean {
   try {
-    // Limpar classe de preview e handlers temporários
-    definirPrintPreviewAtivo(false);
+    setPrintPreviewActive(false);
 
     return true;
   } catch (error) {
@@ -333,89 +303,65 @@ export function restoreAfterPrint(): boolean {
   }
 }
 
-/**
- * Abre diálogo de impressão com validação e otimização
- * @param _docName - Nome do documento (para título)
- * @param logger - Função de logging (opcional)
- * @returns Promise que resolve quando usuário fecha diálogo
- */
 export function printDocument(
   docName: string = 'document',
   logger: (message: string) => void = logInfo,
   options?: PrintDocumentOptions
 ): Promise<boolean> {
   return new Promise((resolve) => {
-    const executar = async (): Promise<void> => {
-      let restaurarTitulo: (() => void) | null = null;
+    const execute = async (): Promise<void> => {
+      let restoreTitle: (() => void) | null = null;
 
       try {
-        const preview = obterPreviewElement(options);
+        const preview = getPreviewElement(options);
         if (!preview) {
           logger('Error: preview element not found');
           resolve(false);
           return;
         }
 
-        const validation = await obterValidacaoParaImpressao(preview, options);
-        if (!confirmarImpressaoComAvisos(validation, logger)) {
+        const validation = await getValidationForPrint(preview, options);
+        if (!confirmPrintWithWarnings(validation, logger)) {
           resolve(false);
           return;
         }
 
-        restaurarTitulo = aplicarTituloPdfTemporario(docName);
-        abrirDialogoComRestauracao(() => {
-          restaurarTitulo?.();
+        restoreTitle = applyTemporaryPdfTitle(docName);
+        openPrintDialogWithRestore(() => {
+          restoreTitle?.();
           restoreAfterPrint();
           resolve(true);
         });
       } catch (error) {
         const errorMsg = error instanceof Error ? error.message : String(error);
-        logErro(`Erro ao imprimir: ${errorMsg}`);
-        restaurarTitulo?.();
+        logErro(`Print failed: ${errorMsg}`);
+        restoreTitle?.();
         restoreAfterPrint();
         resolve(false);
       }
     };
 
-    executar();
+    execute();
   });
 }
 
-/**
- * Ativa modo de preview de impressão (emula print media no CSS)
- * Permite ao usuário ver como ficará a impressão sem abrir print dialog
- * Pressione ESC para sair
- */
 export function togglePrintPreview(): void {
-  const ativo = document.body.classList.contains('print-mode');
-  definirPrintPreviewAtivo(!ativo);
+  const active = document.body.classList.contains('print-mode');
+  setPrintPreviewActive(!active);
 }
 
-/**
- * Entra em modo de preview (não toggle)
- * @returns Se entrou ou já estava
- */
 export function enterPrintPreview(): boolean {
   if (document.body.classList.contains('print-mode')) return false;
-  definirPrintPreviewAtivo(true);
+  setPrintPreviewActive(true);
   return true;
 }
 
-/**
- * Sai do modo de preview
- * @returns Se saiu ou já estava fora
- */
 export function exitPrintPreview(): boolean {
   if (!document.body.classList.contains('print-mode')) return false;
-  definirPrintPreviewAtivo(false);
+  setPrintPreviewActive(false);
   return true;
 }
 
-/**
- * Calcula estatísticas do documento para impressão
- * @param htmlContent - Conteúdo HTML
- * @returns Estatísticas (palavras, parágrafos, imagens, etc)
- */
 export function getPrintStatistics(htmlContent: string): PrintStatistics {
   const tempDiv = document.createElement('div');
   tempDiv.innerHTML = htmlContent;
@@ -433,17 +379,11 @@ export function getPrintStatistics(htmlContent: string): PrintStatistics {
     images,
     tables,
     lists,
-    estimatedPages: Math.ceil(words / 250 + images * 0.5), // Estimativa simples
-    estimatedReadTime: Math.ceil(words / 200), // minutos
+    estimatedPages: Math.ceil(words / 250 + images * 0.5),
+    estimatedReadTime: Math.ceil(words / 200),
   };
 }
 
-/**
- * Gera relatório de impressão para logging
- * @param docName - Nome do documento
- * @param htmlContent - Conteúdo HTML
- * @returns Relatório formatado
- */
 export async function generatePrintReport(docName: string, htmlContent: string): Promise<string> {
   const stats = getPrintStatistics(htmlContent);
   const validation = await validatePrintContent(htmlContent);

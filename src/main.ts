@@ -438,10 +438,10 @@ function deleteDoc(id: number): void {
   const doc = state.docs.find((d) => d.id === id)
   const nome = doc?.name || 'documento'
   void confirmar({
-    titulo: 'Deletar documento',
-    mensagem: `Tem certeza que deseja deletar "${nome}"?`,
-    textoBotaoConfirmar: 'Deletar',
-    variante: 'danger'
+    title: 'Delete document',
+    message: `Are you sure you want to delete "${nome}"?`,
+    confirmLabel: 'Delete',
+    variant: 'danger'
   }).then((confirmado) => {
     if (!confirmado) return
     const success = documentManager.delete(id)
