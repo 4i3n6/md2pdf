@@ -7,6 +7,13 @@ New releases are prepended automatically by [release-please](https://github.com/
 
 ---
 
+## [2.1.2](https://github.com/4i3n6/md2pdf/compare/md2pdf-v2.1.1...md2pdf-v2.1.2) (2026-02-20)
+
+
+### ### Fixed
+
+* **main:** replace top-level throw with graceful mobile viewport handling ([af99038](https://github.com/4i3n6/md2pdf/commit/af990381903e31599a67b1afa35022b8037e3aaa))
+
 ## [2.1.1](https://github.com/4i3n6/md2pdf/compare/md2pdf-v2.1.0...md2pdf-v2.1.1) (2026-02-20)
 
 
