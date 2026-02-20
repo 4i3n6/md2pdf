@@ -1,12 +1,12 @@
 # MD2PDF
 
-> A terminal-flavored Markdown editor that converts documents to precision-printed PDFs — entirely in your browser.
+> LLMs write in Markdown. Humans read PDFs. MD2PDF is the interface.
 
-No servers. No uploads. No accounts. Every keystroke stays on your machine.
+## **[md2pdf.xyz](https://md2pdf.xyz)** — open and use right now. No signup. No install.
 
 [![CI](https://github.com/4i3n6/md2pdf/actions/workflows/ci.yml/badge.svg)](https://github.com/4i3n6/md2pdf/actions/workflows/ci.yml)
-[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![Release](https://img.shields.io/github/v/release/4i3n6/md2pdf)](https://github.com/4i3n6/md2pdf/releases/latest)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![TypeScript](https://img.shields.io/badge/TypeScript-strict-3178c6.svg)](tsconfig.json)
 [![Client-side only](https://img.shields.io/badge/runs-in_browser_only-22c55e.svg)](#privacy)
 [![No data collected](https://img.shields.io/badge/data-none_collected-22c55e.svg)](#privacy)
@@ -15,13 +15,33 @@ No servers. No uploads. No accounts. Every keystroke stays on your machine.
 
 ---
 
-## What it is
+## The idea
 
-MD2PDF is a fully client-side Markdown editor with a live split-pane preview and pixel-accurate PDF export through the browser's native print engine. It was designed around a single hard constraint: **the PDF must look exactly like the preview.**
+Modern LLMs — ChatGPT, Claude, Gemini, Perplexity — produce Markdown by default. They do it exceptionally well: structured headings, fenced code blocks, tables, Mermaid diagrams, numbered lists.
 
-Documents are stored in `localStorage`. The editor is powered by CodeMirror 6. Diagrams render via Mermaid. PDF generation calls `window.print()` against a purpose-built A4 stylesheet — no PDF library, no wkhtmltopdf, no puppeteer. Just the browser, doing its job.
+Markdown is a *source* format. The people receiving your work read PDFs.
 
-The UI is deliberately minimal: monospace font throughout, a live metrics bar showing memory, render latency, and system status, a sidebar that shows nothing but what you need.
+MD2PDF closes that gap. Paste the output from any LLM, see it rendered live, export a pixel-accurate PDF in one click. No server sees your document. No account required. No conversion pipeline. Everything runs entirely in your browser — and works offline after the first load.
+
+```
+LLM output (Markdown)  →  md2pdf.xyz  →  PDF
+```
+
+---
+
+## Use it
+
+**[md2pdf.xyz](https://md2pdf.xyz)** — open and use immediately. Nothing to install.
+
+Or self-host in under a minute:
+
+```bash
+git clone https://github.com/4i3n6/md2pdf.git
+cd md2pdf
+npm install && npm run dev
+```
+
+Open [http://localhost:3000](http://localhost:3000).
 
 ---
 
@@ -64,19 +84,6 @@ The UI is deliberately minimal: monospace font throughout, a live metrics bar sh
 - **WCAG 2.1 AA** — semantic HTML, ARIA labels on all interactive elements, compliant contrast ratios throughout
 - **Full keyboard operation** — every action reachable without a mouse
 - **Bilingual UI** — English (`/`) and Portuguese (`/pt/`)
-
----
-
-## Quick start
-
-```bash
-git clone https://github.com/4i3n6/md2pdf.git
-cd md2pdf
-npm install
-npm run dev
-```
-
-Open [http://localhost:3000](http://localhost:3000).
 
 ---
 
@@ -152,7 +159,7 @@ All Mermaid diagram types are supported. Use a `mermaid` fenced code block:
 ~~~markdown
 ```mermaid
 flowchart LR
-    A[Write] --> B{Preview} --> C[Print]
+    A[LLM output] --> B{md2pdf.xyz} --> C[PDF]
 ```
 ~~~
 
@@ -237,7 +244,9 @@ Edit `defaultDoc` in `src/services/documentManager.ts`.
 
 ## Privacy
 
-All data — documents, preferences, editor state — is stored exclusively in your browser's `localStorage`. Nothing is sent to any server. The application has no analytics, no telemetry, and no network requests after the initial page load.
+All data — documents, preferences, editor state — is stored exclusively in your browser's `localStorage`. Nothing is sent to any server. The application has no analytics, no telemetry, and makes no network requests after the initial page load.
+
+Your documents are yours. They never leave your device.
 
 ---
 
