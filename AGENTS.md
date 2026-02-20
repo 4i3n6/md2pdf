@@ -1,55 +1,109 @@
-# AGENTS.md - Guia para Agentes de Código
+# AGENTS.md
 
-## Comandos Essenciais
+## Identity and authorship
 
-```bash
-npm run dev      # Desenvolvimento (porta 3000, abre automaticamente)
-npm run build    # Build para produção em ./dist
-npm run preview  # Preview da build de produção
+All commits to this repository must use the following identity:
+
+```
+name:  4i3n6
+email: 4i3n6@pm.me
 ```
 
-**Nota:** Este projeto não possui lint ou testes. Build deve executar sem erros.
+This is enforced by `.githooks/pre-commit`. If your local git identity differs, fix it:
 
-## Convenções de Código
+```bash
+git config user.name "4i3n6"
+git config user.email "4i3n6@pm.me"
+```
 
-### Imports & Estrutura
-- **Imports**: ES6 modules (`import`/`export`)
-- **Tipo de projeto**: CommonJS type, mas código usa ES6 imports (processado por Vite)
-- Ordem: dependências externas → módulos locais → estilos CSS
+The `.githooks/` directory is committed to the repo. To activate hooks after cloning:
 
-### Formatação & Nomenclatura
-- **Idioma**: Português para comentários, variáveis, funções do sistema
-- **Padrão**: camelCase para variáveis/funções (ex: `initSystem`, `getCurrentDoc`)
-- **Constantes**: camelCase com PascalCase para objetos (ex: `Logger`, `state`)
-- **Espaçamento**: 4 espaços de indentação
+```bash
+git config core.hooksPath .githooks
+```
 
-### Tipos & Validação
-- **Tipagem**: TypeScript estrito — todos os arquivos são `.ts`, com `tsconfig.json` configurado
-- **Typecheck**: `npm run typecheck` executa `tsc --noEmit` (deve passar sem erros antes de qualquer commit)
-- **Validação**: Validação simples com try/catch; log de erros obrigatório
+## Language policy
 
-### Tratamento de Erros
-- Sempre usar Logger (objeto disponível globalmente)
-- Padrão: `Logger.error()` para erros, `Logger.success()` para sucesso, `Logger.log()` para info
-- Confirmações críticas com `confirm()` nativo
+**Everything in this repository is written in English (EN-US).**
 
-### Arquitetura & Padrões
-- **Padrão**: State management simples com objeto `state` global
-- **DOM**: Seleção por ID com `document.getElementById()`
-- **Eventos**: Event listeners com `addEventListener`
-- **Renderização**: Funções puras como `renderList()`, `renderPreview()` sem side effects desnecessários
-- **Persistência**: localStorage com chave `md2pdf-docs-v3`
+- Source code: identifiers, comments, string literals — EN-US
+- Documentation: all `.md` files — EN-US
+- Commit messages — EN-US (enforced by `.githooks/commit-msg`)
+- Exception: the `/pt/` directory contains user-facing translated UI (PT-BR) — do not touch unless explicitly working on a translation
 
-### Build & Otimizações
-- **Minificação**: Terser com `drop_console: true` e `drop_debugger: true`
-- **Code splitting**: Automático para codemirror, marked
-- **PWA**: Vite PWA plugin ativo com service worker auto-update
-- **Limites**: Chunk size warning em 1000KB
+## Commit format
 
-### Boas Práticas
-- ✅ Manter funções pequenas e focadas (máx 30 linhas)
-- ✅ Comentários apenas para lógica não óbvia
-- ✅ Salvar docs após cada modificação crítica (`saveDocs()`)
-- ✅ Usar Logger para todas as operações do sistema
-- ❌ Evitar console.log direto (será removido no build)
-- ❌ Não adicionar dependências sem justificar
+Conventional commits, in English:
+
+```
+type(scope): short description in EN-US
+
+Optional body.
+```
+
+Types: `feat`, `fix`, `refactor`, `docs`, `test`, `chore`, `ci`, `build`, `style`, `perf`
+
+The commit-msg hook rejects PT-BR verbs in the description.
+
+## Commands
+
+```bash
+npm run dev          # dev server on port 3000 (auto-opens browser)
+npm run build        # production build to ./dist
+npm run preview      # preview production build
+npm run typecheck    # tsc --noEmit (must pass before every commit)
+npm run smoke        # smoke test (requires build)
+npm run visual:test  # Playwright render/print fidelity suite
+```
+
+Build must exit with code 0. No typecheck errors tolerated.
+
+## Code conventions
+
+### Imports
+
+ES6 modules (`import`/`export`). Order: external dependencies -> local modules -> CSS.
+
+### Naming
+
+- Variables and functions: `camelCase` (e.g., `initSystem`, `getCurrentDoc`)
+- Classes and objects: `PascalCase` (e.g., `Logger`, `DocumentManager`)
+- Indentation: 4 spaces
+
+### TypeScript
+
+Strict mode throughout. All source files are `.ts`. No `any`, no `@ts-ignore` without documented justification. Typecheck must pass before committing.
+
+### Error handling
+
+Use the global `Logger` object:
+
+- `Logger.error()` — errors
+- `Logger.success()` — success
+- `Logger.log()` — info
+
+No `console.log` in production code (stripped by Terser at build time).
+
+Critical destructive actions use `modalService.confirm()` — not native `confirm()`.
+
+### Architecture
+
+- State: single global `state` object
+- DOM access: `document.getElementById()`
+- Events: `addEventListener`
+- Rendering: pure functions (`renderList()`, `renderPreview()`) with no unnecessary side effects
+- Persistence: `localStorage` under key `md2pdf-docs-v3`
+
+### Build
+
+- Minification: Terser with `drop_console: true` and `drop_debugger: true`
+- Code splitting: automatic for `codemirror`, `marked`
+- PWA: Vite PWA plugin with service worker auto-update
+- Chunk size warning threshold: 1000 KB
+
+## Rules
+
+- Functions: max 30 lines, single responsibility
+- No new dependencies without explicit justification
+- `saveDocs()` after every critical document mutation
+- No PT-BR in source code, comments, or documentation outside `/pt/`

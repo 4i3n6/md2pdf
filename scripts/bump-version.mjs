@@ -165,7 +165,7 @@ for (const file of VERSION_FILES) {
 updatePackageLockVersion(newVersion)
 
 // Create Git Tag if --tag is present
-if (process.argv.includes('--tag') \u0026\u0026!isSync) {
+if (process.argv.includes('--tag') &&!isSync) {
   try {
     const tagName = `v${newVersion}`
     console.log(`\nCreating git tag: ${tagName}...`)

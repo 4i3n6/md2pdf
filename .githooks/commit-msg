@@ -1,0 +1,29 @@
+#!/bin/sh
+# commit-msg — rejects commit messages written in Portuguese (PT-BR).
+# Configured via: git config core.hooksPath .githooks
+
+MSG_FILE="$1"
+MSG=$(cat "$MSG_FILE")
+
+if echo "$MSG" | grep -qE "^Merge |^Revert "; then
+    exit 0
+fi
+
+SUBJECT=$(echo "$MSG" | head -1 | sed 's/^[a-z]*([^)]*): //' | sed 's/^[a-z]*!: //' | sed 's/^[a-z]*: //')
+
+PTBR_PATTERN="(adicionar|adicionando|adicionado|remover|removendo|removido|corrigir|corrigindo|corrigido|corrige|corrigiu|atualizar|atualizando|atualizado|criar|criando|criado|criou|extrair|extraindo|extraido|implementar|implementando|implementado|refatorar|refatorando|refatorado|substituir|substituindo|substituido|substitui|melhorar|melhorando|melhorado|resolver|resolvendo|resolvido|configurar|configurando|configurado|ajustar|ajustando|ajustado|desativar|desativando|desativado|ativar|ativando|ativado|evitar|evitando|evitado|permitir|permitindo|permitido|forçar|forçando|forçado|fixar|fixando|fixado)"
+
+if echo "$SUBJECT" | grep -qiE "\\b$PTBR_PATTERN\\b"; then
+    echo ""
+    echo "ERROR: Commit message appears to be in Portuguese (PT-BR)."
+    echo "This repository requires commit messages in English (EN-US)."
+    echo ""
+    echo "Subject: '$SUBJECT'"
+    echo ""
+    echo "  WRONG: fix: corrigir erro no parser"
+    echo "  RIGHT: fix: fix parser error"
+    echo ""
+    exit 1
+fi
+
+exit 0
