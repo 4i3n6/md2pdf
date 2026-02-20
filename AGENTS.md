@@ -2,19 +2,7 @@
 
 ## Identity and authorship
 
-All commits to this repository must use the following identity:
-
-```
-name:  4i3n6
-email: 4i3n6@pm.me
-```
-
-This is enforced by `.githooks/pre-commit`. If your local git identity differs, fix it:
-
-```bash
-git config user.name "4i3n6"
-git config user.email "4i3n6@pm.me"
-```
+Each contributor commits with their own identity. There is no project-wide enforced name/email.
 
 The `.githooks/` directory is committed to the repo. To activate hooks after cloning:
 
