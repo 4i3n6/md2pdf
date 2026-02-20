@@ -529,6 +529,15 @@
         border: 1px dashed red;
     }
     */
+
+    /* ============================================================
+       HIDE MOBILE OVERLAY IN PRINT
+       ============================================================ */
+
+    .mobile-block-overlay {
+        display: none !important;
+        visibility: hidden !important;
+    }
 }
 
 /* ============================================================
@@ -672,14 +681,7 @@ body.print-mode #preview-wrapper {
     padding-top: 50px; /* Para não sobrepor a mensagem */
 }
 
-/* ============================================================
-   HIDE MOBILE OVERLAY IN PRINT
-   ============================================================ */
 
-.mobile-block-overlay {
-    display: none !important;
-    visibility: hidden !important;
-}
 
 /* ============================================================
    MERMAID DIAGRAMS FOR PRINT - Professional Documentation Style
