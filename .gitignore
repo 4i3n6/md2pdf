@@ -22,8 +22,19 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# AI assistant config (each dev may have their own locally)
+CLAUDE.md
+.cursorrules
+.cursorignore
+.github/copilot-instructions.md
+.windsurfrules
+
+# Test artifacts
 playwright-report
 test-results
+
+# Tool-specific
 .serena
 .crush
 .wrangler

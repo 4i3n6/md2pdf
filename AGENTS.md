@@ -47,6 +47,8 @@ Versioning and GitHub Releases are fully automated via [release-please](https://
 - `feat:` → minor (`1.x.0`)
 - `BREAKING CHANGE:` in commit body → major (`x.0.0`)
 
+**Do NOT manually bump versions** in `package.json`, HTML files, `content.json`, or `i18n/*.ts`. release-please manages all version strings across the repository. Manual bumps cause conflicts and break the automated release pipeline.
+
 **Manual sync (edge cases only):**
 ```bash
 node scripts/bump-version.mjs sync   # propagate current package.json version to all files
@@ -108,9 +110,29 @@ Critical destructive actions use `modalService.confirm()` — not native `confir
 - PWA: Vite PWA plugin with service worker auto-update
 - Chunk size warning threshold: 1000 KB
 
+## Security
+
+- All user-generated HTML must be sanitized (DOMPurify in the browser, equivalent in Node.js)
+- Never set Mermaid `securityLevel` to `'loose'` — use `'strict'` or `'sandbox'`
+- No raw HTML injection into browser contexts (Puppeteer, iframes) without prior sanitization
+- No credentials, tokens, or secrets in code or documentation
+- Sensitive data in logs must be truncated/masked (e.g., `222***222`)
+
 ## Rules
 
 - Functions: max 30 lines, single responsibility
 - No new dependencies without explicit justification
 - `saveDocs()` after every critical document mutation
 - No PT-BR in source code, comments, or documentation outside `/pt/`
+
+## Contributing (Pull Requests)
+
+External contributions are welcome. To keep PRs mergeable:
+
+1. **Do not bump versions.** release-please handles all version strings. PRs that touch `package.json` version, HTML version spans, `content.json`, or `i18n/*.ts` version fields will be rejected.
+2. **Do not add AI config files.** `CLAUDE.md`, `.cursorrules`, `.cursorignore`, and similar are gitignored. Use them locally but do not commit them. `AGENTS.md` is the single source of truth for project conventions.
+3. **Justify new dependencies.** Open an issue or explain in the PR body why the dependency is necessary and whether it belongs in `dependencies` (required at runtime by the published package) or `devDependencies` (build tools, test frameworks, bundled code).
+4. **Prefer shared code over duplication.** If logic already exists in `src/processors/` or `src/utils/`, extract a platform-agnostic module instead of reimplementing it.
+5. **Run checks before opening.** `npm run typecheck` and `npm test` must both pass. PRs with type errors or failing tests will not be reviewed.
+6. **Follow the commit format.** Conventional commits in English. The commit-msg hook rejects non-conforming messages.
+7. **One logical change per PR.** Avoid mixing unrelated changes (e.g., a new feature + a CI config change + a Node.js version bump). Split them into separate PRs.
