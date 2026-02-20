@@ -8,6 +8,10 @@ No servers. No uploads. No accounts. Every keystroke stays on your machine.
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![Release](https://img.shields.io/github/v/release/4i3n6/md2pdf)](https://github.com/4i3n6/md2pdf/releases/latest)
 [![TypeScript](https://img.shields.io/badge/TypeScript-strict-3178c6.svg)](tsconfig.json)
+[![Client-side only](https://img.shields.io/badge/runs-in_browser_only-22c55e.svg)](#privacy)
+[![No data collected](https://img.shields.io/badge/data-none_collected-22c55e.svg)](#privacy)
+[![Offline-first](https://img.shields.io/badge/offline-first-0ea5e9.svg)](#offline-and-pwa)
+[![PWA](https://img.shields.io/badge/PWA-installable-7c3aed.svg)](#offline-and-pwa)
 
 ---
 
