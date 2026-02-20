@@ -1,7 +1,7 @@
-import { obterFencePreviewPorNome } from '@/services/documentLanguageService'
+import { getFencePreviewByName } from '@/services/documentLanguageService'
 
-export function preprocessarMarkdownParaPreview(markdown: string, docName: string): string {
-    const fence = obterFencePreviewPorNome(docName)
+export function preprocessMarkdownForPreview(markdown: string, docName: string): string {
+    const fence = getFencePreviewByName(docName)
     if (!fence) return markdown
     return `\`\`\`${fence}\n${markdown}\n\`\`\``
 }

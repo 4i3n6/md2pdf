@@ -1,5 +1,5 @@
 import { processMarkdown, estimatePageCount } from '@/processors/markdownProcessor'
-import { preprocessarMarkdownParaPreview } from '@/services/markdownPreprocessService'
+import { preprocessMarkdownForPreview } from '@/services/markdownPreprocessService'
 import type { LoggerInterface } from '@/types/index'
 
 interface PreviewRenderer {
@@ -12,17 +12,17 @@ type RenderRequest = {
     docName: string
 }
 
-function pedidosIguais(a: RenderRequest, b: RenderRequest): boolean {
+function requestsAreEqual(a: RenderRequest, b: RenderRequest): boolean {
     return a.container === b.container && a.markdown === b.markdown && a.docName === b.docName
 }
 
 export class PreviewService {
-    private renderEmExecucao: boolean = false
-    private ultimoPedido: RenderRequest | null = null
-    private ultimaEstimativaPaginas: number | null = null
-    private ultimoLogEstimativaTs: number = 0
-    private ultimoMarkdownProcessado: string | null = null
-    private ultimoHtmlProcessado: string = ''
+    private renderInProgress: boolean = false
+    private latestRequest: RenderRequest | null = null
+    private lastPageEstimate: number | null = null
+    private lastEstimateLogTs: number = 0
+    private lastProcessedMarkdown: string | null = null
+    private lastProcessedHtml: string = ''
 
     constructor(
         private renderer: PreviewRenderer,
@@ -34,63 +34,63 @@ export class PreviewService {
         markdown: string,
         docName: string = ''
     ): void {
-        const proximoPedido: RenderRequest = { container, markdown, docName }
-        if (this.ultimoPedido && pedidosIguais(this.ultimoPedido, proximoPedido)) {
+        const nextRequest: RenderRequest = { container, markdown, docName }
+        if (this.latestRequest && requestsAreEqual(this.latestRequest, nextRequest)) {
             return
         }
 
-        this.ultimoPedido = proximoPedido
-        if (this.renderEmExecucao) return
-        void this.processarFila()
+        this.latestRequest = nextRequest
+        if (this.renderInProgress) return
+        void this.processQueue()
     }
 
-    private async processarFila(): Promise<void> {
-        this.renderEmExecucao = true
+    private async processQueue(): Promise<void> {
+        this.renderInProgress = true
         try {
-            while (this.ultimoPedido) {
-                const pedido = this.ultimoPedido
-                this.ultimoPedido = null
-                await this.renderizar(pedido)
+            while (this.latestRequest) {
+                const request = this.latestRequest
+                this.latestRequest = null
+                await this.render(request)
             }
         } finally {
-            this.renderEmExecucao = false
+            this.renderInProgress = false
         }
     }
 
-    private async renderizar(pedido: RenderRequest): Promise<void> {
-        if (!pedido.container || !pedido.container.isConnected) return
+    private async render(request: RenderRequest): Promise<void> {
+        if (!request.container || !request.container.isConnected) return
 
-        const content = preprocessarMarkdownParaPreview(pedido.markdown, pedido.docName)
-        const html = this.obterHtmlRenderizado(content)
+        const content = preprocessMarkdownForPreview(request.markdown, request.docName)
+        const html = this.getRenderedHtml(content)
 
-        await this.renderer.renderPreview(pedido.container, html)
+        await this.renderer.renderPreview(request.container, html)
 
         const estimatedPages = estimatePageCount(html)
-        this.logarEstimativaPaginas(estimatedPages)
+        this.logPageEstimate(estimatedPages)
     }
 
-    private obterHtmlRenderizado(markdownPreprocessado: string): string {
-        if (this.ultimoMarkdownProcessado === markdownPreprocessado) {
-            return this.ultimoHtmlProcessado
+    private getRenderedHtml(preprocessedMarkdown: string): string {
+        if (this.lastProcessedMarkdown === preprocessedMarkdown) {
+            return this.lastProcessedHtml
         }
 
-        const html = processMarkdown(markdownPreprocessado)
-        this.ultimoMarkdownProcessado = markdownPreprocessado
-        this.ultimoHtmlProcessado = html
+        const html = processMarkdown(preprocessedMarkdown)
+        this.lastProcessedMarkdown = preprocessedMarkdown
+        this.lastProcessedHtml = html
         return html
     }
 
-    private logarEstimativaPaginas(estimatedPages: number): void {
-        const agora = Date.now()
-        const mudouEstimativa = this.ultimaEstimativaPaginas !== estimatedPages
-        const passouJanelaLog = agora - this.ultimoLogEstimativaTs >= 2000
+    private logPageEstimate(estimatedPages: number): void {
+        const now = Date.now()
+        const estimateChanged = this.lastPageEstimate !== estimatedPages
+        const logWindowElapsed = now - this.lastEstimateLogTs >= 2000
 
-        if (!mudouEstimativa && !passouJanelaLog) {
+        if (!estimateChanged && !logWindowElapsed) {
             return
         }
 
-        this.ultimaEstimativaPaginas = estimatedPages
-        this.ultimoLogEstimativaTs = agora
-        this.logger.log(`Renderizado em ~${estimatedPages} pagina(s) A4`, 'info')
+        this.lastPageEstimate = estimatedPages
+        this.lastEstimateLogTs = now
+        this.logger.log(`Rendered in ~${estimatedPages} A4 page(s)`, 'info')
     }
 }

@@ -68,7 +68,7 @@ export function setupQuickTags(deps: QuickTagsDeps): void {
                     insert = '**' + selectedText + '**'
                     cursorOffset = insert.length
                 } else {
-                    insert = '**texto**'
+                    insert = '**text**'
                     cursorOffset = 2
                 }
                 break
@@ -78,7 +78,7 @@ export function setupQuickTags(deps: QuickTagsDeps): void {
                     insert = '*' + selectedText + '*'
                     cursorOffset = insert.length
                 } else {
-                    insert = '*texto*'
+                    insert = '*text*'
                     cursorOffset = 1
                 }
                 break
@@ -98,7 +98,7 @@ export function setupQuickTags(deps: QuickTagsDeps): void {
                     insert = '[' + selectedText + '](url)'
                     cursorOffset = insert.length - 4
                 } else {
-                    insert = '[texto](url)'
+                    insert = '[text](url)'
                     cursorOffset = 1
                 }
                 break
@@ -108,7 +108,7 @@ export function setupQuickTags(deps: QuickTagsDeps): void {
                     insert = '~~' + selectedText + '~~'
                     cursorOffset = insert.length
                 } else {
-                    insert = '~~texto~~'
+                    insert = '~~text~~'
                     cursorOffset = 2
                 }
                 break
@@ -154,7 +154,7 @@ export function setupQuickTags(deps: QuickTagsDeps): void {
                 break
 
             case 'table':
-                insert = '\n| Coluna 1 | Coluna 2 | Coluna 3 |\n|----------|----------|----------|\n| dado 1   | dado 2   | dado 3   |\n'
+                insert = '\n| Column 1 | Column 2 | Column 3 |\n|----------|----------|----------|\n| value 1  | value 2  | value 3  |\n'
                 cursorOffset = 3
                 break
 
@@ -163,7 +163,7 @@ export function setupQuickTags(deps: QuickTagsDeps): void {
                     insert = '<mark style="background:#fef08a">' + selectedText + '</mark>'
                     cursorOffset = insert.length
                 } else {
-                    insert = '<mark style="background:#fef08a">texto</mark>'
+                    insert = '<mark style="background:#fef08a">text</mark>'
                     cursorOffset = 32
                 }
                 break
@@ -173,7 +173,7 @@ export function setupQuickTags(deps: QuickTagsDeps): void {
                     insert = '<mark style="background:#bbf7d0">' + selectedText + '</mark>'
                     cursorOffset = insert.length
                 } else {
-                    insert = '<mark style="background:#bbf7d0">texto</mark>'
+                    insert = '<mark style="background:#bbf7d0">text</mark>'
                     cursorOffset = 32
                 }
                 break
@@ -183,7 +183,7 @@ export function setupQuickTags(deps: QuickTagsDeps): void {
                     insert = '<mark style="background:#bfdbfe">' + selectedText + '</mark>'
                     cursorOffset = insert.length
                 } else {
-                    insert = '<mark style="background:#bfdbfe">texto</mark>'
+                    insert = '<mark style="background:#bfdbfe">text</mark>'
                     cursorOffset = 32
                 }
                 break
@@ -193,7 +193,7 @@ export function setupQuickTags(deps: QuickTagsDeps): void {
                     insert = '<mark style="background:#fecaca">' + selectedText + '</mark>'
                     cursorOffset = insert.length
                 } else {
-                    insert = '<mark style="background:#fecaca">texto</mark>'
+                    insert = '<mark style="background:#fecaca">text</mark>'
                     cursorOffset = 32
                 }
                 break
@@ -202,9 +202,9 @@ export function setupQuickTags(deps: QuickTagsDeps): void {
                 if (hasSelection) {
                     insert = selectedText.replace(/<[^>]*>/g, '')
                     cursorOffset = insert.length
-                    deps.logger.log('Tags HTML removidas da selecao')
+                    deps.logger.log('HTML tags removed from selection')
                 } else {
-                    deps.logger.log('Selecione um texto para remover tags', 'warning')
+                    deps.logger.log('Select text to remove tags', 'warning')
                     return
                 }
                 break
@@ -218,7 +218,7 @@ export function setupQuickTags(deps: QuickTagsDeps): void {
                     insert = `<div style="text-align: ${alignValue}">${selectedText}</div>`
                     cursorOffset = insert.length
                 } else {
-                    deps.logger.log('Selecione um texto para alinhar', 'warning')
+                    deps.logger.log('Select text to align', 'warning')
                     return
                 }
                 break
@@ -233,7 +233,7 @@ export function setupQuickTags(deps: QuickTagsDeps): void {
         })
 
         view.focus()
-        deps.logger.log(`Tag "${tag}" inserida`)
+        deps.logger.log(`Tag "${tag}" inserted`)
     }
 
     const container = document.querySelector('.quick-tags-container')
@@ -249,6 +249,6 @@ export function setupQuickTags(deps: QuickTagsDeps): void {
         }
     })
 
-    deps.logger.success('Quick Tags ativadas')
+    deps.logger.success('Quick Tags active')
 }
 

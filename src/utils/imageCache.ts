@@ -1,5 +1,5 @@
 import { ImageCacheConfig } from '@/constants'
-import { logAviso } from '@/utils/logger'
+import { logWarn } from '@/utils/logger'
 
 interface Dimensions {
   width: number
@@ -49,7 +49,7 @@ class ImageCacheManager {
         }
       } catch (e) {
         const errorMsg = e instanceof Error ? e.message : String(e)
-        logAviso(`Failed to load cache from localStorage: ${errorMsg}`)
+        logWarn(`Failed to load cache from localStorage: ${errorMsg}`)
       }
     }
   }
@@ -71,7 +71,7 @@ class ImageCacheManager {
         this.localStorage.setItem(CACHE_KEY, JSON.stringify(data))
       } catch (e) {
         const errorMsg = e instanceof Error ? e.message : String(e)
-        logAviso(`Failed to save cleaned cache: ${errorMsg}`)
+        logWarn(`Failed to save cleaned cache: ${errorMsg}`)
       }
     }
   }
@@ -118,7 +118,7 @@ class ImageCacheManager {
           }
         } catch (e) {
           const errorMsg = e instanceof Error ? e.message : String(e)
-          logAviso(`Failed to read cache from localStorage: ${errorMsg}`)
+          logWarn(`Failed to read cache from localStorage: ${errorMsg}`)
         }
 
         data.cache[src] = entry
@@ -131,11 +131,11 @@ class ImageCacheManager {
         this.localStorage.setItem(CACHE_KEY, JSON.stringify(data))
       } catch (e) {
         if (e instanceof DOMException && e.name === 'QuotaExceededError') {
-          logAviso('localStorage full - clearing image cache')
+          logWarn('localStorage full - clearing image cache')
           this.clear()
         } else {
           const errorMsg = e instanceof Error ? e.message : String(e)
-          logAviso(`Failed to save to cache: ${errorMsg}`)
+          logWarn(`Failed to save to cache: ${errorMsg}`)
         }
       }
     }
@@ -163,7 +163,7 @@ class ImageCacheManager {
         this.localStorage.removeItem(CACHE_KEY)
       } catch (e) {
         const errorMsg = e instanceof Error ? e.message : String(e)
-        logAviso(`Failed to clear cache: ${errorMsg}`)
+        logWarn(`Failed to clear cache: ${errorMsg}`)
       }
     }
   }

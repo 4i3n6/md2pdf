@@ -1,7 +1,7 @@
 import { BackupConfig } from '@/constants'
 import { getDocPreferences, loadDocPreferences, saveDocPreferences, type DocumentPreferences } from '@/services/previewPreferencesService'
 import type { AppState, Document as AppDocument, LoggerInterface } from '@/types/index'
-import { confirmar } from '@/services/modalService'
+import { confirm } from '@/services/modalService'
 
 type BackupPayload = {
     version: number
@@ -25,7 +25,7 @@ type DocumentIoDeps = {
     renderPreview: (md: string) => void
     updateMetrics: () => void
     updateSaveStatus: () => void
-    atualizarLinguagemEditor: (nome?: string) => Promise<void>
+    updateEditorLanguage: (name?: string) => Promise<void>
 }
 
 export function createDocumentIoService(deps: DocumentIoDeps) {
@@ -58,7 +58,7 @@ export function createDocumentIoService(deps: DocumentIoDeps) {
                 deps.renderList()
                 deps.renderPreview(content)
                 deps.updateSaveStatus()
-                void deps.atualizarLinguagemEditor(newDoc.name)
+                void deps.updateEditorLanguage(newDoc.name)
 
                 deps.logger.success(`Arquivo importado: ${file.name}`)
             } catch (error) {
@@ -138,14 +138,14 @@ export function createDocumentIoService(deps: DocumentIoDeps) {
         const payload = raw as Partial<BackupPayload>
         if (!Array.isArray(payload.docs)) return null
 
-        const prefsBrutas = payload.prefs && typeof payload.prefs === 'object'
+        const rawPrefs = payload.prefs && typeof payload.prefs === 'object'
             ? (payload.prefs as Record<string, unknown>)
             : {}
 
         const prefs: Record<string, DocumentPreferences> = {}
-        Object.entries(prefsBrutas).forEach(([docId, valor]) => {
-            if (!valor || typeof valor !== 'object') return
-            const pref = valor as Partial<DocumentPreferences>
+        Object.entries(rawPrefs).forEach(([docId, prefValue]) => {
+            if (!prefValue || typeof prefValue !== 'object') return
+            const pref = prefValue as Partial<DocumentPreferences>
             if (typeof pref.font !== 'string' || typeof pref.align !== 'string') return
             const fontSize = typeof pref.fontSize === 'string' ? pref.fontSize : '8pt'
             prefs[docId] = { font: pref.font, align: pref.align, fontSize }
@@ -170,25 +170,25 @@ export function createDocumentIoService(deps: DocumentIoDeps) {
             }
         })
 
-        const docsAtualizados = deps.documentManager.getAll()
-        deps.state.docs = docsAtualizados
-        deps.state.currentId = docsAtualizados[0]?.id ?? null
+        const updatedDocs = deps.documentManager.getAll()
+        deps.state.docs = updatedDocs
+        deps.state.currentId = updatedDocs[0]?.id ?? null
 
-        const docAtual = deps.getCurrentDoc()
+        const currentDoc = deps.getCurrentDoc()
         if (deps.state.editor) {
             deps.state.editor.dispatch({
                 changes: {
                     from: 0,
                     to: deps.state.editor.state.doc.length,
-                    insert: docAtual?.content || ''
+                    insert: currentDoc?.content || ''
                 }
             })
         }
 
         deps.renderList()
-        if (docAtual) {
-            deps.renderPreview(docAtual.content)
-            loadDocPreferences(deps.state, deps.logger, docAtual.id)
+        if (currentDoc) {
+            deps.renderPreview(currentDoc.content)
+            loadDocPreferences(deps.state, deps.logger, currentDoc.id)
         } else {
             deps.renderPreview('')
         }
@@ -229,7 +229,7 @@ export function createDocumentIoService(deps: DocumentIoDeps) {
                 return
             }
 
-            const confirmed = await confirmar({
+            const confirmed = await confirm({
                 title: 'Restore backup',
                 message: 'This action replaces all current documents.\nContinue?',
                 confirmLabel: 'Restore',
@@ -275,7 +275,7 @@ export function createDocumentIoService(deps: DocumentIoDeps) {
     return {
         importMarkdownFile,
         downloadMarkdownFile,
-        exportarBackupDocumentos: exportBackup,
-        importarBackupDocumentos: importBackup
+        exportBackupDocuments: exportBackup,
+        importBackupDocuments: importBackup
     }
 }

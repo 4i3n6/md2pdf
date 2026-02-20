@@ -1,32 +1,32 @@
 import type { LoggerInterface } from '@/types/index'
 
-function obterLogger(): LoggerInterface | null {
+function getLogger(): LoggerInterface | null {
     if (typeof window === 'undefined') {
         return null
     }
     return window.Logger || null
 }
 
-export function logInfo(mensagem: string): void {
-    const logger = obterLogger()
+export function logInfo(message: string): void {
+    const logger = getLogger()
     if (!logger?.log) return
-    logger.log(mensagem, 'info')
+    logger.log(message, 'info')
 }
 
-export function logAviso(mensagem: string): void {
-    const logger = obterLogger()
+export function logWarn(message: string): void {
+    const logger = getLogger()
     if (!logger?.log) return
-    logger.log(mensagem, 'warning')
+    logger.log(message, 'warning')
 }
 
-export function logErro(mensagem: string): void {
-    const logger = obterLogger()
+export function logError(message: string): void {
+    const logger = getLogger()
     if (!logger?.error) return
-    logger.error(mensagem)
+    logger.error(message)
 }
 
-export function logSucesso(mensagem: string): void {
-    const logger = obterLogger()
+export function logSuccess(message: string): void {
+    const logger = getLogger()
     if (!logger?.success) return
-    logger.success(mensagem)
+    logger.success(message)
 }

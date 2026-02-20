@@ -8,7 +8,7 @@
 import { MermaidConfig } from '@/constants'
 import { decodeBase64Utf8 } from '@/utils/base64'
 import { t } from '@/i18n'
-import { logErro } from '@/utils/logger'
+import { logError } from '@/utils/logger'
 
 let mermaidInstance: typeof import('mermaid').default | null = null
 let initPromise: Promise<void> | null = null
@@ -66,23 +66,23 @@ async function ensureMermaidLoaded(): Promise<typeof import('mermaid').default> 
   return mermaidInstance!
 }
 
-function normalizarMermaidSource(source: string): string {
+function normalizeMermaidSource(source: string): string {
   return source.trim()
 }
 
-function gerarMermaidId(): string {
+function generateMermaidId(): string {
   return `mermaid-${Date.now()}-${Math.random().toString(36).slice(2, 9)}`
 }
 
 function decodeBase64Source(base64: string): string {
   return decodeBase64Utf8(base64, {
-    onError: logErro,
-    errorPrefix: '[Mermaid] Falha ao decodificar base64: '
+    onError: logError,
+    errorPrefix: '[Mermaid] Failed to decode base64: '
   })
 }
 
-function setTextoSeguro(elemento: HTMLElement, texto: string): void {
-  elemento.textContent = texto
+function setTextSafe(element: HTMLElement, text: string): void {
+  element.textContent = text
 }
 
 function parseDimension(value: string | null): number {
@@ -93,7 +93,7 @@ function parseDimension(value: string | null): number {
   return Number.isFinite(parsed) ? parsed : 0
 }
 
-function extrairDimensoesSvg(svgElement: SVGSVGElement | null): { width: number, height: number } {
+function extractSvgDimensions(svgElement: SVGSVGElement | null): { width: number, height: number } {
   if (!svgElement) {
     return { width: 0, height: 0 }
   }
@@ -128,7 +128,7 @@ function extrairDimensoesSvg(svgElement: SVGSVGElement | null): { width: number,
 }
 
 function isWideDiagramForPrint(svgElement: SVGSVGElement | null): boolean {
-  const { width, height } = extrairDimensoesSvg(svgElement)
+  const { width, height } = extractSvgDimensions(svgElement)
   const maxWidth = MermaidConfig.maxPageWidthPx
   const landscapeTrigger = maxWidth * LANDSCAPE_MULTIPLIER
   return width > maxWidth && width > landscapeTrigger && width > height
@@ -188,7 +188,7 @@ function limitarCache(): void {
 }
 
 async function renderMermaidSvg(source: string): Promise<string> {
-  const normalizedSource = normalizarMermaidSource(source)
+  const normalizedSource = normalizeMermaidSource(source)
   const cacheKey = normalizedSource
   const cachedSvg = mermaidCache.get(cacheKey)
   if (cachedSvg) {
@@ -202,7 +202,7 @@ async function renderMermaidSvg(source: string): Promise<string> {
 
   const renderPromise = (async () => {
     const mermaid = await ensureMermaidLoaded()
-    const id = gerarMermaidId()
+    const id = generateMermaidId()
     const { svg } = await mermaid.render(id, normalizedSource)
     mermaidCache.set(cacheKey, svg)
     limitarCache()
@@ -219,7 +219,7 @@ async function renderMermaidSvg(source: string): Promise<string> {
   }
 }
 
-function renderMermaidError(block: HTMLElement, mensagem: string): void {
+function renderMermaidError(block: HTMLElement, message: string): void {
   block.innerHTML = ''
   const errorContainer = document.createElement('div')
   errorContainer.className = 'mermaid-error'
@@ -227,7 +227,7 @@ function renderMermaidError(block: HTMLElement, mensagem: string): void {
   const title = document.createElement('strong')
   title.textContent = `${t('preview.mermaidErrorLabel')} `
   const details = document.createElement('pre')
-  setTextoSeguro(details, mensagem)
+  setTextSafe(details, message)
 
   errorContainer.appendChild(title)
   errorContainer.appendChild(details)
@@ -288,11 +288,11 @@ export async function processMermaidDiagrams(container: HTMLElement | null): Pro
 
         const numberSpan = document.createElement('span')
         numberSpan.className = 'diagram-number'
-        setTextoSeguro(numberSpan, '')
+        setTextSafe(numberSpan, '')
 
         const titleSpan = document.createElement('span')
         titleSpan.className = 'diagram-title'
-        setTextoSeguro(titleSpan, diagramTitle)
+        setTextSafe(titleSpan, diagramTitle)
 
         caption.appendChild(numberSpan)
         caption.appendChild(titleSpan)
@@ -307,7 +307,7 @@ export async function processMermaidDiagrams(container: HTMLElement | null): Pro
       processedCount += 1
     } catch (e) {
       const errorMessage = e instanceof Error ? e.message : 'Unknown error'
-      logErro(`Erro ao renderizar Mermaid: ${errorMessage}`)
+      logError(`Failed to render Mermaid: ${errorMessage}`)
       renderMermaidError(block, errorMessage)
     }
   }

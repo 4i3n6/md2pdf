@@ -13,7 +13,7 @@ type SaveStatusDeps = {
     debounceMs: number
 }
 
-export function documentoEstaModificado(doc: AppDocument): boolean {
+export function isDocumentModified(doc: AppDocument): boolean {
     if (!doc.lastSaved) return true
     return doc.updated > doc.lastSaved
 }
@@ -44,7 +44,7 @@ export function createSaveStatusService(deps: SaveStatusDeps) {
         const statusEl = document.getElementById('save-status')
         if (!statusEl) return
 
-        if (documentoEstaModificado(doc)) {
+        if (isDocumentModified(doc)) {
             statusEl.className = 'save-status save-status-modified'
             statusEl.innerHTML = `<span class="save-dot modified"></span><span class="save-text">${deps.t('save.notSaved')}</span>`
             return
@@ -55,7 +55,7 @@ export function createSaveStatusService(deps: SaveStatusDeps) {
         statusEl.innerHTML = `<span class="save-dot saved"></span><span class="save-text">${statusText}</span>`
     }
 
-    function marcarDocumentosSalvos(): void {
+    function markDocumentsSaved(): void {
         const now = Date.now()
         deps.state.docs.forEach((doc) => {
             if (!doc.lastSaved || doc.updated > doc.lastSaved) {
@@ -64,19 +64,19 @@ export function createSaveStatusService(deps: SaveStatusDeps) {
         })
     }
 
-    function salvarDocumentosAgora(): void {
-        marcarDocumentosSalvos()
+    function saveDocumentsNow(): void {
+        markDocumentsSaved()
         deps.persistDocs()
         deps.updateMetrics()
         updateSaveStatus()
     }
 
-    const salvarDocumentosDebounced = debounce(() => {
-        salvarDocumentosAgora()
+    const debouncedSave = debounce(() => {
+        saveDocumentsNow()
     }, deps.debounceMs)
 
-    function agendarSalvamento(): void {
-        salvarDocumentosDebounced()
+    function scheduleSave(): void {
+        debouncedSave()
         updateSaveStatus()
     }
 
@@ -87,7 +87,7 @@ export function createSaveStatusService(deps: SaveStatusDeps) {
             return
         }
 
-        salvarDocumentosAgora()
+        saveDocumentsNow()
         deps.logger.success(deps.t('logs.docSaved'))
     }
 
@@ -120,8 +120,8 @@ export function createSaveStatusService(deps: SaveStatusDeps) {
 
     return {
         updateSaveStatus,
-        agendarSalvamento,
-        salvarDocumentosAgora,
+        scheduleSave,
+        saveDocumentsNow,
         setupSaveControls
     }
 }

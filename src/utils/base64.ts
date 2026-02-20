@@ -1,15 +1,15 @@
 type DecodeBase64Options = {
-    onError?: (mensagem: string) => void
+    onError?: (message: string) => void
     errorPrefix?: string
 }
 
 function encodeViaTextEncoder(input: string): string {
-    const textoCodificado = new TextEncoder().encode(input)
-    let bruto = ''
-    for (let i = 0; i < textoCodificado.length; i += 1) {
-        bruto += String.fromCharCode(textoCodificado[i] ?? 0)
+    const encoded = new TextEncoder().encode(input)
+    let raw = ''
+    for (let i = 0; i < encoded.length; i += 1) {
+        raw += String.fromCharCode(encoded[i] ?? 0)
     }
-    return btoa(bruto)
+    return btoa(raw)
 }
 
 function encodeViaLegacyUnicode(input: string): string {

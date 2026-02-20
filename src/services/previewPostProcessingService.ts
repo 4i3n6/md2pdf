@@ -5,58 +5,58 @@ import { processCryptoTruncationInTables } from '@/processors/cryptoTableTruncat
 import type { LoggerInterface } from '@/types/index'
 import { runPipeline, type PipelineStage } from '@/utils/pipeline'
 
-type PreviewPosProcessador = {
-    executar: (container: HTMLElement) => Promise<number>
-    mensagemSucesso: (quantidade: number) => string
-    mensagemErro: string
+type PreviewPostProcessor = {
+    execute: (container: HTMLElement) => Promise<number>
+    successMessage: (count: number) => string
+    errorMessage: string
 }
 
-type PreviewPosProcessamentoContexto = {
+type PreviewPostProcessingContext = {
     container: HTMLElement
     logger: LoggerInterface | undefined
 }
 
-const processadores: PreviewPosProcessador[] = [
+const processors: PreviewPostProcessor[] = [
     {
-        executar: (container) => processImagesInPreview(container, true),
-        mensagemSucesso: (quantidade) => `${quantidade} imagem(ns) otimizada(s) para A4`,
-        mensagemErro: 'Erro ao processar imagens'
+        execute: (container) => processImagesInPreview(container, true),
+        successMessage: (count) => `${count} image(s) optimized for A4`,
+        errorMessage: 'Failed to process images'
     },
     {
-        executar: processMermaidDiagrams,
-        mensagemSucesso: (quantidade) => `${quantidade} diagrama(s) Mermaid renderizado(s)`,
-        mensagemErro: 'Erro ao processar diagramas Mermaid'
+        execute: processMermaidDiagrams,
+        successMessage: (count) => `${count} Mermaid diagram(s) rendered`,
+        errorMessage: 'Failed to process Mermaid diagrams'
     },
     {
-        executar: processYamlBlocks,
-        mensagemSucesso: (quantidade) => `${quantidade} bloco(s) YAML renderizado(s)`,
-        mensagemErro: 'Erro ao processar blocos YAML'
+        execute: processYamlBlocks,
+        successMessage: (count) => `${count} YAML block(s) rendered`,
+        errorMessage: 'Failed to process YAML blocks'
     },
     {
-        executar: processCryptoTruncationInTables,
-        mensagemSucesso: (quantidade) => `${quantidade} valor(es) cripto truncado(s) em tabela(s)`,
-        mensagemErro: 'Erro ao truncar valores cripto em tabelas'
+        execute: processCryptoTruncationInTables,
+        successMessage: (count) => `${count} crypto value(s) truncated in table(s)`,
+        errorMessage: 'Failed to truncate crypto values in tables'
     }
 ]
 
-const etapasPosProcessamento: PipelineStage<PreviewPosProcessamentoContexto>[] = processadores.map(
-    (processador, idx) => ({
-        id: `preview-pos-processador-${idx + 1}`,
-        run: async (contexto): Promise<void> => {
-            const processados = await processador.executar(contexto.container)
-            if (processados > 0) {
-                contexto.logger?.log?.(processador.mensagemSucesso(processados), 'success')
+const postProcessingStages: PipelineStage<PreviewPostProcessingContext>[] = processors.map(
+    (processor, idx) => ({
+        id: `preview-post-processor-${idx + 1}`,
+        run: async (ctx): Promise<void> => {
+            const processed = await processor.execute(ctx.container)
+            if (processed > 0) {
+                ctx.logger?.log?.(processor.successMessage(processed), 'success')
             }
         },
-        onError: (erro, contexto): void => {
-            contexto.logger?.error?.(`${processador.mensagemErro}: ${String(erro)}`)
+        onError: (error, ctx): void => {
+            ctx.logger?.error?.(`${processor.errorMessage}: ${String(error)}`)
         }
     })
 )
 
-export async function executarPosProcessamentoPreview(
+export async function runPreviewPostProcessing(
     container: HTMLElement,
     logger?: LoggerInterface
 ): Promise<void> {
-    await runPipeline({ container, logger }, etapasPosProcessamento)
+    await runPipeline({ container, logger }, postProcessingStages)
 }

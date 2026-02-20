@@ -66,7 +66,7 @@ const CSS_MODAL = `
 .md2pdf-modal-icon.warning { background: #b45309; }
 .md2pdf-modal-icon.info    { background: var(--accent,  #0052cc); }
 
-.md2pdf-modal-titulo {
+.md2pdf-modal-title {
     font-size: 12px;
     font-weight: 700;
     color: var(--text-main, #111827);
@@ -115,32 +115,32 @@ const CSS_MODAL = `
     outline-offset: 2px;
 }
 
-.md2pdf-modal-btn.confirmar.danger {
+.md2pdf-modal-btn.confirm.danger {
     background: var(--error, #ae0a04);
     color: #ffffff;
     border-color: var(--error, #ae0a04);
 }
-.md2pdf-modal-btn.confirmar.danger:hover {
+.md2pdf-modal-btn.confirm.danger:hover {
     background: #8b0000;
     border-color: #8b0000;
 }
 
-.md2pdf-modal-btn.confirmar.warning {
+.md2pdf-modal-btn.confirm.warning {
     background: #b45309;
     color: #ffffff;
     border-color: #b45309;
 }
-.md2pdf-modal-btn.confirmar.warning:hover {
+.md2pdf-modal-btn.confirm.warning:hover {
     background: #92400e;
     border-color: #92400e;
 }
 
-.md2pdf-modal-btn.confirmar.info {
+.md2pdf-modal-btn.confirm.info {
     background: var(--accent, #0052cc);
     color: #ffffff;
     border-color: var(--accent, #0052cc);
 }
-.md2pdf-modal-btn.confirmar.info:hover {
+.md2pdf-modal-btn.confirm.info:hover {
     background: #003d99;
     border-color: #003d99;
 }
@@ -163,7 +163,7 @@ function getVariantIcon(variant: ModalVariant): string {
     return 'i'
 }
 
-export function confirmar(options: ModalOptions): Promise<boolean> {
+export function confirm(options: ModalOptions): Promise<boolean> {
     return new Promise((resolve) => {
         injectStyles()
 
@@ -175,7 +175,7 @@ export function confirmar(options: ModalOptions): Promise<boolean> {
         overlay.className = 'md2pdf-modal-overlay'
         overlay.setAttribute('role', 'dialog')
         overlay.setAttribute('aria-modal', 'true')
-        overlay.setAttribute('aria-labelledby', 'md2pdf-modal-titulo')
+        overlay.setAttribute('aria-labelledby', 'md2pdf-modal-title')
 
         const modal = document.createElement('div')
         modal.className = 'md2pdf-modal'
@@ -189,8 +189,8 @@ export function confirmar(options: ModalOptions): Promise<boolean> {
         icon.setAttribute('aria-hidden', 'true')
 
         const titleEl = document.createElement('span')
-        titleEl.className = 'md2pdf-modal-titulo'
-        titleEl.id = 'md2pdf-modal-titulo'
+        titleEl.className = 'md2pdf-modal-title'
+        titleEl.id = 'md2pdf-modal-title'
         titleEl.textContent = options.title
 
         header.appendChild(icon)
@@ -204,12 +204,12 @@ export function confirmar(options: ModalOptions): Promise<boolean> {
         footer.className = 'md2pdf-modal-footer'
 
         const btnCancel = document.createElement('button')
-        btnCancel.className = 'md2pdf-modal-btn cancelar'
+        btnCancel.className = 'md2pdf-modal-btn cancel'
         btnCancel.textContent = cancelLabel
         btnCancel.type = 'button'
 
         const btnConfirm = document.createElement('button')
-        btnConfirm.className = `md2pdf-modal-btn confirmar ${variant}`
+        btnConfirm.className = `md2pdf-modal-btn confirm ${variant}`
         btnConfirm.textContent = confirmLabel
         btnConfirm.type = 'button'
 

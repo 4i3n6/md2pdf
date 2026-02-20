@@ -1,6 +1,6 @@
-const extensoesMarkdown = new Set(['', 'md', 'markdown', 'txt'])
+const markdownExtensions = new Set(['', 'md', 'markdown', 'txt'])
 
-const fencesPreviewPorExtensao: Record<string, string> = {
+const fencesByExtension: Record<string, string> = {
     sql: 'sql',
     ddl: 'sql',
     json: 'json',
@@ -31,7 +31,7 @@ const fencesPreviewPorExtensao: Record<string, string> = {
     ruby: 'ruby'
 }
 
-const aliasesLinguagemCodigo: Record<string, string> = {
+const codeLanguageAliases: Record<string, string> = {
     js: 'javascript',
     jsx: 'javascript',
     ts: 'typescript',
@@ -53,37 +53,37 @@ const aliasesLinguagemCodigo: Record<string, string> = {
     xhtml: 'xml'
 }
 
-export function obterExtensaoDocumentoArquivo(nome?: string): string {
-    const origem = (nome || '').trim()
-    const partes = origem.split('.')
-    if (partes.length < 2) return ''
-    return (partes.pop() || '').toLowerCase().trim()
+export function getFileExtension(name?: string): string {
+    const source = (name || '').trim()
+    const parts = source.split('.')
+    if (parts.length < 2) return ''
+    return (parts.pop() || '').toLowerCase().trim()
 }
 
-export function documentoEhMarkdownPorNome(nome?: string): boolean {
-    return extensoesMarkdown.has(obterExtensaoDocumentoArquivo(nome))
+export function isMarkdownByName(name?: string): boolean {
+    return markdownExtensions.has(getFileExtension(name))
 }
 
-export function obterModoEditorPorNome(nome?: string): string {
-    if (documentoEhMarkdownPorNome(nome)) return 'markdown'
-    const ext = obterExtensaoDocumentoArquivo(nome)
+export function getEditorModeByName(name?: string): string {
+    if (isMarkdownByName(name)) return 'markdown'
+    const ext = getFileExtension(name)
     return ext || 'plaintext'
 }
 
-export function obterFencePreviewPorNome(nome?: string): string | null {
-    const ext = obterExtensaoDocumentoArquivo(nome)
-    return fencesPreviewPorExtensao[ext] || null
+export function getFencePreviewByName(name?: string): string | null {
+    const ext = getFileExtension(name)
+    return fencesByExtension[ext] || null
 }
 
-export function normalizarLinguagemCodigo(nomeBruto?: string): string {
-    const partes = (nomeBruto || 'plaintext')
+export function normalizeCodeLanguage(rawName?: string): string {
+    const parts = (rawName || 'plaintext')
         .toLowerCase()
         .trim()
         .split(/\s+/)
-    const bruto = partes[0] || 'plaintext'
-    const limpo = bruto.replace(/[^a-z0-9#+.-]/g, '')
+    const raw = parts[0] || 'plaintext'
+    const normalized = raw.replace(/[^a-z0-9#+.-]/g, '')
 
-    if (!limpo) return 'plaintext'
+    if (!normalized) return 'plaintext'
 
-    return aliasesLinguagemCodigo[limpo] || limpo
+    return codeLanguageAliases[normalized] || normalized
 }

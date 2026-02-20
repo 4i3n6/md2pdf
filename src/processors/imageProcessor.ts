@@ -1,6 +1,6 @@
 import { PrintLimits } from '@/constants'
 import { imageCache } from '@/utils/imageCache'
-import { logAviso } from '@/utils/logger'
+import { logWarn } from '@/utils/logger'
 
 interface ImageDimensions {
   width: number
@@ -38,7 +38,7 @@ export function getImageDimensions(src: string): Promise<ImageDimensions | null>
     }
 
     img.onerror = () => {
-      logAviso(`Failed to load image: ${src}`)
+      logWarn(`Failed to load image: ${src}`)
       resolve(null)
     }
 
@@ -153,7 +153,7 @@ export async function processImagesForPrint(
         processed++
       } else {
         const errorMsg = result.reason instanceof Error ? result.reason.message : String(result.reason)
-        logAviso(`Failed to process image: ${errorMsg}`)
+        logWarn(`Failed to process image: ${errorMsg}`)
       }
     })
   }

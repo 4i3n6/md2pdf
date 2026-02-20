@@ -24,9 +24,9 @@ import typescript from 'highlight.js/lib/languages/typescript'
 import yaml from 'highlight.js/lib/languages/yaml'
 import { t } from '@/i18n'
 import { encodeBase64Utf8 } from '@/utils/base64'
-import { normalizarLinguagemCodigo } from '@/services/documentLanguageService'
-import { logErro } from '@/utils/logger'
-import { registrarHooksSanitizacaoStyle } from './styleSanitizer'
+import { normalizeCodeLanguage } from '@/services/documentLanguageService'
+import { logError } from '@/utils/logger'
+import { registerStyleSanitizationHooks } from './styleSanitizer'
 
 // Explicit registration to keep the highlight.js bundle lean.
 const highlightLanguages: Array<[string, LanguageFn]> = [
@@ -212,10 +212,10 @@ class PrintRenderer extends Renderer {
         return
       }
 
-      Array.from(element.childNodes).forEach((child) => processTextNodes(child))
+      Array.from(element.childNodes).forEach((child) => { processTextNodes(child) })
     }
 
-    Array.from(template.content.childNodes).forEach((node) => processTextNodes(node))
+    Array.from(template.content.childNodes).forEach((node) => { processTextNodes(node) })
     return template.innerHTML
   }
 
@@ -302,7 +302,7 @@ class PrintRenderer extends Renderer {
 
   override code(token: Tokens.Code): string {
     const rawLanguage = typeof token.lang === 'string' ? token.lang.trim() : ''
-    const lang = normalizarLinguagemCodigo(rawLanguage)
+    const lang = normalizeCodeLanguage(rawLanguage)
     const hasLanguage = rawLanguage.length > 0
     let highlightedCode = token.text
 
@@ -533,13 +533,13 @@ export function processMarkdown(markdown: string): string {
     )
 
     const dirty = marked(preprocessed) as string
-    registrarHooksSanitizacaoStyle()
+    registerStyleSanitizationHooks()
     const clean = DOMPurify.sanitize(dirty, DOMPURIFY_CONFIG as any) as unknown as string
 
     return clean
   } catch (e) {
     const errorMsg = e instanceof Error ? e.message : 'Unknown error'
-    logErro(`Failed to process markdown: ${errorMsg}`)
+    logError(`Failed to process markdown: ${errorMsg}`)
     return `<p class="error">Failed to process markdown: ${DOMPurify.sanitize(errorMsg)}</p>`
   }
 }
@@ -578,7 +578,7 @@ export async function processImagesInPreview(container: HTMLElement | null, useC
     return await processImagesForPrint(container, useCache)
   } catch (e) {
     const errorMsg = e instanceof Error ? e.message : String(e)
-    logErro(`Failed to process images for print: ${errorMsg}`)
+    logError(`Failed to process images for print: ${errorMsg}`)
     return 0
   }
 }

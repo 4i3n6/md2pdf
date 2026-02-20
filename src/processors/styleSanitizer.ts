@@ -1,7 +1,7 @@
 import DOMPurify from 'dompurify'
 
-const tagsComStylePermitido = new Set(['span', 'div', 'mark', 'figure', 'blockquote', 'th', 'td'])
-const propriedadesStylePermitidasPorTag: Record<string, Set<string>> = {
+const tagsAllowingStyle = new Set(['span', 'div', 'mark', 'figure', 'blockquote', 'th', 'td'])
+const allowedStylePropertiesByTag: Record<string, Set<string>> = {
     span: new Set(['font-family', 'color']),
     div: new Set(['text-align', 'page-break-inside', 'break-inside']),
     mark: new Set(['background', 'background-color', 'color']),
@@ -11,41 +11,41 @@ const propriedadesStylePermitidasPorTag: Record<string, Set<string>> = {
     td: new Set(['text-align'])
 }
 
-const regexCorCss = /^(#[0-9a-f]{3,8}|rgb(a)?\([^)]{1,40}\)|hsl(a)?\([^)]{1,40}\)|transparent|black|white)$/i
-const regexFonteCss = /^[a-z0-9\s,'"-]+$/i
+const cssColorRegex = /^(#[0-9a-f]{3,8}|rgb(a)?\([^)]{1,40}\)|hsl(a)?\([^)]{1,40}\)|transparent|black|white)$/i
+const cssFontRegex = /^[a-z0-9\s,'"-]+$/i
 
-function sanitizarValorCss(propriedade: string, valorBruto: string): string | null {
-    const valor = valorBruto.trim()
-    if (!valor) return null
+function sanitizeCssValue(property: string, rawValue: string): string | null {
+    const value = rawValue.trim()
+    if (!value) return null
 
-    if (/url\s*\(|expression\s*\(|@import|javascript:/i.test(valor)) {
+    if (/url\s*\(|expression\s*\(|@import|javascript:/i.test(value)) {
         return null
     }
 
-    if (propriedade === 'text-align') {
-        if (/^(left|right|center|justify)$/i.test(valor)) {
-            return valor.toLowerCase()
+    if (property === 'text-align') {
+        if (/^(left|right|center|justify)$/i.test(value)) {
+            return value.toLowerCase()
         }
         return null
     }
 
-    if (propriedade === 'font-family') {
-        if (valor.length <= 120 && regexFonteCss.test(valor)) {
-            return valor
+    if (property === 'font-family') {
+        if (value.length <= 120 && cssFontRegex.test(value)) {
+            return value
         }
         return null
     }
 
-    if (propriedade === 'background' || propriedade === 'background-color' || propriedade === 'color') {
-        if (regexCorCss.test(valor)) {
-            return valor.toLowerCase()
+    if (property === 'background' || property === 'background-color' || property === 'color') {
+        if (cssColorRegex.test(value)) {
+            return value.toLowerCase()
         }
         return null
     }
 
-    if (propriedade === 'page-break-inside' || propriedade === 'break-inside') {
-        if (/^(auto|avoid|avoid-page)$/i.test(valor)) {
-            return valor.toLowerCase()
+    if (property === 'page-break-inside' || property === 'break-inside') {
+        if (/^(auto|avoid|avoid-page)$/i.test(value)) {
+            return value.toLowerCase()
         }
         return null
     }
@@ -53,34 +53,34 @@ function sanitizarValorCss(propriedade: string, valorBruto: string): string | nu
     return null
 }
 
-function sanitizarStyleInline(tagName: string, styleBruto: string): string {
-    if (!styleBruto || !tagName) return ''
-    if (!tagsComStylePermitido.has(tagName)) return ''
+function sanitizeInlineStyle(tagName: string, rawStyle: string): string {
+    if (!rawStyle || !tagName) return ''
+    if (!tagsAllowingStyle.has(tagName)) return ''
 
-    const propriedadesPermitidas = propriedadesStylePermitidasPorTag[tagName]
-    if (!propriedadesPermitidas) return ''
+    const allowedProperties = allowedStylePropertiesByTag[tagName]
+    if (!allowedProperties) return ''
 
-    const regrasSanitizadas: string[] = []
-    const declaracoes = styleBruto.split(';')
+    const sanitizedRules: string[] = []
+    const declarations = rawStyle.split(';')
 
-    declaracoes.forEach((declaracao) => {
-        const idxSeparador = declaracao.indexOf(':')
-        if (idxSeparador <= 0) return
+    declarations.forEach((declaration) => {
+        const separatorIdx = declaration.indexOf(':')
+        if (separatorIdx <= 0) return
 
-        const propriedade = declaracao.slice(0, idxSeparador).trim().toLowerCase()
-        const valor = declaracao.slice(idxSeparador + 1)
+        const property = declaration.slice(0, separatorIdx).trim().toLowerCase()
+        const value = declaration.slice(separatorIdx + 1)
 
-        if (!propriedadesPermitidas.has(propriedade)) {
+        if (!allowedProperties.has(property)) {
             return
         }
 
-        const valorSanitizado = sanitizarValorCss(propriedade, valor)
-        if (!valorSanitizado) return
+        const sanitizedValue = sanitizeCssValue(property, value)
+        if (!sanitizedValue) return
 
-        regrasSanitizadas.push(`${propriedade}: ${valorSanitizado}`)
+        sanitizedRules.push(`${property}: ${sanitizedValue}`)
     })
 
-    return regrasSanitizadas.join('; ')
+    return sanitizedRules.join('; ')
 }
 
 type HookData = {
@@ -89,24 +89,24 @@ type HookData = {
     keepAttr?: boolean
 }
 
-let hooksDomPurifyRegistrados = false
+let domPurifyHooksRegistered = false
 
-export function registrarHooksSanitizacaoStyle(): void {
-    if (hooksDomPurifyRegistrados) return
+export function registerStyleSanitizationHooks(): void {
+    if (domPurifyHooksRegistered) return
 
     DOMPurify.addHook('uponSanitizeAttribute', (node: Element, data: HookData) => {
         if (!data || data.attrName !== 'style') return
 
         const tagName = node?.tagName?.toLowerCase() || ''
-        const valorSanitizado = sanitizarStyleInline(tagName, String(data.attrValue || ''))
-        if (!valorSanitizado) {
+        const sanitizedValue = sanitizeInlineStyle(tagName, String(data.attrValue || ''))
+        if (!sanitizedValue) {
             data.keepAttr = false
             return
         }
 
-        data.attrValue = valorSanitizado
+        data.attrValue = sanitizedValue
         data.keepAttr = true
     })
 
-    hooksDomPurifyRegistrados = true
+    domPurifyHooksRegistered = true
 }

@@ -1,6 +1,6 @@
 import { StorageKeys } from '@/constants'
 import type { SyncQueueItem, ConnectivityStatus } from '@/types/index'
-import { logErro, logInfo, logSucesso } from '@/utils/logger'
+import { logError, logInfo, logSuccess } from '@/utils/logger'
 import { storageGetJson, storageSetJson } from '@/utils/storage'
 
 type StatusChangeCallback = (isOnline: boolean) => void
@@ -32,7 +32,7 @@ class OfflineManager {
         cb(isOnline)
       } catch (e) {
         const errorMsg = e instanceof Error ? e.message : String(e)
-        logErro(`Error in connectivity callback: ${errorMsg}`)
+        logError(`Error in connectivity callback: ${errorMsg}`)
       }
     })
   }
@@ -91,14 +91,14 @@ class OfflineManager {
     storageSetJson(
       StorageKeys.syncQueue,
       this.syncQueue,
-      (msg) => logErro(msg)
+      (msg) => logError(msg)
     )
   }
 
   loadSyncQueue(): void {
     const stored = storageGetJson<SyncQueueItem[]>(
       StorageKeys.syncQueue,
-      (msg) => logErro(msg)
+      (msg) => logError(msg)
     )
     if (stored && Array.isArray(stored)) {
       this.syncQueue = stored
@@ -118,7 +118,7 @@ class OfflineManager {
         }
       } catch (e) {
         const errorMsg = e instanceof Error ? e.message : String(e)
-        logErro(`Error processing sync operation: ${errorMsg}`)
+        logError(`Error processing sync operation: ${errorMsg}`)
       }
     })
 
@@ -126,7 +126,7 @@ class OfflineManager {
     this.persistSyncQueue()
 
     if (processed.length > 0) {
-      logSucesso(`${processed.length} operation(s) synced`)
+      logSuccess(`${processed.length} operation(s) synced`)
     }
   }
 

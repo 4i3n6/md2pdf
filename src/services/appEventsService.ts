@@ -3,22 +3,22 @@ import type { Document, LoggerInterface } from '@/types/index'
 type DocumentIoService = {
     importMarkdownFile: () => void
     downloadMarkdownFile: () => void
-    exportarBackupDocumentos: () => void
-    importarBackupDocumentos: () => void
+    exportBackupDocuments: () => void
+    importBackupDocuments: () => void
 }
 
 type AppEventsDeps = {
     logger: LoggerInterface
     createDoc: () => void
-    imprimirDocumentoAtual: () => Promise<void>
+    printCurrentDocument: () => Promise<void>
     documentIoService: DocumentIoService
     togglePrintPreview: () => void
     getCurrentDoc: () => Document | undefined
-    obterExtensaoDocumento: (nome?: string) => string
+    getDocumentExtension: (name?: string) => string
     saveDocs: () => void
     renderList: () => void
     renderPreview: (md: string) => void
-    atualizarLinguagemEditor: (nome?: string) => Promise<void>
+    updateEditorLanguage: (name?: string) => Promise<void>
 }
 
 export function setupAppEvents(deps: AppEventsDeps): void {
@@ -30,7 +30,7 @@ export function setupAppEvents(deps: AppEventsDeps): void {
     const btnDown = document.getElementById('download-btn')
     if (btnDown) {
         btnDown.addEventListener('click', (): void => {
-            void deps.imprimirDocumentoAtual()
+            void deps.printCurrentDocument()
         })
     }
 
@@ -48,12 +48,12 @@ export function setupAppEvents(deps: AppEventsDeps): void {
 
     const btnBackup = document.getElementById('backup-btn')
     if (btnBackup) {
-        btnBackup.addEventListener('click', deps.documentIoService.exportarBackupDocumentos)
+        btnBackup.addEventListener('click', deps.documentIoService.exportBackupDocuments)
     }
 
     const btnRestore = document.getElementById('restore-btn')
     if (btnRestore) {
-        btnRestore.addEventListener('click', deps.documentIoService.importarBackupDocumentos)
+        btnRestore.addEventListener('click', deps.documentIoService.importBackupDocuments)
     }
 
     // Atalhos de teclado globais
@@ -77,14 +77,14 @@ export function setupAppEvents(deps: AppEventsDeps): void {
             const target = e.target as HTMLInputElement
             const doc = deps.getCurrentDoc()
             if (doc) {
-                const extAnterior = deps.obterExtensaoDocumento(doc.name)
+                const previousExt = deps.getDocumentExtension(doc.name)
                 doc.name = target.value
                 deps.saveDocs()
                 deps.renderList()
-                const extNovo = deps.obterExtensaoDocumento(doc.name)
-                if (extAnterior !== extNovo) {
+                const newExt = deps.getDocumentExtension(doc.name)
+                if (previousExt !== newExt) {
                     deps.renderPreview(doc.content)
-                    void deps.atualizarLinguagemEditor(doc.name)
+                    void deps.updateEditorLanguage(doc.name)
                 }
             }
         })

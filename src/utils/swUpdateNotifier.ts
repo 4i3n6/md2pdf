@@ -1,4 +1,4 @@
-import { logErro } from '@/utils/logger'
+import { logError } from '@/utils/logger'
 
 class SWUpdateNotifier {
   init(): void {
@@ -21,7 +21,7 @@ class SWUpdateNotifier {
       }
     } catch (e) {
       const errorMsg = e instanceof Error ? e.message : String(e)
-      logErro(`Failed to check for updates: ${errorMsg}`)
+      logError(`Failed to check for updates: ${errorMsg}`)
     }
   }
 

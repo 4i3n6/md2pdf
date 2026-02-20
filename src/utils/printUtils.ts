@@ -1,7 +1,7 @@
 import { PrintLimits } from '@/constants'
-import { logAviso, logErro, logInfo } from '@/utils/logger'
+import { logWarn, logError, logInfo } from '@/utils/logger'
 import { runPipeline, type PipelineStage } from '@/utils/pipeline'
-import { confirmar } from '@/services/modalService'
+import { confirm } from '@/services/modalService'
 
 export interface ValidationResult {
   isValid: boolean;
@@ -186,8 +186,8 @@ async function confirmPrintWithWarnings(
 ): Promise<boolean> {
   if (validation.issues.length === 0) return true;
 
-  validation.issues.forEach((issue) => logger(issue));
-  return confirmar({
+  validation.issues.forEach((issue) => { logger(issue) });
+  return confirm({
     title: 'Print warnings',
     message: `${validation.issues.length} warning(s) detected.\nContinue anyway?`,
     confirmLabel: 'Print anyway',
@@ -222,7 +222,7 @@ function openPrintDialogWithRestore(onRestore: () => void): void {
 
   setTimeout(() => {
     if (!hasRestored) {
-      logAviso('[Print] Fallback: restoring after timeout');
+      logWarn('[Print] Fallback: restoring after timeout');
       doRestore();
     }
   }, PrintTimings.fallbackRestoreTimeoutMs);
@@ -236,13 +236,13 @@ export async function validatePrintContent(content: PrintContentTarget): Promise
   }
 
   const container = typeof content === 'string' ? createTempContainer(content) : content;
-  const contexto: ValidationPipelineContext = {
+  const ctx: ValidationPipelineContext = {
     container,
     htmlContent: typeof content === 'string' ? content : container.innerHTML,
     isLive: container.isConnected,
     issues
   }
-  await runPipeline(contexto, printValidationPipeline)
+  await runPipeline(ctx, printValidationPipeline)
 
   return {
     isValid: issues.length === 0,
@@ -286,7 +286,7 @@ export function optimizeForPrint(): boolean {
     return true;
   } catch (error) {
     const errorMsg = error instanceof Error ? error.message : String(error);
-    logErro(`Failed to optimize for print: ${errorMsg}`);
+    logError(`Failed to optimize for print: ${errorMsg}`);
     return false;
   }
 }
@@ -298,7 +298,7 @@ export function restoreAfterPrint(): boolean {
     return true;
   } catch (error) {
     const errorMsg = error instanceof Error ? error.message : String(error);
-    logErro(`Error restoring after print: ${errorMsg}`);
+    logError(`Error restoring after print: ${errorMsg}`);
     return false;
   }
 }
@@ -334,7 +334,7 @@ export function printDocument(
         });
       } catch (error) {
         const errorMsg = error instanceof Error ? error.message : String(error);
-        logErro(`Print failed: ${errorMsg}`);
+        logError(`Print failed: ${errorMsg}`);
         restoreTitle?.();
         restoreAfterPrint();
         resolve(false);

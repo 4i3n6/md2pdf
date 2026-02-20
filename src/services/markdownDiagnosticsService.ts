@@ -7,7 +7,7 @@ import type { LoggerInterface } from '@/types/index'
 type MarkdownDiagnosticsDeps = {
     logger: LoggerInterface
     getEditorView: () => EditorView | null
-    documentoEhMarkdown: () => boolean
+    isMarkdownDocument: () => boolean
 }
 
 function escapeHtml(text: string): string {
@@ -239,7 +239,7 @@ export function createMarkdownDiagnosticsService(deps: MarkdownDiagnosticsDeps) 
         const editor = deps.getEditorView()
         if (!editor) return
 
-        if (!deps.documentoEhMarkdown()) {
+        if (!deps.isMarkdownDocument()) {
             clearDiagnostics()
             return
         }

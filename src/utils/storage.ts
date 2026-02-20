@@ -2,7 +2,7 @@ export type StorageErrorHandler = (message: string) => void
 
 type StorageLike = Pick<Storage, 'getItem' | 'setItem' | 'removeItem'>
 
-function resolverStorage(storage?: StorageLike | null): StorageLike | null {
+function resolveStorage(storage?: StorageLike | null): StorageLike | null {
     if (storage) return storage
     if (typeof window === 'undefined') return null
     try {
@@ -12,92 +12,92 @@ function resolverStorage(storage?: StorageLike | null): StorageLike | null {
     }
 }
 
-function formatarErro(chave: string, operacao: string, e: unknown): string {
+function formatError(key: string, operation: string, e: unknown): string {
     const errorMsg = e instanceof Error ? e.message : String(e)
-    return `Storage: falha ao ${operacao} "${chave}": ${errorMsg}`
+    return `Storage: failed to ${operation} "${key}": ${errorMsg}`
 }
 
 export function storageGetItem(
-    chave: string,
+    key: string,
     onError?: StorageErrorHandler,
     storage?: StorageLike | null
 ): string | null {
-    const resolved = resolverStorage(storage)
+    const resolved = resolveStorage(storage)
     if (!resolved) return null
 
     try {
-        return resolved.getItem(chave)
+        return resolved.getItem(key)
     } catch (e) {
-        onError?.(formatarErro(chave, 'ler', e))
+        onError?.(formatError(key, 'read', e))
         return null
     }
 }
 
 export function storageSetItem(
-    chave: string,
-    valor: string,
+    key: string,
+    value: string,
     onError?: StorageErrorHandler,
     storage?: StorageLike | null
 ): boolean {
-    const resolved = resolverStorage(storage)
+    const resolved = resolveStorage(storage)
     if (!resolved) return false
 
     try {
-        resolved.setItem(chave, valor)
+        resolved.setItem(key, value)
         return true
     } catch (e) {
-        onError?.(formatarErro(chave, 'salvar', e))
+        onError?.(formatError(key, 'save', e))
         return false
     }
 }
 
 export function storageRemoveItem(
-    chave: string,
+    key: string,
     onError?: StorageErrorHandler,
     storage?: StorageLike | null
 ): boolean {
-    const resolved = resolverStorage(storage)
+    const resolved = resolveStorage(storage)
     if (!resolved) return false
 
     try {
-        resolved.removeItem(chave)
+        resolved.removeItem(key)
         return true
     } catch (e) {
-        onError?.(formatarErro(chave, 'remover', e))
+        onError?.(formatError(key, 'remove', e))
         return false
     }
 }
 
 export function storageGetJson<T>(
-    chave: string,
+    key: string,
     onError?: StorageErrorHandler,
     storage?: StorageLike | null
 ): T | null {
-    const raw = storageGetItem(chave, onError, storage)
+    const raw = storageGetItem(key, onError, storage)
     if (!raw) return null
 
     try {
         return JSON.parse(raw) as T
     } catch (e) {
-        onError?.(formatarErro(chave, 'parsear JSON', e))
+        onError?.(formatError(key, 'parse JSON', e))
         return null
     }
 }
 
 export function storageSetJson(
-    chave: string,
-    valor: unknown,
+    key: string,
+    value: unknown,
     onError?: StorageErrorHandler,
     storage?: StorageLike | null
 ): boolean {
     let serialized = ''
     try {
-        serialized = JSON.stringify(valor)
+        serialized = JSON.stringify(value)
     } catch (e) {
-        onError?.(formatarErro(chave, 'serializar JSON', e))
+        onError?.(formatError(key, 'serialize JSON', e))
         return false
     }
 
-    return storageSetItem(chave, serialized, onError, storage)
+    return storageSetItem(key, serialized, onError, storage)
 }
 

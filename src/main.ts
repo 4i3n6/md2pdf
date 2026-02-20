@@ -8,18 +8,18 @@ import OfflineManager from './utils/offlineManager'
 import SWUpdateNotifier from './utils/swUpdateNotifier'
 import { PreviewService } from './services/previewService'
 import { initSplitter } from './services/splitterService'
-import { createSaveStatusService, documentoEstaModificado } from './services/saveStatusService'
+import { createSaveStatusService, isDocumentModified } from './services/saveStatusService'
 import { createDocumentIoService } from './services/documentIoService'
 import { setupKeyboardNavigation } from './services/keyboardNavigationService'
 import { setupQuickTags } from './services/quickTagsService'
 import { createPrintWorkflowService } from './services/printWorkflowService'
 import { setupAppEvents } from './services/appEventsService'
 import { createMarkdownDiagnosticsService } from './services/markdownDiagnosticsService'
-import { carregadoresLinguagem } from './services/editorLanguageLoaders'
+import { languageLoaders } from './services/editorLanguageLoaders'
 import {
-  documentoEhMarkdownPorNome,
-  obterExtensaoDocumentoArquivo,
-  obterModoEditorPorNome
+  isMarkdownByName,
+  getFileExtension,
+  getEditorModeByName
 } from './services/documentLanguageService'
 import {
   loadDocPreferences,
@@ -32,7 +32,7 @@ import { LayoutBreakpoints, SaveConfig } from '@/constants'
 import type { AppState, LoggerInterface, Document as AppDocument } from '@/types/index'
 import { debounce } from '@/utils/debounce'
 import { editorTheme } from './editorTheme'
-import { confirmar } from './services/modalService'
+import { confirm } from './services/modalService'
 import './pwaRegister'
 import './styles.css'
 import './styles-print.css'
@@ -51,10 +51,10 @@ if (isMobileViewport()) {
 // Initialize i18n based on URL path
 initI18n()
 
-// Logger do Sistema (uses i18n locale for time formatting)
+// System Logger (uses i18n locale for time formatting)
 const APP_VERSION = __APP_VERSION__ || '0.0.0'
-const LimitesLogger = {
-  maxLinhasConsole: 400
+const LoggerLimits = {
+  maxConsoleLines: 400
 }
 
 const Logger: LoggerInterface = {
@@ -68,7 +68,7 @@ const Logger: LoggerInterface = {
     line.textContent = `[${time}] ${msg}`;
 
     consoleEl.appendChild(line);
-    while (consoleEl.childElementCount > LimitesLogger.maxLinhasConsole) {
+    while (consoleEl.childElementCount > LoggerLimits.maxConsoleLines) {
       if (!consoleEl.firstElementChild) {
         break;
       }
@@ -80,7 +80,7 @@ const Logger: LoggerInterface = {
   success: (msg: string): void => Logger.log(msg, 'success')
 };
 
-// Expor Logger globalmente para uso em outros modulos
+// Expose Logger globally for use across modules
 declare global {
   interface Window {
     Logger: LoggerInterface;
@@ -90,7 +90,7 @@ window.Logger = Logger;
 
 const previewService = new PreviewService(uiRenderer, Logger)
 
-function atualizarVersaoUI(): void {
+function updateVersionUI(): void {
   const versionEl = document.querySelector('[data-app-version]') as HTMLElement | null;
   if (versionEl) {
     versionEl.textContent = `v${APP_VERSION}`;
@@ -106,19 +106,15 @@ documentManager.setLogger(Logger);
 uiRenderer.setLogger(Logger);
 
 window.addEventListener('error', (event: ErrorEvent): void => {
-  const message = event.message || 'Erro inesperado';
-  Logger.error(`Erro inesperado: ${message}`);
+  const message = event.message || 'Unexpected error';
+  Logger.error(`Unexpected error: ${message}`);
 });
 
 window.addEventListener('unhandledrejection', (event: PromiseRejectionEvent): void => {
   const reason = event.reason instanceof Error ? event.reason.message : String(event.reason);
-  Logger.error(`Promise rejeitada: ${reason}`);
+  Logger.error(`Unhandled promise rejection: ${reason}`);
 });
 
-/**
- * Estado da aplicacao (UI-only)
- * Documentos sao gerenciados pelo DocumentManager
- */
 const state: AppState = {
   docs: [],
   currentId: null,
@@ -128,14 +124,14 @@ const state: AppState = {
 const markdownDiagnosticsService = createMarkdownDiagnosticsService({
   logger: Logger,
   getEditorView: () => state.editor,
-  documentoEhMarkdown: () => documentoEhMarkdown()
+  isMarkdownDocument: () => isMarkdownDocument()
 })
 
 const saveStatusService = createSaveStatusService({
   state,
   logger: Logger,
   getCurrentDoc,
-  persistDocs: () => documentManager.persistir(),
+  persistDocs: () => documentManager.persist(),
   updateMetrics,
   t,
   debounceMs: SaveConfig.debounceMs
@@ -156,13 +152,13 @@ const documentIoService = createDocumentIoService({
   renderPreview,
   updateMetrics,
   updateSaveStatus: () => saveStatusService.updateSaveStatus(),
-  atualizarLinguagemEditor
+  updateEditorLanguage
 })
 
-// Compartimento para alternar linguagem do editor dinamicamente
-const compartimentoLinguagem = new Compartment();
-let requisicaoLinguagemEditor = 0;
-let modoEditorAtual = '';
+// Compartment for dynamic editor language switching
+const languageCompartment = new Compartment();
+let editorLanguageRequestId = 0;
+let currentEditorMode = '';
 
 // ============================================
 // UTILITY FUNCTIONS
@@ -173,39 +169,39 @@ let modoEditorAtual = '';
 // ============================================
 
 function initSystem(): void {
-  atualizarVersaoUI();
-  Logger.log('Inicializando nucleo...');
-  Logger.log(`Versao ${APP_VERSION}`);
-  Logger.success('Markdown processor carregado');
-  Logger.success('Estilos de impressao A4 ativos');
+  updateVersionUI();
+  Logger.log('Initializing core...');
+  Logger.log(`Version ${APP_VERSION}`);
+  Logger.success('Markdown processor loaded');
+  Logger.success('A4 print styles active');
 
   OfflineManager.init();
   OfflineManager.loadSyncQueue();
   OfflineManager.onStatusChange((isOnline: boolean): void => {
     const msg = isOnline
-      ? 'Conexao restaurada'
-      : 'Sem conexao - Modo offline ativo';
+      ? 'Connection restored'
+      : 'No connection - Offline mode active';
     Logger.log(msg, isOnline ? 'success' : 'warning');
   });
-  Logger.success('Gerenciador offline ativo');
+  Logger.success('Offline manager active');
 
   SWUpdateNotifier.init();
-  Logger.success('Monitor de atualizacoes ativo');
+  Logger.success('Update notifier active');
 
   loadDocs();
   initEditor();
   setupAppEvents({
     logger: Logger,
     createDoc,
-    imprimirDocumentoAtual: () => printWorkflowService.imprimirDocumentoAtual(),
+    printCurrentDocument: () => printWorkflowService.printCurrentDocument(),
     documentIoService,
     togglePrintPreview,
     getCurrentDoc,
-    obterExtensaoDocumento,
+    getDocumentExtension,
     saveDocs,
     renderList,
     renderPreview,
-    atualizarLinguagemEditor
+    updateEditorLanguage
   })
   setupQuickTags({ state, logger: Logger });
   setupPreviewControls(state, Logger);
@@ -236,67 +232,67 @@ function saveDocs(): void {
   const doc = getCurrentDoc()
   if (!doc) return
 
-  saveStatusService.salvarDocumentosAgora()
+  saveStatusService.saveDocumentsNow()
 }
 
-function obterExtensaoDocumento(nome?: string): string {
-  return obterExtensaoDocumentoArquivo(nome ?? getCurrentDoc()?.name ?? '')
+function getDocumentExtension(name?: string): string {
+  return getFileExtension(name ?? getCurrentDoc()?.name ?? '')
 }
 
-function documentoEhMarkdown(nome?: string): boolean {
-  return documentoEhMarkdownPorNome(nome ?? getCurrentDoc()?.name ?? '')
+function isMarkdownDocument(name?: string): boolean {
+  return isMarkdownByName(name ?? getCurrentDoc()?.name ?? '')
 }
 
-function obterModoEditor(nome?: string): string {
-  return obterModoEditorPorNome(nome ?? getCurrentDoc()?.name ?? '')
+function getEditorMode(name?: string): string {
+  return getEditorModeByName(name ?? getCurrentDoc()?.name ?? '')
 }
 
-async function carregarLinguagemEditor(nome?: string): Promise<Extension> {
-  if (documentoEhMarkdown(nome)) {
+async function loadEditorLanguage(name?: string): Promise<Extension> {
+  if (isMarkdownDocument(name)) {
     return markdown()
   }
 
-  const ext = obterExtensaoDocumento(nome)
-  const carregador = carregadoresLinguagem[ext]
-  if (!carregador) {
+  const ext = getDocumentExtension(name)
+  const loader = languageLoaders[ext]
+  if (!loader) {
     return []
   }
-  return await carregador()
+  return await loader()
 }
 
-async function atualizarLinguagemEditor(nome?: string): Promise<void> {
+async function updateEditorLanguage(name?: string): Promise<void> {
   if (!state.editor) return
 
-  const modo = obterModoEditor(nome)
-  if (modo === modoEditorAtual) {
+  const mode = getEditorMode(name)
+  if (mode === currentEditorMode) {
     return
   }
 
-  if (modo !== 'markdown') {
+  if (mode !== 'markdown') {
     markdownDiagnosticsService.clearDiagnostics()
   }
 
-  const requisicaoAtual = ++requisicaoLinguagemEditor
+  const currentRequest = ++editorLanguageRequestId
   try {
-    const extensao = await carregarLinguagemEditor(nome)
-    if (!state.editor || requisicaoAtual !== requisicaoLinguagemEditor) {
+    const extension = await loadEditorLanguage(name)
+    if (!state.editor || currentRequest !== editorLanguageRequestId) {
       return
     }
     state.editor.dispatch({
-      effects: compartimentoLinguagem.reconfigure(extensao)
+      effects: languageCompartment.reconfigure(extension)
     })
-    modoEditorAtual = modo
-    const linguagemAtiva = state.editor.state.facet(language)
-    const nomeLinguagem = linguagemAtiva?.name || 'nenhuma'
-    Logger.log(`Editor ajustado para ${modo} (${nomeLinguagem})`)
+    currentEditorMode = mode
+    const activeLanguage = state.editor.state.facet(language)
+    const languageName = activeLanguage?.name || 'none'
+    Logger.log(`Editor set to ${mode} (${languageName})`)
   } catch (e) {
     const errorMsg = e instanceof Error ? e.message : String(e)
-    Logger.error(`Falha ao carregar linguagem do editor: ${errorMsg}`)
-    if (state.editor && requisicaoAtual === requisicaoLinguagemEditor) {
+    Logger.error(`Failed to load editor language: ${errorMsg}`)
+    if (state.editor && currentRequest === editorLanguageRequestId) {
       state.editor.dispatch({
-        effects: compartimentoLinguagem.reconfigure(markdown())
+        effects: languageCompartment.reconfigure(markdown())
       })
-      modoEditorAtual = 'markdown'
+      currentEditorMode = 'markdown'
     }
   }
 }
@@ -304,7 +300,7 @@ async function atualizarLinguagemEditor(nome?: string): Promise<void> {
 function initEditor(): void {
   const el = document.getElementById('editor');
   if (!el) {
-    Logger.error('Elemento editor nao encontrado!');
+    Logger.error('Editor element not found!');
     return;
   }
 
@@ -318,7 +314,7 @@ function initEditor(): void {
     doc: doc ? doc.content : '',
     extensions: [
       basicSetup,
-      compartimentoLinguagem.of(markdown()),
+      languageCompartment.of(markdown()),
       EditorView.lineWrapping,
       markdownDiagnosticsService.decorationsField,
       markdownDiagnosticsService.hoverTooltipExtension,
@@ -332,7 +328,7 @@ function initEditor(): void {
           if (active) {
             active.content = val;
             active.updated = Date.now();
-            saveStatusService.agendarSalvamento();
+            saveStatusService.scheduleSave();
           }
 
           debouncedValidate(val);
@@ -356,7 +352,7 @@ function initEditor(): void {
     if (state.currentId) {
       loadDocPreferences(state, Logger, state.currentId);
     }
-    void atualizarLinguagemEditor(doc.name);
+    void updateEditorLanguage(doc.name);
   }
 }
 
@@ -394,8 +390,8 @@ function renderList(): void {
 function switchDoc(id: number): void {
   if (id === state.currentId) return;
   const currentDoc = getCurrentDoc();
-  if (currentDoc && documentoEstaModificado(currentDoc)) {
-    saveStatusService.salvarDocumentosAgora();
+  if (currentDoc && isDocumentModified(currentDoc)) {
+    saveStatusService.saveDocumentsNow();
   }
   state.currentId = id;
 
@@ -408,13 +404,13 @@ function switchDoc(id: number): void {
     renderList();
     loadDocPreferences(state, Logger, id);
     saveStatusService.updateSaveStatus();
-    void atualizarLinguagemEditor(doc.name);
-    Logger.log(`Alternado para doc ID: ${id}`);
+    void updateEditorLanguage(doc.name);
+    Logger.log(`Switched to doc ID: ${id}`);
   }
 }
 
 function createDoc(): void {
-  Logger.log('Criando novo documento...')
+  Logger.log('Creating new document...')
   try {
     const newDoc = documentManager.create()
     state.currentId = newDoc.id
@@ -426,35 +422,35 @@ function createDoc(): void {
     }
     renderList()
     renderPreview('')
-    void atualizarLinguagemEditor(newDoc.name)
-    Logger.success(`Documento criado [ID: ${newDoc.id}]`)
+    void updateEditorLanguage(newDoc.name)
+    Logger.success(`Document created [ID: ${newDoc.id}]`)
   } catch (e) {
     const errorMessage = e instanceof Error ? e.message : String(e)
-    Logger.error('Falha ao criar documento: ' + errorMessage)
+    Logger.error('Failed to create document: ' + errorMessage)
   }
 }
 
 function deleteDoc(id: number): void {
   const doc = state.docs.find((d) => d.id === id)
-  const nome = doc?.name || 'documento'
-  void confirmar({
+  const docName = doc?.name || 'document'
+  void confirm({
     title: 'Delete document',
-    message: `Are you sure you want to delete "${nome}"?`,
+    message: `Are you sure you want to delete "${docName}"?`,
     confirmLabel: 'Delete',
     variant: 'danger'
-  }).then((confirmado) => {
-    if (!confirmado) return
+  }).then((confirmed) => {
+    if (!confirmed) return
     const success = documentManager.delete(id)
     if (success) {
       if (state.currentId === id) {
         const docs = documentManager.getAll()
         if (docs.length > 0 && docs[0]) {
-          // Nao setar state.currentId antes do switchDoc, para evitar early-return.
+          // Do not set state.currentId before switchDoc — avoids early-return.
           switchDoc(docs[0].id)
         }
       }
       renderList()
-      Logger.log(`Documento ${id} removido.`)
+      Logger.log(`Document ${id} removed.`)
     }
   })
 }

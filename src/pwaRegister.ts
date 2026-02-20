@@ -1,4 +1,4 @@
-import { logErro, logInfo, logSucesso } from '@/utils/logger'
+import { logError, logInfo, logSuccess } from '@/utils/logger'
 
 export function registerServiceWorker(): void {
   if (import.meta.env.DEV) {
@@ -9,23 +9,23 @@ export function registerServiceWorker(): void {
           if (registrations.length === 0) return;
           return Promise.all(registrations.map((registration) => registration.unregister()))
             .then(() => {
-              logSucesso('[PWA] Service Worker removed in development');
+              logSuccess('[PWA] Service Worker removed in development');
             })
         })
         .catch((error) => {
           const errorMsg = error instanceof Error ? error.message : String(error);
-          logErro(`[PWA] Failed to remove Service Worker in dev: ${errorMsg}`);
+          logError(`[PWA] Failed to remove Service Worker in dev: ${errorMsg}`);
         });
     }
     if ('caches' in window) {
       caches.keys()
         .then((keys) => Promise.all(keys.map((key) => caches.delete(key))))
         .then(() => {
-          logSucesso('[PWA] Cache cleared in development');
+          logSuccess('[PWA] Cache cleared in development');
         })
         .catch((error) => {
           const errorMsg = error instanceof Error ? error.message : String(error);
-          logErro(`[PWA] Failed to clear cache in dev: ${errorMsg}`);
+          logError(`[PWA] Failed to clear cache in dev: ${errorMsg}`);
         });
     }
     return;
@@ -63,7 +63,7 @@ export function registerServiceWorker(): void {
     } catch (error) {
       if (import.meta.env.PROD) {
         const errorMsg = error instanceof Error ? error.message : String(error);
-        logErro(`[PWA] Failed to register Service Worker: ${errorMsg}`);
+        logError(`[PWA] Failed to register Service Worker: ${errorMsg}`);
       }
     }
   });

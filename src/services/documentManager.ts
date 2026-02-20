@@ -34,7 +34,7 @@ export class DocumentManager {
     const legacyDocs = this.loadFromStorage(StorageKeys.legacyDocuments)
     if (legacyDocs && legacyDocs.length > 0) {
         this.docs = legacyDocs
-        this.persistir()
+        this.persist()
         this.logger?.success?.('Migration complete: md2pdf-docs-v2 -> md2pdf-docs-v3')
         return
     }
@@ -93,7 +93,7 @@ export class DocumentManager {
     }
   }
 
-  persistir(): void {
+  persist(): void {
     this.save()
   }
 
