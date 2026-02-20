@@ -18,3 +18,24 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
           config-file: release-please-config.json
           manifest-file: .release-please-manifest.json
+
+  auto-merge:
+    needs: release-please
+    runs-on: ubuntu-latest
+    steps:
+      - name: Merge pending release PR
+        run: |
+          PR=$(gh pr list \
+            --repo 4i3n6/md2pdf \
+            --label "autorelease: pending" \
+            --state open \
+            --json number \
+            --jq '.[0].number // empty')
+          if [ -n "$PR" ]; then
+            gh pr merge "$PR" --merge --repo 4i3n6/md2pdf
+            echo "Merged release PR #$PR"
+          else
+            echo "No pending release PR — skipping"
+          fi
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
