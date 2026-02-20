@@ -1,5 +1,6 @@
 #!/bin/sh
-# pre-commit — enforces author identity and bumps version on every commit.
+# pre-commit — enforces author identity.
+# Version management is handled by release-please (see .github/workflows/release-please.yml).
 # Configured via: git config core.hooksPath .githooks
 
 REQUIRED_NAME="4i3n6"
@@ -18,25 +19,6 @@ if [ "$AUTHOR_NAME" != "$REQUIRED_NAME" ] || [ "$AUTHOR_EMAIL" != "$REQUIRED_EMA
     echo "  git config user.email '$REQUIRED_EMAIL'"
     echo ""
     exit 1
-fi
-
-STAGED_FILES=$(git diff --cached --name-only --diff-filter=ACM | \
-    grep -Ev "^(package\.json|package-lock\.json|src/i18n/en\.ts|src/i18n/pt\.ts|app\.html|pt/app\.html|scripts/bump-version\.mjs)$")
-
-if [ -n "$STAGED_FILES" ]; then
-    echo "[pre-commit] Bumping version..."
-
-    node scripts/bump-version.mjs patch
-    if [ $? -ne 0 ]; then
-        echo "[pre-commit] ERROR: version bump failed — aborting commit"
-        exit 1
-    fi
-
-    git add package.json package-lock.json \
-        src/i18n/en.ts src/i18n/pt.ts \
-        app.html pt/app.html
-
-    echo "[pre-commit] Version bumped and staged"
 fi
 
 exit 0

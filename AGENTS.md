@@ -45,6 +45,25 @@ Types: `feat`, `fix`, `refactor`, `docs`, `test`, `chore`, `ci`, `build`, `style
 
 The commit-msg hook rejects PT-BR verbs in the description.
 
+## Release workflow
+
+Versioning and GitHub Releases are fully automated via [release-please](https://github.com/googleapis/release-please).
+
+**How it works:**
+1. Push conventional commits to `main`
+2. release-please opens (or updates) a Release PR with a generated CHANGELOG entry and a version bump in `package.json` and all extra-files
+3. Merge the PR — a GitHub Release is created automatically and tagged
+
+**Version bump rules:**
+- `fix:`, `perf:`, `refactor:`, `docs:` → patch (`1.1.x`)
+- `feat:` → minor (`1.x.0`)
+- `BREAKING CHANGE:` in commit body → major (`x.0.0`)
+
+**Manual sync (edge cases only):**
+```bash
+node scripts/bump-version.mjs sync   # propagate current package.json version to all files
+```
+
 ## Commands
 
 ```bash
