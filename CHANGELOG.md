@@ -7,6 +7,13 @@ New releases are prepended automatically by [release-please](https://github.com/
 
 ---
 
+## [2.1.3](https://github.com/4i3n6/md2pdf/compare/md2pdf-v2.1.2...md2pdf-v2.1.3) (2026-02-20)
+
+
+### ### Fixed
+
+* **styles:** move mobile overlay hide rule inside [@media](https://github.com/media) print ([83a4f6d](https://github.com/4i3n6/md2pdf/commit/83a4f6d5664bf9f907d4c939cd9aee6b650a05bb))
+
 ## [2.1.2](https://github.com/4i3n6/md2pdf/compare/md2pdf-v2.1.1...md2pdf-v2.1.2) (2026-02-20)
 
 
