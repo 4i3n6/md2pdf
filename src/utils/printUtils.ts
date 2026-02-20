@@ -111,7 +111,7 @@ function validarImagensNoContainer(container: HTMLElement, issues: string[]): vo
     const imgHeightMm = dims.heightPx / pxPorMm;
 
     if (imgWidthMm > maxWidthMm || imgHeightMm > maxHeightMm) {
-      issues.push(`⚠️ Imagem ${idx + 1}: ${Math.round(dims.widthPx)}x${Math.round(dims.heightPx)}px pode não caber na página A4`);
+      issues.push(`⚠️ Image ${idx + 1}: ${Math.round(dims.widthPx)}x${Math.round(dims.heightPx)}px may not fit on A4 page`);
     }
   });
 }
@@ -134,7 +134,7 @@ function validarTabelasNoContainer(container: HTMLElement, issues: string[]): vo
 
     if (excessoDetectado > toleranciaPx) {
       issues.push(
-        `⚠️ Tabela ${idx + 1}: ${Math.round(tableWidthPx)}px (área útil ${Math.round(containerWidthPx)}px, excesso ${Math.round(excessoDetectado)}px) pode transbordar na impressão`
+        `⚠️ Table ${idx + 1}: ${Math.round(tableWidthPx)}px (usable area ${Math.round(containerWidthPx)}px, excess ${Math.round(excessoDetectado)}px) may overflow in print`
       );
     }
   });
@@ -143,7 +143,7 @@ function validarTabelasNoContainer(container: HTMLElement, issues: string[]): vo
 function validarUrlsLongasNoHtml(htmlContent: string, issues: string[]): void {
   const longLines = htmlContent.match(/https?:\/\/[^\s<>"]{80,}/g);
   if (longLines && longLines.length > 0) {
-    issues.push(`⚠️ ${longLines.length} URL(s) muito longa(s) podem transbordar em impressão`);
+    issues.push(`⚠️ ${longLines.length} long URL(s) may overflow in print output`);
   }
 }
 
@@ -199,9 +199,9 @@ async function confirmarImpressaoComAvisos(
 
   validation.issues.forEach((issue) => logger(issue));
   return confirmar({
-    titulo: 'Avisos de impressão',
-    mensagem: `${validation.issues.length} aviso(s) detectado(s).\nContinuar mesmo assim?`,
-    textoBotaoConfirmar: 'Imprimir assim mesmo',
+    titulo: 'Print warnings',
+    mensagem: `${validation.issues.length} warning(s) detected.\nContinue anyway?`,
+    textoBotaoConfirmar: 'Print anyway',
     variante: 'warning'
   });
 }
@@ -248,7 +248,7 @@ export async function validatePrintContent(content: PrintContentTarget): Promise
   const issues: string[] = [];
 
   if (!content || (typeof content === 'string' && content.length === 0)) {
-    return { isValid: false, issues: ['Nenhum conteúdo para imprimir'] };
+    return { isValid: false, issues: ['No content to print'] };
   }
 
   const container = typeof content === 'string' ? criarContainerTemporario(content) : content;
@@ -328,7 +328,7 @@ export function restoreAfterPrint(): boolean {
     return true;
   } catch (error) {
     const errorMsg = error instanceof Error ? error.message : String(error);
-    logErro(`Erro ao restaurar após print: ${errorMsg}`);
+    logErro(`Error restoring after print: ${errorMsg}`);
     return false;
   }
 }
@@ -351,7 +351,7 @@ export function printDocument(
       try {
         const preview = obterPreviewElement(options);
         if (!preview) {
-          logger('Erro: elemento preview não encontrado');
+          logger('Error: preview element not found');
           resolve(false);
           return;
         }
@@ -449,17 +449,17 @@ export async function generatePrintReport(docName: string, htmlContent: string):
   const validation = await validatePrintContent(htmlContent);
 
   return `
-=== RELATÓRIO DE IMPRESSÃO ===
-Documento: ${docName}
-Palavras: ${stats.words}
-Parágrafos: ${stats.paragraphs}
-Imagens: ${stats.images}
-Tabelas: ${stats.tables}
-Listas: ${stats.lists}
-Páginas estimadas: ${stats.estimatedPages}
-Tempo de leitura: ~${stats.estimatedReadTime}min
-Status: ${validation.isValid ? '✓ PRONTO PARA IMPRESSÃO' : '⚠️ COM AVISOS'}
-${validation.issues.length > 0 ? 'Avisos:\n' + validation.issues.map((i) => '  ' + i).join('\n') : ''}
-============================
+=== PRINT REPORT ===
+Document: ${docName}
+Words: ${stats.words}
+Paragraphs: ${stats.paragraphs}
+Images: ${stats.images}
+Tables: ${stats.tables}
+Lists: ${stats.lists}
+Estimated pages: ${stats.estimatedPages}
+Reading time: ~${stats.estimatedReadTime}min
+Status: ${validation.isValid ? '✓ READY TO PRINT' : '⚠️ HAS WARNINGS'}
+${validation.issues.length > 0 ? 'Warnings:\n' + validation.issues.map((i) => '  ' + i).join('\n') : ''}
+====================
   `.trim();
 }

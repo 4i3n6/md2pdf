@@ -244,6 +244,6 @@ export function validateImageForA4(width: number, height: number): ImageValidati
 
   return {
     fits: false,
-    message: `✗ Imagem (${widthMm.toFixed(1)}x${heightMm.toFixed(1)}mm) não cabe em A4 (max ${maxWidthMm}x${maxHeightMm}mm) - será redimensionada`
+    message: `✗ Image (${widthMm.toFixed(1)}x${heightMm.toFixed(1)}mm) does not fit on A4 (max ${maxWidthMm}x${maxHeightMm}mm) - will be resized`
   }
 }

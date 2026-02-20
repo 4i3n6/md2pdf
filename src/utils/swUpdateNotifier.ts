@@ -45,8 +45,8 @@ class SWUpdateNotifier {
     const logger = window.Logger
 
     if (logger && logger.log) {
-      logger.log('Atualizando aplicação...', 'success')
-      logger.log('Por favor, recarregue a página para usar a versão mais recente', 'warning')
+      logger.log('Updating application...', 'success')
+      logger.log('Please reload the page to use the latest version', 'warning')
     }
 
     // Cria elemento de notificação visual
@@ -83,8 +83,8 @@ class SWUpdateNotifier {
 
     const content = document.createElement('div')
     content.innerHTML = `
-      <div style="margin-bottom: 12px; font-weight: bold;">🔄 Atualização Disponível</div>
-      <div style="margin-bottom: 12px; opacity: 0.9;">Nova versão do MD2PDF está pronta. Recarregue para usar.</div>
+      <div style="margin-bottom: 12px; font-weight: bold;">🔄 Update Available</div>
+      <div style="margin-bottom: 12px; opacity: 0.9;">A new version of MD2PDF is ready. Reload to use it.</div>
       <button id="update-reload-btn" style="
         width: 100%;
         padding: 8px;
@@ -95,7 +95,7 @@ class SWUpdateNotifier {
         cursor: pointer;
         font-weight: bold;
         font-family: monospace;
-      ">RECARREGAR AGORA</button>
+      ">RELOAD NOW</button>
     `
 
     banner.appendChild(content)

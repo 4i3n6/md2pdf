@@ -94,11 +94,11 @@ const a = 1
 describe('Utilitarios de Erro', () => {
     it('deve retornar descricao de erro conhecida', () => {
         const desc = getErrorDescription('INVALID_HEADING_LEVEL')
-        expect(desc).toBe('Nivel de heading invalido')
+        expect(desc).toBe('Invalid heading level')
     })
 
     it('deve retornar mensagem padrao para erro desconhecido', () => {
         const desc = getErrorDescription('ERRO_MUITO_LOUCO')
-        expect(desc).toBe('Erro desconhecido')
+        expect(desc).toBe('Unknown error')
     })
 })

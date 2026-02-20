@@ -79,7 +79,7 @@ export function validateMarkdown(markdown: string): MarkdownValidationResult {
         errors.push({
           line: lineNum,
           column: 1,
-          message: `Markdown suporta no máximo 6 níveis de heading (encontrado: ${hashCount})`,
+          message: `Markdown supports a maximum of 6 heading levels (found: ${hashCount})`,
           severity: 'error',
           code: 'INVALID_HEADING_LEVEL',
           suggestion: '######' + rest,
@@ -93,7 +93,7 @@ export function validateMarkdown(markdown: string): MarkdownValidationResult {
         warnings.push({
           line: lineNum,
           column: hashCount + 1,
-          message: 'Heading deve ter espaço após "#"',
+          message: 'Heading must have a space after "#"',
           severity: 'warning',
           code: 'HEADING_MISSING_SPACE',
           suggestion: fixedLine,
@@ -118,7 +118,7 @@ export function validateMarkdown(markdown: string): MarkdownValidationResult {
         errors.push({
           line: lineNum,
           column: linkMatch.index + 1,
-          message: 'Link vazio: []() - adicione texto e URL',
+          message: 'Empty link: []() - add text and URL',
           severity: 'error',
           code: 'EMPTY_LINK'
         });
@@ -126,7 +126,7 @@ export function validateMarkdown(markdown: string): MarkdownValidationResult {
         errors.push({
           line: lineNum,
           column: linkMatch.index + 1,
-          message: 'Link sem texto: [](url)',
+          message: 'Link without text: [](url)',
           severity: 'error',
           code: 'EMPTY_LINK_TEXT'
         });
@@ -134,7 +134,7 @@ export function validateMarkdown(markdown: string): MarkdownValidationResult {
         errors.push({
           line: lineNum,
           column: linkMatch.index + 1,
-          message: 'Link sem URL: [text]()',
+          message: 'Link without URL: [text]()',
           severity: 'error',
           code: 'EMPTY_LINK_URL'
         });
@@ -143,7 +143,7 @@ export function validateMarkdown(markdown: string): MarkdownValidationResult {
         warnings.push({
           line: lineNum,
           column: linkMatch.index + 1,
-          message: 'URL deveria comecar com http:, https:, #, / ou mailto:',
+          message: 'URL should start with http:, https:, #, / or mailto:',
           severity: 'warning',
           code: 'LINK_MISSING_PROTOCOL'
         });
@@ -161,7 +161,7 @@ export function validateMarkdown(markdown: string): MarkdownValidationResult {
         warnings.push({
           line: lineNum,
           column: imageMatch.index + 1,
-          message: 'Imagem deveria ter texto alternativo (alt text)',
+          message: 'Image should have alternative text (alt text)',
           severity: 'warning',
           code: 'MISSING_IMAGE_ALT'
         });
@@ -171,7 +171,7 @@ export function validateMarkdown(markdown: string): MarkdownValidationResult {
         errors.push({
           line: lineNum,
           column: imageMatch.index + 1,
-          message: 'Imagem não pode ter src vazia: ![alt]()',
+          message: 'Image cannot have empty src: ![alt]()',
           severity: 'error',
           code: 'EMPTY_IMAGE_SRC'
         });
@@ -184,7 +184,7 @@ export function validateMarkdown(markdown: string): MarkdownValidationResult {
       warnings.push({
         line: lineNum,
         column: line.indexOf('`') + 1,
-        message: 'Número ímpar de backticks (`) - código inline desbalanceado',
+        message: 'Odd number of backticks (`) - unbalanced inline code',
         severity: 'warning',
         code: 'UNBALANCED_BACKTICKS'
       });
@@ -202,7 +202,7 @@ export function validateMarkdown(markdown: string): MarkdownValidationResult {
         warnings.push({
           line: lineNum,
           column: 1,
-          message: 'Número ímpar de * (asteriscos) - italic/bold desbalanceado',
+          message: 'Odd number of * (asterisks) - unbalanced italic/bold',
           severity: 'warning',
           code: 'UNBALANCED_EMPHASIS'
         });
@@ -220,7 +220,7 @@ export function validateMarkdown(markdown: string): MarkdownValidationResult {
       warnings.push({
         line: lineNum,
         column: 1,
-        message: 'Blockquote deveria ter espaço após ">"',
+        message: 'Blockquote should have a space after ">"',
         severity: 'warning',
         code: 'BLOCKQUOTE_MISSING_SPACE',
         suggestion: fixedLine,
@@ -289,7 +289,7 @@ export function validateMarkdown(markdown: string): MarkdownValidationResult {
       warnings.push({
         line: lineNum,
         column: 4,
-        message: `Linguagem desconhecida: "${language}" (pode não fazer highlighting)`,
+        message: `Unknown language: "${language}" (may not be highlighted)`,
         severity: 'info',
         code: 'UNKNOWN_CODE_LANGUAGE'
       });
@@ -303,7 +303,7 @@ export function validateMarkdown(markdown: string): MarkdownValidationResult {
     errors.push({
       line: lastLine,
       column: 1,
-      message: 'Bloco de código não fechado - faltam 3 backticks (```)',
+      message: 'Unclosed code block - missing 3 backticks (```)',
       severity: 'error',
       code: 'UNCLOSED_CODE_BLOCK',
       suggestion: '```',
@@ -324,7 +324,7 @@ export function validateMarkdown(markdown: string): MarkdownValidationResult {
         warnings.push({
           line: lineNum,
           column: 1,
-          message: 'Tabela deveria ter no mínimo 2 colunas',
+          message: 'Table should have at least 2 columns',
           severity: 'warning',
           code: 'INVALID_TABLE'
         });
@@ -347,21 +347,21 @@ export function validateMarkdown(markdown: string): MarkdownValidationResult {
  */
 export function getErrorDescription(code: string): string {
   const descriptions: Record<string, string> = {
-    INVALID_HEADING_LEVEL: 'Nivel de heading invalido',
-    HEADING_MISSING_SPACE: 'Espaco ausente apos heading',
-    EMPTY_LINK: 'Link completamente vazio',
-    EMPTY_LINK_TEXT: 'Texto do link vazio',
-    EMPTY_LINK_URL: 'URL do link vazia',
-    LINK_MISSING_PROTOCOL: 'URL sem protocolo',
-    MISSING_IMAGE_ALT: 'Texto alternativo (alt) da imagem ausente',
-    EMPTY_IMAGE_SRC: 'Src da imagem vazio',
-    UNBALANCED_BACKTICKS: 'Backticks desbalanceados',
-    UNBALANCED_EMPHASIS: 'Enfase (bold/italic) desbalanceada',
-    BLOCKQUOTE_MISSING_SPACE: 'Espaco ausente apos blockquote',
-    UNCLOSED_CODE_BLOCK: 'Bloco de codigo nao fechado',
-    UNKNOWN_CODE_LANGUAGE: 'Linguagem desconhecida',
-    INVALID_TABLE: 'Tabela invalida'
+    INVALID_HEADING_LEVEL: 'Invalid heading level',
+    HEADING_MISSING_SPACE: 'Missing space after heading marker',
+    EMPTY_LINK: 'Completely empty link',
+    EMPTY_LINK_TEXT: 'Link text is empty',
+    EMPTY_LINK_URL: 'Link URL is empty',
+    LINK_MISSING_PROTOCOL: 'URL missing protocol',
+    MISSING_IMAGE_ALT: 'Image is missing alternative text',
+    EMPTY_IMAGE_SRC: 'Image src is empty',
+    UNBALANCED_BACKTICKS: 'Unbalanced backticks',
+    UNBALANCED_EMPHASIS: 'Unbalanced emphasis (bold/italic)',
+    BLOCKQUOTE_MISSING_SPACE: 'Missing space after blockquote marker',
+    UNCLOSED_CODE_BLOCK: 'Code block is not closed',
+    UNKNOWN_CODE_LANGUAGE: 'Unknown code language',
+    INVALID_TABLE: 'Invalid table'
   };
 
-  return descriptions[code] || 'Erro desconhecido';
+  return descriptions[code] || 'Unknown error';
 }

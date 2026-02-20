@@ -236,7 +236,7 @@ export function createDocumentIoService(deps: DocumentIoDeps) {
                 variante: 'warning'
             })
             if (!confirmado) {
-                deps.logger.log('Restauração cancelada pelo usuário', 'warning')
+                deps.logger.log('Restore cancelled by user', 'warning')
                 return
             }
 

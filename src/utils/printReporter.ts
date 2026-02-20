@@ -340,18 +340,17 @@ export class PrintReporter {
     const checks: string[] = [];
     const warnings: string[] = [];
 
-    if (stats.words > 0) checks.push('✓ Conteúdo detectado');
-    if (stats.images > 0) checks.push(`✓ ${stats.images} imagem(ns) detectada(s)`);
-    if (stats.tables > 0) checks.push(`✓ ${stats.tables} tabela(s) detectada(s)`);
-    if (stats.links > 0) checks.push(`✓ ${stats.links} link(s) detectado(s)`);
+    if (stats.words > 0) checks.push('✓ Content detected');
+    if (stats.images > 0) checks.push(`✓ ${stats.images} image(s) detected`);
+    if (stats.tables > 0) checks.push(`✓ ${stats.tables} table(s) detected`);
+    if (stats.links > 0) checks.push(`✓ ${stats.links} link(s) detected`);
 
-    // Avisos
     if (stats.estimatedPages > 100)
-      warnings.push('⚠️  Documento muito longo (100+ páginas)');
+      warnings.push('⚠️  Document is very long (100+ pages)');
     if (stats.images > 50)
-      warnings.push('⚠️  Muitas imagens (50+) - pode ser lento');
+      warnings.push('⚠️  Many images (50+) - may be slow');
     if (stats.tableRows > 1000)
-      warnings.push('⚠️  Tabelas muito grandes (1000+ linhas)');
+      warnings.push('⚠️  Very large tables (1000+ rows)');
 
     return {
       checks,
