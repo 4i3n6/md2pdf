@@ -20,7 +20,10 @@ import { execSync } from 'child_process'
 const __dirname = dirname(fileURLToPath(import.meta.url))
 const rootDir = join(__dirname, '..')
 
-// All files that contain version references
+// All files that contain version references.
+// NOTE: CHANGELOG.md is intentionally excluded — its historical version headers
+// must not be clobbered. The [Unreleased] entry is promoted separately via
+// promoteChangelogUnreleased() only when running with --tag.
 const VERSION_FILES = [
   'src/i18n/en.ts',
   'src/i18n/pt.ts',
@@ -32,8 +35,7 @@ const VERSION_FILES = [
   'pt/manual/index.html',
   'manual/content.json',
   'pt/manual/content.json',
-  'README.md',
-  'CHANGELOG.md'
+  'README.md'
 ]
 
 /**
@@ -112,6 +114,41 @@ function updateFileVersion(filePath, newVersion) {
   }
 }
 
+/**
+ * Promotes the [Unreleased] header in CHANGELOG.md to the given version.
+ * Only the first occurrence of "## [Unreleased]" is touched; all historical
+ * version headers are left intact.
+ * @param {string} newVersion
+ */
+function promoteChangelogUnreleased(newVersion) {
+  const changelogPath = join(rootDir, 'CHANGELOG.md')
+  if (!existsSync(changelogPath)) {
+    console.log('  Skipped: CHANGELOG.md not found')
+    return
+  }
+
+  try {
+    const content = readFileSync(changelogPath, 'utf-8')
+    const today = new Date().toISOString().slice(0, 10)
+
+    // Replace only the first [Unreleased] header with the real version + date
+    const updated = content.replace(
+      /^## \[Unreleased\][^\n]*/m,
+      `## [${newVersion}] — ${today}`
+    )
+
+    if (content === updated) {
+      console.log('  No [Unreleased] entry found in CHANGELOG.md — skipped')
+      return
+    }
+
+    writeFileSync(changelogPath, updated, 'utf-8')
+    console.log(`  Promoted [Unreleased] → [${newVersion}] in CHANGELOG.md`)
+  } catch (err) {
+    console.error(`  Error updating CHANGELOG.md:`, err.message)
+  }
+}
+
 function updatePackageLockVersion(newVersion) {
   const packageLockPath = join(rootDir, 'package-lock.json')
   if (!existsSync(packageLockPath)) {
@@ -165,7 +202,10 @@ for (const file of VERSION_FILES) {
 updatePackageLockVersion(newVersion)
 
 // Create Git Tag if --tag is present
-if (process.argv.includes('--tag') &&!isSync) {
+if (process.argv.includes('--tag') && !isSync) {
+  // Promote the [Unreleased] CHANGELOG entry to the actual version before tagging
+  promoteChangelogUnreleased(newVersion)
+
   try {
     const tagName = `v${newVersion}`
     console.log(`\nCreating git tag: ${tagName}...`)
