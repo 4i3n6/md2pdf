@@ -1,0 +1,84 @@
+name: Build CLI Executables
+
+on:
+  # Build on release tags created by release-please
+  push:
+    tags:
+      - 'v*'
+  # Allow manual trigger
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build-sea:
+    strategy:
+      matrix:
+        include:
+          - os: ubuntu-latest
+            platform: linux
+            arch: x64
+          - os: macos-latest
+            platform: darwin
+            arch: arm64
+          - os: windows-latest
+            platform: win32
+            arch: x64
+
+    runs-on: ${{ matrix.os }}
+    name: Build ${{ matrix.platform }}-${{ matrix.arch }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Build CLI bundle
+        run: npm run build:cli
+
+      - name: Build SEA executable
+        run: node scripts/build-sea.mjs --skip-cli
+
+      - name: Verify executable
+        shell: bash
+        run: |
+          EXT=""
+          if [ "${{ matrix.platform }}" = "win32" ]; then EXT=".exe"; fi
+          BINARY="dist-cli/md2pdf-${{ matrix.platform }}-${{ matrix.arch }}${EXT}"
+          echo "Testing: $BINARY"
+          "$BINARY" --version
+          "$BINARY" --help
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: md2pdf-${{ matrix.platform }}-${{ matrix.arch }}
+          path: dist-cli/md2pdf-${{ matrix.platform }}-${{ matrix.arch }}*
+
+  release:
+    needs: build-sea
+    runs-on: ubuntu-latest
+    if: startsWith(github.ref, 'refs/tags/v')
+
+    steps:
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+
+      - name: List artifacts
+        run: find artifacts -type f | sort
+
+      - name: Upload binaries to GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: artifacts/**/*
+          fail_on_unmatched_files: false

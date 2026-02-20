@@ -1,6 +1,6 @@
 {
   "name": "md2pdf",
-  "version": "2.1.1",
+  "version": "2.1.2",
   "description": "",
   "main": "index.js",
   "bin": {
@@ -28,6 +28,7 @@
     "release": "node scripts/bump-version.mjs patch --tag && git push origin main --tags",
     "preview": "vite preview",
     "build:cli": "tsup",
+    "build:sea": "node scripts/build-sea.mjs",
     "build:all": "npm run build && npm run build:cli"
   },
   "keywords": [],
@@ -57,7 +58,7 @@
     "js-yaml": "^4.1.1",
     "marked": "^17.0.1",
     "mermaid": "^11.12.2",
-    "puppeteer": "^23.11.1",
+    "puppeteer-core": "^23.11.1",
     "commander": "^12.1.0",
     "vite": "^7.2.6"
   },

@@ -9,8 +9,8 @@ export default defineConfig({
     clean: true,
     splitting: false,
     banner: { js: '#!/usr/bin/env node' },
-    external: ['puppeteer', 'mermaid'],
+    external: ['mermaid'],
     loader: { '.css': 'text' },
-    noExternal: ['marked', 'highlight.js', 'js-yaml', 'commander'],
+    noExternal: ['marked', 'highlight.js', 'js-yaml', 'commander', 'puppeteer-core'],
     tsconfig: 'tsconfig.cli.json'
 })
