@@ -1,0 +1,243 @@
+import * as fs from 'fs'
+import * as path from 'path'
+import puppeteer from 'puppeteer-core'
+import type { Browser, Page } from 'puppeteer-core'
+import type { PageMargins } from './utils'
+
+export interface PdfOptions {
+    pageSize: string
+    landscape: boolean
+    margin: PageMargins
+    mermaid: boolean
+    timeout: number
+    debug: boolean
+}
+
+const CHROME_PATHS: Record<string, string[]> = {
+    darwin: [
+        '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
+        '/Applications/Google Chrome Canary.app/Contents/MacOS/Google Chrome Canary',
+        '/Applications/Chromium.app/Contents/MacOS/Chromium',
+        '/Applications/Brave Browser.app/Contents/MacOS/Brave Browser',
+        '/Applications/Microsoft Edge.app/Contents/MacOS/Microsoft Edge',
+    ],
+    linux: [
+        '/usr/bin/google-chrome',
+        '/usr/bin/google-chrome-stable',
+        '/usr/bin/chromium',
+        '/usr/bin/chromium-browser',
+        '/snap/bin/chromium',
+        '/usr/bin/brave-browser',
+        '/usr/bin/microsoft-edge',
+    ],
+    win32: [
+        'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe',
+        'C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe',
+        `${process.env['LOCALAPPDATA'] ?? ''}\\Google\\Chrome\\Application\\chrome.exe`,
+        'C:\\Program Files\\Chromium\\Application\\chrome.exe',
+        'C:\\Program Files (x86)\\Microsoft\\Edge\\Application\\msedge.exe',
+    ],
+}
+
+function findChrome(): string {
+    const candidates = CHROME_PATHS[process.platform] ?? []
+
+    for (const candidate of candidates) {
+        if (candidate && fs.existsSync(candidate)) {
+            return candidate
+        }
+    }
+
+    const envPath = process.env['CHROME_PATH']
+    if (envPath && fs.existsSync(envPath)) {
+        return envPath
+    }
+
+    const lines = [
+        'Error: Chrome/Chromium not found.',
+        '',
+        'md2pdf needs a Chromium-based browser to generate PDFs.',
+        'Options:',
+        '  1. Install Google Chrome: https://google.com/chrome',
+        '  2. Set CHROME_PATH environment variable to your browser executable',
+        `     Example: CHROME_PATH=/path/to/chrome md2pdf input.md`,
+    ]
+    throw new Error(lines.join('\n'))
+}
+
+export async function generatePdf(
+    htmlContent: string,
+    outputPath: string,
+    inputDir: string,
+    options: PdfOptions
+): Promise<void> {
+    const tempFileName = `.md2pdf-temp-${Date.now()}.html`
+    const tempHtmlPath = path.join(inputDir, tempFileName)
+
+    let browser: Browser | null = null
+
+    try {
+        fs.writeFileSync(tempHtmlPath, htmlContent, 'utf-8')
+
+        const executablePath = findChrome()
+        browser = await puppeteer.launch({
+            headless: true,
+            executablePath,
+            args: ['--no-sandbox', '--disable-setuid-sandbox']
+        })
+
+        const page = await browser.newPage()
+
+        const fileUrl = `file://${tempHtmlPath}`
+        await page.goto(fileUrl, {
+            waitUntil: 'networkidle0',
+            timeout: options.timeout
+        })
+
+        await page.emulateMediaType('print')
+
+        if (options.mermaid) {
+            await renderMermaidDiagrams(page, options.timeout)
+        }
+
+        await waitForImages(page, options.timeout)
+
+        await page.pdf({
+            path: outputPath,
+            format: options.pageSize as 'A4' | 'Letter' | 'Legal',
+            landscape: options.landscape,
+            margin: options.margin,
+            printBackground: true,
+            preferCSSPageSize: true
+        })
+    } finally {
+        if (browser) {
+            await browser.close()
+        }
+
+        if (!options.debug && fs.existsSync(tempHtmlPath)) {
+            fs.unlinkSync(tempHtmlPath)
+        }
+
+        if (options.debug) {
+            const debugPath = tempHtmlPath.replace(
+                '.html',
+                '.debug.html'
+            )
+            if (tempHtmlPath !== debugPath && fs.existsSync(tempHtmlPath)) {
+                fs.renameSync(tempHtmlPath, debugPath)
+            }
+            process.stderr.write(`Debug HTML saved: ${debugPath}\n`)
+        }
+    }
+}
+
+async function renderMermaidDiagrams(
+    page: Page,
+    timeout: number
+): Promise<void> {
+    const hasMermaid = await page.evaluate(() => {
+        return document.querySelectorAll('[data-mermaid-source]').length > 0
+    })
+
+    if (!hasMermaid) return
+
+    let loaded = false
+
+    // Try local mermaid package first (available in dev / npm install)
+    for (const entry of ['mermaid/dist/mermaid.min.js', 'mermaid/dist/mermaid.js']) {
+        try {
+            const resolved = require.resolve(entry)
+            await page.addScriptTag({ path: resolved })
+            loaded = true
+            break
+        } catch {
+            // not found, try next
+        }
+    }
+
+    // Fallback: load from CDN (standalone binary / SEA)
+    if (!loaded) {
+        try {
+            await page.addScriptTag({
+                url: 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js'
+            })
+            loaded = true
+        } catch {
+            process.stderr.write(
+                'Warning: mermaid not available (install locally or check internet), skipping diagrams\n'
+            )
+            return
+        }
+    }
+
+    await page.evaluate(async () => {
+        const mermaidGlobal = (window as unknown as { mermaid: {
+            initialize: (config: Record<string, unknown>) => void
+            run: (config: { nodes: NodeListOf<Element> }) => Promise<void>
+        } }).mermaid
+
+        mermaidGlobal.initialize({
+            startOnLoad: false,
+            theme: 'default',
+            securityLevel: 'loose'
+        })
+
+        const blocks = document.querySelectorAll('[data-mermaid-source]')
+        for (const block of blocks) {
+            const b64 = block.getAttribute('data-mermaid-source')
+            if (!b64) continue
+
+            try {
+                const source = atob(b64)
+                block.removeAttribute('data-mermaid-source')
+                block.textContent = source
+            } catch {
+                // Skip blocks with invalid base64
+            }
+        }
+
+        const mermaidBlocks = document.querySelectorAll('.mermaid')
+        if (mermaidBlocks.length > 0) {
+            await mermaidGlobal.run({ nodes: mermaidBlocks })
+        }
+    })
+
+    await page.waitForFunction(
+        () => {
+            const blocks = document.querySelectorAll('.mermaid')
+            return Array.from(blocks).every(
+                (b) => b.querySelector('svg') !== null || b.classList.contains('mermaid-error')
+            )
+        },
+        { timeout }
+    )
+}
+
+async function waitForImages(
+    page: Page,
+    timeout: number
+): Promise<void> {
+    await page.evaluate((imgTimeout: number) => {
+        const images = document.querySelectorAll('img')
+        const promises = Array.from(images).map(
+            (img) =>
+                new Promise<void>((resolve) => {
+                    if (img.complete) {
+                        resolve()
+                        return
+                    }
+                    const timer = setTimeout(resolve, imgTimeout)
+                    img.addEventListener('load', () => {
+                        clearTimeout(timer)
+                        resolve()
+                    })
+                    img.addEventListener('error', () => {
+                        clearTimeout(timer)
+                        resolve()
+                    })
+                })
+        )
+        return Promise.all(promises)
+    }, Math.min(timeout, 10000))
+}
