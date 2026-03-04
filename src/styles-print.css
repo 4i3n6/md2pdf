@@ -211,15 +211,15 @@
        LINKS - MOSTRAR URL EM PRINT
        ============================================================ */
 
-    .markdown-body a,
-    .markdown-body .markdown-link {
-        color: black;
-        text-decoration: underline;
-        word-break: break-word;
-        overflow-wrap: anywhere;
-        display: inline;
-        max-width: 100%;
-    }
+.markdown-body a,
+.markdown-body .markdown-link {
+    color: black;
+    text-decoration: underline;
+        word-break: break-all;
+    overflow-wrap: anywhere;
+    display: inline;
+    max-width: 100%;
+}
 
     /* URLs não são exibidas após links para manter fidelidade com preview */
     .markdown-body a[href]::after {
@@ -377,12 +377,12 @@
         border-collapse: collapse;
         margin: 16px 0;
         page-break-inside: auto;
-        border: 1px solid #d1d5db;
-        font-size: inherit;
-        table-layout: fixed;
-        min-width: 0;
-        overflow-x: visible;
-    }
+    border: 1px solid #d1d5db;
+    font-size: inherit;
+    table-layout: fixed;
+    min-width: 0;
+    overflow-x: hidden;
+}
 
     .markdown-body th,
     .markdown-body td {
@@ -637,8 +637,8 @@ body.print-mode .markdown-body .markdown-table-content {
     max-width: 100%;
     border-collapse: collapse;
     table-layout: fixed;
-        min-width: 0;
-        overflow-x: visible;
+    min-width: 0;
+    overflow-x: hidden;
     page-break-inside: auto;
 }
 
