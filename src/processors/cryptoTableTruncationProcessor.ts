@@ -23,6 +23,10 @@ function truncateCellTextNodes(cell: Element): number {
     let node = walker.nextNode()
 
     while (node) {
+        if ((node as Text).parentElement?.closest('a')) {
+            node = walker.nextNode()
+            continue
+        }
         const original = node.textContent || ''
         const processed = truncateCryptoText(original)
         if (processed !== original) {
