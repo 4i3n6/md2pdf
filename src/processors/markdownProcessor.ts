@@ -150,17 +150,18 @@ function isAutolinkedUrl(tokenText: string, tokenHref: string): boolean {
     return false
   }
 
-  const normalizedTokenText = decodeHtmlEntities(tokenText)
+  const normalizedText = decodeHtmlEntities(tokenText)
+  const normalizedHref = decodeHtmlEntities(tokenHref)
 
-  if (normalizedTokenText === tokenHref) {
+  if (normalizedText === normalizedHref) {
     return true
   }
 
-  if (`https://${normalizedTokenText}` === tokenHref) {
+  if (`https://${normalizedText}` === normalizedHref) {
     return true
   }
 
-  if (`http://${normalizedTokenText}` === tokenHref) {
+  if (`http://${normalizedText}` === normalizedHref) {
     return true
   }
 
@@ -383,8 +384,9 @@ class PrintRenderer extends Renderer {
       ? this.parser.parseInline(token.tokens)
       : token.text || ''
 
-    if (isAutolinkedUrl(token.text, token.href) && token.href.length > 60) {
-      rawContent = truncateUrlForDisplay(token.href)
+    const decodedHref = decodeHtmlEntities(token.href)
+    if (isAutolinkedUrl(token.text, token.href) && decodedHref.length > 60) {
+      rawContent = truncateUrlForDisplay(decodedHref)
     }
 
     const content = abbreviateCryptoInContent(rawContent)
@@ -452,6 +454,33 @@ marked.setOptions({
 })
 
 marked.use({ renderer: new PrintRenderer() })
+
+marked.use({
+  walkTokens(token: Tokens.Generic) {
+    if (token.type !== 'link') {
+      return
+    }
+
+    const linkToken = token as Tokens.Link & { tokens?: Tokens.Generic[] }
+    const decodedHref = decodeHtmlEntities(linkToken.href)
+
+    if (!isAutolinkedUrl(linkToken.text, linkToken.href) || decodedHref.length <= 60) {
+      return
+    }
+
+    const truncated = truncateUrlForDisplay(decodedHref)
+    linkToken.text = truncated
+
+    const firstChild = linkToken.tokens?.[0]
+    if (!firstChild || firstChild.type !== 'text') {
+      return
+    }
+
+    const textToken = firstChild as Tokens.Text & { raw?: string }
+    textToken.text = truncated
+    textToken.raw = truncated
+  }
+})
 
 marked.use({
   extensions: [
