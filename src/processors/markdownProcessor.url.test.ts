@@ -3,9 +3,22 @@ import { readFileSync } from 'node:fs'
 import { resolve } from 'node:path'
 
 function loadPrivateUrlHelpers() {
-    const filePath = resolve(process.cwd(), 'src', 'processors', 'markdownProcessor.ts')
-    const source = readFileSync(filePath, 'utf8')
+    const source = readMarkdownProcessorSource()
+    const helpersSection = extractUrlHelperSection(source)
+    const { truncateSource, autolinkSource } = splitHelperFunctions(helpersSection)
 
+    return loadUrlHelpersFromSource({
+        truncateSource,
+        autolinkSource
+    })
+}
+
+function readMarkdownProcessorSource(): string {
+    const filePath = resolve(process.cwd(), 'src', 'processors', 'markdownProcessor.ts')
+    return readFileSync(filePath, 'utf8')
+}
+
+function extractUrlHelperSection(source: string): string {
     const truncateStart = source.indexOf('function truncateUrlForDisplay')
     if (truncateStart < 0) {
         throw new Error('truncateUrlForDisplay function not found')
@@ -15,21 +28,38 @@ function loadPrivateUrlHelpers() {
     if (fencedStart < 0) {
         throw new Error('findFencedCodeBlock function not found')
     }
-    const helpersSection = source.slice(truncateStart, fencedStart)
+    return source.slice(truncateStart, fencedStart)
+}
+
+function splitHelperFunctions(helpersSection: string): {
+    truncateSource: string
+    autolinkSource: string
+} {
     const autoLinkStart = helpersSection.indexOf('function isAutolinkedUrl')
     if (autoLinkStart < 0) {
         throw new Error('isAutolinkedUrl function not found')
     }
 
-    const truncateSource = helpersSection.slice(0, autoLinkStart).trim()
-    const autolinkSource = helpersSection.slice(autoLinkStart).trim()
+    return {
+        truncateSource: helpersSection.slice(0, autoLinkStart).trim(),
+        autolinkSource: helpersSection.slice(autoLinkStart).trim()
+    }
+}
 
-    const transpileSource = (value: string): string =>
-        value
-            .replace(/:\s*string/g, '')
-            .replace(/:\s*number/g, '')
-            .replace(/:\s*boolean/g, '')
+function transpileSource(value: string): string {
+    return value
+        .replace(/:\s*string/g, '')
+        .replace(/:\s*number/g, '')
+        .replace(/:\s*boolean/g, '')
+}
 
+function loadUrlHelpersFromSource({ truncateSource, autolinkSource }: {
+    truncateSource: string
+    autolinkSource: string
+}): {
+    truncateUrlForDisplay: (url: string, maxLength?: number) => string
+    isAutolinkedUrl: (tokenText: string, tokenHref: string) => boolean
+} {
     const moduleExports: {
         truncateUrlForDisplay?: (url: string, maxLength?: number) => string
         isAutolinkedUrl?: (tokenText: string, tokenHref: string) => boolean
