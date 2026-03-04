@@ -20,6 +20,8 @@ interface PrintStatistics {
 
 type PrintContentTarget = string | HTMLElement;
 
+
+
 export interface PrintDocumentOptions {
   previewElement?: HTMLElement | null;
   validation?: ValidationResult;
@@ -129,13 +131,6 @@ function validateTables(container: HTMLElement, issues: string[]): void {
   });
 }
 
-function validateLongUrls(htmlContent: string, issues: string[]): void {
-  const longLines = htmlContent.match(/https?:\/\/[^\s<>"]{80,}/g);
-  if (longLines && longLines.length > 0) {
-    issues.push(`⚠️ ${longLines.length} long URL(s) may overflow in print output`);
-  }
-}
-
 const printValidationPipeline: PipelineStage<ValidationPipelineContext>[] = [
   {
     id: 'validate-images-print',
@@ -153,12 +148,6 @@ const printValidationPipeline: PipelineStage<ValidationPipelineContext>[] = [
     enabled: (ctx) => ctx.isLive,
     run: (ctx): void => {
       validateTables(ctx.container, ctx.issues);
-    }
-  },
-  {
-    id: 'validate-long-urls-print',
-    run: (ctx): void => {
-      validateLongUrls(ctx.htmlContent, ctx.issues);
     }
   }
 ]
@@ -321,7 +310,7 @@ export function printDocument(
         }
 
         const validation = await getValidationForPrint(preview, options);
-        if (!confirmPrintWithWarnings(validation, logger)) {
+        if (!(await confirmPrintWithWarnings(validation, logger))) {
           resolve(false);
           return;
         }

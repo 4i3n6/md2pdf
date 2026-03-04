@@ -551,11 +551,6 @@ export function validateMarkdown(markdown: string): { isValid: boolean; warnings
     warnings.push('Content contains potentially dangerous tags (will be removed)')
   }
 
-  const longUrls = markdown.match(/https?:\/\/[^\s]{100,}/g)
-  if (longUrls) {
-    warnings.push(`${longUrls.length} long URL(s) may overflow in print output`)
-  }
-
   return {
     isValid: warnings.length === 0,
     warnings
