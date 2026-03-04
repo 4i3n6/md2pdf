@@ -136,20 +136,31 @@ function truncateUrlForDisplay(url: string, maxLength: number = 60): string {
   return `${url.substring(0, 40)}...${url.substring(url.length - 15)}`
 }
 
+function decodeHtmlEntities(text: string): string {
+  return text
+    .replace(/&amp;/g, '&')
+    .replace(/&lt;/g, '<')
+    .replace(/&gt;/g, '>')
+    .replace(/&quot;/g, '"')
+    .replace(/&#39;/g, '\'')
+}
+
 function isAutolinkedUrl(tokenText: string, tokenHref: string): boolean {
   if (!tokenText || !tokenHref) {
     return false
   }
 
-  if (tokenText === tokenHref) {
+  const normalizedTokenText = decodeHtmlEntities(tokenText)
+
+  if (normalizedTokenText === tokenHref) {
     return true
   }
 
-  if (`https://${tokenText}` === tokenHref) {
+  if (`https://${normalizedTokenText}` === tokenHref) {
     return true
   }
 
-  if (`http://${tokenText}` === tokenHref) {
+  if (`http://${normalizedTokenText}` === tokenHref) {
     return true
   }
 
