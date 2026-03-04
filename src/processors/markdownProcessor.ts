@@ -128,6 +128,34 @@ function abbreviateCryptoInContent(content: string): string {
     .replace(btcAddressRegex, abbreviateCryptoAddress)
 }
 
+function truncateUrlForDisplay(url: string, maxLength: number = 60): string {
+  if (url.length <= maxLength) {
+    return url
+  }
+
+  return `${url.substring(0, 40)}...${url.substring(url.length - 15)}`
+}
+
+function isAutolinkedUrl(tokenText: string, tokenHref: string): boolean {
+  if (!tokenText || !tokenHref) {
+    return false
+  }
+
+  if (tokenText === tokenHref) {
+    return true
+  }
+
+  if (`https://${tokenText}` === tokenHref) {
+    return true
+  }
+
+  if (`http://${tokenText}` === tokenHref) {
+    return true
+  }
+
+  return false
+}
+
 function findFencedCodeBlock(src: string, language: string): { raw: string, text: string } | null {
   const escapedLanguage = escapeRegex(language)
   const regex = new RegExp(
@@ -340,9 +368,14 @@ class PrintRenderer extends Renderer {
   }
 
   override link(token: Tokens.Link): string {
-    const rawContent = token.tokens && token.tokens.length > 0
+    let rawContent = token.tokens && token.tokens.length > 0
       ? this.parser.parseInline(token.tokens)
       : token.text || ''
+
+    if (isAutolinkedUrl(token.text, token.href) && token.href.length > 60) {
+      rawContent = truncateUrlForDisplay(token.href)
+    }
+
     const content = abbreviateCryptoInContent(rawContent)
     return `<a href="${token.href}" title="${token.title || ''}" class="markdown-link">${content}</a>`
   }

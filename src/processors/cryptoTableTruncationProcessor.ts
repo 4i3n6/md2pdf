@@ -3,12 +3,18 @@ function abbreviateCryptoAddress(value: string): string {
     return `${value.slice(0, 10)}...${value.slice(-8)}`
 }
 
+function truncateUrlText(url: string): string {
+    return `${url.substring(0, 40)}...${url.substring(url.length - 15)}`
+}
+
 function truncateCryptoText(text: string): string {
     const evmAddressRegex = /\b0x[a-fA-F0-9]{24,}\b/g
     const btcAddressRegex = /\b(?:bc1|[13])[a-zA-HJ-NP-Z0-9]{25,62}\b/g
+    const longUrlRegex = /https?:\/\/[^\s<>"']{60,}/g
     return text
         .replace(evmAddressRegex, abbreviateCryptoAddress)
         .replace(btcAddressRegex, abbreviateCryptoAddress)
+        .replace(longUrlRegex, truncateUrlText)
 }
 
 function truncateCellTextNodes(cell: Element): number {
