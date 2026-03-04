@@ -7,6 +7,13 @@ New releases are prepended automatically by [release-please](https://github.com/
 
 ---
 
+## [2.1.4](https://github.com/4i3n6/md2pdf/compare/md2pdf-v2.1.3...md2pdf-v2.1.4) (2026-03-04)
+
+
+### ### Fixed
+
+* **print:** prevent long URLs from overflowing A4 page width ([520dd1a](https://github.com/4i3n6/md2pdf/commit/520dd1accc0f2433ce0daf02a5ae86b642ff5bb2))
+
 ## [2.1.3](https://github.com/4i3n6/md2pdf/compare/md2pdf-v2.1.2...md2pdf-v2.1.3) (2026-02-20)
 
 
