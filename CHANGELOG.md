@@ -7,6 +7,31 @@ New releases are prepended automatically by [release-please](https://github.com/
 
 ---
 
+## [2.2.0](https://github.com/4i3n6/md2pdf/compare/md2pdf-v2.1.4...md2pdf-v2.2.0) (2026-03-04)
+
+
+### ### Added
+
+* **print:** truncate long autolinked URLs for print display ([f2e8bc7](https://github.com/4i3n6/md2pdf/commit/f2e8bc7c74657641694dcb50c7749705287f266e))
+
+
+### ### Fixed
+
+* **print:** decode HTML entities in isAutolinkedUrl for correct autolink detection ([1209c66](https://github.com/4i3n6/md2pdf/commit/1209c669e26cf61432bbb9d1d94993e2111eb45f))
+* **print:** fix table overflow-x and link word-break in print CSS ([c8dafa9](https://github.com/4i3n6/md2pdf/commit/c8dafa9912cb01e4e804930b39fe4e2f9fe67bd0))
+* **print:** skip anchor text nodes in table URL truncation ([2df19ce](https://github.com/4i3n6/md2pdf/commit/2df19ce533d389cc868c0566158d7fbfad1584a2))
+* **print:** use walkTokens to truncate GFM autolinks in marked v17 ([e1232ef](https://github.com/4i3n6/md2pdf/commit/e1232ef88af89fe2b05b0b03f3ffa26a283334b8))
+
+
+### ### Changed
+
+* **test:** split loadPrivateUrlHelpers to satisfy 30-line limit ([d64bfc3](https://github.com/4i3n6/md2pdf/commit/d64bfc3eee7f4915644862fdd54cab7c12970158))
+
+
+### ### Tests
+
+* **print:** add URL truncation unit tests ([8c6da86](https://github.com/4i3n6/md2pdf/commit/8c6da8603f7f5ccd5cd51319a15b41cb387dd718))
+
 ## [2.1.4](https://github.com/4i3n6/md2pdf/compare/md2pdf-v2.1.3...md2pdf-v2.1.4) (2026-03-04)
 
 
