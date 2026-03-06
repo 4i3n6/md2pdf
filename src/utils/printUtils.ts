@@ -36,7 +36,8 @@ type ValidationPipelineContext = {
 
 const PrintTimings = {
   afterPrintRestoreDelayMs: 100,
-  fallbackRestoreTimeoutMs: 5000
+  fallbackRestoreTimeoutMs: 5000,
+  imageLoadTimeoutMs: 5000
 } as const;
 
 function createTempContainer(htmlContent: string): HTMLElement {
@@ -49,22 +50,60 @@ async function waitForImages(
   images: HTMLImageElement[],
   timeoutMs: number = 2000
 ): Promise<void> {
-  const pending = images.filter((img) => !img.complete);
-  if (pending.length === 0) return;
+  if (images.length === 0) return;
 
   await Promise.race([
     Promise.all(
-      pending.map(
-        (img) =>
-          new Promise<void>((resolve) => {
-            const onDone = (): void => resolve();
-            img.addEventListener('load', onDone, { once: true });
-            img.addEventListener('error', onDone, { once: true });
-          })
-      )
+      images.map((img) => waitForImageReady(img))
     ),
     new Promise<void>((resolve) => setTimeout(resolve, timeoutMs))
   ]);
+}
+
+async function waitForImageReady(img: HTMLImageElement): Promise<void> {
+  if (img.complete) {
+    await decodeImage(img)
+    return
+  }
+
+  await new Promise<void>((resolve) => {
+    const onDone = (): void => {
+      img.removeEventListener('load', onDone)
+      img.removeEventListener('error', onDone)
+      resolve()
+    }
+
+    img.addEventListener('load', onDone, { once: true })
+    img.addEventListener('error', onDone, { once: true })
+  })
+
+  await decodeImage(img)
+}
+
+async function decodeImage(img: HTMLImageElement): Promise<void> {
+  if (typeof img.decode !== 'function') return
+
+  try {
+    await img.decode()
+  } catch {
+    // Ignore decode failures and rely on the browser fallback during print.
+  }
+}
+
+async function prepareImagesForPrint(
+  container: HTMLElement,
+  logger: (message: string) => void
+): Promise<void> {
+  const images = Array.from(container.querySelectorAll('img'))
+  if (images.length === 0) return
+
+  const { processImagesForPrint } = await import('@/processors/imageProcessor')
+  const processed = await processImagesForPrint(container, true)
+  await waitForImages(images, PrintTimings.imageLoadTimeoutMs)
+
+  if (processed > 0) {
+    logger(`Prepared ${processed} image(s) for print`)
+  }
 }
 
 function getImageDimensions(img: HTMLImageElement): { widthPx: number; heightPx: number } {
@@ -309,6 +348,7 @@ export function printDocument(
           return;
         }
 
+        await prepareImagesForPrint(preview, logger);
         const validation = await getValidationForPrint(preview, options);
         if (!(await confirmPrintWithWarnings(validation, logger))) {
           resolve(false);

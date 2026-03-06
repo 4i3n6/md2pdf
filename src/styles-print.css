@@ -445,7 +445,7 @@
     .markdown-body img,
     .markdown-body .markdown-img {
         max-width: 100%;
-        max-height: 100mm;
+        max-height: calc(297mm - 20mm);
         height: auto;
         border: none;
         display: block;
@@ -624,6 +624,15 @@ body.print-mode .markdown-body {
     border-radius: 4px;
     overflow-wrap: anywhere;
     word-break: break-word;
+}
+
+body.print-mode .markdown-body img,
+body.print-mode .markdown-body .markdown-img {
+    max-width: 100%;
+    max-height: calc(297mm - 20mm);
+    height: auto;
+    display: block;
+    margin: 0 auto;
 }
 
 /* Alinhar comportamento de tabela/texto com @media print para reduzir divergencias visuais */
