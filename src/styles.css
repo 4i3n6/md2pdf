@@ -457,10 +457,9 @@ body.splitter-dragging iframe {
 
 .markdown-body blockquote { 
     border-left: 4px solid var(--accent); 
-    padding-left: 15px; 
     color: var(--text-dim); 
     background: #eff6ff;
-    padding: 10px;
+    padding: 10px 10px 10px 15px;
 }
 
 .markdown-body table { width: 100%; border-collapse: collapse; border: 1px solid var(--border); }
@@ -472,6 +471,35 @@ body.splitter-dragging iframe {
 .markdown-body td[align="center"] { text-align: center; }
 .markdown-body th[align="right"],
 .markdown-body td[align="right"] { text-align: right; }
+
+.markdown-body figure,
+.markdown-body .markdown-image {
+    width: 100%;
+    margin: 1.25em auto;
+    text-align: center;
+}
+
+.markdown-body img,
+.markdown-body .markdown-img {
+    display: block;
+    width: auto;
+    max-width: min(100%, 720px);
+    max-height: min(72vh, 900px);
+    height: auto;
+    margin: 0 auto;
+    object-fit: contain;
+}
+
+.markdown-body figcaption,
+.markdown-body .markdown-figcaption {
+    width: min(100%, 72ch);
+    margin: 0.5em auto 0;
+    text-align: center;
+    color: var(--text-dim);
+    font-size: 11px;
+    line-height: 1.5;
+    font-style: italic;
+}
 
 /* Horizontal Rule - Visual line only */
 .markdown-body hr,
@@ -633,7 +661,6 @@ body.splitter-dragging iframe {
 
 .markdown-code-block::before {
     content: attr(data-lang);
-    display: block;
     font-size: 10px;
     font-weight: 700;
     color: #6a737d;
@@ -807,10 +834,9 @@ textarea:focus-visible {
 /* Improved blockquote contrast */
 .markdown-body blockquote {
     border-left: 4px solid var(--accent);
-    padding-left: 15px;
     color: var(--text-main);
     background: #f0f4ff;
-    padding: 10px;
+    padding: 10px 10px 10px 15px;
     font-style: italic;
 }
 

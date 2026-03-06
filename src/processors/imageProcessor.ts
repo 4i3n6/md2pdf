@@ -11,9 +11,17 @@ interface PrintDimensions {
   width: string
   height: string
   maxWidth: string
+  maxHeight?: string
   scale?: number
   calculatedWidthMm?: number
   calculatedHeightMm?: number
+}
+
+interface PreviewDimensions {
+  width: string
+  height: string
+  maxWidth: string
+  maxHeight: string
 }
 
 interface ImageValidationResult {
@@ -57,7 +65,8 @@ export function calculatePrintDimensions(width: number, height: number): PrintDi
     return {
       width: '100%',
       height: 'auto',
-      maxWidth: '100%'
+      maxWidth: '100%',
+      maxHeight: `${PrintLimits.maxHeightMm * PrintLimits.pxPerMm}px`
     }
   }
 
@@ -84,10 +93,38 @@ export function calculatePrintDimensions(width: number, height: number): PrintDi
     width: `${width * scale}px`,
     height: 'auto',
     maxWidth: '100%',
+    maxHeight: `${PrintLimits.maxHeightMm * PrintLimits.pxPerMm}px`,
     scale: scale,
     calculatedWidthMm: widthMm * scale,
     calculatedHeightMm: heightMm * scale
   }
+}
+
+export function calculatePreviewDimensions(): PreviewDimensions {
+  const fallbackMaxHeightPx = 720
+  const viewportHeightPx = typeof window === 'undefined'
+    ? fallbackMaxHeightPx
+    : Math.max(window.innerHeight * 0.72, 320)
+
+  return {
+    width: 'auto',
+    height: 'auto',
+    maxWidth: '100%',
+    maxHeight: `${Math.round(viewportHeightPx)}px`
+  }
+}
+
+function applyImageStyles(
+  img: HTMLImageElement,
+  styles: { width: string; height: string; maxWidth: string; maxHeight?: string }
+): void {
+  img.style.width = styles.width
+  img.style.height = styles.height
+  img.style.maxWidth = styles.maxWidth
+  img.style.maxHeight = styles.maxHeight || ''
+  img.style.display = 'block'
+  img.style.margin = '0 auto'
+  img.style.objectFit = 'contain'
 }
 
 export async function getCachedImageDimensions(src: string): Promise<ImageDimensions | null> {
@@ -132,19 +169,68 @@ export async function processImagesForPrint(
           : await getImageDimensions(src)
 
         if (!dimensions) {
-          img.style.maxWidth = '100%'
-          img.style.height = 'auto'
+          applyImageStyles(img, {
+            width: 'auto',
+            height: 'auto',
+            maxWidth: '100%'
+          })
           return
         }
 
         const printDims = calculatePrintDimensions(dimensions.width, dimensions.height)
-        img.style.width = printDims.width
-        img.style.height = printDims.height
-        img.style.maxWidth = printDims.maxWidth
+        applyImageStyles(img, printDims)
 
         img.dataset['originalWidth'] = String(dimensions.width)
         img.dataset['originalHeight'] = String(dimensions.height)
         img.dataset['printScale'] = String(printDims.scale ?? 1)
+      })
+    )
+
+    results.forEach((result) => {
+      if (result.status === 'fulfilled') {
+        processed++
+      } else {
+        const errorMsg = result.reason instanceof Error ? result.reason.message : String(result.reason)
+        logWarn(`Failed to process image: ${errorMsg}`)
+      }
+    })
+  }
+
+  return processed
+}
+
+export async function processImagesForPreview(
+  container: HTMLElement | null,
+  useCache: boolean = true,
+  maxConcurrent: number = 5
+): Promise<number> {
+  if (!container) return 0
+
+  const images = Array.from(container.querySelectorAll('img'))
+  if (images.length === 0) return 0
+
+  let processed = 0
+
+  for (let i = 0; i < images.length; i += maxConcurrent) {
+    const batch = images.slice(i, i + maxConcurrent)
+
+    const results = await Promise.allSettled(
+      batch.map(async (img) => {
+        const src = img.src
+        if (!src) return
+
+        const dimensions = useCache
+          ? await getCachedImageDimensions(src)
+          : await getImageDimensions(src)
+
+        applyImageStyles(img, calculatePreviewDimensions())
+
+        if (!dimensions) {
+          return
+        }
+
+        img.dataset['originalWidth'] = String(dimensions.width)
+        img.dataset['originalHeight'] = String(dimensions.height)
       })
     )
 

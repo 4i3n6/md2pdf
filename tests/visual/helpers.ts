@@ -44,6 +44,20 @@ type ResultadoOverflowTabela = {
     whiteSpaceCelula: string[]
 }
 
+type PrintImageMetrics = {
+    imageCount: number
+    figureCount: number
+    wrappedFigureCount: number
+    dataPrintImageCount: number
+    imageWidthsPx: number[]
+    imageHeightsPx: number[]
+    imageMaxHeightsPx: number[]
+    naturalAspectRatios: number[]
+    renderedAspectRatios: number[]
+    centerOffsetsPx: number[]
+    captions: string[]
+}
+
 export async function medirOverflowDeTabelas(page: Page): Promise<ResultadoOverflowTabela> {
     return await page.locator(seletorPreview).evaluate((preview): ResultadoOverflowTabela => {
         const root = preview as HTMLElement
@@ -76,6 +90,50 @@ export async function medirOverflowDeTabelas(page: Page): Promise<ResultadoOverf
             overflowsPx,
             whiteSpaceCabecalho,
             whiteSpaceCelula
+        }
+    })
+}
+
+export async function measurePrintImages(page: Page): Promise<PrintImageMetrics> {
+    return await page.locator(seletorPreview).evaluate((preview): PrintImageMetrics => {
+        const root = preview as HTMLElement
+        const images = Array.from(root.querySelectorAll('img'))
+
+        return {
+            imageCount: images.length,
+            figureCount: root.querySelectorAll('figure.markdown-image').length,
+            wrappedFigureCount: root.querySelectorAll('p > figure.markdown-image').length,
+            dataPrintImageCount: root.querySelectorAll('img[data-print-image="true"]').length,
+            imageWidthsPx: images.map((img) => img.getBoundingClientRect().width),
+            imageHeightsPx: images.map((img) => img.getBoundingClientRect().height),
+            imageMaxHeightsPx: images.map((img) => {
+                const maxHeight = Number.parseFloat(window.getComputedStyle(img).maxHeight)
+                return Number.isFinite(maxHeight) ? maxHeight : 0
+            }),
+            naturalAspectRatios: images.map((img) => {
+                if (!img.naturalWidth || !img.naturalHeight) {
+                    return 0
+                }
+                return img.naturalWidth / img.naturalHeight
+            }),
+            renderedAspectRatios: images.map((img) => {
+                const rect = img.getBoundingClientRect()
+                if (!rect.width || !rect.height) {
+                    return 0
+                }
+                return rect.width / rect.height
+            }),
+            centerOffsetsPx: images.map((img) => {
+                const imgRect = img.getBoundingClientRect()
+                const figure = img.closest('figure.markdown-image')
+                const containerRect = figure?.getBoundingClientRect() || root.getBoundingClientRect()
+                const imgCenterX = imgRect.left + imgRect.width / 2
+                const containerCenterX = containerRect.left + containerRect.width / 2
+                return Math.abs(imgCenterX - containerCenterX)
+            }),
+            captions: Array.from(root.querySelectorAll('figure.markdown-image figcaption')).map(
+                (caption) => caption.textContent || ''
+            )
         }
     })
 }

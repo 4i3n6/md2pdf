@@ -272,6 +272,10 @@ class PrintRenderer extends Renderer {
   }
 
   override paragraph(token: Tokens.Paragraph): string {
+    if (token.tokens.length === 1 && token.tokens[0]?.type === 'image') {
+      return `${this.parser.parseInline(token.tokens)}\n`
+    }
+
     const content = this.parser.parseInline(token.tokens)
     return `<p class="markdown-paragraph">${content}</p>\n`
   }
@@ -282,7 +286,7 @@ class PrintRenderer extends Renderer {
            alt="${token.text || 'Image'}" 
            class="markdown-img"
            data-print-image="true"
-           loading="lazy">
+           loading="eager">
       <figcaption class="markdown-figcaption">${token.text || 'Image'}</figcaption>
     </figure>\n`
   }
@@ -400,10 +404,6 @@ class PrintRenderer extends Renderer {
     const items = token.items
       .map((item: Tokens.ListItem) => {
         const itemContent = this.parser.parse(item.tokens)
-        if (item.task) {
-          const checked = item.checked ? 'checked' : ''
-          return `<li><input type="checkbox" ${checked} disabled> ${itemContent}</li>`
-        }
         return `<li>${itemContent}</li>`
       })
       .join('')
@@ -450,10 +450,9 @@ marked.setOptions({
   gfm: true,
   breaks: true,
   pedantic: false,
-  async: false
+  async: false,
+  renderer: new PrintRenderer()
 })
-
-marked.use({ renderer: new PrintRenderer() })
 
 marked.use({
   walkTokens(token: Tokens.Generic) {
@@ -642,11 +641,11 @@ export async function processImagesInPreview(container: HTMLElement | null, useC
   if (!container) return 0
 
   try {
-    const { processImagesForPrint } = await import('./imageProcessor')
-    return await processImagesForPrint(container, useCache)
+    const { processImagesForPreview } = await import('./imageProcessor')
+    return await processImagesForPreview(container, useCache)
   } catch (e) {
     const errorMsg = e instanceof Error ? e.message : String(e)
-    logError(`Failed to process images for print: ${errorMsg}`)
+    logError(`Failed to process images for preview: ${errorMsg}`)
     return 0
   }
 }

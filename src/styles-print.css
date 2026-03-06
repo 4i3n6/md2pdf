@@ -432,7 +432,8 @@
     .markdown-body figure,
     .markdown-body .markdown-image {
         page-break-inside: avoid;
-        margin: 0.1em 0;
+        width: 100%;
+        margin: 0.5em auto;
         text-align: center;
     }
 
@@ -444,19 +445,22 @@
 
     .markdown-body img,
     .markdown-body .markdown-img {
-        max-width: 100%;
-        max-height: 100mm;
-        height: auto;
+        width: auto !important;
+        max-width: 100% !important;
+        max-height: calc(297mm - 20mm) !important;
+        height: auto !important;
         border: none;
-        display: block;
-        margin: 0 auto;
+        display: block !important;
+        margin: 0 auto !important;
     }
 
     .markdown-body figcaption,
     .markdown-body .markdown-figcaption {
+        width: min(100%, 72ch);
         font-size: 7pt;
         color: #888;
-        margin-top: 0.05em;
+        margin: 0.25em auto 0;
+        text-align: center;
         font-style: italic;
     }
 
@@ -624,6 +628,30 @@ body.print-mode .markdown-body {
     border-radius: 4px;
     overflow-wrap: anywhere;
     word-break: break-word;
+}
+
+body.print-mode .markdown-body img,
+body.print-mode .markdown-body .markdown-img {
+    width: auto !important;
+    max-width: 100% !important;
+    max-height: calc(297mm - 20mm) !important;
+    height: auto !important;
+    display: block !important;
+    margin: 0 auto !important;
+}
+
+body.print-mode .markdown-body figure,
+body.print-mode .markdown-body .markdown-image {
+    width: 100%;
+    margin: 0.5em auto;
+    text-align: center;
+}
+
+body.print-mode .markdown-body figcaption,
+body.print-mode .markdown-body .markdown-figcaption {
+    width: min(100%, 72ch);
+    margin: 0.25em auto 0;
+    text-align: center;
 }
 
 /* Alinhar comportamento de tabela/texto com @media print para reduzir divergencias visuais */
