@@ -2,11 +2,13 @@ import { expect, test } from '@playwright/test'
 import {
     abrirAplicacao,
     definirMarkdownNoEditor,
+    measurePrintImages,
     medirOverflowDeTabelas
 } from './helpers'
 import {
     markdownFidelidadeImpressao,
-    markdownFidelidadeRender
+    markdownFidelidadeRender,
+    markdownPrintImageSizing
 } from './fixtures'
 
 test.describe('Fidelidade Render e Print', () => {
@@ -58,6 +60,24 @@ test.describe('Fidelidade Render e Print', () => {
                 maxDiffPixelRatio: 0.03
             }
         )
+    })
+
+    test('print media keeps standalone images as print blocks and uses the full A4 height budget', async ({
+        page
+    }) => {
+        await abrirAplicacao(page)
+        await definirMarkdownNoEditor(page, markdownPrintImageSizing)
+
+        await page.emulateMedia({ media: 'print' })
+        const printImages = await measurePrintImages(page)
+
+        expect(printImages.imageCount).toBe(1)
+        expect(printImages.figureCount).toBe(1)
+        expect(printImages.wrappedFigureCount).toBe(0)
+        expect(printImages.dataPrintImageCount).toBe(1)
+        expect(printImages.captions[0]).toBe('Tall print image')
+        expect(printImages.imageHeightsPx[0]).toBeGreaterThan(1000)
+        expect(printImages.imageMaxHeightsPx[0]).toBeGreaterThan(1000)
     })
 
     test('preview de impressao (print-mode) mantem constraints visuais de tabela', async ({

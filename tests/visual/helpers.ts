@@ -44,6 +44,16 @@ type ResultadoOverflowTabela = {
     whiteSpaceCelula: string[]
 }
 
+type PrintImageMetrics = {
+    imageCount: number
+    figureCount: number
+    wrappedFigureCount: number
+    dataPrintImageCount: number
+    imageHeightsPx: number[]
+    imageMaxHeightsPx: number[]
+    captions: string[]
+}
+
 export async function medirOverflowDeTabelas(page: Page): Promise<ResultadoOverflowTabela> {
     return await page.locator(seletorPreview).evaluate((preview): ResultadoOverflowTabela => {
         const root = preview as HTMLElement
@@ -76,6 +86,28 @@ export async function medirOverflowDeTabelas(page: Page): Promise<ResultadoOverf
             overflowsPx,
             whiteSpaceCabecalho,
             whiteSpaceCelula
+        }
+    })
+}
+
+export async function measurePrintImages(page: Page): Promise<PrintImageMetrics> {
+    return await page.locator(seletorPreview).evaluate((preview): PrintImageMetrics => {
+        const root = preview as HTMLElement
+        const images = Array.from(root.querySelectorAll('img'))
+
+        return {
+            imageCount: images.length,
+            figureCount: root.querySelectorAll('figure.markdown-image').length,
+            wrappedFigureCount: root.querySelectorAll('p > figure.markdown-image').length,
+            dataPrintImageCount: root.querySelectorAll('img[data-print-image="true"]').length,
+            imageHeightsPx: images.map((img) => img.getBoundingClientRect().height),
+            imageMaxHeightsPx: images.map((img) => {
+                const maxHeight = Number.parseFloat(window.getComputedStyle(img).maxHeight)
+                return Number.isFinite(maxHeight) ? maxHeight : 0
+            }),
+            captions: Array.from(root.querySelectorAll('figure.markdown-image figcaption')).map(
+                (caption) => caption.textContent || ''
+            )
         }
     })
 }
