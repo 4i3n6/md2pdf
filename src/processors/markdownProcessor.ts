@@ -272,6 +272,10 @@ class PrintRenderer extends Renderer {
   }
 
   override paragraph(token: Tokens.Paragraph): string {
+    if (token.tokens.length === 1 && token.tokens[0]?.type === 'image') {
+      return `${this.parser.parseInline(token.tokens)}\n`
+    }
+
     const content = this.parser.parseInline(token.tokens)
     return `<p class="markdown-paragraph">${content}</p>\n`
   }
@@ -282,7 +286,7 @@ class PrintRenderer extends Renderer {
            alt="${token.text || 'Image'}" 
            class="markdown-img"
            data-print-image="true"
-           loading="lazy">
+           loading="eager">
       <figcaption class="markdown-figcaption">${token.text || 'Image'}</figcaption>
     </figure>\n`
   }
@@ -450,10 +454,9 @@ marked.setOptions({
   gfm: true,
   breaks: true,
   pedantic: false,
-  async: false
+  async: false,
+  renderer: new PrintRenderer()
 })
-
-marked.use({ renderer: new PrintRenderer() })
 
 marked.use({
   walkTokens(token: Tokens.Generic) {
