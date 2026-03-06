@@ -12,6 +12,31 @@ import {
 } from './fixtures'
 
 test.describe('Fidelidade Render e Print', () => {
+    test('preview renderiza imagens standalone como figure com legenda sem wrapper extra', async ({
+        page
+    }) => {
+        await abrirAplicacao(page)
+        await definirMarkdownNoEditor(page, markdownPrintImageSizing)
+
+        const previewImages = await measurePrintImages(page)
+
+        expect(previewImages.imageCount).toBe(1)
+        expect(previewImages.figureCount).toBe(1)
+        expect(previewImages.wrappedFigureCount).toBe(0)
+        expect(previewImages.dataPrintImageCount).toBe(1)
+        expect(previewImages.captions[0]).toBe('Tall print image')
+        expect(previewImages.imageHeightsPx[0]).toBeGreaterThan(0)
+
+        await expect(page.locator('#preview-wrapper')).toHaveScreenshot(
+            'preview-standalone-image.png',
+            {
+                animations: 'disabled',
+                caret: 'hide',
+                maxDiffPixelRatio: 0.03
+            }
+        )
+    })
+
     test('input_stream para render_output preserva estrutura essencial', async ({ page }) => {
         await abrirAplicacao(page)
         await definirMarkdownNoEditor(page, markdownFidelidadeRender)
