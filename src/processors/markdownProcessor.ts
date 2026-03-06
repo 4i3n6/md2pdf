@@ -641,11 +641,11 @@ export async function processImagesInPreview(container: HTMLElement | null, useC
   if (!container) return 0
 
   try {
-    const { processImagesForPrint } = await import('./imageProcessor')
-    return await processImagesForPrint(container, useCache)
+    const { processImagesForPreview } = await import('./imageProcessor')
+    return await processImagesForPreview(container, useCache)
   } catch (e) {
     const errorMsg = e instanceof Error ? e.message : String(e)
-    logError(`Failed to process images for print: ${errorMsg}`)
+    logError(`Failed to process images for preview: ${errorMsg}`)
     return 0
   }
 }
