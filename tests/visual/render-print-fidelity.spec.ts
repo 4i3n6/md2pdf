@@ -25,7 +25,11 @@ test.describe('Fidelidade Render e Print', () => {
         expect(previewImages.wrappedFigureCount).toBe(0)
         expect(previewImages.dataPrintImageCount).toBe(1)
         expect(previewImages.captions[0]).toBe('Tall print image')
+        expect(previewImages.imageWidthsPx[0]).toBeGreaterThan(0)
         expect(previewImages.imageHeightsPx[0]).toBeGreaterThan(0)
+        expect(previewImages.imageHeightsPx[0]).toBeLessThanOrEqual(previewImages.imageMaxHeightsPx[0] + 1)
+        expect(Math.abs(previewImages.renderedAspectRatios[0] - previewImages.naturalAspectRatios[0])).toBeLessThan(0.02)
+        expect(previewImages.centerOffsetsPx[0]).toBeLessThanOrEqual(2)
 
         await expect(page.locator('#preview-wrapper')).toHaveScreenshot(
             'preview-standalone-image.png',
@@ -101,8 +105,49 @@ test.describe('Fidelidade Render e Print', () => {
         expect(printImages.wrappedFigureCount).toBe(0)
         expect(printImages.dataPrintImageCount).toBe(1)
         expect(printImages.captions[0]).toBe('Tall print image')
+        expect(printImages.imageWidthsPx[0]).toBeGreaterThan(0)
         expect(printImages.imageHeightsPx[0]).toBeGreaterThan(1000)
         expect(printImages.imageMaxHeightsPx[0]).toBeGreaterThan(1000)
+        expect(printImages.imageHeightsPx[0]).toBeLessThanOrEqual(printImages.imageMaxHeightsPx[0] + 1)
+        expect(Math.abs(printImages.renderedAspectRatios[0] - printImages.naturalAspectRatios[0])).toBeLessThan(0.02)
+        expect(printImages.centerOffsetsPx[0]).toBeLessThanOrEqual(2)
+
+        await expect(page.locator('#preview-wrapper')).toHaveScreenshot(
+            'print-standalone-image.png',
+            {
+                animations: 'disabled',
+                caret: 'hide',
+                maxDiffPixelRatio: 0.03
+            }
+        )
+    })
+
+    test('preview de impressao centraliza imagens e preserva proporcao visual', async ({ page }) => {
+        await abrirAplicacao(page)
+        await definirMarkdownNoEditor(page, markdownPrintImageSizing)
+
+        await page.keyboard.press('ControlOrMeta+Shift+P')
+        await expect(page.locator('body')).toHaveClass(/print-mode/)
+
+        const printModeImages = await measurePrintImages(page)
+
+        expect(printModeImages.imageCount).toBe(1)
+        expect(printModeImages.figureCount).toBe(1)
+        expect(printModeImages.captions[0]).toBe('Tall print image')
+        expect(printModeImages.imageWidthsPx[0]).toBeGreaterThan(0)
+        expect(printModeImages.imageHeightsPx[0]).toBeGreaterThan(1000)
+        expect(printModeImages.imageHeightsPx[0]).toBeLessThanOrEqual(printModeImages.imageMaxHeightsPx[0] + 1)
+        expect(Math.abs(printModeImages.renderedAspectRatios[0] - printModeImages.naturalAspectRatios[0])).toBeLessThan(0.02)
+        expect(printModeImages.centerOffsetsPx[0]).toBeLessThanOrEqual(2)
+
+        await expect(page.locator('#preview-wrapper')).toHaveScreenshot(
+            'print-mode-standalone-image.png',
+            {
+                animations: 'disabled',
+                caret: 'hide',
+                maxDiffPixelRatio: 0.03
+            }
+        )
     })
 
     test('preview de impressao (print-mode) mantem constraints visuais de tabela', async ({
