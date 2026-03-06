@@ -20,4 +20,12 @@ describe('processMarkdown', () => {
         expect(html).toContain('<figure class="markdown-table">')
         expect(html).toContain('<table class="markdown-table-content">')
     })
+
+    it('renders task list checkboxes exactly once per item', () => {
+        const html = processMarkdown('- [x] Item concluido\n- [ ] Item pendente')
+
+        expect((html.match(/type="checkbox"/g) || []).length).toBe(2)
+        expect(html).toContain('<li><input checked="" disabled="" type="checkbox"> Item concluido</li>')
+        expect(html).toContain('<li><input disabled="" type="checkbox"> Item pendente</li>')
+    })
 })

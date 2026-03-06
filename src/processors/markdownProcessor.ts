@@ -404,10 +404,6 @@ class PrintRenderer extends Renderer {
     const items = token.items
       .map((item: Tokens.ListItem) => {
         const itemContent = this.parser.parse(item.tokens)
-        if (item.task) {
-          const checked = item.checked ? 'checked' : ''
-          return `<li><input type="checkbox" ${checked} disabled> ${itemContent}</li>`
-        }
         return `<li>${itemContent}</li>`
       })
       .join('')
