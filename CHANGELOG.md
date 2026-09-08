@@ -7,6 +7,32 @@ New releases are prepended automatically by [release-please](https://github.com/
 
 ---
 
+## [2.2.1](https://github.com/4i3n6/md2pdf/compare/md2pdf-v2.2.0...md2pdf-v2.2.1) (2026-09-08)
+
+
+### ### Fixed
+
+* **deploy:** ship _headers from dist, drop the _redirects loop ([8b509e1](https://github.com/4i3n6/md2pdf/commit/8b509e1d7b22a9b68b4de9d9585ceceb22b1b0b1))
+* **deploy:** ship _headers from dist, drop the _redirects loop ([220ddfa](https://github.com/4i3n6/md2pdf/commit/220ddfabe017d015edf43ceda5665af13af51adf))
+* **markdown:** apply print renderer to standalone images ([a93800d](https://github.com/4i3n6/md2pdf/commit/a93800d23462a85bb11688e866ea702c46c60916))
+* **markdown:** avoid duplicate task list checkboxes ([c5b6cc3](https://github.com/4i3n6/md2pdf/commit/c5b6cc3d9ecc47d2b766ecc78d25d6ba6f66c525))
+* **print:** improve image layout across preview and print ([9c5825c](https://github.com/4i3n6/md2pdf/commit/9c5825c02f857b0ac55c18626e9e99ed791a97e4))
+* **print:** prepare images before browser print ([a81de4f](https://github.com/4i3n6/md2pdf/commit/a81de4f3a4ad85dbd3ffe0b82e06637cd8f26357))
+* **print:** separate preview and print image sizing ([3a7fb16](https://github.com/4i3n6/md2pdf/commit/3a7fb1621b5ca350fc6286c58c64703071e2d6a9))
+* **privacy:** stop polling the network every 10 seconds ([0f7253a](https://github.com/4i3n6/md2pdf/commit/0f7253a1e221743bea939925b23723413483625d))
+* **privacy:** stop polling the network every 10 seconds ([81f6615](https://github.com/4i3n6/md2pdf/commit/81f6615cec034b538b566262dc7b521e5324f7c0))
+* **release:** make release-please actually propagate the version ([a1813d0](https://github.com/4i3n6/md2pdf/commit/a1813d0ae5fa50b3b67f9fe92229cf1f57138065))
+* **release:** make release-please actually propagate the version ([72f64e6](https://github.com/4i3n6/md2pdf/commit/72f64e6d83e23269e3ae37c9762fa652fc81bb85))
+* **styles:** center standalone markdown images across layouts ([c214cae](https://github.com/4i3n6/md2pdf/commit/c214cae962939cac4d3bdc895c8977bcc7d5d79a))
+
+
+### ### Tests
+
+* **print:** add image rendering regressions ([a446888](https://github.com/4i3n6/md2pdf/commit/a44688876e167a3a902859527788e50936f0707d))
+* **print:** assert image centering and aspect ratios ([1ce16ff](https://github.com/4i3n6/md2pdf/commit/1ce16ff653788a44d191e3a906814d93120be0ec))
+* **print:** cover preview image output and refresh baselines ([5e9e4dd](https://github.com/4i3n6/md2pdf/commit/5e9e4dd02643d23036edd30745f4e7021433ab02))
+* **print:** refresh image layout snapshots ([0f9b0ac](https://github.com/4i3n6/md2pdf/commit/0f9b0acde26a1bce95d744b385d869b3c1876187))
+
 ## [2.2.0](https://github.com/4i3n6/md2pdf/compare/md2pdf-v2.1.4...md2pdf-v2.2.0) (2026-03-04)
 
 
