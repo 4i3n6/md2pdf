@@ -24,7 +24,11 @@ const arquivos = [
   { nome: 'src/i18n/en.ts', padrao: new RegExp(`version:\\s*['"]v${esperado}['"]`) },
   { nome: 'src/i18n/pt.ts', padrao: new RegExp(`version:\\s*['"]v${esperado}['"]`) },
   { nome: 'app.html', padrao: new RegExp(`v${esperado}`) },
-  { nome: 'pt/app.html', padrao: new RegExp(`v${esperado}`) }
+  { nome: 'pt/app.html', padrao: new RegExp(`v${esperado}`) },
+  { nome: 'index.html', padrao: new RegExp(`v${esperado}`) },
+  { nome: 'pt/index.html', padrao: new RegExp(`v${esperado}`) },
+  { nome: 'manual/content.json', padrao: new RegExp(`"version"\\s*:\\s*"${esperado}"`) },
+  { nome: 'pt/manual/content.json', padrao: new RegExp(`"version"\\s*:\\s*"${esperado}"`) }
 ]
 
 if (existsSync(resolve(rootDir, 'dist/app.html'))) {

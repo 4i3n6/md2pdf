@@ -20,12 +20,10 @@
         { "type": "generic", "path": "app.html" },
         { "type": "generic", "path": "pt/index.html" },
         { "type": "generic", "path": "pt/app.html" },
-        { "type": "generic", "path": "manual/index.html" },
-        { "type": "generic", "path": "pt/manual/index.html" },
         { "type": "generic", "path": "src/i18n/en.ts" },
         { "type": "generic", "path": "src/i18n/pt.ts" },
-        { "type": "json",    "path": "manual/content.json",    "jsonpath": "$.version" },
-        { "type": "json",    "path": "pt/manual/content.json", "jsonpath": "$.version" }
+        { "type": "json",    "path": "manual/content.json",    "jsonpath": "$.site.version" },
+        { "type": "json",    "path": "pt/manual/content.json", "jsonpath": "$.site.version" }
       ]
     }
   }
