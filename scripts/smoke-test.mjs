@@ -23,6 +23,14 @@ function assertLooksLikeHtml(filePath) {
     }
 }
 
+function assertFileContains(filePath, trecho) {
+    const conteudo = readFileSync(filePath, 'utf8')
+    if (!conteudo.includes(trecho)) {
+        logErro(`${filePath} nao contem "${trecho}". Arquivo chegou vazio ou truncado ao dist.`)
+        process.exit(1)
+    }
+}
+
 function assertJsonParses(filePath) {
     try {
         JSON.parse(readFileSync(filePath, 'utf8'))
@@ -43,6 +51,7 @@ function verificarDist() {
     const ptManualIndexPath = join(distDir, 'pt', 'manual', 'index.html')
     const swPath = join(distDir, 'sw.js')
     const manifestPath = join(distDir, 'manifest.webmanifest')
+    const headersPath = join(distDir, '_headers')
     const assetsDir = join(distDir, 'assets')
 
     assertFileExists(indexPath, 'Execute npm run build antes do smoke test')
@@ -53,6 +62,7 @@ function verificarDist() {
     assertFileExists(ptManualIndexPath, 'Build do manual PT (pt/manual/index.html) nao foi gerado')
     assertFileExists(swPath, 'Service Worker nao foi gerado')
     assertFileExists(manifestPath, 'Manifest PWA nao foi gerado')
+    assertFileExists(headersPath, 'public/_headers nao chegou ao dist: headers de seguranca nao seriam aplicados')
 
     if (!existsSync(assetsDir)) {
         logErro('dist/assets nao encontrado. Build incompleto ou pasta removida.')
@@ -73,6 +83,7 @@ function verificarDist() {
     assertLooksLikeHtml(manualIndexPath)
     assertLooksLikeHtml(ptManualIndexPath)
     assertJsonParses(manifestPath)
+    assertFileContains(headersPath, 'X-Frame-Options')
 
     const workbox = existsSync(distDir)
         ? readdirSync(distDir).some((arquivo) => /^workbox-.*\.js$/.test(arquivo))
@@ -84,6 +95,7 @@ function verificarDist() {
 
     logInfo('dist/index.html e assets basicos encontrados.')
     logInfo('app/pt/manual/pwa artefatos encontrados.')
+    logInfo('_headers presente no dist.')
 }
 
 verificarDist()
