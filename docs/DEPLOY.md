@@ -18,24 +18,26 @@ Connect the repository and set:
 - **Build command:** `npm run build`
 - **Output directory:** `dist`
 
-The `_redirects` and `_headers` files in the repo root are picked up automatically by Cloudflare Pages. They handle route rewrites and security headers.
+`_headers` lives in `public/`, which Vite copies verbatim into `dist/` at build time. Cloudflare Pages reads it from the output directory, not from the repo root — with a build command configured, the repo root is never served. `npm run smoke` asserts it reaches `dist/`.
+
+There is deliberately **no `_redirects` file**. Cloudflare Pages already resolves extensionless routes natively: `/app` serves `app.html`, and `/manual/getting-started` canonicalises to `/manual/getting-started/` with a 308 that terminates at 200. An explicit `/app /app.html 200` rewrite fights that canonicalisation — Pages redirects `/app.html` back to `/app`, producing an infinite loop. Do not reintroduce one.
 
 ## Generic static host
 
-Serve `./dist`. The host must rewrite `/app` to `/app.html`. All other routes are file-based.
+Serve `./dist`. Hosts that do not resolve extensionless paths need `/app` rewritten to `/app.html` and `/manual/<page>` to `/manual/<page>/index.html`. All other routes are file-based.
 
 ## Routes
 
-| Path | File |
-|---|---|
-| `/` | `index.html` |
-| `/app` | `app.html` (rewrite required) |
-| `/manual/*` | `manual/*/index.html` |
-| `/pt/*` | `pt/*/index.html` |
+| Path | File | Cloudflare Pages |
+|---|---|---|
+| `/` | `index.html` | native |
+| `/app` | `app.html` | native — do not add a rewrite |
+| `/manual/*` | `manual/*/index.html` | native, via 308 to trailing slash |
+| `/pt/*` | `pt/*/index.html` | native |
 
 ## Security headers
 
-Configured in `_headers`:
+Configured in `public/_headers`, served from `dist/_headers`:
 
 - `X-Frame-Options: DENY`
 - `X-Content-Type-Options: nosniff`
