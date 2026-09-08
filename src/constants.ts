@@ -11,7 +11,6 @@ export const StorageKeys = {
     legacyDocuments: 'md2pdf-docs-v2',
     docPreferencesPrefix: 'md2pdf-doc-prefs-',
     splitterRatio: 'md2pdf-splitter-ratio',
-    syncQueue: 'md2pdf-sync-queue',
     imageCache: 'md2pdf-image-cache-v1'
 }
 

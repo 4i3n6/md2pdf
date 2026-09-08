@@ -44,20 +44,6 @@ export interface PrintStats {
   codeBlocks: number
 }
 
-export interface SyncQueueItem {
-  id: string
-  type: 'save' | 'delete' | 'create'
-  docId?: number
-  data?: unknown
-  timestamp: number
-}
-
-export interface ConnectivityStatus {
-  isOnline: boolean
-  queueSize: number
-  timestamp: number
-}
-
 export interface LoggerInterface {
   log: (msg: string, type?: 'info' | 'error' | 'success' | 'warning') => void
   error: (msg: string) => void
