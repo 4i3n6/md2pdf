@@ -179,7 +179,6 @@ function initSystem(): void {
   Logger.success('A4 print styles active');
 
   OfflineManager.init();
-  OfflineManager.loadSyncQueue();
   OfflineManager.onStatusChange((isOnline: boolean): void => {
     const msg = isOnline
       ? 'Connection restored'
